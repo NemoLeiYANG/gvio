@@ -1,4 +1,6 @@
-# Gimbal Visual Inertial Odometry (GVIO)
+# GVIO
+
+*G*imbal *V*isual *I*nertial *O*dometry (GVIO)
 
 ## LICENCE
 
