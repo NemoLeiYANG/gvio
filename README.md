@@ -1,6 +1,6 @@
 # GVIO
 
-*G*imbal *V*isual *I*nertial *O*dometry (GVIO)
+**G**imbal **V**isual **I**nertial **O**dometry (GVIO)
 
 ## LICENCE
 
