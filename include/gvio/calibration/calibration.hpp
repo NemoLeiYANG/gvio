@@ -1,0 +1,4 @@
+#ifndef GVIO_CALIBRATION_HPP
+#define GVIO_CALIBRATION_HPP
+
+#endif

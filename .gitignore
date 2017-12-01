@@ -1,0 +1,29 @@
+*.aux
+*.bbl
+*.blg
+*.log
+*.bcf
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+*~
+
+lib
+bin
+obj
+tags
+build
+
+# scripts and folders
+run.sh
+
+# matlab
+*.mat
+octave-workspace
+
+# misc
+.ropeproject
+
+*.pyc
