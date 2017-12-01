@@ -3,7 +3,7 @@
 
 namespace gvio {
 
-TEST(Util_stats, linreg) {
+TEST(Stats, linreg) {
   Eigen::Vector2d p;
   std::vector<Eigen::Vector2d> points;
   double m;

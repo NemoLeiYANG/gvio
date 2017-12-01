@@ -1,6 +1,5 @@
 #include "gvio/imu/mpu9250.hpp"
 
-
 namespace gvio {
 
 int MPU9250::configure() {
@@ -133,4 +132,4 @@ int MPU9250::getAccelFchoice() {
   return data;
 }
 
-}  // namespace gvio
+} // namespace gvio

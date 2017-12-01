@@ -2,7 +2,7 @@
 #include "gvio/util/data.hpp"
 #include "gvio/util/config.hpp"
 
-#define TEST_CONFIG "tests/data/utils/config.yaml"
+#define TEST_CONFIG "test_data/utils/config.yaml"
 
 namespace gvio {
 
@@ -425,4 +425,4 @@ TEST(ConfigParser, load) {
   std::cout << std::endl;
 }
 
-}  // namespace gvio
+} // namespace gvio

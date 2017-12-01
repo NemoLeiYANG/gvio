@@ -2,17 +2,17 @@
 #include "gvio/apriltag/mit.hpp"
 #include "gvio/camera/camera.hpp"
 
-#define TEST_CONFIG "tests/configs/apriltag/config.yaml"
-#define TEST_IMAGE_CENTER "tests/data/apriltag/center.png"
-#define TEST_IMAGE_TOP "tests/data/apriltag/top.png"
-#define TEST_IMAGE_BOTTOM "tests/data/apriltag/bottom.png"
-#define TEST_IMAGE_LEFT "tests/data/apriltag/left.png"
-#define TEST_IMAGE_RIGHT "tests/data/apriltag/right.png"
-#define TEST_IMAGE_TOP_LEFT "tests/data/apriltag/top_left.png"
-#define TEST_IMAGE_BOTTOM_LEFT "tests/data/apriltag/bottom_left.png"
-#define TEST_IMAGE_TOP_RIGHT "tests/data/apriltag/top_right.png"
-#define TEST_IMAGE_BOTTOM_RIGHT "tests/data/apriltag/bottom_right.png"
-#define TEST_ILLUM_INVAR "tests/data/apriltag/illum_invar.png"
+#define TEST_CONFIG "test_configs/apriltag/config.yaml"
+#define TEST_IMAGE_CENTER "test_data/apriltag/center.png"
+#define TEST_IMAGE_TOP "test_data/apriltag/top.png"
+#define TEST_IMAGE_BOTTOM "test_data/apriltag/bottom.png"
+#define TEST_IMAGE_LEFT "test_data/apriltag/left.png"
+#define TEST_IMAGE_RIGHT "test_data/apriltag/right.png"
+#define TEST_IMAGE_TOP_LEFT "test_data/apriltag/top_left.png"
+#define TEST_IMAGE_BOTTOM_LEFT "test_data/apriltag/bottom_left.png"
+#define TEST_IMAGE_TOP_RIGHT "test_data/apriltag/top_right.png"
+#define TEST_IMAGE_BOTTOM_RIGHT "test_data/apriltag/bottom_right.png"
+#define TEST_ILLUM_INVAR "test_data/apriltag/illum_invar.png"
 
 namespace atl {
 

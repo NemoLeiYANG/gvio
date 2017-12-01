@@ -8,6 +8,7 @@ ENDIF()
 
 # DEPENDENCIES
 FIND_PACKAGE(OpenCV 3.0 REQUIRED)
+FIND_PACKAGE(Ceres REQUIRED)
 FIND_PACKAGE(Eigen3 REQUIRED)
 INCLUDE(cmake/GetGtest.cmake)
 INCLUDE(cmake/ImportEigen3.cmake)
@@ -28,6 +29,8 @@ ADD_LIBRARY(
 	# driver
 	src/driver/i2c.cpp
 	src/driver/uart.cpp
+  # feature
+	src/feature/feature_tracker.cpp
 	# gimbal
 	# src/gimbal/gimbal.cpp
 	src/gimbal/sbgc.cpp
@@ -53,6 +56,9 @@ SET(${PROJECT_NAME}_DEPS
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 
 # UNIT TESTS
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tests)
+FILE(COPY tests/test_data DESTINATION ${PROJECT_BINARY_DIR}/tests)
+FILE(COPY tests/test_configs DESTINATION ${PROJECT_BINARY_DIR}/tests)
 ADD_EXECUTABLE(
 	gvio_tests
 	# imu

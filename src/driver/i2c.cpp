@@ -8,7 +8,7 @@ int I2C::setup() {
   char filename[20];
 
   // setup
-  adapter_nr = 1;  // probably dynamically determined
+  adapter_nr = 1; // probably dynamically determined
   memset(filename, '\0', sizeof(char) * 20);
   snprintf(filename, 19, "/dev/i2c-%d", adapter_nr);
 
@@ -96,4 +96,4 @@ int I2C::writeBytes(char reg_addr, char *data, size_t length) {
   return 0;
 }
 
-}  // namespace gvio
+} // namespace gvio

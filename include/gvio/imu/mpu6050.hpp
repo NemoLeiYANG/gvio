@@ -12,8 +12,8 @@ namespace gvio {
 
 // GENERAL
 #define MPU6050_ADDRESS 0x68
-#define MPU6050_ADDRESS_AD0_LOW 0x68   // addr pin low (GND) [default]
-#define MPU6050_ADDRESS_AD0_HIGH 0x69  // addr pin high (VCC)
+#define MPU6050_ADDRESS_AD0_LOW 0x68  // addr pin low (GND) [default]
+#define MPU6050_ADDRESS_AD0_HIGH 0x69 // addr pin high (VCC)
 
 // REGISTER ADDRESSES
 #define MPU6050_RA_XG_OFFS_TC 0x00
@@ -127,7 +127,6 @@ namespace gvio {
 #define MPU6050_RA_FIFO_R_W 0x74
 #define MPU6050_RA_WHO_AM_I 0x75
 
-
 class MPU6050Gyroscope {
 public:
   float sensitivity;
@@ -148,22 +147,15 @@ public:
   float roll;
 
   MPU6050Gyroscope()
-    : sensitivity(0.0f),
+      : sensitivity(0.0f),
 
-      raw_x(0),
-      raw_y(0),
-      raw_z(0),
+        raw_x(0), raw_y(0), raw_z(0),
 
-      offset_x(0.0f),
-      offset_y(0.0f),
-      offset_z(0.0f),
+        offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
 
-      x(0.0f),
-      y(0.0f),
-      z(0.0f),
+        x(0.0f), y(0.0f), z(0.0f),
 
-      pitch(0.0f),
-      roll(0.0f) {}
+        pitch(0.0f), roll(0.0f) {}
 };
 
 class MPU6050Accelerometer {
@@ -186,22 +178,15 @@ public:
   float roll;
 
   MPU6050Accelerometer()
-    : sensitivity(0.0f),
+      : sensitivity(0.0f),
 
-      raw_x(0),
-      raw_y(0),
-      raw_z(0),
+        raw_x(0), raw_y(0), raw_z(0),
 
-      offset_x(0.0f),
-      offset_y(0.0f),
-      offset_z(0.0f),
+        offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
 
-      x(0.0f),
-      y(0.0f),
-      z(0.0f),
+        x(0.0f), y(0.0f), z(0.0f),
 
-      pitch(0.0f),
-      roll(0.0f) {}
+        pitch(0.0f), roll(0.0f) {}
 };
 
 class MPU6050 {
@@ -222,20 +207,13 @@ public:
   int8_t dplf_config;
 
   MPU6050()
-    : gyro(),
-      accel(),
-      i2c(),
+      : gyro(), accel(), i2c(),
 
-      pitch(0.0f),
-      roll(0.0f),
-      temperature(0.0f),
+        pitch(0.0f), roll(0.0f), temperature(0.0f),
 
-      pitch_offset(0.0f),
-      roll_offset(0.0f),
+        pitch_offset(0.0f), roll_offset(0.0f),
 
-      last_updated(clock()),
-      sample_rate(-1.0f),
-      dplf_config(0) {}
+        last_updated(clock()), sample_rate(-1.0f), dplf_config(0) {}
 
   int configure();
   int ping();
@@ -259,5 +237,5 @@ public:
   int record(std::string output_path, int nb_samples);
 };
 
-}  // namespace gvio
+} // namespace gvio
 #endif

@@ -1,24 +1,24 @@
 #include "gvio/gvio_test.hpp"
 #include "gvio/util/data.hpp"
 
-#define TEST_DATA "tests/data/utils/matrix.dat"
+#define TEST_DATA "test_data/utils/matrix.dat"
 #define TEST_OUTPUT "/tmp/matrix.dat"
 
 namespace gvio {
 
-TEST(data, csvrows) {
+TEST(Data, csvrows) {
   int rows;
   rows = csvrows(TEST_DATA);
   EXPECT_EQ(281, rows);
 }
 
-TEST(data, csvcols) {
+TEST(Data, csvcols) {
   int cols;
   cols = csvcols(TEST_DATA);
   EXPECT_EQ(2, cols);
 }
 
-TEST(data, csv2mat) {
+TEST(Data, csv2mat) {
   MatX data;
 
   csv2mat(TEST_DATA, true, data);
@@ -30,7 +30,7 @@ TEST(data, csv2mat) {
   EXPECT_FLOAT_EQ(613.503760567, data(279, 1));
 }
 
-TEST(data, mat2csv) {
+TEST(Data, mat2csv) {
   MatX x;
   MatX y;
 

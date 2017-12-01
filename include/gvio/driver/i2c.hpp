@@ -42,5 +42,5 @@ public:
   int writeBytes(char reg_addr, char *data, size_t length);
 };
 
-}  // namespace gvio
+} // namespace gvio
 #endif

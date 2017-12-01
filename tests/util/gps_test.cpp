@@ -3,7 +3,7 @@
 
 namespace gvio {
 
-TEST(Util, latlon_offset) {
+TEST(GPS, latlon_offset) {
   // UWaterloo 110 yards Canadian Football field from one end to another
   double lat = 43.474357;
   double lon = -80.550415;
@@ -24,7 +24,7 @@ TEST(Util, latlon_offset) {
   EXPECT_NEAR(-80.549298, lon_new, 0.0015);
 }
 
-TEST(Utils, latlon_diff) {
+TEST(GPS, latlon_diff) {
   // UWaterloo 110 yards Canadian Football field from one end to another
   double lat_ref = 43.474357;
   double lon_ref = -80.550415;
@@ -44,7 +44,7 @@ TEST(Utils, latlon_diff) {
   EXPECT_NEAR(100, dist, 1.0);
 }
 
-TEST(Utils, latlon_dist) {
+TEST(GPS, latlon_dist) {
   // UWaterloo 110 yards Canadian Football field from one end to another
   double lat_ref = 43.474357;
   double lon_ref = -80.550415;
@@ -59,4 +59,4 @@ TEST(Utils, latlon_dist) {
   EXPECT_NEAR(100, dist, 1.0);
 }
 
-}  // namespace gvio
+} // namespace gvio

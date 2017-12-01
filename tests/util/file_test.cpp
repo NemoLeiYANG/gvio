@@ -3,12 +3,12 @@
 
 namespace gvio {
 
-TEST(file, file_exists) {
+TEST(File, file_exists) {
   EXPECT_TRUE(file_exists("tests/configs/control/position_controller.yaml"));
   EXPECT_FALSE(file_exists("tests/configs/control/bogus.yaml"));
 }
 
-TEST(file, path_split) {
+TEST(File, path_split) {
   std::vector<std::string> splits;
 
   splits = path_split("/a/b/c.yaml");
@@ -18,7 +18,7 @@ TEST(file, path_split) {
   EXPECT_EQ("c.yaml", splits[2]);
 }
 
-TEST(file, paths_combine) {
+TEST(File, paths_combine) {
   std::string out;
 
   paths_combine("/a/b/c", "../", out);

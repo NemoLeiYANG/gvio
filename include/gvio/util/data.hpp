@@ -8,7 +8,7 @@
 
 #include "gvio/util/math.hpp"
 
-namespace gvio{
+namespace gvio {
 
 // CSV ERROR MESSAGES
 #define E_CSV_DATA_LOAD "Error! failed to load test data [%s]!!\n"

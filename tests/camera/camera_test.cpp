@@ -1,7 +1,7 @@
 #include "gvio/gvio_test.hpp"
 #include "gvio/camera/camera.hpp"
 
-#define TEST_CONFIG_PATH "tests/configs/camera/webcam"
+#define TEST_CONFIG_PATH "test_configs/camera/webcam"
 
 namespace gvio {
 

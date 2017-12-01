@@ -7,8 +7,8 @@ namespace gvio {
 
 /* GENERAL */
 #define MPU9250_ADDRESS 0x68
-#define MPU9250_ADDRESS_AD0_LOW 0x68   // addr pin low (GND) [default]
-#define MPU9250_ADDRESS_AD0_HIGH 0x69  // addr pin high (VCC)
+#define MPU9250_ADDRESS_AD0_LOW 0x68  // addr pin low (GND) [default]
+#define MPU9250_ADDRESS_AD0_HIGH 0x69 // addr pin high (VCC)
 
 /* REGISTER ADDRESSES */
 #define MPU9250_SELF_TEST_X_GYRO 0x00
@@ -112,7 +112,6 @@ namespace gvio {
 #define MPU9250_ZA_OFFSET_H 0x7D
 #define MPU9250_ZA_OFFSET_L 0x7E
 
-
 class MPU9250Gyroscope {
 public:
   float sensitivity;
@@ -133,22 +132,15 @@ public:
   float roll;
 
   MPU9250Gyroscope()
-    : sensitivity(0.0f),
+      : sensitivity(0.0f),
 
-      raw_x(0),
-      raw_y(0),
-      raw_z(0),
+        raw_x(0), raw_y(0), raw_z(0),
 
-      offset_x(0.0f),
-      offset_y(0.0f),
-      offset_z(0.0f),
+        offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
 
-      x(0.0f),
-      y(0.0f),
-      z(0.0f),
+        x(0.0f), y(0.0f), z(0.0f),
 
-      pitch(0.0f),
-      roll(0.0f) {}
+        pitch(0.0f), roll(0.0f) {}
 };
 
 class MPU9250Accelerometer {
@@ -171,22 +163,15 @@ public:
   float roll;
 
   MPU9250Accelerometer()
-    : sensitivity(0.0f),
+      : sensitivity(0.0f),
 
-      raw_x(0),
-      raw_y(0),
-      raw_z(0),
+        raw_x(0), raw_y(0), raw_z(0),
 
-      offset_x(0.0f),
-      offset_y(0.0f),
-      offset_z(0.0f),
+        offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
 
-      x(0.0f),
-      y(0.0f),
-      z(0.0f),
+        x(0.0f), y(0.0f), z(0.0f),
 
-      pitch(0.0f),
-      roll(0.0f) {}
+        pitch(0.0f), roll(0.0f) {}
 };
 
 class MPU9250Magnetometer {
@@ -208,21 +193,15 @@ public:
   float heading;
 
   MPU9250Magnetometer()
-    : sensitivity(0.0f),
+      : sensitivity(0.0f),
 
-      raw_x(0),
-      raw_y(0),
-      raw_z(0),
+        raw_x(0), raw_y(0), raw_z(0),
 
-      offset_x(0.0f),
-      offset_y(0.0f),
-      offset_z(0.0f),
+        offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
 
-      x(0.0f),
-      y(0.0f),
-      z(0.0f),
+        x(0.0f), y(0.0f), z(0.0f),
 
-      heading(0.0f) {}
+        heading(0.0f) {}
 };
 
 class MPU9250 {
@@ -243,20 +222,13 @@ public:
   float sample_rate;
 
   MPU9250()
-    : gyro(),
-      accel(),
-      mag(),
-      i2c(),
+      : gyro(), accel(), mag(), i2c(),
 
-      pitch(0.0f),
-      roll(0.0f),
-      temperature(0.0f),
+        pitch(0.0f), roll(0.0f), temperature(0.0f),
 
-      pitch_offset(0.0f),
-      roll_offset(0.0f),
+        pitch_offset(0.0f), roll_offset(0.0f),
 
-      last_updated(0),
-      sample_rate(-1.0f) {}
+        last_updated(0), sample_rate(-1.0f) {}
 
   int configure();
   int ping();
@@ -268,5 +240,5 @@ public:
   int getAccelFchoice();
 };
 
-}  // namespace gvio
+} // namespace gvio
 #endif

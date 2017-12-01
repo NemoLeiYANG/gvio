@@ -2,7 +2,7 @@
 #include "gvio/util/opencv.hpp"
 #include "gvio/camera/config.hpp"
 
-#define TEST_CONFIG "tests/configs/camera/webcam/640x480.yaml"
+#define TEST_CONFIG "test_configs/camera/webcam/640x480.yaml"
 
 namespace gvio {
 

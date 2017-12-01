@@ -1,7 +1,7 @@
 #include "gvio/gvio_test.hpp"
 #include "gvio/gimbal/gimbal.hpp"
 
-#define TEST_CONFIG "tests/configs/gimbal/config.yaml"
+#define TEST_CONFIG "test_configs/gimbal/config.yaml"
 
 namespace gvio {
 

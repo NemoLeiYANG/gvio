@@ -3,7 +3,7 @@
 
 namespace gvio {
 
-TEST(Util_time, ticAndtoc) {
+TEST(Time, ticAndtoc) {
   struct timespec start;
 
   tic(&start);

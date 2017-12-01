@@ -1,6 +1,5 @@
 #include "gvio/imu/mpu6050.hpp"
 
-
 namespace gvio {
 
 int MPU6050::configure() {
@@ -138,7 +137,6 @@ int MPU6050::getData() {
   this->gyro.x = this->gyro.raw_x / this->gyro.sensitivity;
   this->gyro.y = this->gyro.raw_y / this->gyro.sensitivity;
   this->gyro.z = this->gyro.raw_z / this->gyro.sensitivity;
-
 
   // calculate dt
   time_now = clock();
@@ -490,4 +488,4 @@ int MPU6050::record(std::string output_path, int nb_samples) {
   return 0;
 }
 
-}  // namespace gvio
+} // namespace gvio
