@@ -12,7 +12,7 @@ TEST(file, path_split) {
   std::vector<std::string> splits;
 
   splits = path_split("/a/b/c.yaml");
-  EXPECT_EQ(3, splits.size());
+  EXPECT_EQ(3, (int) splits.size());
   EXPECT_EQ("a", splits[0]);
   EXPECT_EQ("b", splits[1]);
   EXPECT_EQ("c.yaml", splits[2]);

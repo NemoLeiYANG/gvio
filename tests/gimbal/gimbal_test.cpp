@@ -23,7 +23,6 @@ TEST(Gimbal, constructor) {
   Gimbal gimbal;
 
   EXPECT_FALSE(gimbal.configured);
-
   EXPECT_FALSE(gimbal.sbgc.configured);
 }
 

@@ -12,8 +12,8 @@ TEST(Camera, constructor) {
   EXPECT_FALSE(camera.initialized);
 
   EXPECT_FALSE(camera.config.loaded);
-  EXPECT_EQ(0, camera.modes.size());
-  EXPECT_EQ(0, camera.configs.size());
+  EXPECT_EQ(0, (int) camera.modes.size());
+  EXPECT_EQ(0, (int) camera.configs.size());
 
   EXPECT_EQ(NULL, camera.capture);
   EXPECT_FLOAT_EQ(0.0, camera.last_tic);

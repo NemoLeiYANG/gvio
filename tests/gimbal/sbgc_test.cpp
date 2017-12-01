@@ -45,7 +45,7 @@ TEST(SBGC, ReadFrame) {
 
   // assert
   EXPECT_EQ(18, frame.data_size);
-  EXPECT_EQ(0, 0);
+  EXPECT_EQ(0, retval);
 }
 
 TEST(SBGC, getBoardInfo) {
