@@ -1,9 +1,10 @@
-#ifndef GVIO_FEATURE_HPP
-#define GVIO_FEATURE_HPP
+#ifndef GVIO_FEATURE_TRACKER_HPP
+#define GVIO_FEATURE_TRACKER_HPP
 
 #include <stdio.h>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d/features2d.hpp>
@@ -20,7 +21,7 @@ using FrameID = long int;
  * Feature
  */
 struct Feature {
-  float angle = -1;
+  float angle = -1.0;
   int class_id = -1;
   int octave = 0;
   cv::Point2f pt;
@@ -28,6 +29,8 @@ struct Feature {
   float size = 0;
 
   TrackID track_id = -1;
+
+  Feature() {}
 
   Feature(const cv::KeyPoint &kp) {
     this->angle = kp.angle;
@@ -38,9 +41,17 @@ struct Feature {
     this->size = kp.size;
   }
 
+  /**
+   * Set feature track ID
+   *
+   * @param track_id Track ID
+   */
   void setTrackID(const TrackID &track_id) { this->track_id = track_id; }
 
-  cv::KeyPoint asCvKeypoint() {
+  /**
+   * Return feature as cv::KeyPoint
+   */
+  cv::KeyPoint asCvKeyPoint() {
     return cv::KeyPoint(this->pt,
                         this->size,
                         this->angle,
@@ -54,27 +65,45 @@ struct Feature {
  * Feature track
  */
 struct FeatureTrack {
-  TrackID track_id;
-  FrameID frame_start;
-  FrameID frame_end;
+  TrackID track_id = -1;
+  FrameID frame_start = -1;
+  FrameID frame_end = -1;
   std::vector<Feature> track;
+
+  FeatureTrack() {}
 
   FeatureTrack(const TrackID &track_id,
                const FrameID &frame_id,
-               const Feature &data)
-      : track_id{track_id}, frame_start{frame_id - 1}, frame_end{frame_id},
-        track{data} {}
+               const Feature &f1,
+               const Feature &f2)
+      : track_id{track_id}, frame_start{frame_id - 1}, frame_end{frame_id} {
+    this->track.push_back(f1);
+    this->track.push_back(f2);
+  }
 
+  /**
+   * Update feature track
+   *
+   * @param frame_id Frame ID
+   * @param data Feature
+   */
   void update(const FrameID &frame_id, const Feature &data) {
     this->frame_end = frame_id;
     this->track.push_back(data);
   }
 
-  int last(Feature &data) {
-    data = this->track.back();
-    return 0;
-  }
+  /**
+   * Return last feature seen
+   *
+   * @param data Feature
+   */
+  Feature &last() { return this->track.back(); }
 
+  /**
+   * Return feature track length
+   *
+   * @returns Size of feature track
+   */
   size_t tracked_length() { return this->track.size(); }
 };
 
@@ -82,12 +111,19 @@ class FeatureTracker {
 public:
   bool configured = false;
 
+  // Detector settings
+  int fast_threshold = 10;
+  bool fast_nonmax_suppression = true;
+
+  // Descriptor settings
+  cv::Ptr<cv::ORB> orb;
+
   // Frame and track ounters
-  size_t counter_frame_id = -1;
-  size_t counter_track_id = -1;
+  FrameID counter_frame_id = -1;
+  TrackID counter_track_id = -1;
 
   // Feature track book keeping
-  std::vector<FeatureTrack> tracking;
+  std::vector<TrackID> tracking;
   std::vector<TrackID> lost;
   std::map<TrackID, FeatureTrack> buffer;
 
@@ -96,34 +132,45 @@ public:
   cv::Mat fea_ref;
   cv::Mat unmatched;
 
-  FeatureTracker() {}
+  FeatureTracker() { this->orb = cv::ORB::create(); }
 
   /**
    * Configure
+   *
    * @param config_file Path to config file
    */
   int configure(const std::string &config_file);
 
   /**
-   * Detect features
-   * @param image Input image
-   */
-  int detect(const cv::Mat &image);
-
-  /**
    * Add feature track
+   *
+   * @param f1 First feature
+   * @param f2 Second feature
    */
-  int addTrack(const Feature &f1, const Feature &f2);
+  int addTrack(Feature &f1, Feature &f2);
 
   /**
    * Remove feature track
+   *
+   * @param track_id Track ID
+   * @param lost Mark feature track as lost
    */
   int removeTrack(const TrackID &track_id, const bool lost = false);
 
   /**
    * Update feature track
+   *
+   * @param track_id Track ID
+   * @param f Feature
    */
-  int updateTrack(const TrackID &track_id, const Feature &f);
+  int updateTrack(const TrackID &track_id, Feature &f);
+
+  /**
+   * Detect features
+   *
+   * @param image Input image
+   */
+  int detect(const cv::Mat &image);
 
   /**
    * Match features
@@ -138,7 +185,7 @@ public:
   /**
    * Clear old feature tracks
    */
-  int clear();
+  size_t clear();
 
   /**
    * Update feature tracker

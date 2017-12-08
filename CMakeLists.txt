@@ -36,6 +36,8 @@ ADD_LIBRARY(
 	src/gimbal/sbgc.cpp
 	# imu
 	src/imu/mpu6050.cpp
+  # kitti
+	src/kitti/raw.cpp
 	# utils
 	src/util/config.cpp
 	src/util/data.cpp
@@ -68,9 +70,13 @@ ADD_EXECUTABLE(
 	# camera
 	tests/camera/camera_test.cpp
 	tests/camera/config_test.cpp
+  # feature
+  tests/feature/feature_tracker_test.cpp
 	# gimbal
 	# tests/gimbal/gimbal_test.cpp
 	tests/gimbal/sbgc_test.cpp
+  # kitti
+	tests/kitti/raw_test.cpp
 	# util
 	tests/util/config_test.cpp
 	tests/util/data_test.cpp

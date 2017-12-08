@@ -2,16 +2,45 @@
 
 namespace gvio {
 
-bool file_exists(const std::string &fp) {
+bool file_exists(const std::string &path) {
   FILE *file;
 
-  file = fopen(fp.c_str(), "r");
+  file = fopen(path.c_str(), "r");
   if (file != NULL) {
     fclose(file);
     return true;
   } else {
     return false;
   }
+}
+
+bool dir_exists(const std::string &path) {
+  DIR *dir = opendir(path.c_str());
+
+  if (dir) {
+    closedir(dir);
+    return true;
+  } else if (ENOENT == errno) {
+    return false;
+  } else {
+    LOG_ERROR("dir_exists() failed! %s", strerror(errno));
+    exit(-1);
+  }
+}
+
+std::string strip(const std::string &s, const std::string &target) {
+  size_t first = s.find_first_not_of(target);
+  if (std::string::npos == first) {
+    return s;
+  }
+
+  size_t last = s.find_last_not_of(target);
+  return s.substr(first, (last - first + 1));
+}
+
+std::string strip_end(const std::string &s, const std::string &target) {
+  size_t last = s.find_last_not_of(target);
+  return s.substr(0, last + 1);
 }
 
 int remove_dir(const std::string &path) {
