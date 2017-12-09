@@ -69,6 +69,30 @@ int remove_dir(const std::string &path) {
   return 0;
 }
 
+int list_dir(const std::string &path, std::vector<std::string> &results) {
+  struct dirent *entry;
+  DIR *dp;
+
+  // Check directory
+  dp = opendir(path.c_str());
+  if (dp == NULL) {
+    LOG_ERROR("Failed to list [%s]!", path.c_str());
+    return -1;
+  }
+
+  // List directory
+  while ((entry = readdir(dp))) {
+    std::string value(entry->d_name);
+    if (value != "." && value != "..") {
+      results.push_back(value);
+    }
+  }
+
+  // Clean up
+  closedir(dp);
+  return 0;
+}
+
 std::vector<std::string> path_split(const std::string path) {
   std::string s;
   std::vector<std::string> splits;

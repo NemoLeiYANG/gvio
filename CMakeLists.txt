@@ -37,7 +37,10 @@ ADD_LIBRARY(
 	# imu
 	src/imu/mpu6050.cpp
   # kitti
-	src/kitti/raw.cpp
+	src/kitti/raw/calib.cpp
+	src/kitti/raw/oxts.cpp
+	src/kitti/raw/parse.cpp
+	src/kitti/raw/raw.cpp
 	# utils
 	src/util/config.cpp
 	src/util/data.cpp
@@ -61,6 +64,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_data DESTINATION ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_configs DESTINATION ${PROJECT_BINARY_DIR}/tests)
+ADD_DEFINITIONS(-DTEST_DATA_PATH "${PROJECT_BINARY_DIR}/tests/test_data")
 ADD_EXECUTABLE(
 	gvio_tests
 	# imu
@@ -76,7 +80,10 @@ ADD_EXECUTABLE(
 	# tests/gimbal/gimbal_test.cpp
 	tests/gimbal/sbgc_test.cpp
   # kitti
-	tests/kitti/raw_test.cpp
+	tests/kitti/raw/calib_test.cpp
+	tests/kitti/raw/oxts_test.cpp
+	tests/kitti/raw/parse_test.cpp
+	tests/kitti/raw/raw_test.cpp
 	# util
 	tests/util/config_test.cpp
 	tests/util/data_test.cpp
