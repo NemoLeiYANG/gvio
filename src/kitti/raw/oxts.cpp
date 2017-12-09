@@ -116,8 +116,12 @@ int OXTS::parseTimeStamps(const std::string &oxts_dir) {
 }
 
 int OXTS::load(const std::string &oxts_dir) {
-  this->parseOXTS(oxts_dir);
-  this->parseTimeStamps(oxts_dir);
+  if (this->parseOXTS(oxts_dir) != 0) {
+    return -1;
+  }
+  if (this->parseTimeStamps(oxts_dir) != 0) {
+    return -1;
+  }
 
   return 0;
 }

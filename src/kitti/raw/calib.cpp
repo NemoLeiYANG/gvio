@@ -5,6 +5,11 @@ namespace gvio {
 int CalibCamToCam::load(const std::string &file_path) {
   std::ifstream file(file_path.c_str());
 
+  // Check file
+  if (file.good() != true) {
+    return -1;
+  }
+
   // Parse calibration file
   std::string line;
   while (std::getline(file, line)) {
@@ -57,8 +62,13 @@ int CalibCamToCam::load(const std::string &file_path) {
   return 0;
 }
 
-int CalibIMUToCam::load(const std::string &file_path) {
+int CalibIMUToVelo::load(const std::string &file_path) {
   std::ifstream file(file_path.c_str());
+
+  // Check file
+  if (file.good() != true) {
+    return -1;
+  }
 
   // Parse calibration file
   std::string line;
@@ -89,6 +99,11 @@ int CalibIMUToCam::load(const std::string &file_path) {
 
 int CalibVeloToCam::load(const std::string &file_path) {
   std::ifstream file(file_path.c_str());
+
+  // Check file
+  if (file.good() != true) {
+    return -1;
+  }
 
   // Parse calibration file
   std::string line;

@@ -31,16 +31,37 @@ struct OXTS {
 
   OXTS() {}
 
-  /// Parse OXTS
+  /**
+   * Parse OXTS
+   *
+   * @param oxts_dir Path to OXTS data
+   * @returns 0 for success, -1 for failure
+   */
   int parseOXTS(const std::string &oxts_dir);
 
-  /// Parse a single timestamp
+  /**
+   * Parse a single timestamp to seconds since epoch (Unix time)
+   *
+   * @param line Timestamp line in the form of "2011-09-26 13:04:32.349659964"
+   * @param s Seconds
+   * @returns 0 for success, -1 for failure
+   */
   int parseSingleTimeStamp(const std::string &line, double *s);
 
-  /// Parse timestamps
+  /**
+   * Parse timestamps
+   *
+   * @param oxts_dir Path to OXTS data
+   * @returns 0 for success, -1 for failure
+   */
   int parseTimeStamps(const std::string &oxts_dir);
 
-  /// Load OXTS
+  /**
+   * Load OXTS
+   *
+   * @param oxts_dir Path to OXTS data
+   * @returns 0 for success, -1 for failure
+   */
   int load(const std::string &oxts_dir);
 };
 

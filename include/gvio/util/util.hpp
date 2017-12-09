@@ -17,4 +17,11 @@
     (void) (expr);                                                             \
   } while (0)
 
+// MACROS
+#define CHECK(A, M, ...)                                                       \
+  if (!(A)) {                                                                  \
+    LOG_ERROR(M, ##__VA_ARGS__);                                               \
+    goto error;                                                                \
+  }
+
 #endif

@@ -26,23 +26,27 @@ struct CalibCamToCam {
 
   CalibCamToCam() {}
 
-  /// Load calibration
+  /**
+   * Load calibration
+   */
   int load(const std::string &file_path);
 };
 
 /**
- * IMU to Camera calibration
+ * IMU to Velo calibration
  */
-struct CalibIMUToCam {
+struct CalibIMUToVelo {
   bool ok = false;
 
   std::string calib_time;
   Mat3 R;
   Vec3 t;
 
-  CalibIMUToCam() {}
+  CalibIMUToVelo() {}
 
-  /// Load calibration
+  /**
+   * Load calibration
+   */
   int load(const std::string &file_path);
 };
 
@@ -60,7 +64,9 @@ struct CalibVeloToCam {
 
   CalibVeloToCam() {}
 
-  /// Load calibration
+  /**
+   * Load calibration
+   */
   int load(const std::string &file_path);
 };
 
