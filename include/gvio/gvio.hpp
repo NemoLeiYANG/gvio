@@ -9,6 +9,8 @@
 #include "gvio/feature/feature.hpp"
 #include "gvio/gimbal/gimbal.hpp"
 #include "gvio/imu/imu.hpp"
+#include "gvio/kitti/kitti.hpp"
+#include "gvio/quaternion/quaternion.hpp"
 #include "gvio/util/util.hpp"
 
 #endif

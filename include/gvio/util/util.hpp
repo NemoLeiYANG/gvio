@@ -5,6 +5,7 @@
 #include "gvio/util/data.hpp"
 #include "gvio/util/file.hpp"
 #include "gvio/util/gps.hpp"
+#include "gvio/util/linalg.hpp"
 #include "gvio/util/log.hpp"
 #include "gvio/util/math.hpp"
 #include "gvio/util/opencv.hpp"

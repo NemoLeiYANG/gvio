@@ -19,7 +19,6 @@ INCLUDE_DIRECTORIES(include /usr/include/eigen3)
 # LIBRARY
 ADD_LIBRARY(
 	${PROJECT_NAME}
-	STATIC
 	# apriltag
 	src/apriltag/base_detector.cpp
 	src/apriltag/mit.cpp
@@ -29,6 +28,9 @@ ADD_LIBRARY(
 	# driver
 	src/driver/i2c.cpp
 	src/driver/uart.cpp
+  # estimation
+  src/estimation/camera_state.cpp
+  src/estimation/imu_state.cpp
   # feature
 	src/feature/feature_tracker.cpp
 	# gimbal
@@ -41,11 +43,14 @@ ADD_LIBRARY(
 	src/kitti/raw/oxts.cpp
 	src/kitti/raw/parse.cpp
 	src/kitti/raw/raw.cpp
+	# quaternion
+	src/quaternion/jpl.cpp
 	# utils
 	src/util/config.cpp
 	src/util/data.cpp
 	src/util/file.cpp
 	src/util/gps.cpp
+	src/util/linalg.cpp
 	src/util/math.cpp
 	src/util/opencv.cpp
 	src/util/stats.cpp
@@ -55,7 +60,6 @@ SET(${PROJECT_NAME}_DEPS
 	${OpenCV_LIBS}
 	apriltags_mit
 	yaml-cpp
-	gtest
 	pthread
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
@@ -64,7 +68,6 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_data DESTINATION ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_configs DESTINATION ${PROJECT_BINARY_DIR}/tests)
-ADD_DEFINITIONS(-DTEST_DATA_PATH "${PROJECT_BINARY_DIR}/tests/test_data")
 ADD_EXECUTABLE(
 	gvio_tests
 	# imu
@@ -95,4 +98,4 @@ ADD_EXECUTABLE(
 	# test runner
 	tests/test_runner.cpp
 )
-TARGET_LINK_LIBRARIES(gvio_tests ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+TARGET_LINK_LIBRARIES(gvio_tests ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS} gtest)

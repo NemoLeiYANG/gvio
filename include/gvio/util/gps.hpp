@@ -1,8 +1,9 @@
 #ifndef GVIO_UTILS_GPS_HPP
 #define GVIO_UTILS_GPS_HPP
 
-#include "gvio/util/math.hpp"
 #include <cmath>
+
+#include "gvio/util/math.hpp"
 
 namespace gvio {
 
@@ -56,4 +57,4 @@ void latlon_diff(double lat_ref,
 double latlon_dist(double lat_ref, double lon_ref, double lat, double lon);
 
 } // namepsace gvio
-#endif
+#endif // GVIO_UTILS_GPS_HPP
