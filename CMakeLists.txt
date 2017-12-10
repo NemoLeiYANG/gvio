@@ -28,11 +28,12 @@ ADD_LIBRARY(
 	# driver
 	src/driver/i2c.cpp
 	src/driver/uart.cpp
-  # estimation
-  src/estimation/camera_state.cpp
-  src/estimation/imu_state.cpp
+  # msckf
+  src/msckf/camera_state.cpp
+  src/msckf/imu_state.cpp
   # feature
-	src/feature/feature_tracker.cpp
+	src/feature2d/feature_tracker.cpp
+	src/feature2d/gms_matcher.cpp
 	# gimbal
 	# src/gimbal/gimbal.cpp
 	src/gimbal/sbgc.cpp
@@ -77,8 +78,9 @@ ADD_EXECUTABLE(
 	# camera
 	tests/camera/camera_test.cpp
 	tests/camera/config_test.cpp
-  # feature
-  tests/feature/feature_tracker_test.cpp
+  # feature2d
+  tests/feature2d/feature_tracker_test.cpp
+	tests/feature2d/gms_matcher_test.cpp
 	# gimbal
 	# tests/gimbal/gimbal_test.cpp
 	tests/gimbal/sbgc_test.cpp

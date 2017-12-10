@@ -1,5 +1,5 @@
-#ifndef GVIO_FEATURE_TRACKER_HPP
-#define GVIO_FEATURE_TRACKER_HPP
+#ifndef GVIO_FEATURE2D_TRACKER_HPP
+#define GVIO_FEATURE2D_TRACKER_HPP
 
 #include <stdio.h>
 #include <vector>
@@ -11,6 +11,9 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "gvio/util/util.hpp"
+#include "gvio/feature2d/gms_matcher.hpp"
+
 namespace gvio {
 
 // Track and frame ID typedefs
@@ -21,25 +24,13 @@ using FrameID = long int;
  * Feature
  */
 struct Feature {
-  float angle = -1.0;
-  int class_id = -1;
-  int octave = 0;
-  cv::Point2f pt;
-  float response = 0;
-  float size = 0;
-
   TrackID track_id = -1;
 
-  Feature() {}
+  cv::KeyPoint kp;
+  cv::Mat des;
 
-  Feature(const cv::KeyPoint &kp) {
-    this->angle = kp.angle;
-    this->class_id = kp.class_id;
-    this->octave = kp.octave;
-    this->pt = kp.pt;
-    this->response = kp.response;
-    this->size = kp.size;
-  }
+  Feature() {}
+  Feature(const cv::KeyPoint &kp) : kp{kp} {}
 
   /**
    * Set feature track ID
@@ -51,14 +42,7 @@ struct Feature {
   /**
    * Return feature as cv::KeyPoint
    */
-  cv::KeyPoint asCvKeyPoint() {
-    return cv::KeyPoint(this->pt,
-                        this->size,
-                        this->angle,
-                        this->response,
-                        this->octave,
-                        this->class_id);
-  }
+  cv::KeyPoint getKeyPoint() { return this->kp; }
 };
 
 /**
@@ -111,12 +95,14 @@ class FeatureTracker {
 public:
   bool configured = false;
 
-  // Detector settings
+  // Detector
   int fast_threshold = 10;
   bool fast_nonmax_suppression = true;
 
-  // Descriptor settings
-  cv::Ptr<cv::ORB> orb;
+  // Descriptor
+  cv::Ptr<cv::ORB> orb = cv::ORB::create();
+
+  // Matcher
 
   // Frame and track ounters
   FrameID counter_frame_id = -1;
@@ -132,7 +118,7 @@ public:
   cv::Mat fea_ref;
   cv::Mat unmatched;
 
-  FeatureTracker() { this->orb = cv::ORB::create(); }
+  FeatureTracker() {}
 
   /**
    * Configure
@@ -194,4 +180,4 @@ public:
 };
 
 } // namespace gvio
-#endif
+#endif // GVIO_FEATURE2D_TRACKER_HPP

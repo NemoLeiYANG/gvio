@@ -1,4 +1,4 @@
-#include "gvio/estimation/camera_state.hpp"
+#include "gvio/msckf/camera_state.hpp"
 
 namespace gvio {
 

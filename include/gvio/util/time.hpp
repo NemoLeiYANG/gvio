@@ -9,6 +9,10 @@ namespace gvio {
 void tic(struct timespec *tic);
 float toc(struct timespec *tic);
 float mtoc(struct timespec *tic);
+
+/**
+ * Get time now in milliseconds since epoch
+ */
 double time_now();
 
 } // namespace gvio

@@ -1,11 +1,14 @@
-#ifndef GVIO_ESTIMATION_IMU_STATE_HPP
-#define GVIO_ESTIMATION_IMU_STATE_HPP
+#ifndef GVIO_MSCKF_IMU_STATE_HPP
+#define GVIO_MSCKF_IMU_STATE_HPP
 
 #include "gvio/util/util.hpp"
 #include "gvio/quaternion/jpl.hpp"
 
 namespace gvio {
 
+/**
+ * IMU State
+ */
 struct IMUState {
   const double size = 15; ///< Size of state vector
 
@@ -81,4 +84,4 @@ struct IMUState {
 };
 
 } // namespace gvio
-#endif // GVIO_ESTIMATION_IMU_STATE_HPP
+#endif // GVIO_MSCKF_IMU_STATE_HPP

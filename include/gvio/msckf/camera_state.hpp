@@ -1,11 +1,14 @@
-#ifndef GVIO_ESTIMATION_CAMERA_STATE_HPP
-#define GVIO_ESTIMATION_CAMERA_STATE_HPP
+#ifndef GVIO_MSCKF_CAMERA_STATE_HPP
+#define GVIO_MSCKF_CAMERA_STATE_HPP
 
 #include "gvio/util/util.hpp"
 #include "gvio/quaternion/jpl.hpp"
 
 namespace gvio {
 
+/**
+ * Camera State
+ */
 struct CameraState {
   const int size = 6;      ///< Size of state vector
   int frame_id = -1;       ///< Camera frame id
@@ -28,4 +31,4 @@ struct CameraState {
 };
 
 } // namespace gvio
-#endif // GVIO_ESTIMATION_CAMERA_STATE_HPP
+#endif // GVIO_MSCKF_CAMERA_STATE_HPP

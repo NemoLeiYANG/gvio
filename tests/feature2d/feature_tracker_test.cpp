@@ -1,7 +1,5 @@
-#include <memory>
-
 #include "gvio/gvio_test.hpp"
-#include "gvio/feature/feature_tracker.hpp"
+#include "gvio/feature2d/feature_tracker.hpp"
 
 namespace gvio {
 
@@ -9,11 +7,11 @@ TEST(Feature, constructor) {
   cv::KeyPoint kp;
   Feature f(kp);
 
-  EXPECT_FLOAT_EQ(-1.0, f.angle);
-  EXPECT_EQ(-1, f.class_id);
-  EXPECT_EQ(0, f.octave);
-  EXPECT_FLOAT_EQ(0.0, f.response);
-  EXPECT_FLOAT_EQ(0.0, f.size);
+  EXPECT_FLOAT_EQ(-1.0, f.kp.angle);
+  EXPECT_EQ(-1, f.kp.class_id);
+  EXPECT_EQ(0, f.kp.octave);
+  EXPECT_FLOAT_EQ(0.0, f.kp.response);
+  EXPECT_FLOAT_EQ(0.0, f.kp.size);
 }
 
 TEST(Feature, setTrackID) {
@@ -24,10 +22,10 @@ TEST(Feature, setTrackID) {
   EXPECT_EQ(100, f.track_id);
 }
 
-TEST(Feature, asCvKeyPoint) {
+TEST(Feature, getKeyPoint) {
   cv::KeyPoint kp;
   Feature f(kp);
-  const cv::KeyPoint kp2 = f.asCvKeyPoint();
+  const cv::KeyPoint kp2 = f.getKeyPoint();
 
   EXPECT_FLOAT_EQ(-1.0, kp2.angle);
   EXPECT_EQ(-1, kp2.class_id);
@@ -79,9 +77,9 @@ TEST(FeatureTrack, last) {
   track.update(2, f3);
   auto t = track.last();
 
-  EXPECT_FLOAT_EQ(1.0, t.pt.x);
-  EXPECT_FLOAT_EQ(2.0, t.pt.y);
-  EXPECT_EQ(21, t.size);
+  EXPECT_FLOAT_EQ(1.0, t.kp.pt.x);
+  EXPECT_FLOAT_EQ(2.0, t.kp.pt.y);
+  EXPECT_EQ(21, t.kp.size);
 }
 
 TEST(FeatureTrack, tracked_length) {
@@ -169,6 +167,28 @@ TEST(FeatureTracker, updateTrack) {
   EXPECT_EQ(3, (int) tracker.buffer[0].tracked_length());
 }
 
-TEST(FeatureTracker, detect) { FeatureTracker tracker; }
+TEST(FeatureTracker, detect) {
+  FeatureTracker tracker;
+
+  cv::VideoCapture capture(0);
+  cv::Mat frame;
+
+  // double time_prev = time_now();
+  // int frame_counter = 0;
+  //
+  // while (cv::waitKey(1) != 113) {
+  //   capture >> frame;
+  //
+  //   tracker.detect(frame);
+  //   cv::imshow("Image", frame);
+  //
+  //   frame_counter++;
+  //   if (frame_counter % 10 == 0) {
+  //     std::cout << 10.0 / (time_now() - time_prev) << std::endl;
+  //     time_prev = time_now();
+  //     frame_counter = 0;
+  //   }
+  // }
+}
 
 } // namespace gvio

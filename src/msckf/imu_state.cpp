@@ -1,4 +1,4 @@
-#include "gvio/estimation/imu_state.hpp"
+#include "gvio/msckf/imu_state.hpp"
 
 namespace gvio {
 

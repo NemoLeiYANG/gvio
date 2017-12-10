@@ -1,4 +1,4 @@
-#include "gvio/feature/feature_tracker.hpp"
+#include "gvio/feature2d/feature_tracker.hpp"
 
 namespace gvio {
 
@@ -64,7 +64,7 @@ int FeatureTracker::detect(const cv::Mat &image) {
            keypoints,
            this->fast_threshold,
            this->fast_nonmax_suppression);
-  if (keypoints.size() > 0) {
+  if (keypoints.size() == 0) {
     return -1;
   }
 
