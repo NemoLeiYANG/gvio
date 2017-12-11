@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup msckf
+ */
 #ifndef GVIO_MSCKF_CAMERA_STATE_HPP
 #define GVIO_MSCKF_CAMERA_STATE_HPP
 
@@ -5,6 +9,10 @@
 #include "gvio/quaternion/jpl.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup msckf
+ * @{
+ */
 
 /**
  * Camera State
@@ -30,5 +38,6 @@ struct CameraState {
   void setFrameID(const int frame_id);
 };
 
+/** @} group msckf */
 } // namespace gvio
 #endif // GVIO_MSCKF_CAMERA_STATE_HPP

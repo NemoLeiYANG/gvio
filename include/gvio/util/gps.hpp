@@ -1,14 +1,20 @@
+/**
+ * @file
+ * @defgroup gps gps
+ * @ingroup util
+ */
 #ifndef GVIO_UTILS_GPS_HPP
 #define GVIO_UTILS_GPS_HPP
-/**
- * @file gps.hpp
- */
 
 #include <cmath>
 
 #include "gvio/util/math.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup gps
+ * @{
+ */
 
 #define EARTH_RADIUS_M 6378137.0
 
@@ -59,5 +65,6 @@ void latlon_diff(double lat_ref,
  */
 double latlon_dist(double lat_ref, double lon_ref, double lat, double lon);
 
+/** @} group gps */
 } // namepsace gvio
 #endif // GVIO_UTILS_GPS_HPP

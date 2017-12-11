@@ -1,12 +1,18 @@
+/**
+ * @file
+ * @defgroup linalg linalg
+ * @ingroup util
+ */
 #ifndef GVIO_UTILS_LINALG_HPP
 #define GVIO_UTILS_LINALG_HPP
-/**
- * @file linalg.hpp
- */
 
 #include "gvio/util/math.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup linalg
+ * @{
+ */
 
 /**
  * Zeros-matrix
@@ -53,5 +59,6 @@ Mat3 skewsq(const Vec3 &w);
  */
 MatX enforce_psd(const MatX &A);
 
+/** @} group linalg */
 } // namepsace gvio
 #endif // GVIO_UTILS_LINALG_HPP

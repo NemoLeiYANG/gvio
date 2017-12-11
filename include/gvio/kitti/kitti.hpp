@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @defgroup kitti kitti
+ */
 #ifndef GVIO_KITTI_KITTI_HPP
 #define GVIO_KITTI_KITTI_HPP
 

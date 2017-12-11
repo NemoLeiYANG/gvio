@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @defgroup apriltag apriltag
+ */
 #ifndef GVIO_APRILTAG_HPP
 #define GVIO_APRILTAG_HPP
 

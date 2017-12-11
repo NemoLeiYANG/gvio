@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup msckf
+ */
 #ifndef GVIO_MSCKF_IMU_STATE_HPP
 #define GVIO_MSCKF_IMU_STATE_HPP
 
@@ -5,6 +9,10 @@
 #include "gvio/quaternion/jpl.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup msckf
+ * @{
+ */
 
 /**
  * IMU State
@@ -83,5 +91,6 @@ struct IMUState {
   void correct(const VecX &dx);
 };
 
+/** @} group msckf */
 } // namespace gvio
 #endif // GVIO_MSCKF_IMU_STATE_HPP

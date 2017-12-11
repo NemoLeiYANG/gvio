@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @defgroup driver driver
+ */
 #ifndef GVIO_DRIVER_HPP
 #define GVIO_DRIVER_HPP
 

@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup gimbal
+ */
 #ifndef GVIO_VISION_GIMBAL_SBGC_HPP
 #define GVIO_VISION_GIMBAL_SBGC_HPP
 
@@ -12,6 +16,10 @@
 #include <Eigen/Dense>
 
 namespace gvio {
+/**
+ * @addtogroup gimbal
+ * @{
+ */
 
 // GENERAL
 #define SBGC_CMD_MAX_BYTES 255
@@ -182,5 +190,6 @@ public:
                     double yaw_speed);
 };
 
-} // end of namespace gvio
-#endif
+/** @} group feature2d */
+} // namespace gvio
+#endif // GVIO_FEATURE2D_GMS_MATCHER_HPP

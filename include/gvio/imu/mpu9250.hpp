@@ -1,9 +1,17 @@
+/**
+ * @file
+ * @ingroup imu
+ */
 #ifndef GVIO_IMU_MPU9250_HPP
 #define GVIO_IMU_MPU9250_HPP
 
 #include "gvio/driver/i2c.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup imu
+ * @{
+ */
 
 /* GENERAL */
 #define MPU9250_ADDRESS 0x68
@@ -240,5 +248,6 @@ public:
   int getAccelFchoice();
 };
 
+/** @} group imu */
 } // namespace gvio
 #endif

@@ -1,8 +1,9 @@
+/**
+ * @file
+ * @ingroup apriltag
+ */
 #ifndef GVIO_APRILTAG_BASE_HPP
 #define GVIO_APRILTAG_BASE_HPP
-/**
- * @file base_detector.hpp
- */
 
 #include <cmath>
 #include <fstream>
@@ -20,6 +21,10 @@
 #include "gvio/camera/camera.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup apriltag
+ * @{
+ */
 
 class TagPose {
 public:
@@ -233,5 +238,6 @@ public:
   void printTag(const TagPose &tag);
 };
 
+/** @} group apriltag */
 } // namespace gvio
 #endif

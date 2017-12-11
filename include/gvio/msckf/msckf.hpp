@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @defgroup msckf msckf
+ */
 #ifndef GVIO_MSCKF_MSCKF_HPP
 #define GVIO_MSCKF_MSCKF_HPP
 
@@ -9,6 +13,10 @@
 #include "gvio/estimation/msckf.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup msckf
+ * @{
+ */
 
 struct MSCKF {
   std::vector<CameraState> cam_states;
@@ -26,5 +34,6 @@ struct MSCKF {
   void measurementUpdate();
 };
 
+/** @} group msckf */
 } // namespace gvio
 #endif // GVIO_MSCKF_MSCKF_HPP

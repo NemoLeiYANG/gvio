@@ -1,5 +1,9 @@
-#ifndef GVIO_DRIVERS_I2C_HPP
-#define GVIO_DRIVERS_I2C_HPP
+/**
+ * @file
+ * @ingroup driver driver
+ */
+#ifndef GVIO_DRIVER_I2C_HPP
+#define GVIO_DRIVER_I2C_HPP
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +19,10 @@
 #include "gvio/util/log.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup driver
+ * @{
+ */
 
 // ERROR MESSAGES
 #define I2C_INIT_FAILED "failed to initialize I2C!"
@@ -42,5 +50,6 @@ public:
   int writeBytes(char reg_addr, char *data, size_t length);
 };
 
+/** @} group driver */
 } // namespace gvio
 #endif

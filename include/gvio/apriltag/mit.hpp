@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup apriltag
+ */
 #ifndef GVIO_VISION_APRILTAG_MIT_HPP
 #define GVIO_VISION_APRILTAG_MIT_HPP
 
@@ -22,6 +26,10 @@
 #include "gvio/apriltag/base_detector.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup apriltag
+ * @{
+ */
 
 /**
  * MIT Apriltag Detector
@@ -50,5 +58,6 @@ public:
   int extractTags(cv::Mat &image, std::vector<TagPose> &tags);
 };
 
+/** @} group apriltag */
 } // namespace gvio
 #endif

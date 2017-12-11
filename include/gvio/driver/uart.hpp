@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup driver driver
+ */
 #ifndef GVIO_DRIVERS_UART_HPP
 #define GVIO_DRIVERS_UART_HPP
 
@@ -10,6 +14,10 @@
 #include <iostream>
 
 namespace gvio {
+/**
+ * @addtogroup driver
+ * @{
+ */
 
 class UART {
 public:
@@ -33,5 +41,6 @@ public:
 int set_interface_attribs(int fd, int speed, int parity);
 void set_blocking(int fd, int should_block);
 
+/** @} group driver */
 } // namespace gvio
 #endif

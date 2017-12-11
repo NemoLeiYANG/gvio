@@ -1,8 +1,10 @@
+/**
+ * @file
+ * @defgroup file file
+ * @ingroup util
+ */
 #ifndef GVIO_UTILS_FILE_HPP
 #define GVIO_UTILS_FILE_HPP
-/**
- * @file file.hpp
- */
 
 #include <dirent.h>
 #include <stdio.h>
@@ -16,6 +18,10 @@
 #include "gvio/util/log.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup file
+ * @{
+ */
 
 bool file_exists(const std::string &path);
 bool dir_exists(const std::string &path);
@@ -28,5 +34,6 @@ void paths_combine(const std::string path1,
                    const std::string path2,
                    std::string &out);
 
+/** @} group file */
 } // end of gvio namepsace
 #endif

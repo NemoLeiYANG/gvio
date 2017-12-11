@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup imu
+ */
 #ifndef GVIO_IMU_MPU6050_HPP
 #define GVIO_IMU_MPU6050_HPP
 
@@ -9,6 +13,10 @@
 #include "gvio/driver/i2c.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup imu
+ * @{
+ */
 
 // GENERAL
 #define MPU6050_ADDRESS 0x68
@@ -237,5 +245,6 @@ public:
   int record(std::string output_path, int nb_samples);
 };
 
+/** @} group imu */
 } // namespace gvio
 #endif

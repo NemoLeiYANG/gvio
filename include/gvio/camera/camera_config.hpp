@@ -1,8 +1,9 @@
+/**
+ * @file
+ * @ingroup camera camera
+ */
 #ifndef GVIO_VISION_CAMERA_CAMERA_CONFIG_HPP
 #define GVIO_VISION_CAMERA_CAMERA_CONFIG_HPP
-/**
- * @file camera_config.hpp
- */
 
 #include <yaml-cpp/yaml.h>
 
@@ -13,6 +14,10 @@
 #include "gvio/util/util.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup camera
+ * @{
+ */
 
 class CameraConfig {
 public:
@@ -59,5 +64,6 @@ public:
   void print();
 };
 
+/** @} group camera */
 } // namespace gvio
 #endif

@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup kitti
+ */
 #ifndef GVIO_KITTI_RAW_HPP
 #define GVIO_KITTI_RAW_HPP
 
@@ -12,6 +16,10 @@
 #include "gvio/kitti/raw/parse.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup kitti
+ * @{
+ */
 
 /**
  * Load KITTI Raw Dataset
@@ -56,5 +64,6 @@ public:
   int load();
 };
 
+/** @} group kitti */
 } // namespace gvio
 #endif // GVIO_KITTI_RAW_HPP

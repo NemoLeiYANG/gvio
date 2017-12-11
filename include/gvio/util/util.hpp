@@ -1,8 +1,9 @@
+/**
+ * @file
+ * @defgroup util util
+ */
 #ifndef GVIO_UTIL_UTIL_HPP
 #define GVIO_UTIL_UTIL_HPP
-/**
- * @file util.hpp
- */
 
 #include "gvio/util/config.hpp"
 #include "gvio/util/data.hpp"
@@ -14,6 +15,12 @@
 #include "gvio/util/opencv.hpp"
 #include "gvio/util/stats.hpp"
 #include "gvio/util/time.hpp"
+
+namespace gvio {
+/**
+ * @addtogroup util
+ * @{
+ */
 
 // MACROS
 #define UNUSED(expr)                                                           \
@@ -28,4 +35,6 @@
     goto error;                                                                \
   }
 
-#endif
+/** @} group util */
+} // namespace gvio
+#endif // GVIO_UTIL_UTIL_HPP

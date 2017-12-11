@@ -1,9 +1,17 @@
+/**
+ * @file
+ * @ingroup quaternion
+ */
 #ifndef GVIO_QUATERNION_JPL_HPP
 #define GVIO_QUATERNION_JPL_HPP
 
 #include "gvio/util/util.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup quaternion
+ * @{
+ */
 
 /**
  * Quaternion norm
@@ -114,5 +122,6 @@ Mat3 C(const Vec4 &q);
  */
 Mat4 Omega(const Vec3 &w);
 
+/** @} group quaternion */
 } // namespace gvio
 #endif // GVIO_QUATERNION_JPL_HPP

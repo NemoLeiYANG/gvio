@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup kitti
+ */
 #ifndef GVIO_KITTI_RAW_PARSE_HPP
 #define GVIO_KITTI_RAW_PARSE_HPP
 
@@ -9,6 +13,10 @@
 #include "gvio/util/util.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup kitti
+ * @{
+ */
 
 /// Parse calibration string
 std::string parseString(const std::string &line);
@@ -34,5 +42,6 @@ Mat3 parseMat3(const std::string &line);
 /// Parse 3x4 matrix
 Mat34 parseMat34(const std::string &line);
 
+/** @} group kitti */
 } // namespace gvio
 #endif // GVIO_KITTI_RAW_PARSE_HPP

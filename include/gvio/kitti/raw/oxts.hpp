@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup kitti
+ */
 #ifndef GVIO_KITTI_RAW_OXTS_HPP
 #define GVIO_KITTI_RAW_OXTS_HPP
 
@@ -10,6 +14,10 @@
 #include "gvio/kitti/raw/parse.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup kitti
+ * @{
+ */
 
 /**
  * OXTS
@@ -65,5 +73,6 @@ struct OXTS {
   int load(const std::string &oxts_dir);
 };
 
+/** @} group kitti */
 } // namespace gvio
 #endif // GVIO_KITTI_RAW_OXTS_HPP

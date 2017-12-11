@@ -1,3 +1,8 @@
+/**
+ * @file
+ * @defgroup config config
+ * @ingroup util
+ */
 #ifndef GVIO_UTILS_CONFIG_HPP
 #define GVIO_UTILS_CONFIG_HPP
 
@@ -17,6 +22,10 @@
 #include "gvio/util/math.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup config
+ * @{
+ */
 
 /**
  * An enum used by `ConfigParam` to denote the yaml value type.
@@ -211,5 +220,6 @@ public:
   int load(const std::string &config_file);
 };
 
+/** @} group config */
 } // namespace gvio
 #endif // GVIO_UTILS_CONFIG_HPP

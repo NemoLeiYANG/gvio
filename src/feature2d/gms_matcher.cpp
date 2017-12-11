@@ -1,5 +1,7 @@
 #include "gvio/feature2d/gms_matcher.hpp"
 
+namespace gvio {
+
 std::vector<cv::Point2f> GMSMatcher::normalizePoints(
     const std::vector<cv::KeyPoint> &kp, const cv::Size &size) {
   const size_t numP = kp.size();
@@ -295,3 +297,5 @@ int GMSMatcher::match(const std::vector<cv::KeyPoint> &k1,
 
   return inliers.size();
 }
+
+} // namespace gvio

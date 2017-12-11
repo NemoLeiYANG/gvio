@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @defgroup gimbal gimbal
+ */
 #ifndef GVIO_GIMBAL_HPP
 #define GVIO_GIMBAL_HPP
 
@@ -11,6 +15,10 @@
 #include "gvio/gimbal/sbgc.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup gimbal
+ * @{
+ */
 
 class Gimbal {
 public:
@@ -52,4 +60,5 @@ public:
 };
 
 } // namespace gvio
+/** @} group gimbal */
 #endif

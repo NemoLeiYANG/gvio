@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @defgroup camera camera
+ */
 #ifndef GVIO_VISION_CAMERA_HPP
 #define GVIO_VISION_CAMERA_HPP
 
@@ -13,6 +17,10 @@
 #include "gvio/camera/camera_config.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup camera
+ * @{
+ */
 
 /** Generic Camera **/
 class Camera {
@@ -115,5 +123,6 @@ public:
   int showImage(cv::Mat &image);
 };
 
+/** @} group camera */
 } // namespace gvio
 #endif

@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup kitti
+ */
 #ifndef GVIO_KITTI_RAW_CALIB_HPP
 #define GVIO_KITTI_RAW_CALIB_HPP
 
@@ -6,6 +10,10 @@
 #include "gvio/kitti/raw/parse.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup kitti
+ * @{
+ */
 
 /**
  * Camera to Camera calibration
@@ -70,5 +78,6 @@ struct CalibVeloToCam {
   int load(const std::string &file_path);
 };
 
+/** @} group kitti */
 } // namespace gvio
 #endif // GVIO_KITTI_RAW_CALIB_HPP

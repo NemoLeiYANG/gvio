@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup feature2d
+ */
 #ifndef GVIO_FEATURE2D_TRACKER_HPP
 #define GVIO_FEATURE2D_TRACKER_HPP
 
@@ -15,6 +19,10 @@
 #include "gvio/feature2d/gms_matcher.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup feature2d
+ * @{
+ */
 
 // Track and frame ID typedefs
 using TrackID = long int;
@@ -219,5 +227,6 @@ inline void kd2f(const std::vector<cv::KeyPoint> &keypoints,
   }
 }
 
+/** @} group feature2d */
 } // namespace gvio
 #endif // GVIO_FEATURE2D_TRACKER_HPP

@@ -1,8 +1,10 @@
+/**
+ * @file
+ * @defgroup math math
+ * @ingroup util
+ */
 #ifndef GVIO_UTILS_MATH_HPP
 #define GVIO_UTILS_MATH_HPP
-/**
- * @file math.hpp
- */
 
 #include <iostream>
 
@@ -12,6 +14,10 @@
 #include "gvio/util/log.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup math
+ * @{
+ */
 
 #ifndef __EIGEN_TYPEDEF__
 #define __EIGEN_TYPEDEF__
@@ -188,5 +194,6 @@ closest_point(const Vec2 &p1, const Vec2 &p2, const Vec2 &p3, Vec2 &closest);
  */
 Vec2 lerp(const Vec2 &a, const Vec2 &b, const double mu);
 
+/** @} group math */
 } // namespace gvio
 #endif
