@@ -24,7 +24,7 @@ ADD_LIBRARY(
 	src/apriltag/mit.cpp
 	# camera
 	src/camera/camera.cpp
-	src/camera/config.cpp
+	src/camera/camera_config.cpp
 	# driver
 	src/driver/i2c.cpp
 	src/driver/uart.cpp
@@ -77,7 +77,7 @@ ADD_EXECUTABLE(
 	# tests/apriltag/mit_test.cpp
 	# camera
 	tests/camera/camera_test.cpp
-	tests/camera/config_test.cpp
+	tests/camera/camera_config_test.cpp
   # feature2d
   tests/feature2d/feature_tracker_test.cpp
 	tests/feature2d/gms_matcher_test.cpp
