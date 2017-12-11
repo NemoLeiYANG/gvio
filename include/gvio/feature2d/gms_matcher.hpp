@@ -84,11 +84,11 @@ const int mRotationPatterns[8][9] = {
 // 5 level scales
 const double mScaleRatios[5] = {1.0, 1.0 / 2, 1.0 / sqrt(2.0), sqrt(2.0), 2.0};
 
-inline cv::Mat DrawInlier(cv::Mat &src1,
-                          cv::Mat &src2,
-                          std::vector<cv::KeyPoint> &kpt1,
-                          std::vector<cv::KeyPoint> &kpt2,
-                          std::vector<cv::DMatch> &inlier,
+inline cv::Mat DrawInlier(const cv::Mat &src1,
+                          const cv::Mat &src2,
+                          const std::vector<cv::KeyPoint> &kpt1,
+                          const std::vector<cv::KeyPoint> &kpt2,
+                          const std::vector<cv::DMatch> &inlier,
                           int type) {
   const int height = std::max(src1.rows, src2.rows);
   const int width = src1.cols + src2.cols;
@@ -123,43 +123,10 @@ inline cv::Mat DrawInlier(cv::Mat &src1,
   return output;
 }
 
-inline void imresize(cv::Mat &src, int height) {
-  double ratio = src.rows * 1.0 / height;
-  int width = static_cast<int>(src.cols * 1.0 / ratio);
-  resize(src, src, cv::Size(width, height));
-}
-
 class GMSMatcher {
 public:
-  // OpenCV Keypoints & Correspond Image Size & Nearest Neighbor Matches
-  GMSMatcher(const std::vector<cv::KeyPoint> &vkp1,
-             const cv::Size size1,
-             const std::vector<cv::KeyPoint> &vkp2,
-             const cv::Size size2,
-             const std::vector<cv::DMatch> &vDMatches) {
-    // Input initialize
-    NormalizePoints(vkp1, size1, mvP1);
-    NormalizePoints(vkp2, size2, mvP2);
-    mNumberMatches = vDMatches.size();
-    ConvertMatches(vDMatches, mvMatches);
+  cv::BFMatcher bf_matcher = cv::BFMatcher(cv::NORM_HAMMING);
 
-    // Grid initialize
-    mGridSizeLeft = cv::Size(20, 20);
-    mGridNumberLeft = mGridSizeLeft.width * mGridSizeLeft.height;
-
-    // Initialize the neihbor of left grid
-    mGridNeighborLeft = cv::Mat::zeros(mGridNumberLeft, 9, CV_32SC1);
-    InitalizeNeighbors(mGridNeighborLeft, mGridSizeLeft);
-  };
-  ~GMSMatcher(){};
-
-  // Get Inlier Mask
-  // Return number of inliers
-  int GetInlierMask(std::vector<bool> &vbInliers,
-                    bool WithScale = false,
-                    bool WithRotation = false);
-
-private:
   // Normalized Points
   std::vector<cv::Point2f> mvP1, mvP2;
 
@@ -198,6 +165,9 @@ private:
   cv::Mat mGridNeighborLeft;
   cv::Mat mGridNeighborRight;
 
+  GMSMatcher() {}
+  ~GMSMatcher() {}
+
   // Normalize Key Points to Range(0 - 1)
   void NormalizePoints(const std::vector<cv::KeyPoint> &kp,
                        const cv::Size &size,
@@ -223,7 +193,7 @@ private:
     }
   }
 
-  int GetGridIndexLeft(const cv::Point2f &pt, int type) {
+  int GetGridIndexLeft(const cv::Point2f &pt, const int type) {
     int x = 0, y = 0;
 
     if (type == 1) {
@@ -260,9 +230,9 @@ private:
     return x + y * mGridSizeRight.width;
   }
 
-  void AssignMatchPairs(int GridType);
+  void AssignMatchPairs(const int GridType);
 
-  void VerifyCellPairs(int RotationType);
+  void VerifyCellPairs(const int RotationType);
 
   // Get Neighbor 9
   std::vector<int> GetNB9(const int idx, const cv::Size &GridSize) {
@@ -294,7 +264,7 @@ private:
     }
   }
 
-  void SetScale(int Scale) {
+  void SetScale(const int Scale) {
     // Set Scale
     mGridSizeRight.width = mGridSizeLeft.width * mScaleRatios[Scale];
     mGridSizeRight.height = mGridSizeLeft.height * mScaleRatios[Scale];
@@ -305,7 +275,18 @@ private:
     InitalizeNeighbors(mGridNeighborRight, mGridSizeRight);
   }
 
-  int run(int RotationType);
+  int run(const int RotationType);
+
+  int GetInlierMask(std::vector<bool> &vbInliers,
+                    bool WithScale = false,
+                    bool WithRotation = false);
+
+  int match(const std::vector<cv::KeyPoint> &kp1,
+            const cv::Mat &des1,
+            const std::vector<cv::KeyPoint> &kp2,
+            const cv::Mat &des2,
+            const cv::Size &img_size,
+            std::vector<cv::DMatch> &matches);
 };
 
 #endif // GVIO_FEATURE2D_GMS_MATCHER_HPP

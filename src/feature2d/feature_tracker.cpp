@@ -57,7 +57,8 @@ int FeatureTracker::updateTrack(const TrackID &track_id, Feature &f) {
   return 0;
 }
 
-int FeatureTracker::detect(const cv::Mat &image) {
+int FeatureTracker::detect(const cv::Mat &image,
+                           std::vector<Feature> &features) {
   // Detect features
   std::vector<cv::KeyPoint> keypoints;
   cv::FAST(image,
@@ -72,6 +73,34 @@ int FeatureTracker::detect(const cv::Mat &image) {
   cv::Mat mask;
   cv::Mat descriptors;
   this->orb->compute(image, keypoints, descriptors);
+
+  // Create features
+  for (int i = 0; i < descriptors.cols; i++) {
+    features.emplace_back(keypoints[i], descriptors.col(i));
+  }
+
+  return 0;
+}
+
+int FeatureTracker::match(const std::vector<Feature> &f1) {
+  // Stack previously unmatched features with tracked features
+  std::vector<Feature> f0;
+  f0.reserve(this->fea_ref.size() + this->unmatched.size());
+  f0.insert(f0.end(), this->fea_ref.begin(), this->fea_ref.end());
+  f0.insert(f0.end(), this->unmatched.begin(), this->unmatched.end());
+
+  // Convert list of features to list of cv2.KeyPoint and descriptors
+  std::vector<cv::KeyPoint> kps0, kps1;
+  cv::Mat des0, des1;
+  Feature::toKeyPointsAndDescriptors(f0, kps0, des0);
+  Feature::toKeyPointsAndDescriptors(f1, kps1, des1);
+
+  // Perform matching
+  // Note: arguments to the brute-force matcher is (query descriptors,
+  // train descriptors), here we use des1 as the query descriptors because
+  // des1 represents the latest descriptors from the latest image frame
+  std::vector<cv::DMatch> matches_bf;
+  // this->matcher.match(kps0, des0, kps1, des1, this->img_size, matches_bf);
 
   return 0;
 }

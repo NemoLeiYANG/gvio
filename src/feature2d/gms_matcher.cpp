@@ -5,6 +5,7 @@ int GMSMatcher::GetInlierMask(std::vector<bool> &vbInliers,
                               bool WithRotation) {
   int max_inlier = 0;
 
+  // With no rotation and no scale
   if (!WithScale && !WithRotation) {
     SetScale(0);
     max_inlier = run(1);
@@ -12,6 +13,7 @@ int GMSMatcher::GetInlierMask(std::vector<bool> &vbInliers,
     return max_inlier;
   }
 
+  // With rotation and scale
   if (WithRotation && WithScale) {
     for (int Scale = 0; Scale < 5; Scale++) {
       SetScale(Scale);
@@ -27,6 +29,7 @@ int GMSMatcher::GetInlierMask(std::vector<bool> &vbInliers,
     return max_inlier;
   }
 
+  // With rotation
   if (WithRotation && !WithScale) {
     for (int RotationType = 1; RotationType <= 8; RotationType++) {
       int num_inlier = run(RotationType);
@@ -39,6 +42,7 @@ int GMSMatcher::GetInlierMask(std::vector<bool> &vbInliers,
     return max_inlier;
   }
 
+  // With scale
   if (!WithRotation && WithScale) {
     for (int Scale = 0; Scale < 5; Scale++) {
       SetScale(Scale);
@@ -79,7 +83,6 @@ void GMSMatcher::AssignMatchPairs(int GridType) {
 }
 
 void GMSMatcher::VerifyCellPairs(int RotationType) {
-
   const int *CurrentRP = mRotationPatterns[RotationType - 1];
 
   for (int i = 0; i < mGridNumberLeft; i++) {
@@ -98,7 +101,6 @@ void GMSMatcher::VerifyCellPairs(int RotationType) {
     }
 
     int idx_grid_rt = mCellPairs[i];
-
     const int *NB9_lt = mGridNeighborLeft.ptr<int>(i);
     const int *NB9_rt = mGridNeighborRight.ptr<int>(idx_grid_rt);
 
@@ -119,13 +121,13 @@ void GMSMatcher::VerifyCellPairs(int RotationType) {
 
     thresh = THRESH_FACTOR * sqrt(thresh / numpair);
 
-    if (score < thresh)
+    if (score < thresh) {
       mCellPairs[i] = -2;
+    }
   }
 }
 
 int GMSMatcher::run(int RotationType) {
-
   mvbInlierMask.assign(mNumberMatches, false);
 
   // Initialize Motion Statisctics
@@ -151,4 +153,41 @@ int GMSMatcher::run(int RotationType) {
   }
   int num_inlier = cv::sum(mvbInlierMask)[0];
   return num_inlier;
+}
+
+int GMSMatcher::match(const std::vector<cv::KeyPoint> &k1,
+                      const cv::Mat &d1,
+                      const std::vector<cv::KeyPoint> &k2,
+                      const cv::Mat &d2,
+                      const cv::Size &img_size,
+                      std::vector<cv::DMatch> &matches) {
+  // Match using Brute-force matcher (First pass)
+  std::vector<cv::DMatch> matches_bf;
+  this->bf_matcher.match(d1, d2, matches_bf);
+
+  // Initialize input
+  this->NormalizePoints(k1, img_size, this->mvP1);
+  this->NormalizePoints(k2, img_size, this->mvP2);
+  this->mNumberMatches = matches_bf.size();
+  this->ConvertMatches(matches_bf, this->mvMatches);
+
+  // Initialize Grid
+  this->mGridSizeLeft = cv::Size(20, 20);
+  this->mGridNumberLeft =
+      this->mGridSizeLeft.width * this->mGridSizeLeft.height;
+
+  // Initialize the neihbor of left grid
+  this->mGridNeighborLeft = cv::Mat::zeros(mGridNumberLeft, 9, CV_32SC1);
+  this->InitalizeNeighbors(mGridNeighborLeft, mGridSizeLeft);
+
+  // Matching using GMS matcher (Second pass)
+  std::vector<bool> inliers;
+  int nb_inliers = this->GetInlierMask(inliers, false, false);
+  for (size_t i = 0; i < inliers.size(); i++) {
+    if (inliers[i] == true) {
+      matches.push_back(matches_bf[i]);
+    }
+  }
+
+  return nb_inliers;
 }

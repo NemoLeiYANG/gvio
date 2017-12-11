@@ -27,10 +27,11 @@ struct Feature {
   TrackID track_id = -1;
 
   cv::KeyPoint kp;
-  cv::Mat des;
+  cv::Mat desc;
 
   Feature() {}
   Feature(const cv::KeyPoint &kp) : kp{kp} {}
+  Feature(const cv::KeyPoint &kp, const cv::Mat &desc) : kp{kp}, desc{desc} {}
 
   /**
    * Set feature track ID
@@ -43,6 +44,22 @@ struct Feature {
    * Return feature as cv::KeyPoint
    */
   cv::KeyPoint getKeyPoint() { return this->kp; }
+
+  /**
+   * Features to keypoints and descriptors
+   */
+  static void toKeyPointsAndDescriptors(const std::vector<Feature> &features,
+                                        std::vector<cv::KeyPoint> &keypoints,
+                                        cv::Mat &descriptors) {
+    descriptors = cv::Mat(features[0].desc.rows, features.size(), CV_8UC1);
+    for (size_t i = 0; i < features.size(); i++) {
+      keypoints.push_back(features[i].kp);
+
+      cv::Mat d;
+      features[i].desc.copyTo(d);
+      descriptors.col(i) = d;
+    }
+  }
 };
 
 /**
@@ -103,6 +120,8 @@ public:
   cv::Ptr<cv::ORB> orb = cv::ORB::create();
 
   // Matcher
+  cv::Size img_size;
+  GMSMatcher matcher;
 
   // Frame and track ounters
   FrameID counter_frame_id = -1;
@@ -115,8 +134,8 @@ public:
 
   // Image, feature, unmatched features book keeping
   cv::Mat img_ref;
-  cv::Mat fea_ref;
-  cv::Mat unmatched;
+  std::vector<Feature> fea_ref;
+  std::vector<Feature> unmatched;
 
   FeatureTracker() {}
 
@@ -156,12 +175,17 @@ public:
    *
    * @param image Input image
    */
-  int detect(const cv::Mat &image);
+  int detect(const cv::Mat &image, std::vector<Feature> &features);
 
   /**
-   * Match features
+   * Match features to feature tracks
+   *
+   * The idea is that with the current features, we want to match it against
+   * the current list of FeatureTrack.
+   *
+   * @param features List of features
    */
-  int match();
+  int match(const std::vector<Feature> &features);
 
   /**
    * Process matches

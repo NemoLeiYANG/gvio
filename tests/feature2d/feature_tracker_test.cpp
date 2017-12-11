@@ -1,6 +1,9 @@
 #include "gvio/gvio_test.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 
+#define TEST_IMAGE_TOP "test_data/apriltag/top.png"
+#define TEST_IMAGE_BOTTOM "test_data/apriltag/bottom.png"
+
 namespace gvio {
 
 TEST(Feature, constructor) {
@@ -167,28 +170,50 @@ TEST(FeatureTracker, updateTrack) {
   EXPECT_EQ(3, (int) tracker.buffer[0].tracked_length());
 }
 
-TEST(FeatureTracker, detect) {
+// TEST(FeatureTracker, detect) {
+//   FeatureTracker tracker;
+//
+//   cv::VideoCapture capture(0);
+//   cv::Mat frame;
+//
+//   double time_prev = time_now();
+//   int frame_counter = 0;
+//
+//   std::vector<Feature> features;
+//
+//   while (cv::waitKey(1) != 113) {
+//     capture >> frame;
+//
+//     tracker.detect(frame, features);
+//     cv::imshow("Image", frame);
+//
+//     frame_counter++;
+//     if (frame_counter % 10 == 0) {
+//       std::cout << 10.0 / (time_now() - time_prev) << std::endl;
+//       time_prev = time_now();
+//       frame_counter = 0;
+//     }
+//   }
+// }
+
+TEST(FeatureTracker, match) {
   FeatureTracker tracker;
 
-  cv::VideoCapture capture(0);
-  cv::Mat frame;
+  cv::Mat img_top = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
+  cv::Mat img_bottom = cv::imread(TEST_IMAGE_BOTTOM, CV_LOAD_IMAGE_COLOR);
 
-  // double time_prev = time_now();
-  // int frame_counter = 0;
-  //
-  // while (cv::waitKey(1) != 113) {
-  //   capture >> frame;
-  //
-  //   tracker.detect(frame);
-  //   cv::imshow("Image", frame);
-  //
-  //   frame_counter++;
-  //   if (frame_counter % 10 == 0) {
-  //     std::cout << 10.0 / (time_now() - time_prev) << std::endl;
-  //     time_prev = time_now();
-  //     frame_counter = 0;
-  //   }
-  // }
+  cv::imshow("Image", img_top);
+  cv::waitKey(0);
+
+  std::vector<Feature> f0;
+  std::vector<Feature> f1;
+
+  tracker.detect(img_top, f0);
+  tracker.fea_ref = f0;
+  tracker.detect(img_bottom, f1);
+
+  tracker.img_size = img_top.size();
+  tracker.match(f1);
 }
 
 } // namespace gvio

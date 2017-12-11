@@ -9,65 +9,58 @@ TEST(GMSMatcher, demo) {
   // Setup ORB
   cv::Ptr<cv::ORB> orb = cv::ORB::create();
   orb->setFastThreshold(0);
-  orb->setMaxFeatures(500);
+  orb->setMaxFeatures(100);
 
   // Get camera frame
-  cv::VideoCapture capture(1);
+  cv::VideoCapture capture(0);
   cv::Mat img1;
   capture >> img1;
 
   // Detect and extract features
-  std::vector<cv::KeyPoint> kp1;
+  std::vector<cv::KeyPoint> k1;
   cv::Mat d1;
-  orb->detectAndCompute(img1, cv::Mat(), kp1, d1);
+  orb->detectAndCompute(img1, cv::Mat(), k1, d1);
 
   // Start timer
   struct timeval tp;
   gettimeofday(&tp, NULL);
   long int start = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+  int frame_counter = 0;
 
+  GMSMatcher gms;
   while (cv::waitKey(1) != 113) {
     // Get camera frame
     cv::Mat img2;
     capture >> img2;
 
     // Detect and extract features
-    std::vector<cv::KeyPoint> kp2;
+    std::vector<cv::KeyPoint> k2;
     cv::Mat d2;
-    orb->detectAndCompute(img2, cv::Mat(), kp2, d2);
-
-    // BF match features
-    std::vector<cv::DMatch> matches_all;
-    cv::BFMatcher matcher(cv::NORM_HAMMING);
-    matcher.match(d1, d2, matches_all);
+    orb->detectAndCompute(img2, cv::Mat(), k2, d2);
 
     // GMS match
-    std::vector<bool> vbInliers;
-    GMSMatcher gms(kp1, img1.size(), kp2, img2.size(), matches_all);
-    int nb_inliers = gms.GetInlierMask(vbInliers, false, false);
-
     std::vector<cv::DMatch> matches_gms;
-    for (size_t i = 0; i < vbInliers.size(); i++) {
-      if (vbInliers[i] == true) {
-        matches_gms.push_back(matches_all[i]);
-      }
-    }
-
-    cv::Mat matches_img = DrawInlier(img1, img2, kp1, kp2, matches_gms, 1);
+    const int nb_inliers = gms.match(k1, d1, k2, d2, img1.size(), matches_gms);
+    cv::Mat matches_img = DrawInlier(img1, img2, k1, k2, matches_gms, 1);
     cv::imshow("Matches", matches_img);
 
     // Update old with new
     img2.copyTo(img1);
-    kp1.clear();
-    kp1 = kp2;
+    k1.clear();
+    k1 = k2;
     d2.copyTo(d1);
 
     // Show FPS
-    gettimeofday(&tp, NULL);
-    long int stop = tp.tv_sec * 1000 + tp.tv_usec / 1000;
-    std::cout << "FPS: " << 1.0 / ((stop - start) / 1000.0) << "\t";
-    std::cout << "Matches: " << nb_inliers << std::endl;
-    start = stop;
+    frame_counter++;
+    if (frame_counter % 10 == 0) {
+      gettimeofday(&tp, NULL);
+      long int stop = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+      std::cout << "FPS: " << 10.0 / ((stop - start) / 1000.0) << "\t";
+      std::cout << "Matches: " << nb_inliers << std::endl;
+      start = stop;
+
+      frame_counter = 0;
+    }
   }
 }
 
