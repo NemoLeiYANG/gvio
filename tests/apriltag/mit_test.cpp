@@ -14,7 +14,7 @@
 #define TEST_IMAGE_BOTTOM_RIGHT "test_data/apriltag/bottom_right.png"
 #define TEST_ILLUM_INVAR "test_data/apriltag/illum_invar.png"
 
-namespace atl {
+namespace gvio {
 
 TEST(MITDetector, constructor) {
   MITDetector detector;
@@ -168,4 +168,4 @@ TEST(MITDetector, cropImage) {
   // cv::imshow("test", image);
 }
 
-} // namespace atl
+} // namespace gvio

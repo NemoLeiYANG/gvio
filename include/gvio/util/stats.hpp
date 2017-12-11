@@ -1,5 +1,8 @@
 #ifndef GVIO_UTILS_STATS_HPP
 #define GVIO_UTILS_STATS_HPP
+/**
+ * @file stats.hpp
+ */
 
 #include "gvio/util/math.hpp"
 

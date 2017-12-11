@@ -1,5 +1,8 @@
 #ifndef GVIO_UTILS_MATH_HPP
 #define GVIO_UTILS_MATH_HPP
+/**
+ * @file math.hpp
+ */
 
 #include <iostream>
 
@@ -152,7 +155,7 @@ double cross_track_error(const Vec2 &p1, const Vec2 &p2, const Vec2 &pos);
  * @param p1 Waypoint 1
  * @param p2 Waypoint 2
  * @param pos Robot position
- * @return
+ * @returns
  *    - 1: Point is left of waypoint line formed by `p1` and `p2`
  *    - 2: Point is right of waypoint line formed by `p1` and `p2`
  *    - 0: Point is colinear with waypoint line formed by `p1` and `p2`
@@ -165,9 +168,9 @@ int point_left_right(const Vec2 &p1, const Vec2 &p2, const Vec2 &pos);
  *
  * @param p1 Waypoint 1
  * @param p2 Waypoint 2
- * @param pos Robot position
- * @param cloest Closest point
- * @return
+ * @param p3 Robot position
+ * @param closest Closest point
+ * @returns
  *    Unit number denoting where the closest point is on waypoint line. For
  *    example, a return value of 0.5 denotes the closest point is half-way
  *    (50%) of the waypoint line, alternatively a negative number denotes the

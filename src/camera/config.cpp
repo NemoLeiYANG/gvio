@@ -1,4 +1,4 @@
-#include "gvio/camera/config.hpp"
+#include "gvio/camera/camera_config.hpp"
 
 namespace gvio {
 

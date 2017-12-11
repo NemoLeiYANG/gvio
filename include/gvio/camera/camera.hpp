@@ -10,7 +10,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "gvio/util/util.hpp"
-#include "gvio/camera/config.hpp"
+#include "gvio/camera/camera_config.hpp"
 
 namespace gvio {
 
@@ -76,8 +76,7 @@ public:
   /**
    * Get camera frame
    *
-   *
-   * @params image Camera frame image
+   * @param image Camera frame image
    * @returns
    *    - 0 for success
    *    - -1 for failure
@@ -98,8 +97,8 @@ public:
 
   /**
    * Show FPS
-   * @params last_tic Last tic in seconds
-   * @params frame Frame number
+   * @param last_tic Last tic in seconds
+   * @param frame Frame number
    * @returns
    *    - 0 for success
    *    - -1 for failure
@@ -108,7 +107,7 @@ public:
 
   /**
    * Show image
-   * @params image Image
+   * @param image Image
    * @returns
    *    - 0 for success
    *    - -1 for failure

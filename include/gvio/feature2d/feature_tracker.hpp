@@ -79,7 +79,7 @@ struct FeatureTrack {
   /**
    * Return last feature seen
    *
-   * @param data Feature
+   * @returns Last feature
    */
   Feature &last() { return this->track.back(); }
 
@@ -161,6 +161,7 @@ public:
    * Detect features
    *
    * @param image Input image
+   * @param features List of features
    * @returns 0 for success, -1 for failure
    */
   int detect(const cv::Mat &image, std::vector<Feature> &features);
@@ -207,6 +208,9 @@ inline void f2kd(const std::vector<Feature> &features,
   }
 }
 
+/**
+  * Keypoints and descriptors to Features
+  */
 inline void kd2f(const std::vector<cv::KeyPoint> &keypoints,
                  const cv::Mat &descriptors,
                  std::vector<Feature> &features) {

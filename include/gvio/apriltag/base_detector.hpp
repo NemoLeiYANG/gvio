@@ -1,5 +1,8 @@
 #ifndef GVIO_APRILTAG_BASE_HPP
 #define GVIO_APRILTAG_BASE_HPP
+/**
+ * @file base_detector.hpp
+ */
 
 #include <cmath>
 #include <fstream>
@@ -139,9 +142,9 @@ public:
   /**
    * Calculate tag corners in inertial frame
    *
-   * @param tag_size Tag size
-   * @param padding Corner padding
    * @param image Image
+   * @param tag_pose Tag pose
+   * @param padding Corner padding
    * @param top_left Top left tag corner
    * @param btm_right Bottom right tag corner
    *
@@ -187,7 +190,7 @@ public:
   /**
    * Crop image
    *
-   * @param prev_tag Previous AprilTag pose
+   * @param tag_pose AprilTag pose
    * @param image Image
    * @param cropped_image Cropped image
    * @param padding Crop padding

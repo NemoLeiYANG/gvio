@@ -1,5 +1,8 @@
 #ifndef GVIO_UTILS_LOG_HPP
 #define GVIO_UTILS_LOG_HPP
+/**
+ * @file log.hpp
+ */
 
 #define __FILENAME__                                                           \
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)

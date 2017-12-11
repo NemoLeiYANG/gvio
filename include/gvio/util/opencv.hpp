@@ -1,5 +1,8 @@
 #ifndef GVIO_UTIL_OPENCV_HPP
 #define GVIO_UTIL_OPENCV_HPP
+/**
+ * @file opencv.hpp
+ */
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>

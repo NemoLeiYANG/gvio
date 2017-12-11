@@ -1,5 +1,8 @@
 #ifndef GVIO_UTILS_LINALG_HPP
 #define GVIO_UTILS_LINALG_HPP
+/**
+ * @file linalg.hpp
+ */
 
 #include "gvio/util/math.hpp"
 

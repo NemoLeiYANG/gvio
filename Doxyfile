@@ -1,0 +1,32 @@
+# General configuration options
+PROJECT_NAME = "gvio"
+OUTPUT_DIRECTORY = "docs"
+OUTPUT_LANGUAGE = English
+QUIET = YES
+WARNINGS = YES
+DISABLE_INDEX = NO
+EXTRACT_ALL = YES  # all docs on classes and functions will be processed
+EXTRACT_PRIVATE = YES  # private docs will be processed
+MARKDOWN_SUPPORT = YES
+HAVE_DOT = NO
+
+# Input files configurations
+FILE_PATTERNS = *.hpp *.cpp
+RECURSIVE = YES
+
+# HTML output configurations
+GENERATE_HTML = YES
+LAYOUT_FILE = docs/style/layout.xml
+# HTML_HEADER = docs/style/header.html
+# HTML_FOOTER = docs/style/footer.html
+# HTML_EXTRA_STYLESHEET = docs/style/customdoxygen.css
+# HTML_EXTRA_FILES = docs/style/doxy-boot.js
+
+DISABLE_INDEX = No
+GENERATE_TREEVIEW = NO
+SEARCHENGINE = NO
+AUTOLINK_SUPPORT=NO
+DISTRIBUTE_GROUP_DOC = YES
+
+# LATEX output
+GENERATE_LATEX = NO

@@ -1,5 +1,8 @@
 #ifndef GVIO_UTILS_DATA_HPP
 #define GVIO_UTILS_DATA_HPP
+/**
+ * @file data.hpp
+ */
 
 #include <fstream>
 #include <iomanip>

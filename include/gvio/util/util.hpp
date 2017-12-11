@@ -1,5 +1,8 @@
 #ifndef GVIO_UTIL_UTIL_HPP
 #define GVIO_UTIL_UTIL_HPP
+/**
+ * @file util.hpp
+ */
 
 #include "gvio/util/config.hpp"
 #include "gvio/util/data.hpp"

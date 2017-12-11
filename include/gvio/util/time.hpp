@@ -1,5 +1,8 @@
 #ifndef GVIO_UTILS_TIME_HPP
 #define GVIO_UTILS_TIME_HPP
+/**
+ * @file time.hpp
+ */
 
 #include <sys/time.h>
 #include <time.h>

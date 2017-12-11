@@ -1,5 +1,8 @@
 #ifndef GVIO_UTILS_FILE_HPP
 #define GVIO_UTILS_FILE_HPP
+/**
+ * @file file.hpp
+ */
 
 #include <dirent.h>
 #include <stdio.h>

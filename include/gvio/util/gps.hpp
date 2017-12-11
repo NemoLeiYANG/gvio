@@ -1,5 +1,8 @@
 #ifndef GVIO_UTILS_GPS_HPP
 #define GVIO_UTILS_GPS_HPP
+/**
+ * @file gps.hpp
+ */
 
 #include <cmath>
 
@@ -13,8 +16,8 @@ namespace gvio {
  * Calculate new latitude and logitude coordinates with an offset in North and
  * East direction
  *
- * @param lat Latitude of origin (decimal format)
- * @param lon Longitude of origin (decimal format)
+ * @param lat_ref Latitude of origin (decimal format)
+ * @param lon_ref Longitude of origin (decimal format)
  * @param offset_N Offset in North direction (meters)
  * @param offset_E Offset in East direction (meters)
  * @param lat_new New latitude (decimal format)

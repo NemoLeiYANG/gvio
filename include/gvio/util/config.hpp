@@ -98,14 +98,6 @@ public:
  *          7.7, 8.8, 9.9]
  * ```
  *
- * For example, consider this yaml file:
- * @include example_params.yaml
- *
- * The code that parses the above is:
- * @include example_config_parser.cpp
- *
- * @todo integrate unit tests into examples (see
- * http://stackoverflow.com/a/16034375/431033)
  */
 class ConfigParser {
 public:
@@ -219,6 +211,5 @@ public:
   int load(const std::string &config_file);
 };
 
-} // namespace atl
-
+} // namespace gvio
 #endif // GVIO_UTILS_CONFIG_HPP
