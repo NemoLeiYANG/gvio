@@ -41,7 +41,7 @@ TEST(GMSMatcher, demo) {
     // GMS match
     std::vector<cv::DMatch> matches_gms;
     const int nb_inliers = gms.match(k1, d1, k2, d2, img1.size(), matches_gms);
-    cv::Mat matches_img = DrawInlier(img1, img2, k1, k2, matches_gms, 1);
+    cv::Mat matches_img = draw_inliers(img1, img2, k1, k2, matches_gms, 1);
     cv::imshow("Matches", matches_img);
 
     // Update old with new
