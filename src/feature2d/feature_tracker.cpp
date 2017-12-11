@@ -92,17 +92,73 @@ int FeatureTracker::match(const std::vector<Feature> &f1) {
   // Convert list of features to list of cv2.KeyPoint and descriptors
   std::vector<cv::KeyPoint> kps0, kps1;
   cv::Mat des0, des1;
-  Feature::toKeyPointsAndDescriptors(f0, kps0, des0);
-  Feature::toKeyPointsAndDescriptors(f1, kps1, des1);
+  f2kd(f0, kps0, des0);
+  f2kd(f1, kps1, des1);
 
   // Perform matching
   // Note: arguments to the brute-force matcher is (query descriptors,
   // train descriptors), here we use des1 as the query descriptors because
   // des1 represents the latest descriptors from the latest image frame
-  std::vector<cv::DMatch> matches_bf;
-  // this->matcher.match(kps0, des0, kps1, des1, this->img_size, matches_bf);
+  std::vector<cv::DMatch> matches;
+  this->matcher.match(kps0, des0, kps1, des1, this->img_size, matches);
+  std::vector<Feature> features0;
+  std::vector<Feature> features1;
+  kd2f(kps0, des0, features0);
+  kd2f(kps1, des1, features1);
+
+  // Update or add feature track
+  std::map<int, bool> tracks_updated;
+  for (size_t i = 0; i < matches.size(); i++) {
+    const int f0_idx = matches[i].trainIdx;
+    const int f1_idx = matches[i].queryIdx;
+    auto fea0 = features0[f0_idx];
+    auto fea1 = features1[f1_idx];
+
+    if (fea0.track_id != -1) {
+      this->updateTrack(fea0.track_id, fea1);
+    } else {
+      this->addTrack(fea0, fea1);
+    }
+
+    tracks_updated.insert({fea0.track_id, true});
+  }
+
+  // Drop dead feature tracks
+  size_t t_size = this->tracking.size();
+  for (size_t i = 0; i < t_size; i++) {
+    const auto track_id = this->tracking[i];
+    if (tracks_updated.count(track_id) == 0) {
+      this->removeTrack(track_id, true);
+    }
+  }
 
   return 0;
+}
+
+std::vector<FeatureTrack> FeatureTracker::purge(const size_t n) {
+  std::vector<FeatureTrack> tracks;
+
+  const int purge_size = std::max(n, this->buffer.size());
+  tracks.resize(purge_size);
+
+  /**
+   * Note: Map is ordered (source: https://stackoverflow.com/q/7648756/154688)
+   */
+  int counter = 0;
+  for (auto kv : this->buffer) {
+    auto track_id = kv.first;
+    auto track = kv.second;
+
+    tracks.push_back(track);
+    this->buffer.erase(track_id);
+
+    counter++;
+    if (counter == purge_size) {
+      break;
+    }
+  }
+
+  return tracks;
 }
 
 } // namespace gvio

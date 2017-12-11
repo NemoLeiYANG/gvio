@@ -25,7 +25,6 @@ using FrameID = long int;
  */
 struct Feature {
   TrackID track_id = -1;
-
   cv::KeyPoint kp;
   cv::Mat desc;
 
@@ -43,23 +42,7 @@ struct Feature {
   /**
    * Return feature as cv::KeyPoint
    */
-  cv::KeyPoint getKeyPoint() { return this->kp; }
-
-  /**
-   * Features to keypoints and descriptors
-   */
-  static void toKeyPointsAndDescriptors(const std::vector<Feature> &features,
-                                        std::vector<cv::KeyPoint> &keypoints,
-                                        cv::Mat &descriptors) {
-    descriptors = cv::Mat(features[0].desc.rows, features.size(), CV_8UC1);
-    for (size_t i = 0; i < features.size(); i++) {
-      keypoints.push_back(features[i].kp);
-
-      cv::Mat d;
-      features[i].desc.copyTo(d);
-      descriptors.col(i) = d;
-    }
-  }
+  cv::KeyPoint &getKeyPoint() { return this->kp; }
 };
 
 /**
@@ -143,6 +126,7 @@ public:
    * Configure
    *
    * @param config_file Path to config file
+   * @returns 0 for success, -1 for failure
    */
   int configure(const std::string &config_file);
 
@@ -151,6 +135,7 @@ public:
    *
    * @param f1 First feature
    * @param f2 Second feature
+   * @returns 0 for success, -1 for failure
    */
   int addTrack(Feature &f1, Feature &f2);
 
@@ -159,6 +144,7 @@ public:
    *
    * @param track_id Track ID
    * @param lost Mark feature track as lost
+   * @returns 0 for success, -1 for failure
    */
   int removeTrack(const TrackID &track_id, const bool lost = false);
 
@@ -167,6 +153,7 @@ public:
    *
    * @param track_id Track ID
    * @param f Feature
+   * @returns 0 for success, -1 for failure
    */
   int updateTrack(const TrackID &track_id, Feature &f);
 
@@ -174,6 +161,7 @@ public:
    * Detect features
    *
    * @param image Input image
+   * @returns 0 for success, -1 for failure
    */
   int detect(const cv::Mat &image, std::vector<Feature> &features);
 
@@ -183,25 +171,49 @@ public:
    * The idea is that with the current features, we want to match it against
    * the current list of FeatureTrack.
    *
-   * @param features List of features
+   * @param f1 List of features in current frame
+   * @returns 0 for success, -1 for failure
    */
-  int match(const std::vector<Feature> &features);
+  int match(const std::vector<Feature> &f1);
 
   /**
-   * Process matches
+   * Purge old feature tracks
+   *
+   * @returns 0 for success, -1 for failure
    */
-  int processMatches();
-
-  /**
-   * Clear old feature tracks
-   */
-  size_t clear();
+  std::vector<FeatureTrack> purge(const size_t n);
 
   /**
    * Update feature tracker
+   *
+   * @returns 0 for success, -1 for failure
    */
   int update();
 };
+
+/**
+  * Features to keypoints and descriptors
+  */
+inline void f2kd(const std::vector<Feature> &features,
+                 std::vector<cv::KeyPoint> &keypoints,
+                 cv::Mat &descriptors) {
+  descriptors = cv::Mat(features[0].desc.rows, features.size(), CV_8UC1);
+  for (size_t i = 0; i < features.size(); i++) {
+    keypoints.push_back(features[i].kp);
+
+    cv::Mat d;
+    features[i].desc.copyTo(d);
+    descriptors.col(i) = d;
+  }
+}
+
+inline void kd2f(const std::vector<cv::KeyPoint> &keypoints,
+                 const cv::Mat &descriptors,
+                 std::vector<Feature> &features) {
+  for (size_t i = 0; i < keypoints.size(); i++) {
+    features.emplace_back(keypoints[i], descriptors.col(i));
+  }
+}
 
 } // namespace gvio
 #endif // GVIO_FEATURE2D_TRACKER_HPP
