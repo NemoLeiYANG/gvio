@@ -195,51 +195,38 @@ TEST(FeatureTracker, updateTrack) {
 //   }
 // }
 
-TEST(FeatureTracker, getKeyPointsAndDescriptors) {
+TEST(FeatureTracker, conversions) {
+  FeatureTracker tracker;
   const cv::Mat img = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
-
-  // Detect features
-  std::vector<Feature> f0;
-  FeatureTracker tracker;
-  tracker.detect(img, f0);
-
-  // Convert features to keypoints and descriptors
-  std::vector<cv::KeyPoint> keypoints;
-  cv::Mat descriptors;
-  tracker.getKeyPointsAndDescriptors(f0, keypoints, descriptors);
-
-  // Assert
-  int index = 0;
-  for (auto &f : f0) {
-    EXPECT_TRUE(f.kp.pt.x == keypoints[index].pt.x);
-    EXPECT_TRUE(f.kp.pt.y == keypoints[index].pt.y);
-    EXPECT_TRUE(cvMatIsEqual(f.desc, descriptors.row(index)));
-    EXPECT_EQ(f.desc.size(), cv::Size(32, 1));
-    index++;
-  }
-}
-
-TEST(FeatureTracker, getFeatures) {
-  FeatureTracker tracker;
-  const cv::Mat image = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
 
   // Detect keypoints and descriptors
   cv::Mat mask;
-  std::vector<cv::KeyPoint> keypoints;
-  cv::Mat descriptors;
+  std::vector<cv::KeyPoint> k0;
+  cv::Mat d0;
   cv::Ptr<cv::ORB> orb = cv::ORB::create();
-  orb->detectAndCompute(image, mask, keypoints, descriptors);
+  orb->detectAndCompute(img, mask, k0, d0);
 
   // Convert keypoints and descriptors to features
   std::vector<Feature> f0;
-  tracker.getFeatures(keypoints, descriptors, f0);
+  tracker.getFeatures(k0, d0, f0);
+
+  // Convert features to keypoints and descriptors
+  std::vector<cv::KeyPoint> k1;
+  cv::Mat d1;
+  tracker.getKeyPointsAndDescriptors(f0, k1, d1);
 
   // Assert
   int index = 0;
   for (auto &f : f0) {
-    EXPECT_TRUE(f.kp.pt.x == keypoints[index].pt.x);
-    EXPECT_TRUE(f.kp.pt.y == keypoints[index].pt.y);
-    EXPECT_TRUE(cvMatIsEqual(f.desc, descriptors.row(index)));
+    EXPECT_TRUE(f.kp.pt.x == k0[index].pt.x);
+    EXPECT_TRUE(f.kp.pt.y == k0[index].pt.y);
+
+    EXPECT_TRUE(f.kp.pt.x == k1[index].pt.x);
+    EXPECT_TRUE(f.kp.pt.y == k1[index].pt.y);
+
+    EXPECT_TRUE(cvMatIsEqual(f.desc, d0.row(index)));
+    EXPECT_TRUE(cvMatIsEqual(f.desc, d1.row(index)));
+
     EXPECT_EQ(f.desc.size(), cv::Size(32, 1));
     index++;
   }
@@ -250,11 +237,24 @@ TEST(FeatureTracker, match) {
   const cv::Mat img0 = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
   const cv::Mat img1 = cv::imread(TEST_IMAGE_BOTTOM, CV_LOAD_IMAGE_COLOR);
 
-  // Detect features from image 0 and 1
-  std::vector<Feature> f0, f1;
-  tracker.detect(img0, f0);
+  // Detect keypoints and descriptors
+  cv::Mat mask;
+  cv::Ptr<cv::ORB> orb = cv::ORB::create();
+
+  // Detect features in image 0
+  std::vector<cv::KeyPoint> k0;
+  cv::Mat d0;
+  std::vector<Feature> f0;
+  orb->detectAndCompute(img0, mask, k0, d0);
+  tracker.getFeatures(k0, d0, f0);
   tracker.fea_ref = f0;
-  tracker.detect(img1, f1);
+
+  // Detect features in image 1
+  std::vector<cv::KeyPoint> k1;
+  cv::Mat d1;
+  std::vector<Feature> f1;
+  orb->detectAndCompute(img1, mask, k1, d1);
+  tracker.getFeatures(k1, d1, f1);
 
   // Perform matching
   std::vector<cv::DMatch> matches;
@@ -262,14 +262,10 @@ TEST(FeatureTracker, match) {
   tracker.match(f1, matches);
 
   // Draw inliers
-  std::vector<cv::KeyPoint> k0, k1;
-  cv::Mat d0, d1;
-  tracker.getKeyPointsAndDescriptors(f0, k0, d0);
-  tracker.getKeyPointsAndDescriptors(f1, k1, d1);
   cv::Mat matches_img = draw_inliers(img0, img1, k0, k1, matches, 1);
 
-  cv::imshow("Matches", matches_img);
-  cv::waitKey();
+  // cv::imshow("Matches", matches_img);
+  // cv::waitKey();
 }
 
 TEST(FeatureTracker, purge) {
@@ -277,11 +273,24 @@ TEST(FeatureTracker, purge) {
   const cv::Mat img0 = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
   const cv::Mat img1 = cv::imread(TEST_IMAGE_BOTTOM, CV_LOAD_IMAGE_COLOR);
 
-  // Detect features from image 0 and 1
-  std::vector<Feature> f0, f1;
-  tracker.detect(img0, f0);
+  // Detect keypoints and descriptors
+  cv::Mat mask;
+  cv::Ptr<cv::ORB> orb = cv::ORB::create();
+
+  // Detect features in image 0
+  std::vector<cv::KeyPoint> k0;
+  cv::Mat d0;
+  std::vector<Feature> f0;
+  orb->detectAndCompute(img0, mask, k0, d0);
+  tracker.getFeatures(k0, d0, f0);
   tracker.fea_ref = f0;
-  tracker.detect(img1, f1);
+
+  // Detect features in image 1
+  std::vector<cv::KeyPoint> k1;
+  cv::Mat d1;
+  std::vector<Feature> f1;
+  orb->detectAndCompute(img1, mask, k1, d1);
+  tracker.getFeatures(k1, d1, f1);
 
   // Perform matching
   std::vector<cv::DMatch> matches;
@@ -295,52 +304,8 @@ TEST(FeatureTracker, purge) {
   TrackID index = 0;
   EXPECT_EQ(10, tracks.size());
   for (auto t : tracks) {
-    std::cout << t << std::endl;
     EXPECT_EQ(index, t.track_id);
     index++;
-  }
-}
-
-TEST(FeatureTracker, initialize) {
-  FeatureTracker tracker;
-
-  const cv::Mat img0 = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
-  const int retval = tracker.initialize(img0);
-
-  // cv::imshow("Image", tracker.img_ref);
-  // cv::waitKey(0);
-
-  // EXPECT_TRUE(cvMatIsEqual(img0, tracker.img_ref));
-  EXPECT_TRUE(tracker.fea_ref.size() > 0);
-  EXPECT_EQ(0, retval);
-}
-
-TEST(FeatureTracker, update) {
-  FeatureTracker tracker;
-
-  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
-  raw_dataset.load();
-
-  // cv::VideoCapture capture(0);
-  // cv::Mat img0;
-  // capture >> img0;
-
-  tracker.show_matches = true;
-  tracker.initialize(cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR));
-  // tracker.initialize(img0);
-
-  for (int i = 1; i < 100; i++) {
-    cv::Mat image = cv::imread(raw_dataset.cam0[i], CV_LOAD_IMAGE_COLOR);
-    // cv::Mat image;
-    // capture >> image;
-
-    tracker.update(image);
-    // std::cout << tracker << std::endl;
-
-    // Break loop if 'q' was pressed
-    if (cv::waitKey(1) == 113) {
-      break;
-    }
   }
 }
 

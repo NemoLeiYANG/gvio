@@ -2,8 +2,6 @@
 
 namespace gvio {
 
-int FeatureTracker::configure(const std::string &config_file) { return 0; }
-
 int FeatureTracker::addTrack(Feature &f1, Feature &f2) {
   // Update and get track and frame ids
   this->counter_track_id++;
@@ -82,32 +80,29 @@ void FeatureTracker::getFeatures(const std::vector<cv::KeyPoint> &keypoints,
 
 int FeatureTracker::detect(const cv::Mat &image,
                            std::vector<Feature> &features) {
-  // Keep track of current image
-  image.copyTo(this->img_cur);
+  UNUSED(image);
+  UNUSED(features);
+  LOG_ERROR("You're suppose to override FeatureTracker::detect()!");
+  LOG_ERROR("FeatureTracker is a base class!");
+  exit(-1);
 
-  // // Detect features
-  // cv::FAST(image,
-  //          keypoints,
-  //          this->fast_threshold,
-  //          this->fast_nonmax_suppression);
-  // if (keypoints.size() == 0) {
-  //   return -1;
+  // // Keep track of current image
+  // image.copyTo(this->img_cur);
+  //
+  // // Feature descriptor extraction
+  // std::vector<cv::KeyPoint> keypoints;
+  // cv::Mat mask;
+  // cv::Mat descriptors;
+  // this->orb->detectAndCompute(image, mask, keypoints, descriptors);
+  //
+  // // Update counters
+  // this->counter_frame_id++;
+  //
+  // // Create features
+  // // for (int i = 0; i < descriptors.rows; i++) {
+  // for (int i = 0; i < 200; i++) {
+  //   features.emplace_back(keypoints[i], descriptors.row(i));
   // }
-
-  // Feature descriptor extraction
-  std::vector<cv::KeyPoint> keypoints;
-  cv::Mat mask;
-  cv::Mat descriptors;
-  this->orb->detectAndCompute(image, mask, keypoints, descriptors);
-
-  // Update counters
-  this->counter_frame_id++;
-
-  // Create features
-  // for (int i = 0; i < descriptors.rows; i++) {
-  for (int i = 0; i < 200; i++) {
-    features.emplace_back(keypoints[i], descriptors.row(i));
-  }
 
   return 0;
 }

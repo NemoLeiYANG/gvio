@@ -95,7 +95,7 @@ int csv2mat(const std::string &file_path, const bool header, MatX &data) {
   return 0;
 }
 
-int mat2csv(const std::string &file_path, MatX data) {
+int mat2csv(const std::string &file_path, const MatX &data) {
   std::ofstream outfile(file_path);
 
   // open file

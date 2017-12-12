@@ -2,8 +2,8 @@
  * @file
  * @ingroup feature2d
  */
-#ifndef GVIO_FEATURE2D_TRACKER_HPP
-#define GVIO_FEATURE2D_TRACKER_HPP
+#ifndef GVIO_FEATURE2D_FEATURE_TRACKER_HPP
+#define GVIO_FEATURE2D_FEATURE_TRACKER_HPP
 
 #include <stdio.h>
 #include <vector>
@@ -125,9 +125,6 @@ class FeatureTracker {
 public:
   bool show_matches = false;
 
-  // Detector and descriptor
-  cv::Ptr<cv::ORB> orb = cv::ORB::create();
-
   // Matcher
   cv::Size img_size;
   GMSMatcher matcher;
@@ -148,14 +145,6 @@ public:
   std::vector<Feature> unmatched;
 
   FeatureTracker() {}
-
-  /**
-   * Configure
-   *
-   * @param config_file Path to config file
-   * @returns 0 for success, -1 for failure
-   */
-  int configure(const std::string &config_file);
 
   /**
    * Add feature track
@@ -213,7 +202,7 @@ public:
    * @param features List of features
    * @returns 0 for success, -1 for failure
    */
-  int detect(const cv::Mat &image, std::vector<Feature> &features);
+  virtual int detect(const cv::Mat &image, std::vector<Feature> &features);
 
   /**
    * Draw matches
@@ -318,4 +307,4 @@ public:
 
 /** @} group feature2d */
 } // namespace gvio
-#endif // GVIO_FEATURE2D_TRACKER_HPP
+#endif // GVIO_FEATURE2D_FEATURE_TRACKER_HPP

@@ -22,7 +22,6 @@
 
 #include "gvio/util/util.hpp"
 #include "gvio/apriltag/base_detector.hpp"
-#include "gvio/apriltag/data.hpp"
 #include "gvio/camera/camera.hpp"
 
 namespace gvio {
