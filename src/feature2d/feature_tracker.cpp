@@ -2,7 +2,7 @@
 
 namespace gvio {
 
-// int FeatureTracker::configure(const std::string &config_file) { return 0; }
+int FeatureTracker::configure(const std::string &config_file) { return 0; }
 
 int FeatureTracker::addTrack(Feature &f1, Feature &f2) {
   // Update and get track and frame ids

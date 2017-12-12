@@ -6,7 +6,6 @@ int CameraConfig::load(const std::string &config_file) {
   ConfigParser parser;
 
   // config variables
-  // clang-format off
   parser.addParam("index", &this->index);
   parser.addParam("image_width", &this->image_width);
   parser.addParam("image_height", &this->image_height);
@@ -31,7 +30,6 @@ int CameraConfig::load(const std::string &config_file) {
   parser.addParam("imshow", &this->imshow);
   parser.addParam("snapshot", &this->snapshot);
   parser.addParam("showfps", &this->showfps);
-  // clang-format on
 
   // load config
   if (parser.load(config_file) != 0) {

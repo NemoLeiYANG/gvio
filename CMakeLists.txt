@@ -22,6 +22,7 @@ ADD_LIBRARY(
 	# apriltag
 	src/apriltag/base_detector.cpp
 	src/apriltag/mit.cpp
+	src/apriltag/michigan.cpp
 	# camera
 	src/camera/camera.cpp
 	src/camera/camera_config.cpp
@@ -60,6 +61,7 @@ ADD_LIBRARY(
 SET(${PROJECT_NAME}_DEPS
 	${OpenCV_LIBS}
 	apriltags_mit
+	apriltag
 	yaml-cpp
 	pthread
 )

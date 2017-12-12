@@ -20,12 +20,12 @@
 #include <apriltag/apriltag.h>
 #include <apriltag/tag16h5.h>
 
-#include "atl/utils/utils.hpp"
-#include "atl/vision/apriltag/base_detector.hpp"
-#include "atl/vision/apriltag/data.hpp"
-#include "atl/vision/camera/camera.hpp"
+#include "gvio/util/util.hpp"
+#include "gvio/apriltag/base_detector.hpp"
+#include "gvio/apriltag/data.hpp"
+#include "gvio/camera/camera.hpp"
 
-namespace atl {
+namespace gvio {
 /**
  * @addtogroup apriltag
  * @{
@@ -80,5 +80,5 @@ public:
 };
 
 /** @} group apriltag */
-} // namespace atl
+} // namespace gvio
 #endif // GVIO_APRILTAG_MICHIGAN_HPP

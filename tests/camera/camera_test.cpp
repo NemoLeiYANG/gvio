@@ -58,9 +58,9 @@ TEST(Camera, getFrame) {
 TEST(Camera, run) {
   Camera camera;
 
-  // camera.configure(TEST_CONFIG_PATH);
-  // camera.initialize();
-  // camera.run();
+  camera.configure(TEST_CONFIG_PATH);
+  camera.initialize();
+  camera.run();
 }
 
 } // namespace gvio
