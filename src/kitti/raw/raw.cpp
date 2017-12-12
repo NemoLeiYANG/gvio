@@ -47,6 +47,14 @@ int RawDataset::loadImagePaths() {
   std::sort(this->cam2.begin(), this->cam2.end());
   std::sort(this->cam3.begin(), this->cam3.end());
 
+  // Add full path to files
+  for (size_t i = 0; i < this->cam0.size(); i++) {
+    this->cam0[i] = this->drive_dir + "/image_00/data/" + this->cam0[i];
+    this->cam1[i] = this->drive_dir + "/image_01/data/" + this->cam1[i];
+    this->cam2[i] = this->drive_dir + "/image_02/data/" + this->cam2[i];
+    this->cam3[i] = this->drive_dir + "/image_03/data/" + this->cam3[i];
+  }
+
   return 0;
 }
 

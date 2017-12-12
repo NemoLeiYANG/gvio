@@ -76,8 +76,8 @@ ADD_EXECUTABLE(
 	# apriltag
 	# tests/apriltag/mit_test.cpp
 	# camera
-	tests/camera/camera_test.cpp
 	tests/camera/camera_config_test.cpp
+	tests/camera/camera_test.cpp
   # feature2d
   tests/feature2d/feature_tracker_test.cpp
 	tests/feature2d/gms_matcher_test.cpp

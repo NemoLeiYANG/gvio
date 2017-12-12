@@ -262,6 +262,9 @@ int GMSMatcher::match(const std::vector<cv::KeyPoint> &k1,
                       const cv::Mat &d2,
                       const cv::Size &img_size,
                       std::vector<cv::DMatch> &matches) {
+  // Pre-check
+  assert(img_size.width != 0 && img_size.height != 0);
+
   // Match using Brute-force matcher (First pass)
   std::vector<cv::DMatch> matches_bf;
 

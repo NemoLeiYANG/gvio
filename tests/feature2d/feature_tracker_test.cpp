@@ -1,4 +1,5 @@
 #include "gvio/gvio_test.hpp"
+#include "gvio/kitti/kitti.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 
 #define TEST_IMAGE_TOP "test_data/apriltag/top.png"
@@ -105,9 +106,7 @@ TEST(FeatureTrack, tracked_length) {
 TEST(FeatureTracker, constructor) {
   FeatureTracker tracker;
 
-  EXPECT_FALSE(tracker.configured);
-  EXPECT_EQ(10, tracker.fast_threshold);
-  EXPECT_EQ(true, tracker.fast_nonmax_suppression);
+  EXPECT_FALSE(tracker.show_matches);
 
   EXPECT_EQ(-1, (int) tracker.counter_frame_id);
   EXPECT_EQ(-1, (int) tracker.counter_track_id);
@@ -196,24 +195,153 @@ TEST(FeatureTracker, updateTrack) {
 //   }
 // }
 
+TEST(FeatureTracker, getKeyPointsAndDescriptors) {
+  const cv::Mat img = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
+
+  // Detect features
+  std::vector<Feature> f0;
+  FeatureTracker tracker;
+  tracker.detect(img, f0);
+
+  // Convert features to keypoints and descriptors
+  std::vector<cv::KeyPoint> keypoints;
+  cv::Mat descriptors;
+  tracker.getKeyPointsAndDescriptors(f0, keypoints, descriptors);
+
+  // Assert
+  int index = 0;
+  for (auto &f : f0) {
+    EXPECT_TRUE(f.kp.pt.x == keypoints[index].pt.x);
+    EXPECT_TRUE(f.kp.pt.y == keypoints[index].pt.y);
+    EXPECT_TRUE(cvMatIsEqual(f.desc, descriptors.row(index)));
+    EXPECT_EQ(f.desc.size(), cv::Size(32, 1));
+    index++;
+  }
+}
+
+TEST(FeatureTracker, getFeatures) {
+  FeatureTracker tracker;
+  const cv::Mat image = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
+
+  // Detect keypoints and descriptors
+  cv::Mat mask;
+  std::vector<cv::KeyPoint> keypoints;
+  cv::Mat descriptors;
+  cv::Ptr<cv::ORB> orb = cv::ORB::create();
+  orb->detectAndCompute(image, mask, keypoints, descriptors);
+
+  // Convert keypoints and descriptors to features
+  std::vector<Feature> f0;
+  tracker.getFeatures(keypoints, descriptors, f0);
+
+  // Assert
+  int index = 0;
+  for (auto &f : f0) {
+    EXPECT_TRUE(f.kp.pt.x == keypoints[index].pt.x);
+    EXPECT_TRUE(f.kp.pt.y == keypoints[index].pt.y);
+    EXPECT_TRUE(cvMatIsEqual(f.desc, descriptors.row(index)));
+    EXPECT_EQ(f.desc.size(), cv::Size(32, 1));
+    index++;
+  }
+}
+
 TEST(FeatureTracker, match) {
   FeatureTracker tracker;
+  const cv::Mat img0 = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
+  const cv::Mat img1 = cv::imread(TEST_IMAGE_BOTTOM, CV_LOAD_IMAGE_COLOR);
 
-  cv::Mat img_top = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
-  cv::Mat img_bottom = cv::imread(TEST_IMAGE_BOTTOM, CV_LOAD_IMAGE_COLOR);
-
-  cv::imshow("Image", img_top);
-  cv::waitKey(0);
-
-  std::vector<Feature> f0;
-  std::vector<Feature> f1;
-
-  tracker.detect(img_top, f0);
+  // Detect features from image 0 and 1
+  std::vector<Feature> f0, f1;
+  tracker.detect(img0, f0);
   tracker.fea_ref = f0;
-  tracker.detect(img_bottom, f1);
+  tracker.detect(img1, f1);
 
-  tracker.img_size = img_top.size();
-  tracker.match(f1);
+  // Perform matching
+  std::vector<cv::DMatch> matches;
+  tracker.img_size = img0.size();
+  tracker.match(f1, matches);
+
+  // Draw inliers
+  std::vector<cv::KeyPoint> k0, k1;
+  cv::Mat d0, d1;
+  tracker.getKeyPointsAndDescriptors(f0, k0, d0);
+  tracker.getKeyPointsAndDescriptors(f1, k1, d1);
+  cv::Mat matches_img = draw_inliers(img0, img1, k0, k1, matches, 1);
+
+  cv::imshow("Matches", matches_img);
+  cv::waitKey();
+}
+
+TEST(FeatureTracker, purge) {
+  FeatureTracker tracker;
+  const cv::Mat img0 = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
+  const cv::Mat img1 = cv::imread(TEST_IMAGE_BOTTOM, CV_LOAD_IMAGE_COLOR);
+
+  // Detect features from image 0 and 1
+  std::vector<Feature> f0, f1;
+  tracker.detect(img0, f0);
+  tracker.fea_ref = f0;
+  tracker.detect(img1, f1);
+
+  // Perform matching
+  std::vector<cv::DMatch> matches;
+  tracker.img_size = img0.size();
+  tracker.match(f1, matches);
+
+  // Purge
+  const std::vector<FeatureTrack> tracks = tracker.purge(10);
+
+  // Assert
+  TrackID index = 0;
+  EXPECT_EQ(10, tracks.size());
+  for (auto t : tracks) {
+    std::cout << t << std::endl;
+    EXPECT_EQ(index, t.track_id);
+    index++;
+  }
+}
+
+TEST(FeatureTracker, initialize) {
+  FeatureTracker tracker;
+
+  const cv::Mat img0 = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
+  const int retval = tracker.initialize(img0);
+
+  // cv::imshow("Image", tracker.img_ref);
+  // cv::waitKey(0);
+
+  // EXPECT_TRUE(cvMatIsEqual(img0, tracker.img_ref));
+  EXPECT_TRUE(tracker.fea_ref.size() > 0);
+  EXPECT_EQ(0, retval);
+}
+
+TEST(FeatureTracker, update) {
+  FeatureTracker tracker;
+
+  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  raw_dataset.load();
+
+  // cv::VideoCapture capture(0);
+  // cv::Mat img0;
+  // capture >> img0;
+
+  tracker.show_matches = true;
+  tracker.initialize(cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR));
+  // tracker.initialize(img0);
+
+  for (int i = 1; i < 100; i++) {
+    cv::Mat image = cv::imread(raw_dataset.cam0[i], CV_LOAD_IMAGE_COLOR);
+    // cv::Mat image;
+    // capture >> image;
+
+    tracker.update(image);
+    // std::cout << tracker << std::endl;
+
+    // Break loop if 'q' was pressed
+    if (cv::waitKey(1) == 113) {
+      break;
+    }
+  }
 }
 
 } // namespace gvio

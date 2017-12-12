@@ -39,6 +39,7 @@ struct Feature {
   Feature() {}
   Feature(const cv::KeyPoint &kp) : kp{kp} {}
   Feature(const cv::KeyPoint &kp, const cv::Mat &desc) : kp{kp}, desc{desc} {}
+  Feature(const Feature &f) : track_id{f.track_id}, kp{f.kp}, desc{f.desc} {}
 
   /**
    * Set feature track ID
@@ -51,6 +52,16 @@ struct Feature {
    * Return feature as cv::KeyPoint
    */
   cv::KeyPoint &getKeyPoint() { return this->kp; }
+
+  /**
+   * Feature to string
+   */
+  friend std::ostream &operator<<(std::ostream &os, const Feature &f) {
+    os << "track_id: " << f.track_id << std::endl;
+    os << "kp: (" << f.kp.pt.x << ", " << f.kp.pt.y << ")" << std::endl;
+    os << "desc: " << f.desc.size() << std::endl;
+    return os;
+  }
 };
 
 /**
@@ -97,17 +108,24 @@ struct FeatureTrack {
    * @returns Size of feature track
    */
   size_t tracked_length() { return this->track.size(); }
+
+  /**
+   * FeatureTrack to string
+   */
+  friend std::ostream &operator<<(std::ostream &os, const FeatureTrack &track) {
+    os << "track_id: " << track.track_id << std::endl;
+    os << "frame_start: " << track.frame_start << std::endl;
+    os << "frame_end: " << track.frame_end << std::endl;
+    os << "length: " << track.track.size() << std::endl;
+    return os;
+  }
 };
 
 class FeatureTracker {
 public:
-  bool configured = false;
+  bool show_matches = false;
 
-  // Detector
-  int fast_threshold = 10;
-  bool fast_nonmax_suppression = true;
-
-  // Descriptor
+  // Detector and descriptor
   cv::Ptr<cv::ORB> orb = cv::ORB::create();
 
   // Matcher
@@ -124,6 +142,7 @@ public:
   std::map<TrackID, FeatureTrack> buffer;
 
   // Image, feature, unmatched features book keeping
+  cv::Mat img_cur;
   cv::Mat img_ref;
   std::vector<Feature> fea_ref;
   std::vector<Feature> unmatched;
@@ -166,6 +185,28 @@ public:
   int updateTrack(const TrackID &track_id, Feature &f);
 
   /**
+   * Convert list of features to keypoints and descriptors
+   *
+   * @param features List of features
+   * @param keypoints Keypoints
+   * @param descriptors Descriptors
+   */
+  void getKeyPointsAndDescriptors(const std::vector<Feature> &features,
+                                  std::vector<cv::KeyPoint> &keypoints,
+                                  cv::Mat &descriptors);
+
+  /**
+    * Convert keypoints and descriptors to list of features
+    *
+   * @param features List of features
+   * @param keypoints Keypoints
+   * @param descriptors Descriptors
+    */
+  void getFeatures(const std::vector<cv::KeyPoint> &keypoints,
+                   const cv::Mat &descriptors,
+                   std::vector<Feature> &features);
+
+  /**
    * Detect features
    *
    * @param image Input image
@@ -173,6 +214,32 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int detect(const cv::Mat &image, std::vector<Feature> &features);
+
+  /**
+   * Draw matches
+   *
+   * @param img0 Previous image frame
+   * @param img1 Current image frame
+   * @param k0 Previous keypoints
+   * @param k1 Current keypoints
+   * @param matches Feature matches
+   * @returns Image with feature matches between previous and current frame
+   */
+  cv::Mat drawMatches(const cv::Mat &img0,
+                      const cv::Mat &img1,
+                      const std::vector<cv::KeyPoint> k0,
+                      const std::vector<cv::KeyPoint> k1,
+                      const std::vector<cv::DMatch> &matches);
+
+  /**
+   * Draw features
+   *
+   * @param image Image frame
+   * @param features List of features
+   * @returns Features image
+   */
+  cv::Mat drawFeatures(const cv::Mat &image,
+                       const std::vector<Feature> features);
 
   /**
    * Match features to feature tracks
@@ -183,49 +250,71 @@ public:
    * @param f1 List of features in current frame
    * @returns 0 for success, -1 for failure
    */
-  int match(const std::vector<Feature> &f1);
+  int match(const std::vector<Feature> &f1, std::vector<cv::DMatch> &matches);
 
   /**
    * Purge old feature tracks
    *
+   * @param n N-number of feature tracks to purge (starting with oldest)
    * @returns 0 for success, -1 for failure
    */
   std::vector<FeatureTrack> purge(const size_t n);
 
   /**
-   * Update feature tracker
+   * Initialize feature tracker
    *
+   * @param img_cur Current image frame
    * @returns 0 for success, -1 for failure
    */
-  int update();
+  int initialize(const cv::Mat &img_cur);
+
+  /**
+   * Update feature tracker
+   *
+   * @param img_cur Current image frame
+   * @param show_matches Show matches
+   * @returns 0 for success, -1 for failure
+   */
+  int update(const cv::Mat &img_cur);
+
+  /**
+   * FeatureTracker to string
+   */
+  friend std::ostream &operator<<(std::ostream &os,
+                                  const FeatureTracker &tracker) {
+    os << "tracking: [";
+    for (auto track_id : tracker.tracking) {
+      os << track_id << ", ";
+    }
+    if (tracker.tracking.size()) {
+      os << "\b\b]" << std::endl;
+    } else {
+      os << "]" << std::endl;
+    }
+
+    os << "lost : [";
+    for (auto track_id : tracker.lost) {
+      os << track_id << ", ";
+    }
+    if (tracker.lost.size()) {
+      os << "\b\b]" << std::endl;
+    } else {
+      os << "]" << std::endl;
+    }
+
+    os << "buffer: [";
+    for (auto kv : tracker.buffer) {
+      os << kv.first << ", ";
+    }
+    if (tracker.buffer.size()) {
+      os << "\b\b]" << std::endl;
+    } else {
+      os << "]" << std::endl;
+    }
+
+    return os;
+  }
 };
-
-/**
-  * Features to keypoints and descriptors
-  */
-inline void f2kd(const std::vector<Feature> &features,
-                 std::vector<cv::KeyPoint> &keypoints,
-                 cv::Mat &descriptors) {
-  descriptors = cv::Mat(features[0].desc.rows, features.size(), CV_8UC1);
-  for (size_t i = 0; i < features.size(); i++) {
-    keypoints.push_back(features[i].kp);
-
-    cv::Mat d;
-    features[i].desc.copyTo(d);
-    descriptors.col(i) = d;
-  }
-}
-
-/**
-  * Keypoints and descriptors to Features
-  */
-inline void kd2f(const std::vector<cv::KeyPoint> &keypoints,
-                 const cv::Mat &descriptors,
-                 std::vector<Feature> &features) {
-  for (size_t i = 0; i < keypoints.size(); i++) {
-    features.emplace_back(keypoints[i], descriptors.col(i));
-  }
-}
 
 /** @} group feature2d */
 } // namespace gvio
