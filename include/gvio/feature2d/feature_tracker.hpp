@@ -37,6 +37,7 @@ struct Feature {
   cv::Mat desc;
 
   Feature() {}
+  Feature(const cv::Point2f &pt) : kp{pt, 1.0f} {}
   Feature(const cv::KeyPoint &kp) : kp{kp} {}
   Feature(const cv::KeyPoint &kp, const cv::Mat &desc) : kp{kp}, desc{desc} {}
   Feature(const Feature &f) : track_id{f.track_id}, kp{f.kp}, desc{f.desc} {}
@@ -61,6 +62,18 @@ struct Feature {
     os << "kp: (" << f.kp.pt.x << ", " << f.kp.pt.y << ")" << std::endl;
     os << "desc: " << f.desc.size() << std::endl;
     return os;
+  }
+};
+
+/**
+ * Compare feature by keypoint
+ */
+struct CompareFeatureByKeyPoint {
+  bool operator()(const Feature &a, const Feature &b) const {
+    const double dx = b.kp.pt.x - a.kp.pt.x;
+    const double dy = b.kp.pt.y - a.kp.pt.y;
+    const double dist = sqrtf(dx*dx + dy*dy);
+    return dist;
   }
 };
 
@@ -239,7 +252,7 @@ public:
    * @param f1 List of features in current frame
    * @returns 0 for success, -1 for failure
    */
-  int match(const std::vector<Feature> &f1, std::vector<cv::DMatch> &matches);
+  virtual int match(const std::vector<Feature> &f1, std::vector<cv::DMatch> &matches);
 
   /**
    * Purge old feature tracks
@@ -264,7 +277,7 @@ public:
    * @param show_matches Show matches
    * @returns 0 for success, -1 for failure
    */
-  int update(const cv::Mat &img_cur);
+  virtual int update(const cv::Mat &img_cur);
 
   /**
    * FeatureTracker to string

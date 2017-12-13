@@ -36,6 +36,7 @@ ADD_LIBRARY(
 	src/feature2d/feature_tracker.cpp
 	src/feature2d/gms_matcher.cpp
 	src/feature2d/orb_tracker.cpp
+	src/feature2d/klt_tracker.cpp
 	# gimbal
 	# src/gimbal/gimbal.cpp
 	src/gimbal/sbgc.cpp
@@ -85,6 +86,7 @@ ADD_EXECUTABLE(
   tests/feature2d/feature_tracker_test.cpp
 	tests/feature2d/gms_matcher_test.cpp
   tests/feature2d/orb_tracker_test.cpp
+  tests/feature2d/klt_tracker_test.cpp
 	# gimbal
 	# tests/gimbal/gimbal_test.cpp
 	tests/gimbal/sbgc_test.cpp

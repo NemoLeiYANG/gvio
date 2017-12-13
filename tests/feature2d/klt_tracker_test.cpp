@@ -1,0 +1,75 @@
+#include "gvio/gvio_test.hpp"
+#include "gvio/kitti/kitti.hpp"
+#include "gvio/feature2d/klt_tracker.hpp"
+
+namespace gvio {
+
+TEST(KLTTracker, detect) {
+  KLTTracker tracker;
+
+  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  raw_dataset.load();
+
+  cv::Mat img0 = cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR);
+
+  std::vector<Feature> features;
+  tracker.detect(img0, features);
+  img0 = tracker.drawFeatures(img0, features);
+
+  EXPECT_TRUE(features.size() > 0);
+
+  // cv::imshow("Image", img0);
+  // cv::waitKey(0);
+}
+
+TEST(KLTTracker, track) {
+  KLTTracker tracker;
+
+  // Setup test data
+  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  raw_dataset.load();
+
+  cv::Mat img0 = cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR);
+  cv::Mat img1 = cv::imread(raw_dataset.cam0[1], CV_LOAD_IMAGE_COLOR);
+
+  img0.copyTo(tracker.img_ref);
+  img1.copyTo(tracker.img_cur);
+
+  // Detect features in image 0
+  tracker.initialize(img0);
+
+  // Detect features in image 1
+  std::vector<Feature> f1;
+  tracker.detect(img1, f1);
+
+  // Match features
+  tracker.show_matches = true;
+  tracker.track(f1);
+  cv::waitKey(0);
+
+  EXPECT_TRUE(f1.size() > 0);
+}
+
+TEST(KLTTracker, demo) {
+  KLTTracker tracker;
+
+  cv::VideoCapture capture(0);
+
+  cv::Mat img0;
+  capture >> img0;
+  tracker.show_matches = true;
+  tracker.initialize(img0);
+
+  while (true) {
+    cv::Mat img_cur;
+    capture >> img_cur;
+    tracker.update(img_cur);
+
+    // Break loop if 'q' was pressed
+    if (cv::waitKey(1) == 113) {
+      break;
+    }
+  }
+}
+
+} // namespace gvio

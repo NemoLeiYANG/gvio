@@ -4,9 +4,6 @@ namespace gvio {
 
 int ORBTracker::detect(const cv::Mat &image,
                        std::vector<Feature> &features) {
-  // Keep track of current image
-  image.copyTo(this->img_cur);
-
   // Feature descriptor extraction
   std::vector<cv::KeyPoint> keypoints;
   cv::Mat mask;

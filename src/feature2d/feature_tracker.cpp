@@ -249,6 +249,9 @@ int FeatureTracker::initialize(const cv::Mat &img_cur) {
 }
 
 int FeatureTracker::update(const cv::Mat &img_cur) {
+  // Keep track of current image
+  img_cur.copyTo(this->img_cur);
+
   // Initialize feature tracker
   if (this->fea_ref.size() == 0) {
     this->initialize(img_cur);
