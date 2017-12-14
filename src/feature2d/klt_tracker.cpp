@@ -60,7 +60,7 @@ int KLTTracker::track(const std::vector<Feature> &features) {
   std::vector<cv::Point2f> p1;
   std::vector<uchar> status;
   std::vector<float> err;
-  cv::Size win_size(40, 40);
+  cv::Size win_size(21, 21);
   cv::calcOpticalFlowPyrLK(gray_img_ref,  // Reference image
                            gray_img_cur,  // Current image
                            p0,            // Input points
