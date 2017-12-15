@@ -19,4 +19,4 @@
 #define TEST_KITTI_DATA "test_data/kitti"
 #endif
 
-#endif
+#endif // GVIO_TEST_HPP
