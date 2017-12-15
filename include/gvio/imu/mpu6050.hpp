@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "gvio/driver/i2c.hpp"
+#include "gvio/imu/imu.hpp"
 
 namespace gvio {
 /**
@@ -135,114 +136,115 @@ namespace gvio {
 #define MPU6050_RA_FIFO_R_W 0x74
 #define MPU6050_RA_WHO_AM_I 0x75
 
-class MPU6050Gyroscope {
-public:
-  float sensitivity;
-
-  int16_t raw_x;
-  int16_t raw_y;
-  int16_t raw_z;
-
-  float offset_x;
-  float offset_y;
-  float offset_z;
-
-  float x;
-  float y;
-  float z;
-
-  float pitch;
-  float roll;
-
-  MPU6050Gyroscope()
-      : sensitivity(0.0f),
-
-        raw_x(0), raw_y(0), raw_z(0),
-
-        offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
-
-        x(0.0f), y(0.0f), z(0.0f),
-
-        pitch(0.0f), roll(0.0f) {}
-};
-
-class MPU6050Accelerometer {
-public:
-  float sensitivity;
-
-  int16_t raw_x;
-  int16_t raw_y;
-  int16_t raw_z;
-
-  float offset_x;
-  float offset_y;
-  float offset_z;
-
-  float x;
-  float y;
-  float z;
-
-  float pitch;
-  float roll;
-
-  MPU6050Accelerometer()
-      : sensitivity(0.0f),
-
-        raw_x(0), raw_y(0), raw_z(0),
-
-        offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
-
-        x(0.0f), y(0.0f), z(0.0f),
-
-        pitch(0.0f), roll(0.0f) {}
-};
-
-class MPU6050 {
-public:
-  MPU6050Gyroscope gyro;
-  MPU6050Accelerometer accel;
+struct MPU6050 {
+  Gyroscope gyro;
+  Accelerometer accel;
   I2C i2c;
 
-  float pitch;
-  float roll;
-  float temperature;
+  float temperature = 0.0f;
 
-  float pitch_offset;
-  float roll_offset;
+  float pitch_offset = 0.0f;
+  float roll_offset = 0.0f;
 
-  clock_t last_updated;
-  float sample_rate;
-  int8_t dplf_config;
+  clock_t last_updated = 0;
+  float sample_rate = -1.0f;
+  int8_t dplf_config = 0;
 
-  MPU6050()
-      : gyro(), accel(), i2c(),
+  MPU6050() {}
 
-        pitch(0.0f), roll(0.0f), temperature(0.0f),
-
-        pitch_offset(0.0f), roll_offset(0.0f),
-
-        last_updated(clock()), sample_rate(-1.0f), dplf_config(0) {}
-
+  /**
+   * Configure
+   * @returns 0 for success, -1 for failure
+   */
   int configure();
+
+  /**
+   * Ping
+   * @returns 0 for success, -1 for failure
+   */
   int ping();
-  void accelerometerCalcAngle();
-  void gyroscopeCalcAngle(float dt);
+
+  /**
+   * Get IMU data
+   * @returns 0 for success, -1 for failure
+   */
   int getData();
-  int calibrate();
-  void print();
-  int setDPLFConfig(int setting);
-  int getDPLFConfig();
-  int setSampleRateDiv(int setting);
+
+  /**
+   * Set DPLF
+   *
+   * @param setting
+   * @returns 0 for success, -1 for failure
+   */
+  int setDPLF(const int setting);
+
+  /**
+   * Get DPLF
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int getDPLF();
+
+  /**
+   * Set sample rate division
+   *
+   * @param setting
+   * @returns 0 for success, -1 for failure
+   */
+  int setSampleRateDiv(const int setting);
+
+  /**
+   * Get sample rate division
+   *
+   * @returns 0 for success, -1 for failure
+   */
   int getSampleRateDiv();
+
+  /**
+   * Get sample rate
+   *
+   * @returns 0 for success, -1 for failure
+   */
   int getSampleRate();
-  int setGyroRange(int setting);
+
+  /**
+   * Set gyro range
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int setGyroRange(const int setting);
+
+  /**
+   * Set gyro range
+   *
+   * @returns 0 for success, -1 for failure
+   */
   int getGyroRange();
-  int setAccelRange(int setting);
+
+  /**
+   * Set accelerometer range
+   *
+   * @param setting
+   * @returns 0 for success, -1 for failure
+   */
+  int setAccelRange(const int setting);
+
+  /**
+   * Get accelerometer range
+   *
+   * @returns 0 for success, -1 for failure
+   */
   int getAccelRange();
+
+  /**
+   * Print info
+   */
   void info();
-  void recordHeader(FILE *output_file);
-  void recordData(FILE *output_file);
-  int record(std::string output_path, int nb_samples);
+
+  /**
+   * Print IMU
+   */
+  void print();
 };
 
 /** @} group imu */

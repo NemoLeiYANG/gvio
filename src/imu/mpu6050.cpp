@@ -11,8 +11,8 @@ int MPU6050::configure() {
   this->i2c.setSlave(MPU6050_ADDRESS);
 
   // set dplf
-  this->setDPLFConfig(6);
-  retval = this->getDPLFConfig();
+  this->setDPLF(6);
+  retval = this->getDPLF();
   if (retval > 7 || retval < 0) {
     return -1;
   } else {
@@ -56,9 +56,6 @@ int MPU6050::configure() {
   // get sample rate
   this->sample_rate = this->getSampleRate();
 
-  // calibrate mpu6050
-  this->calibrate();
-
   return 0;
 }
 
@@ -73,37 +70,12 @@ int MPU6050::ping() {
   return 0;
 }
 
-void MPU6050::accelerometerCalcAngle() {
-  float x;
-  float y;
-  float z;
-
-  // setup
-  x = this->accel.x;
-  y = this->accel.y;
-  z = this->accel.z;
-
-  // calculate pitch and roll
-  this->accel.pitch = (atan(x / sqrt(pow(y, 2) + pow(z, 2)))) * 180 / M_PI;
-  this->accel.roll = (atan(y / sqrt(pow(x, 2) + pow(z, 2)))) * 180 / M_PI;
-}
-
-void MPU6050::gyroscopeCalcAngle(float dt) {
-  this->gyro.roll = (this->gyro.x * dt) + this->roll;
-  this->gyro.pitch = (this->gyro.y * dt) + this->pitch;
-}
-
 int MPU6050::getData() {
-  char raw_data[14];
-  int8_t raw_temp;
-  float dt;
-  clock_t time_now;
-  int retval;
-
   // read this data
+  char raw_data[14];
   memset(raw_data, '\0', 14);
   this->i2c.setSlave(MPU6050_ADDRESS);
-  retval = this->i2c.readBytes(MPU6050_RA_ACCEL_XOUT_H, raw_data, 14);
+  int retval = this->i2c.readBytes(MPU6050_RA_ACCEL_XOUT_H, raw_data, 14);
   if (retval != 0) {
     return -1;
   }
@@ -122,7 +94,7 @@ int MPU6050::getData() {
   this->accel.z = this->accel.raw_z / this->accel.sensitivity;
 
   // temperature
-  raw_temp = (raw_data[6] << 8) | (raw_data[7]);
+  const int8_t raw_temp = (raw_data[6] << 8) | (raw_data[7]);
   this->temperature = raw_temp / 340.0 + 36.53;
 
   // gyroscope
@@ -138,84 +110,13 @@ int MPU6050::getData() {
   this->gyro.y = this->gyro.raw_y / this->gyro.sensitivity;
   this->gyro.z = this->gyro.raw_z / this->gyro.sensitivity;
 
-  // calculate dt
-  time_now = clock();
-  dt = ((double) time_now - this->last_updated) / CLOCKS_PER_SEC;
-
-  // complimentary filter
-  this->accelerometerCalcAngle();
-  this->pitch = (0.98 * this->gyro.pitch) + (0.02 * this->accel.pitch);
-  this->roll = (0.98 * this->gyro.roll) + (0.02 * this->accel.roll);
-  this->gyroscopeCalcAngle(dt);
-
-  // offset pitch and roll
-  this->pitch += this->pitch_offset;
-  this->roll += this->roll_offset;
-
   // set last_updated
   this->last_updated = clock();
 
   return 0;
 }
 
-int MPU6050::calibrate() {
-  int16_t i;
-
-  // let it stablize for a while first
-  LOG_INFO("calibrating mpu6050");
-  for (i = 0; i < 50; i++) {
-    this->getData();
-  }
-
-  // calculate offset
-  for (i = 0; i < 50; i++) {
-    this->getData();
-
-    this->accel.offset_x += this->accel.raw_x;
-    this->accel.offset_y += this->accel.raw_y;
-    this->accel.offset_z += this->accel.raw_z;
-
-    this->accel.offset_x = this->accel.offset_x / 2.0;
-    this->accel.offset_y = this->accel.offset_y / 2.0;
-    this->accel.offset_z = this->accel.offset_z / 2.0;
-
-    this->gyro.offset_x += this->gyro.raw_x;
-    this->gyro.offset_y += this->gyro.raw_y;
-    this->gyro.offset_z += this->gyro.raw_z;
-
-    this->gyro.offset_x = this->gyro.offset_x / 2.0;
-    this->gyro.offset_y = this->gyro.offset_y / 2.0;
-    this->gyro.offset_z = this->gyro.offset_z / 2.0;
-  }
-
-  return 0;
-}
-
-void MPU6050::print() {
-  printf("gyro_x: %f\n", this->gyro.x);
-  printf("gyro_y: %f\n", this->gyro.y);
-  printf("gyro_z: %f\n", this->gyro.z);
-
-  printf("accel x: %f\n", this->accel.x);
-  printf("accel y: %f\n", this->accel.y);
-  printf("accel z: %f\n", this->accel.z);
-
-  printf("\n");
-  printf("accel pitch: %f\n", this->accel.pitch);
-  printf("accel roll: %f\n", this->accel.roll);
-  printf("\n");
-  printf("gyro pitch: %f\n", this->gyro.pitch);
-  printf("gyro roll: %f\n", this->gyro.roll);
-  printf("\n");
-
-  printf("temp: %f\n", this->temperature);
-  printf("\n");
-  printf("\n");
-}
-
-int MPU6050::setDPLFConfig(int setting) {
-  int retval;
-
+int MPU6050::setDPLF(const int setting) {
   /*
       DPLF_CFG    Accelerometer
       ----------------------------------------
@@ -243,14 +144,14 @@ int MPU6050::setDPLFConfig(int setting) {
       7           RESERVED        RESERVED    8
   */
 
-  // check setting range
+  // Check setting range
   if (setting > 7 || setting < 0) {
     return -2;
   }
 
-  // set DPLF
+  // Set DPLF
   this->i2c.setSlave(MPU6050_ADDRESS);
-  retval = this->i2c.writeByte(MPU6050_RA_CONFIG, (char) setting);
+  int retval = this->i2c.writeByte(MPU6050_RA_CONFIG, (char) setting);
   if (retval != 0) {
     return -1;
   }
@@ -258,14 +159,11 @@ int MPU6050::setDPLFConfig(int setting) {
   return 0;
 }
 
-int MPU6050::getDPLFConfig() {
-  char data[1];
-  int retval;
-
+int MPU6050::getDPLF() {
   // get dplf config
-  data[0] = 0x00;
+  char data[1] = {0x00};
   this->i2c.setSlave(MPU6050_ADDRESS);
-  retval = this->i2c.readBytes(MPU6050_RA_CONFIG, data, 1);
+  int retval = this->i2c.readBytes(MPU6050_RA_CONFIG, data, 1);
   if (retval != 0) {
     return -1;
   }
@@ -276,12 +174,10 @@ int MPU6050::getDPLFConfig() {
   return data[0];
 }
 
-int MPU6050::setSampleRateDiv(int div) {
-  int retval;
-
-  // set sample rate divider
+int MPU6050::setSampleRateDiv(const int div) {
+  // Set sample rate divider
   this->i2c.setSlave(MPU6050_ADDRESS);
-  retval = this->i2c.writeByte(MPU6050_RA_SMPLRT_DIV, div);
+  int retval = this->i2c.writeByte(MPU6050_RA_SMPLRT_DIV, div);
   if (retval != 0) {
     return -1;
   }
@@ -290,12 +186,10 @@ int MPU6050::setSampleRateDiv(int div) {
 }
 
 int MPU6050::getSampleRateDiv() {
-  char data;
-  int retval;
-
-  // get sample rate
+  // Get sample rate
   this->i2c.setSlave(MPU6050_ADDRESS);
-  retval = this->i2c.readByte(MPU6050_RA_SMPLRT_DIV, &data);
+  char data = 0;
+  int retval = this->i2c.readByte(MPU6050_RA_SMPLRT_DIV, &data);
   if (retval != 0) {
     return -1;
   }
@@ -304,21 +198,18 @@ int MPU6050::getSampleRateDiv() {
 }
 
 int MPU6050::getSampleRate() {
-  int rate_div;
-  uint8_t dlpf_cfg;
-  uint16_t sample_div;
-  uint16_t gyro_rate;
-
-  // get sample rate divider
-  rate_div = this->getSampleRateDiv();
+  // Get sample rate divider
+  uint16_t sample_div = 0;
+  int rate_div = this->getSampleRateDiv();
   if (rate_div != -1 || rate_div != -2) {
     sample_div = (float) rate_div;
   } else {
     return -1;
   }
 
-  // get gyro sample rate
-  dlpf_cfg = this->getSampleRateDiv();
+  // Get gyro sample rate
+  uint16_t gyro_rate = 0;
+  uint8_t dlpf_cfg = this->getSampleRateDiv();
   if (dlpf_cfg == 0 || dlpf_cfg == 7) {
     gyro_rate = 8000;
   } else if (dlpf_cfg >= 1 || dlpf_cfg <= 6) {
@@ -331,19 +222,16 @@ int MPU6050::getSampleRate() {
   return gyro_rate / (1 + sample_div);
 }
 
-int MPU6050::setGyroRange(int range) {
-  char data;
-  int retval;
-
+int MPU6050::setGyroRange(const int range) {
   // pre-check
   if (range > 3 || range < 0) {
     return -2;
   }
 
   // set sample rate
-  data = range << 3;
+  char data = range << 3;
   this->i2c.setSlave(MPU6050_ADDRESS);
-  retval = this->i2c.writeByte(MPU6050_RA_GYRO_CONFIG, data);
+  int retval = this->i2c.writeByte(MPU6050_RA_GYRO_CONFIG, data);
   if (retval != 0) {
     return -1;
   }
@@ -352,13 +240,10 @@ int MPU6050::setGyroRange(int range) {
 }
 
 int MPU6050::getGyroRange() {
-  char data;
-  int retval;
-
   // get gyro config
-  data = 0x00;
+  char data = 0x00;
   this->i2c.setSlave(MPU6050_ADDRESS);
-  retval = this->i2c.readByte(MPU6050_RA_GYRO_CONFIG, &data);
+  int retval = this->i2c.readByte(MPU6050_RA_GYRO_CONFIG, &data);
   if (retval != 0) {
     return -1;
   }
@@ -369,19 +254,16 @@ int MPU6050::getGyroRange() {
   return data;
 }
 
-int MPU6050::setAccelRange(int range) {
-  char data;
-  int retval;
-
+int MPU6050::setAccelRange(const int range) {
   // pre-check
   if (range > 3 || range < 0) {
     return -2;
   }
 
   // set sample rate
-  data = range << 3;
+  char data = range << 3;
   this->i2c.setSlave(MPU6050_ADDRESS);
-  retval = this->i2c.writeByte(MPU6050_RA_ACCEL_CONFIG, data);
+  int retval = this->i2c.writeByte(MPU6050_RA_ACCEL_CONFIG, data);
   if (retval != 0) {
     return -1;
   }
@@ -422,70 +304,14 @@ void MPU6050::info() {
   printf("\n");
 }
 
-void MPU6050::recordHeader(FILE *output_file) {
-  fprintf(output_file, "gyro.x,");
-  fprintf(output_file, "gyro.y,");
-  fprintf(output_file, "gyro.z,");
-  fprintf(output_file, "gyro.pitch,");
-  fprintf(output_file, "gyro.roll,");
-
-  fprintf(output_file, "accel.x,");
-  fprintf(output_file, "accel.y,");
-  fprintf(output_file, "accel.z,");
-  fprintf(output_file, "accel.pitch,");
-  fprintf(output_file, "accel.roll,");
-
-  fprintf(output_file, "pitch,");
-  fprintf(output_file, "roll\n");
-}
-
-void MPU6050::recordData(FILE *output_file) {
-  fprintf(output_file, "%f,", this->gyro.x);
-  fprintf(output_file, "%f,", this->gyro.y);
-  fprintf(output_file, "%f,", this->gyro.z);
-  fprintf(output_file, "%f,", this->gyro.pitch);
-  fprintf(output_file, "%f,", this->gyro.roll);
-
-  fprintf(output_file, "%f,", this->accel.x);
-  fprintf(output_file, "%f,", this->accel.y);
-  fprintf(output_file, "%f,", this->accel.z);
-  fprintf(output_file, "%f,", this->accel.pitch);
-  fprintf(output_file, "%f,", this->accel.roll);
-
-  fprintf(output_file, "%f,", this->pitch);
-  fprintf(output_file, "%f\n", this->roll);
-}
-
-int MPU6050::record(std::string output_path, int nb_samples) {
-  int i;
-  int8_t retval;
-  FILE *output_file;
-
-  // setup
-  output_file = fopen(output_path.c_str(), "w");
-  this->recordHeader(output_file);
-
-  // record
-  for (i = 0; i < nb_samples; i++) {
-    // get data
-    retval = this->getData();
-    if (retval == -1) {
-      LOG_ERROR("failed to obtain data from MPU6050!");
-      return -1;
-    }
-
-    // record data
-    this->recordData(output_file);
-    if (retval == -1) {
-      LOG_ERROR("failed to record MPU6050 data!");
-      return -1;
-    }
-  }
-
-  // clean up
-  fclose(output_file);
-
-  return 0;
+void MPU6050::print() {
+  printf("gyro_x: %f\n", this->gyro.x);
+  printf("gyro_y: %f\n", this->gyro.y);
+  printf("gyro_z: %f\n", this->gyro.z);
+  printf("accel x: %f\n", this->accel.x);
+  printf("accel y: %f\n", this->accel.y);
+  printf("accel z: %f\n", this->accel.z);
+  printf("temp: %f\n", this->temperature);
 }
 
 } // namespace gvio

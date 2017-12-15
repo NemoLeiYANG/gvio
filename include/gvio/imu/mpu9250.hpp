@@ -122,94 +122,67 @@ namespace gvio {
 
 class MPU9250Gyroscope {
 public:
-  float sensitivity;
+  float sensitivity = 0.0f;
 
-  int16_t raw_x;
-  int16_t raw_y;
-  int16_t raw_z;
+  int16_t raw_x = 0.0f;
+  int16_t raw_y = 0.0f;
+  int16_t raw_z = 0.0f;
 
-  float offset_x;
-  float offset_y;
-  float offset_z;
+  float offset_x = 0.0f;
+  float offset_y = 0.0f;
+  float offset_z = 0.0f;
 
-  float x;
-  float y;
-  float z;
+  float x = 0.0f;
+  float y = 0.0f;
+  float z = 0.0f;
 
-  float pitch;
-  float roll;
+  float pitch = 0.0f;
+  float roll = 0.0f;
 
-  MPU9250Gyroscope()
-      : sensitivity(0.0f),
-
-        raw_x(0), raw_y(0), raw_z(0),
-
-        offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
-
-        x(0.0f), y(0.0f), z(0.0f),
-
-        pitch(0.0f), roll(0.0f) {}
+  MPU9250Gyroscope() {}
 };
 
 class MPU9250Accelerometer {
 public:
-  float sensitivity;
+  float sensitivity = 0.0f;
 
-  int16_t raw_x;
-  int16_t raw_y;
-  int16_t raw_z;
+  int16_t raw_x = 0.0f;
+  int16_t raw_y = 0.0f;
+  int16_t raw_z = 0.0f;
 
-  float offset_x;
-  float offset_y;
-  float offset_z;
+  float offset_x = 0.0f;
+  float offset_y = 0.0f;
+  float offset_z = 0.0f;
 
-  float x;
-  float y;
-  float z;
+  float x = 0.0f;
+  float y = 0.0f;
+  float z = 0.0f;
 
-  float pitch;
-  float roll;
+  float pitch = 0.0f;
+  float roll = 0.0f;
 
-  MPU9250Accelerometer()
-      : sensitivity(0.0f),
-
-        raw_x(0), raw_y(0), raw_z(0),
-
-        offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
-
-        x(0.0f), y(0.0f), z(0.0f),
-
-        pitch(0.0f), roll(0.0f) {}
+  MPU9250Accelerometer() {}
 };
 
 class MPU9250Magnetometer {
 public:
-  float sensitivity;
+  float sensitivity = 0.0f;
 
-  int16_t raw_x;
-  int16_t raw_y;
-  int16_t raw_z;
+  int16_t raw_x = 0;
+  int16_t raw_y = 0;
+  int16_t raw_z = 0;
 
-  float offset_x;
-  float offset_y;
-  float offset_z;
+  float offset_x = 0.0f;
+  float offset_y = 0.0f;
+  float offset_z = 0.0f;
 
-  float x;
-  float y;
-  float z;
+  float x = 0.0f;
+  float y = 0.0f;
+  float z = 0.0f;
 
-  float heading;
+  float heading = 0.0f;
 
-  MPU9250Magnetometer()
-      : sensitivity(0.0f),
-
-        raw_x(0), raw_y(0), raw_z(0),
-
-        offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
-
-        x(0.0f), y(0.0f), z(0.0f),
-
-        heading(0.0f) {}
+  MPU9250Magnetometer() {}
 };
 
 class MPU9250 {
@@ -219,14 +192,15 @@ public:
   MPU9250Magnetometer mag;
   I2C i2c;
 
-  float pitch;
-  float roll;
-  float temperature;
+  float pitch = 0.0f;
+  float roll = 0.0f;
+  float temperature = 0.0f;
 
-  float pitch_offset;
-  float roll_offset;
+  float pitch_offset = 0.0f;
+  float roll_offset = 0.0f;
 
-  clock_t last_updated;
+  clock_t last_updated = 0;
+  float sample_rate = -1.0f;
   float sample_rate;
 
   MPU9250()
