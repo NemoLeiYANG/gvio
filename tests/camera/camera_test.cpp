@@ -1,33 +1,37 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/camera/camera.hpp"
 
 #define TEST_CONFIG_PATH "test_configs/camera/webcam"
 
 namespace gvio {
 
-TEST(Camera, constructor) {
+int test_constructor() {
   Camera camera;
 
-  EXPECT_FALSE(camera.configured);
-  EXPECT_FALSE(camera.initialized);
+  MU_CHECK(camera.configured);
+  MU_CHECK(camera.initialized);
 
-  EXPECT_FALSE(camera.config.loaded);
-  EXPECT_EQ(0, (int) camera.modes.size());
-  EXPECT_EQ(0, (int) camera.configs.size());
+  MU_CHECK(camera.config.loaded);
+  MU_CHECK(0 == (int) camera.modes.size());
+  MU_CHECK(0 == (int) camera.configs.size());
 
-  EXPECT_EQ(NULL, camera.capture);
-  EXPECT_FLOAT_EQ(0.0, camera.last_tic);
+  MU_CHECK(NULL == camera.capture);
+  MU_CHECK_FLOAT(0.0, camera.last_tic);
+
+  return 0;
 }
 
-TEST(Camera, configure) {
+int test_configure() {
   int retval;
   Camera camera;
 
   retval = camera.configure(TEST_CONFIG_PATH);
-  EXPECT_EQ(0, retval);
+  MU_CHECK(0 == retval);
+
+  return 0;
 }
 
-TEST(Camera, changeMode) {
+int test_changeMode() {
   cv::Mat image;
   Camera camera;
 
@@ -35,16 +39,18 @@ TEST(Camera, changeMode) {
   camera.initialize();
 
   camera.getFrame(image);
-  EXPECT_EQ(640, image.cols);
-  EXPECT_EQ(480, image.rows);
+  MU_CHECK(640 == image.cols);
+  MU_CHECK(480 == image.rows);
 
   camera.changeMode("320x240");
   camera.getFrame(image);
-  EXPECT_EQ(320, image.cols);
-  EXPECT_EQ(240, image.rows);
+  MU_CHECK(320 == image.cols);
+  MU_CHECK(240 == image.rows);
+
+  return 0;
 }
 
-TEST(Camera, getFrame) {
+int test_getFrame() {
   cv::Mat image;
   Camera camera;
 
@@ -52,15 +58,29 @@ TEST(Camera, getFrame) {
   camera.initialize();
   camera.getFrame(image);
 
-  EXPECT_FALSE(image.empty());
+  MU_CHECK(image.empty());
+
+  return 0;
 }
 
-TEST(Camera, run) {
+int test_run() {
   Camera camera;
 
   camera.configure(TEST_CONFIG_PATH);
   camera.initialize();
   camera.run();
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_constructor);
+  MU_ADD_TEST(test_configure);
+  MU_ADD_TEST(test_changeMode);
+  MU_ADD_TEST(test_getFrame);
+  MU_ADD_TEST(test_run);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

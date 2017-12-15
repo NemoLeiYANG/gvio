@@ -51,6 +51,55 @@ static int failed = 0;
         }\
     } while (0)
 
+#define MU_FALSE(test) \
+    do { \
+        if (!(test != false)) { \
+            printf( \
+                "%sERROR!%s [%s:%d] %s %sFAILED!%s\n", \
+                KRED, \
+                KNRM, \
+                __func__, \
+                __LINE__, \
+                #test, \
+                KRED, \
+                KNRM \
+            ); \
+            return -1; \
+        }\
+    } while (0)
+
+#define MU_CHECK_NEAR(expected, actual, tolerance) \
+    do { \
+        if (!(fabs(expected - actual) < tolerance)) { \
+            printf( \
+                "%sERROR!%s [%s:%d] %sFAILED!%s\n", \
+                KRED, \
+                KNRM, \
+                __func__, \
+                __LINE__, \
+                KRED, \
+                KNRM \
+            ); \
+            return -1; \
+        }\
+    } while (0)
+
+#define MU_CHECK_FLOAT(expected, actual) \
+    do { \
+        if (!(fabs(expected - actual) < 1e-6)) { \
+            printf( \
+                "%sERROR!%s [%s:%d] %sFAILED!%s\n", \
+                KRED, \
+                KNRM, \
+                __func__, \
+                __LINE__, \
+                KRED, \
+                KNRM \
+            ); \
+            return -1; \
+        }\
+    } while (0)
+
 #define MU_ADD_TEST(test) \
     do { \
         tests++; \
@@ -100,7 +149,7 @@ static int failed = 0;
         else return 0; \
     } while (0)
 
-#define mu_run_tests(TEST_SUITE) \
+#define MU_RUN_TESTS(TEST_SUITE) \
     int main(void) \
     { \
         TEST_SUITE(); \

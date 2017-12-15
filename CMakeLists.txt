@@ -70,10 +70,20 @@ SET(${PROJECT_NAME}_DEPS
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 
-# # UNIT TESTS
-# SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tests)
-# FILE(COPY tests/test_data DESTINATION ${PROJECT_BINARY_DIR}/tests)
-# FILE(COPY tests/test_configs DESTINATION ${PROJECT_BINARY_DIR}/tests)
+# UNIT TESTS
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tests)
+FILE(COPY tests/test_data DESTINATION ${PROJECT_BINARY_DIR}/tests)
+FILE(COPY tests/test_configs DESTINATION ${PROJECT_BINARY_DIR}/tests)
+
+ADD_EXECUTABLE(apriltag_mit_test tests/apriltag/mit_test.cpp)
+TARGET_LINK_LIBRARIES(apriltag_mit_test ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+
+ADD_EXECUTABLE(camera_camera_config_test tests/camera/camera_config_test.cpp)
+TARGET_LINK_LIBRARIES(camera_camera_config_test ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+
+ADD_EXECUTABLE(camera_camera_test tests/camera/camera_test.cpp)
+TARGET_LINK_LIBRARIES(camera_camera_test ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+
 # ADD_EXECUTABLE(
 # 	gvio_tests
 # 	# imu

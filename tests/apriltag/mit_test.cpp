@@ -1,4 +1,4 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/apriltag/mit.hpp"
 #include "gvio/camera/camera.hpp"
 
@@ -16,36 +16,41 @@
 
 namespace gvio {
 
-TEST(MITDetector, constructor) {
+int test_constructor() {
   MITDetector detector;
 
-  EXPECT_FALSE(detector.configured);
+  MU_CHECK(false == detector.configured);
 
-  EXPECT_EQ(NULL, detector.detector);
+  MU_CHECK(NULL == detector.detector);
 
-  EXPECT_EQ(0, detector.tag_configs.size());
-  EXPECT_EQ("", detector.camera_mode);
-  EXPECT_EQ(0, detector.camera_modes.size());
-  EXPECT_EQ(0, detector.camera_configs.size());
-  EXPECT_FALSE(detector.imshow);
+  MU_CHECK(0 == detector.tag_configs.size());
+  MU_CHECK("" == detector.camera_mode);
+  MU_CHECK(0 == detector.camera_modes.size());
+  MU_CHECK(0 == detector.camera_configs.size());
+  MU_CHECK(false == detector.imshow);
+
+  return 0;
 }
 
-TEST(MITDetector, configure) {
+int test_configure() {
   MITDetector detector;
 
   detector.configure(TEST_CONFIG);
-  EXPECT_TRUE(detector.configured);
 
-  EXPECT_FALSE(detector.detector == NULL);
+  MU_CHECK(detector.configured);
 
-  EXPECT_EQ(2, detector.tag_configs.size());
-  EXPECT_EQ(detector.camera_modes[0], detector.camera_mode);
-  EXPECT_EQ(3, detector.camera_modes.size());
-  EXPECT_EQ(3, detector.camera_configs.size());
-  EXPECT_FALSE(detector.imshow);
+  MU_CHECK(NULL == detector.detector);
+
+  MU_CHECK(2 == detector.tag_configs.size());
+  MU_CHECK(detector.camera_modes[0] == detector.camera_mode);
+  MU_CHECK(3 == detector.camera_modes.size());
+  MU_CHECK(3 == detector.camera_configs.size());
+  MU_CHECK(detector.imshow);
+
+  return 0;
 }
 
-TEST(MITDetector, illuminationInvarientTransform) {
+int test_illuminationInvarientTransform() {
   cv::Mat image;
   MITDetector detector;
   std::vector<AprilTags::TagDetection> tags;
@@ -60,10 +65,12 @@ TEST(MITDetector, illuminationInvarientTransform) {
   // cv::waitKey(1000000);
 
   tags = detector.detector->extractTags(image);
-  EXPECT_EQ(2, tags.size());
+  MU_CHECK(2 == tags.size());
+
+  return 0;
 }
 
-TEST(MITDetector, extractTags) {
+int test_extractTags() {
   // setup
   MITDetector detector;
   detector.configure(TEST_CONFIG);
@@ -75,11 +82,11 @@ TEST(MITDetector, extractTags) {
   detector.prev_tag.detected = false;
   // tags[0].print();
 
-  EXPECT_EQ(0, retval);
-  EXPECT_EQ(1, tags.size());
-  ASSERT_NEAR(0.0, tags[0].position(0), 0.15);
-  ASSERT_NEAR(0.0, tags[0].position(1), 0.15);
-  ASSERT_NEAR(2.2, tags[0].position(2), 0.15);
+  MU_CHECK(0 == retval);
+  MU_CHECK(1 == tags.size());
+  MU_CHECK_NEAR(0.0, tags[0].position(0), 0.15);
+  MU_CHECK_NEAR(0.0, tags[0].position(1), 0.15);
+  MU_CHECK_NEAR(2.2, tags[0].position(2), 0.15);
   tags.clear();
 
   // TOP
@@ -88,11 +95,11 @@ TEST(MITDetector, extractTags) {
   detector.prev_tag.detected = false;
   // tags[0].print();
 
-  EXPECT_EQ(0, retval);
-  EXPECT_EQ(1, tags.size());
-  ASSERT_NEAR(0.0, tags[0].position(0), 0.15);
-  ASSERT_NEAR(-0.5, tags[0].position(1), 0.15);
-  ASSERT_NEAR(2.4, tags[0].position(2), 0.15);
+  MU_CHECK(0 == retval);
+  MU_CHECK(1 == tags.size());
+  MU_CHECK_NEAR(0.0, tags[0].position(0), 0.15);
+  MU_CHECK_NEAR(-0.5, tags[0].position(1), 0.15);
+  MU_CHECK_NEAR(2.4, tags[0].position(2), 0.15);
   tags.clear();
 
   // RIGHT
@@ -101,15 +108,17 @@ TEST(MITDetector, extractTags) {
   detector.prev_tag.detected = false;
   // tags[0].print();
 
-  EXPECT_EQ(0, retval);
-  EXPECT_EQ(1, tags.size());
-  ASSERT_NEAR(0.5, tags[0].position(0), 0.15);
-  ASSERT_NEAR(0.0, tags[0].position(1), 0.15);
-  ASSERT_NEAR(2.30, tags[0].position(2), 0.15);
+  MU_CHECK(0 == retval);
+  MU_CHECK(1 == tags.size());
+  MU_CHECK_NEAR(0.5, tags[0].position(0), 0.15);
+  MU_CHECK_NEAR(0.0, tags[0].position(1), 0.15);
+  MU_CHECK_NEAR(2.30, tags[0].position(2), 0.15);
   tags.clear();
+
+  return 0;
 }
 
-TEST(MITDetector, changeMode) {
+int test_changeMode() {
   MITDetector detector;
   cv::Mat image1, image2, image3;
 
@@ -118,18 +127,20 @@ TEST(MITDetector, changeMode) {
 
   image1 = cv::Mat(480, 640, CV_64F, double(0));
   detector.changeMode(image1);
-  EXPECT_EQ("640x480", detector.camera_mode);
+  MU_CHECK("640x480" == detector.camera_mode);
 
   image2 = cv::Mat(240, 320, CV_64F, double(0));
   detector.changeMode(image2);
-  EXPECT_EQ("320x240", detector.camera_mode);
+  MU_CHECK("320x240" == detector.camera_mode);
 
   image3 = cv::Mat(120, 160, CV_64F, double(0));
   detector.changeMode(image3);
-  EXPECT_EQ("160x120", detector.camera_mode);
+  MU_CHECK("160x120" == detector.camera_mode);
+
+  return 0;
 }
 
-TEST(MITDetector, maskImage) {
+int test_maskImage() {
   // setup
   MITDetector detector;
   detector.configure(TEST_CONFIG);
@@ -142,9 +153,11 @@ TEST(MITDetector, maskImage) {
 
   // cv::imshow("test", image);
   // cv::waitKey(100000);
+
+  return 0;
 }
 
-TEST(MITDetector, cropImage) {
+int test_cropImage() {
   // setup
   MITDetector detector;
   detector.configure(TEST_CONFIG);
@@ -166,6 +179,19 @@ TEST(MITDetector, cropImage) {
   cv::waitKey(100000);
 
   // cv::imshow("test", image);
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_constructor);
+  MU_ADD_TEST(test_configure);
+  MU_ADD_TEST(test_illuminationInvarientTransform);
+  MU_ADD_TEST(test_extractTags);
+  MU_ADD_TEST(test_changeMode);
+  MU_ADD_TEST(test_maskImage);
+  MU_ADD_TEST(test_cropImage);
 }
 
 } // namespace gvio
+MU_RUN_TESTS(gvio::test_suite);
