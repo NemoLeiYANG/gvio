@@ -18,7 +18,7 @@ namespace gvio {
  * @{
  */
 
-struct Gyroscope {
+struct GyroData {
   float sensitivity = 0.0f;
 
   int16_t raw_x = 0.0f;
@@ -33,13 +33,10 @@ struct Gyroscope {
   float y = 0.0f;
   float z = 0.0f;
 
-  float pitch = 0.0f;
-  float roll = 0.0f;
-
-  Gyroscope() {}
+  GyroData() {}
 };
 
-struct Accelerometer {
+struct AccelData {
   float sensitivity = 0.0f;
 
   int16_t raw_x = 0;
@@ -54,15 +51,12 @@ struct Accelerometer {
   float y = 0.0f;
   float z = 0.0f;
 
-  float pitch = 0.0f;
-  float roll = 0.0f;
-
-  Accelerometer() {}
+  AccelData() {}
 };
 
 struct IMU {
-  Gyroscope gyro;
-  Accelerometer accel;
+  GyroData gyro;
+  AccelData accel;
   I2C i2c;
 
   IMU() {}
@@ -72,14 +66,14 @@ struct IMU {
    *
    * @returns 0 for success, -1 for failure
    */
-  virtual int ping();
+  virtual int ping() = 0;
 
   /**
    * Get data
    *
    * @returns 0 for success, -1 for failure
    */
-  virtual int getData();
+  virtual int getData() = 0;
 
   /**
    * Record header

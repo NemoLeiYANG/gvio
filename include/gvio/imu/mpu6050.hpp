@@ -136,19 +136,14 @@ namespace gvio {
 #define MPU6050_RA_FIFO_R_W 0x74
 #define MPU6050_RA_WHO_AM_I 0x75
 
-struct MPU6050 {
-  Gyroscope gyro;
-  Accelerometer accel;
-  I2C i2c;
-
+/**
+ * Invensense MPU6050 I2C Driver
+ */
+struct MPU6050 : public IMU {
   float temperature = 0.0f;
-
-  float pitch_offset = 0.0f;
-  float roll_offset = 0.0f;
-
-  clock_t last_updated = 0;
   float sample_rate = -1.0f;
   int8_t dplf_config = 0;
+  clock_t last_updated = 0;
 
   MPU6050() {}
 
@@ -172,6 +167,30 @@ struct MPU6050 {
 
   /**
    * Set DPLF
+   *
+   * DPLF_CFG    Accelerometer
+   * ----------------------------------------
+   *             Bandwidth(Hz) | Delay(ms)
+   * 0           260             0
+   * 1           184             2.0
+   * 2           94              3.0
+   * 3           44              4.9
+   * 4           21              8.5
+   * 5           10              13.8
+   * 6           5               19.0
+   * 7           RESERVED        RESERVED
+   *
+   * DPLF_CFG    Gyroscope
+   * ----------------------------------------------
+   *             Bandwidth(Hz) | Delay(ms) | Fs(kHz)
+   * 0           256             0.98        8
+   * 1           188             1.9         1
+   * 2           98              2.8         1
+   * 3           42              4.8         1
+   * 4           20              8.3         1
+   * 5           10              13.4        1
+   * 6           5               18.5        1
+   * 7           RESERVED        RESERVED    8
    *
    * @param setting
    * @returns 0 for success, -1 for failure
@@ -235,17 +254,12 @@ struct MPU6050 {
    * @returns 0 for success, -1 for failure
    */
   int getAccelRange();
-
-  /**
-   * Print info
-   */
-  void info();
-
-  /**
-   * Print IMU
-   */
-  void print();
 };
+
+/**
+  * MPU6050 to string
+  */
+std::ostream &operator<<(std::ostream &os, const MPU6050 &imu);
 
 /** @} group imu */
 } // namespace gvio

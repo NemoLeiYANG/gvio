@@ -26,19 +26,13 @@ namespace gvio {
 //   this->gyro.pitch = (this->gyro.y * dt) + this->pitch;
 // }
 
-// // calculate dt
-// time_now = clock();
-// dt = ((double) time_now - this->last_updated) / CLOCKS_PER_SEC;
-//
-// // complimentary filter
-// this->accelerometerCalcAngle();
-// this->pitch = (0.98 * this->gyro.pitch) + (0.02 * this->accel.pitch);
-// this->roll = (0.98 * this->gyro.roll) + (0.02 * this->accel.roll);
-// this->gyroscopeCalcAngle(dt);
-
-// // offset pitch and roll
-// this->pitch += this->pitch_offset;
-// this->roll += this->roll_offset;
+// Vec2 complementary_filter(const Gyroscope gyro, const Accelerometer accel, const double dt) {
+//   // complimentary filter
+//   this->accelerometerCalcAngle();
+//   this->pitch = (0.98 * this->gyro.pitch) + (0.02 * this->accel.pitch);
+//   this->roll = (0.98 * this->gyro.roll) + (0.02 * this->accel.roll);
+//   this->gyroscopeCalcAngle(dt);
+// }
 
 // int MPU6050::calibrate() {
 //   // Let it stablize for a while first

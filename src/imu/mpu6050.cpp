@@ -289,29 +289,16 @@ int MPU6050::getAccelRange() {
   return data;
 }
 
-void MPU6050::info() {
-  printf("gyro sensitivity: %f\n", this->gyro.sensitivity);
-  printf("gyro offset_x: %f\n", this->gyro.offset_x);
-  printf("gyro offset_y: %f\n", this->gyro.offset_y);
-  printf("gyro offset_z: %f\n", this->gyro.offset_z);
-  printf("\n");
-  printf("accel sensitivity: %f\n", this->accel.sensitivity);
-  printf("accel offset_x: %f\n", this->accel.offset_x);
-  printf("accel offset_y: %f\n", this->accel.offset_y);
-  printf("accel offset_z: %f\n", this->accel.offset_z);
-  printf("\n");
-  printf("sample rate: %f\n", this->sample_rate);
-  printf("\n");
-}
+std::ostream &operator<<(std::ostream &os, const MPU6050 &imu) {
+  os << "gyro_x: " << imu.gyro.x << std::endl;
+  os << "gyro_y: " << imu.gyro.y << std::endl;
+  os << "gyro_z: " << imu.gyro.z << std::endl;
+  os << "accel x: " << imu.accel.x << std::endl;
+  os << "accel y: " << imu.accel.y << std::endl;
+  os << "accel z: " << imu.accel.z << std::endl;
+  os << "temp: " << imu.temperature << std::endl;
 
-void MPU6050::print() {
-  printf("gyro_x: %f\n", this->gyro.x);
-  printf("gyro_y: %f\n", this->gyro.y);
-  printf("gyro_z: %f\n", this->gyro.z);
-  printf("accel x: %f\n", this->accel.x);
-  printf("accel y: %f\n", this->accel.y);
-  printf("accel z: %f\n", this->accel.z);
-  printf("temp: %f\n", this->temperature);
+  return os;
 }
 
 } // namespace gvio
