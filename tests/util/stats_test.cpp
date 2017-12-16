@@ -1,9 +1,9 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/util/stats.hpp"
 
 namespace gvio {
 
-TEST(Stats, linreg) {
+int test_linreg() {
   Eigen::Vector2d p;
   std::vector<Eigen::Vector2d> points;
   double m;
@@ -27,6 +27,14 @@ TEST(Stats, linreg) {
   std::cout << "m: " << m << std::endl;
   std::cout << "c: " << c << std::endl;
   std::cout << "r: " << r << std::endl;
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_linreg);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

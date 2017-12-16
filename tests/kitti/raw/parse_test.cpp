@@ -1,86 +1,115 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/kitti/raw/parse.hpp"
 
 namespace gvio {
 
-TEST(Parse, parseString) {
+int test_parseString() {
   std::string value = parseString("X: Hello World");
 
-  EXPECT_EQ("Hello World", value);
+  MU_CHECK_EQ("Hello World", value);
+
+  return 0;
 }
 
-TEST(Parse, parseDouble) {
+int test_parseDouble() {
   double value = parseDouble("X: 1.23");
 
-  EXPECT_FLOAT_EQ(1.23, value);
+  MU_CHECK_FLOAT(1.23, value);
+
+  return 0;
 }
 
-TEST(Parse, parseArray) {
+int test_parseArray() {
   std::vector<double> value = parseArray("X: 1.0 2.0 3.0");
 
-  EXPECT_EQ(3, (int) value.size());
-  EXPECT_FLOAT_EQ(1.0, value[0]);
-  EXPECT_FLOAT_EQ(2.0, value[1]);
-  EXPECT_FLOAT_EQ(3.0, value[2]);
+  MU_CHECK_EQ(3, (int) value.size());
+  MU_CHECK_FLOAT(1.0, value[0]);
+  MU_CHECK_FLOAT(2.0, value[1]);
+  MU_CHECK_FLOAT(3.0, value[2]);
+
+  return 0;
 }
 
-TEST(Parse, parseVec2) {
+int test_parseVec2() {
   Vec2 value = parseVec2("X: 1.0 2.0");
 
-  EXPECT_FLOAT_EQ(1.0, value(0));
-  EXPECT_FLOAT_EQ(2.0, value(1));
+  MU_CHECK_FLOAT(1.0, value(0));
+  MU_CHECK_FLOAT(2.0, value(1));
+
+  return 0;
 }
 
-TEST(Parse, parseVec3) {
+int test_parseVec3() {
   Vec3 value = parseVec3("X: 1.0 2.0 3.0");
 
-  EXPECT_FLOAT_EQ(1.0, value(0));
-  EXPECT_FLOAT_EQ(2.0, value(1));
-  EXPECT_FLOAT_EQ(3.0, value(2));
+  MU_CHECK_FLOAT(1.0, value(0));
+  MU_CHECK_FLOAT(2.0, value(1));
+  MU_CHECK_FLOAT(3.0, value(2));
+
+  return 0;
 }
 
-TEST(Parse, parseVecX) {
+int test_parseVecX() {
   VecX value = parseVecX("X: 1.0 2.0 3.0 4.0 5.0 6.0");
 
-  EXPECT_FLOAT_EQ(1.0, value(0));
-  EXPECT_FLOAT_EQ(2.0, value(1));
-  EXPECT_FLOAT_EQ(3.0, value(2));
-  EXPECT_FLOAT_EQ(4.0, value(3));
-  EXPECT_FLOAT_EQ(5.0, value(4));
-  EXPECT_FLOAT_EQ(6.0, value(5));
+  MU_CHECK_FLOAT(1.0, value(0));
+  MU_CHECK_FLOAT(2.0, value(1));
+  MU_CHECK_FLOAT(3.0, value(2));
+  MU_CHECK_FLOAT(4.0, value(3));
+  MU_CHECK_FLOAT(5.0, value(4));
+  MU_CHECK_FLOAT(6.0, value(5));
+
+  return 0;
 }
 
-TEST(Parse, parseMat3) {
+int test_parseMat3() {
   Mat3 value = parseMat3("X: 1 2 3 4 5 6 7 8 9");
 
-  EXPECT_FLOAT_EQ(1.0, value(0, 0));
-  EXPECT_FLOAT_EQ(2.0, value(0, 1));
-  EXPECT_FLOAT_EQ(3.0, value(0, 2));
-  EXPECT_FLOAT_EQ(4.0, value(1, 0));
-  EXPECT_FLOAT_EQ(5.0, value(1, 1));
-  EXPECT_FLOAT_EQ(6.0, value(1, 2));
-  EXPECT_FLOAT_EQ(7.0, value(2, 0));
-  EXPECT_FLOAT_EQ(8.0, value(2, 1));
-  EXPECT_FLOAT_EQ(9.0, value(2, 2));
+  MU_CHECK_FLOAT(1.0, value(0, 0));
+  MU_CHECK_FLOAT(2.0, value(0, 1));
+  MU_CHECK_FLOAT(3.0, value(0, 2));
+  MU_CHECK_FLOAT(4.0, value(1, 0));
+  MU_CHECK_FLOAT(5.0, value(1, 1));
+  MU_CHECK_FLOAT(6.0, value(1, 2));
+  MU_CHECK_FLOAT(7.0, value(2, 0));
+  MU_CHECK_FLOAT(8.0, value(2, 1));
+  MU_CHECK_FLOAT(9.0, value(2, 2));
+
+  return 0;
 }
 
-TEST(Parse, parseMat34) {
+int test_parseMat34() {
   Mat34 value = parseMat34("X: 1 2 3 4 5 6 7 8 9 10 11 12");
 
-  EXPECT_FLOAT_EQ(1.0, value(0, 0));
-  EXPECT_FLOAT_EQ(2.0, value(0, 1));
-  EXPECT_FLOAT_EQ(3.0, value(0, 2));
-  EXPECT_FLOAT_EQ(4.0, value(0, 3));
+  MU_CHECK_FLOAT(1.0, value(0, 0));
+  MU_CHECK_FLOAT(2.0, value(0, 1));
+  MU_CHECK_FLOAT(3.0, value(0, 2));
+  MU_CHECK_FLOAT(4.0, value(0, 3));
 
-  EXPECT_FLOAT_EQ(5.0, value(1, 0));
-  EXPECT_FLOAT_EQ(6.0, value(1, 1));
-  EXPECT_FLOAT_EQ(7.0, value(1, 2));
-  EXPECT_FLOAT_EQ(8.0, value(1, 3));
+  MU_CHECK_FLOAT(5.0, value(1, 0));
+  MU_CHECK_FLOAT(6.0, value(1, 1));
+  MU_CHECK_FLOAT(7.0, value(1, 2));
+  MU_CHECK_FLOAT(8.0, value(1, 3));
 
-  EXPECT_FLOAT_EQ(9.0, value(2, 0));
-  EXPECT_FLOAT_EQ(10.0, value(2, 1));
-  EXPECT_FLOAT_EQ(11.0, value(2, 2));
-  EXPECT_FLOAT_EQ(12.0, value(2, 3));
+  MU_CHECK_FLOAT(9.0, value(2, 0));
+  MU_CHECK_FLOAT(10.0, value(2, 1));
+  MU_CHECK_FLOAT(11.0, value(2, 2));
+  MU_CHECK_FLOAT(12.0, value(2, 3));
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_parseString);
+  MU_ADD_TEST(test_parseDouble);
+  MU_ADD_TEST(test_parseArray);
+  MU_ADD_TEST(test_parseVec2);
+  MU_ADD_TEST(test_parseVec3);
+  MU_ADD_TEST(test_parseVecX);
+  MU_ADD_TEST(test_parseMat3);
+  MU_ADD_TEST(test_parseMat34);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

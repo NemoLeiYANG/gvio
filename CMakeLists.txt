@@ -10,7 +10,6 @@ ENDIF()
 FIND_PACKAGE(OpenCV 3.0 REQUIRED)
 FIND_PACKAGE(Ceres REQUIRED)
 FIND_PACKAGE(Eigen3 REQUIRED)
-# INCLUDE(cmake/GetGtest.cmake)
 INCLUDE(cmake/ImportEigen3.cmake)
 
 # INCLUDES
@@ -74,47 +73,29 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_data DESTINATION ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_configs DESTINATION ${PROJECT_BINARY_DIR}/tests)
-
-ADD_EXECUTABLE(apriltag_mit_test tests/apriltag/mit_test.cpp)
-TARGET_LINK_LIBRARIES(apriltag_mit_test ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
-
-ADD_EXECUTABLE(camera_camera_config_test tests/camera/camera_config_test.cpp)
-TARGET_LINK_LIBRARIES(camera_camera_config_test ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
-
-ADD_EXECUTABLE(camera_camera_test tests/camera/camera_test.cpp)
-TARGET_LINK_LIBRARIES(camera_camera_test ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
-
-# ADD_EXECUTABLE(
-# 	gvio_tests
-# 	# imu
-# 	tests/imu/mpu6050_test.cpp
-# 	# apriltag
-# 	# tests/apriltag/mit_test.cpp
-# 	# camera
-# 	tests/camera/camera_config_test.cpp
-# 	tests/camera/camera_test.cpp
-#   # feature2d
-#   tests/feature2d/feature_tracker_test.cpp
-# 	tests/feature2d/gms_matcher_test.cpp
-#   tests/feature2d/orb_tracker_test.cpp
-#   tests/feature2d/klt_tracker_test.cpp
-# 	# gimbal
-# 	# tests/gimbal/gimbal_test.cpp
-# 	tests/gimbal/sbgc_test.cpp
-#   # kitti
-# 	tests/kitti/raw/calib_test.cpp
-# 	tests/kitti/raw/oxts_test.cpp
-# 	tests/kitti/raw/parse_test.cpp
-# 	tests/kitti/raw/raw_test.cpp
-# 	# util
-# 	tests/util/config_test.cpp
-# 	tests/util/data_test.cpp
-# 	tests/util/file_test.cpp
-# 	tests/util/gps_test.cpp
-# 	tests/util/math_test.cpp
-# 	tests/util/stats_test.cpp
-# 	tests/util/time_test.cpp
-# 	# test runner
-# 	tests/test_runner.cpp
-# )
-# TARGET_LINK_LIBRARIES(gvio_tests ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS} gtest)
+SET(UNITTESTS
+  apriltag-mit_test
+  camera-camera_config_test
+  camera-camera_test
+  feature2d-feature_tracker_test
+  feature2d-gms_matcher_test
+  feature2d-klt_tracker_test
+  feature2d-orb_tracker_test
+  imu-mpu6050_test
+  kitti-raw-calib_test
+  kitti-raw-oxts_test
+  kitti-raw-parse_test
+  kitti-raw-raw_test
+  util-config_test
+  util-data_test
+  util-file_test
+  util-gps_test
+  util-math_test
+  util-stats_test
+  util-time_test
+)
+FOREACH(TEST ${UNITTESTS})
+  STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
+  ADD_EXECUTABLE(${TEST} tests/${TEST_PATH}.cpp)
+  TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+ENDFOREACH(TEST)

@@ -8,10 +8,10 @@ namespace gvio {
 int test_constructor() {
   Camera camera;
 
-  MU_CHECK(camera.configured);
-  MU_CHECK(camera.initialized);
+  MU_FALSE(camera.configured);
+  MU_FALSE(camera.initialized);
 
-  MU_CHECK(camera.config.loaded);
+  MU_FALSE(camera.config.loaded);
   MU_CHECK(0 == (int) camera.modes.size());
   MU_CHECK(0 == (int) camera.configs.size());
 
@@ -58,7 +58,7 @@ int test_getFrame() {
   camera.initialize();
   camera.getFrame(image);
 
-  MU_CHECK(image.empty());
+  MU_FALSE(image.empty());
 
   return 0;
 }
@@ -78,7 +78,7 @@ void test_suite() {
   MU_ADD_TEST(test_configure);
   MU_ADD_TEST(test_changeMode);
   MU_ADD_TEST(test_getFrame);
-  MU_ADD_TEST(test_run);
+  // MU_ADD_TEST(test_run);
 }
 
 } // namespace gvio

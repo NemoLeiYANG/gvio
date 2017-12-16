@@ -15,8 +15,5 @@
 #define TEST_DATA_PATH "test_data"
 #endif
 
-#ifndef TEST_KITTI_DATA
-#define TEST_KITTI_DATA "test_data/kitti"
-#endif
 
 #endif // GVIO_TEST_HPP

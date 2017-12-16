@@ -1,14 +1,16 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/kitti/kitti.hpp"
 #include "gvio/feature2d/klt_tracker.hpp"
 
 namespace gvio {
 
-TEST(KLTTracker, detect) {
+int test_detect() {
   KLTTracker tracker;
 
   RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
-  raw_dataset.load();
+  if (raw_dataset.load() != 0) {
+    return -1;
+  }
 
   cv::Mat img0 = cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR);
 
@@ -16,18 +18,21 @@ TEST(KLTTracker, detect) {
   tracker.detect(img0, features);
   img0 = tracker.drawFeatures(img0, features);
 
-  EXPECT_TRUE(features.size() > 0);
+  MU_CHECK(features.size() > 0);
 
   // cv::imshow("Image", img0);
   // cv::waitKey(0);
+  return 0;
 }
 
-TEST(KLTTracker, track) {
+int test_track() {
   KLTTracker tracker;
 
   // Setup test data
   RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
-  raw_dataset.load();
+  if (raw_dataset.load() != 0) {
+    return -1;
+  }
 
   cv::Mat img0 = cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR);
   cv::Mat img1 = cv::imread(raw_dataset.cam0[1], CV_LOAD_IMAGE_COLOR);
@@ -43,14 +48,16 @@ TEST(KLTTracker, track) {
   tracker.detect(img1, f1);
 
   // Match features
-  tracker.show_matches = true;
+  // tracker.show_matches = true;
   tracker.track(f1);
   cv::waitKey(0);
 
-  EXPECT_TRUE(f1.size() > 0);
+  MU_CHECK(f1.size() > 0);
+
+  return 0;
 }
 
-TEST(KLTTracker, demo) {
+int test_demo() {
   KLTTracker tracker;
 
   cv::VideoCapture capture(0);
@@ -70,6 +77,16 @@ TEST(KLTTracker, demo) {
       break;
     }
   }
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_detect);
+  MU_ADD_TEST(test_track);
+  // MU_ADD_TEST(test_demo);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

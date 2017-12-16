@@ -19,9 +19,9 @@ namespace gvio {
 int test_constructor() {
   MITDetector detector;
 
-  MU_CHECK(false == detector.configured);
+  MU_FALSE(detector.configured);
 
-  MU_CHECK(NULL == detector.detector);
+  MU_CHECK(detector.detector == nullptr);
 
   MU_CHECK(0 == detector.tag_configs.size());
   MU_CHECK("" == detector.camera_mode);
@@ -39,13 +39,13 @@ int test_configure() {
 
   MU_CHECK(detector.configured);
 
-  MU_CHECK(NULL == detector.detector);
+  MU_CHECK(detector.detector != nullptr);
 
   MU_CHECK(2 == detector.tag_configs.size());
   MU_CHECK(detector.camera_modes[0] == detector.camera_mode);
   MU_CHECK(3 == detector.camera_modes.size());
   MU_CHECK(3 == detector.camera_configs.size());
-  MU_CHECK(detector.imshow);
+  MU_FALSE(detector.imshow);
 
   return 0;
 }

@@ -1,14 +1,22 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/imu/mpu6050.hpp"
 
 namespace gvio {
 
-TEST(MPU6050, configure) {
+int test_configure() {
   int retval;
   MPU6050 imu;
 
   retval = imu.configure();
-  EXPECT_EQ(0.0, retval);
+  MU_CHECK_EQ(0.0, retval);
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_configure);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

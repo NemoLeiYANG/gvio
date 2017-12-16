@@ -1,4 +1,4 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/kitti/kitti.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 
@@ -7,51 +7,59 @@
 
 namespace gvio {
 
-TEST(Feature, constructor) {
+int test_Feature_constructor() {
   cv::KeyPoint kp;
   Feature f(kp);
 
-  EXPECT_FLOAT_EQ(-1.0, f.kp.angle);
-  EXPECT_EQ(-1, f.kp.class_id);
-  EXPECT_EQ(0, f.kp.octave);
-  EXPECT_FLOAT_EQ(0.0, f.kp.response);
-  EXPECT_FLOAT_EQ(0.0, f.kp.size);
+  MU_CHECK_FLOAT(-1.0, f.kp.angle);
+  MU_CHECK_EQ(-1, f.kp.class_id);
+  MU_CHECK_EQ(0, f.kp.octave);
+  MU_CHECK_FLOAT(0.0, f.kp.response);
+  MU_CHECK_FLOAT(0.0, f.kp.size);
+
+  return 0;
 }
 
-TEST(Feature, setTrackID) {
+int test_Feature_setTrackID() {
   cv::KeyPoint kp;
   Feature f(kp);
 
   f.setTrackID(100);
-  EXPECT_EQ(100, f.track_id);
+  MU_CHECK_EQ(100, f.track_id);
+
+  return 0;
 }
 
-TEST(Feature, getKeyPoint) {
+int test_Feature_getKeyPoint() {
   cv::KeyPoint kp;
   Feature f(kp);
   const cv::KeyPoint kp2 = f.getKeyPoint();
 
-  EXPECT_FLOAT_EQ(-1.0, kp2.angle);
-  EXPECT_EQ(-1, kp2.class_id);
-  EXPECT_EQ(0, kp2.octave);
-  EXPECT_FLOAT_EQ(0.0, kp2.response);
-  EXPECT_FLOAT_EQ(0.0, kp2.size);
+  MU_CHECK_FLOAT(-1.0, kp2.angle);
+  MU_CHECK_EQ(-1, kp2.class_id);
+  MU_CHECK_EQ(0, kp2.octave);
+  MU_CHECK_FLOAT(0.0, kp2.response);
+  MU_CHECK_FLOAT(0.0, kp2.size);
+
+  return 0;
 }
 
-TEST(FeatureTrack, constructor) {
+int test_FeatureTrack_constructor() {
   cv::KeyPoint kp1;
   cv::KeyPoint kp2;
   Feature f1(kp1);
   Feature f2(kp2);
   FeatureTrack track(0, 1, f1, f2);
 
-  EXPECT_EQ(0, track.track_id);
-  EXPECT_EQ(0, track.frame_start);
-  EXPECT_EQ(1, track.frame_end);
-  EXPECT_EQ(2, (int) track.track.size());
+  MU_CHECK_EQ(0, track.track_id);
+  MU_CHECK_EQ(0, track.frame_start);
+  MU_CHECK_EQ(1, track.frame_end);
+  MU_CHECK_EQ(2, (int) track.track.size());
+
+  return 0;
 }
 
-TEST(FeatureTrack, update) {
+int test_FeatureTrack_update() {
   cv::KeyPoint kp1;
   cv::KeyPoint kp2;
   Feature f1(kp1);
@@ -62,13 +70,15 @@ TEST(FeatureTrack, update) {
   Feature f3(kp3);
   track.update(2, f3);
 
-  EXPECT_EQ(0, track.track_id);
-  EXPECT_EQ(0, track.frame_start);
-  EXPECT_EQ(2, track.frame_end);
-  EXPECT_EQ(3, (int) track.track.size());
+  MU_CHECK_EQ(0, track.track_id);
+  MU_CHECK_EQ(0, track.frame_start);
+  MU_CHECK_EQ(2, track.frame_end);
+  MU_CHECK_EQ(3, (int) track.track.size());
+
+  return 0;
 }
 
-TEST(FeatureTrack, last) {
+int test_FeatureTrack_last() {
   cv::KeyPoint kp1;
   cv::KeyPoint kp2;
   Feature f1(kp1);
@@ -81,12 +91,14 @@ TEST(FeatureTrack, last) {
   track.update(2, f3);
   auto t = track.last();
 
-  EXPECT_FLOAT_EQ(1.0, t.kp.pt.x);
-  EXPECT_FLOAT_EQ(2.0, t.kp.pt.y);
-  EXPECT_EQ(21, t.kp.size);
+  MU_CHECK_FLOAT(1.0, t.kp.pt.x);
+  MU_CHECK_FLOAT(2.0, t.kp.pt.y);
+  MU_CHECK_EQ(21, t.kp.size);
+
+  return 0;
 }
 
-TEST(FeatureTrack, tracked_length) {
+int test_FeatureTrack_tracked_length() {
   cv::KeyPoint kp1;
   cv::KeyPoint kp2;
   Feature f1(kp1);
@@ -97,44 +109,50 @@ TEST(FeatureTrack, tracked_length) {
   Feature f3(kp3);
   track.update(2, f3);
 
-  EXPECT_EQ(0, track.track_id);
-  EXPECT_EQ(0, track.frame_start);
-  EXPECT_EQ(2, track.frame_end);
-  EXPECT_EQ(3, (int) track.tracked_length());
+  MU_CHECK_EQ(0, track.track_id);
+  MU_CHECK_EQ(0, track.frame_start);
+  MU_CHECK_EQ(2, track.frame_end);
+  MU_CHECK_EQ(3, (int) track.tracked_length());
+
+  return 0;
 }
 
-TEST(FeatureTracker, constructor) {
+int test_FeatureTracker_constructor() {
   FeatureTracker tracker;
 
-  EXPECT_FALSE(tracker.show_matches);
+  MU_CHECK(tracker.show_matches == false);
 
-  EXPECT_EQ(-1, (int) tracker.counter_frame_id);
-  EXPECT_EQ(-1, (int) tracker.counter_track_id);
+  MU_CHECK_EQ(-1, (int) tracker.counter_frame_id);
+  MU_CHECK_EQ(-1, (int) tracker.counter_track_id);
 
-  EXPECT_EQ(0, (int) tracker.tracking.size());
-  EXPECT_EQ(0, (int) tracker.lost.size());
-  EXPECT_EQ(0, (int) tracker.buffer.size());
+  MU_CHECK_EQ(0, (int) tracker.tracking.size());
+  MU_CHECK_EQ(0, (int) tracker.lost.size());
+  MU_CHECK_EQ(0, (int) tracker.buffer.size());
+
+  return 0;
 }
 
-TEST(FeatureTracker, addTrack) {
+int test_FeatureTracker_addTrack() {
   FeatureTracker tracker;
   Feature f1;
   Feature f2;
 
   tracker.addTrack(f1, f2);
 
-  EXPECT_EQ(0, tracker.counter_track_id);
-  EXPECT_EQ(-1, tracker.counter_frame_id);
+  MU_CHECK_EQ(0, tracker.counter_track_id);
+  MU_CHECK_EQ(-1, tracker.counter_frame_id);
 
-  EXPECT_EQ(0, f1.track_id);
-  EXPECT_EQ(0, f2.track_id);
+  MU_CHECK_EQ(0, f1.track_id);
+  MU_CHECK_EQ(0, f2.track_id);
 
-  EXPECT_EQ(1, (int) tracker.tracking.size());
-  EXPECT_EQ(0, (int) tracker.lost.size());
-  EXPECT_EQ(1, (int) tracker.buffer.size());
+  MU_CHECK_EQ(1, (int) tracker.tracking.size());
+  MU_CHECK_EQ(0, (int) tracker.lost.size());
+  MU_CHECK_EQ(1, (int) tracker.buffer.size());
+
+  return 0;
 }
 
-TEST(FeatureTracker, removeTrack) {
+int test_FeatureTracker_removeTrack() {
   FeatureTracker tracker;
   Feature f1;
   Feature f2;
@@ -143,20 +161,22 @@ TEST(FeatureTracker, removeTrack) {
   tracker.addTrack(f1, f2);
   tracker.removeTrack(0);
 
-  EXPECT_EQ(0, (int) tracker.tracking.size());
-  EXPECT_EQ(0, (int) tracker.lost.size());
-  EXPECT_EQ(0, (int) tracker.buffer.size());
+  MU_CHECK_EQ(0, (int) tracker.tracking.size());
+  MU_CHECK_EQ(0, (int) tracker.lost.size());
+  MU_CHECK_EQ(0, (int) tracker.buffer.size());
 
   // Test remove as lost
   tracker.addTrack(f1, f2);
   tracker.removeTrack(1, true);
 
-  EXPECT_EQ(0, (int) tracker.tracking.size());
-  EXPECT_EQ(1, (int) tracker.lost.size());
-  EXPECT_EQ(1, (int) tracker.buffer.size());
+  MU_CHECK_EQ(0, (int) tracker.tracking.size());
+  MU_CHECK_EQ(1, (int) tracker.lost.size());
+  MU_CHECK_EQ(1, (int) tracker.buffer.size());
+
+  return 0;
 }
 
-TEST(FeatureTracker, updateTrack) {
+int test_FeatureTracker_updateTrack() {
   FeatureTracker tracker;
   Feature f1;
   Feature f2;
@@ -165,11 +185,13 @@ TEST(FeatureTracker, updateTrack) {
   tracker.addTrack(f1, f2);
   const int retval = tracker.updateTrack(0, f3);
 
-  EXPECT_EQ(0, retval);
-  EXPECT_EQ(3, (int) tracker.buffer[0].tracked_length());
+  MU_CHECK_EQ(0, retval);
+  MU_CHECK_EQ(3, (int) tracker.buffer[0].tracked_length());
+
+  return 0;
 }
 
-// TEST(FeatureTracker, detect) {
+// int test_FeatureTracker_detect() {
 //   FeatureTracker tracker;
 //
 //   cv::VideoCapture capture(0);
@@ -193,9 +215,11 @@ TEST(FeatureTracker, updateTrack) {
 //       frame_counter = 0;
 //     }
 //   }
+//
+//   return 0;
 // }
 
-TEST(FeatureTracker, conversions) {
+int test_FeatureTracker_conversions() {
   FeatureTracker tracker;
   const cv::Mat img = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
 
@@ -218,21 +242,23 @@ TEST(FeatureTracker, conversions) {
   // Assert
   int index = 0;
   for (auto &f : f0) {
-    EXPECT_TRUE(f.kp.pt.x == k0[index].pt.x);
-    EXPECT_TRUE(f.kp.pt.y == k0[index].pt.y);
+    MU_CHECK(f.kp.pt.x == k0[index].pt.x);
+    MU_CHECK(f.kp.pt.y == k0[index].pt.y);
 
-    EXPECT_TRUE(f.kp.pt.x == k1[index].pt.x);
-    EXPECT_TRUE(f.kp.pt.y == k1[index].pt.y);
+    MU_CHECK(f.kp.pt.x == k1[index].pt.x);
+    MU_CHECK(f.kp.pt.y == k1[index].pt.y);
 
-    EXPECT_TRUE(cvMatIsEqual(f.desc, d0.row(index)));
-    EXPECT_TRUE(cvMatIsEqual(f.desc, d1.row(index)));
+    MU_CHECK(cvMatIsEqual(f.desc, d0.row(index)));
+    MU_CHECK(cvMatIsEqual(f.desc, d1.row(index)));
 
-    EXPECT_EQ(f.desc.size(), cv::Size(32, 1));
+    MU_CHECK_EQ(f.desc.size(), cv::Size(32, 1));
     index++;
   }
+
+  return 0;
 }
 
-TEST(FeatureTracker, match) {
+int test_FeatureTracker_match() {
   FeatureTracker tracker;
   const cv::Mat img0 = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
   const cv::Mat img1 = cv::imread(TEST_IMAGE_BOTTOM, CV_LOAD_IMAGE_COLOR);
@@ -266,9 +292,11 @@ TEST(FeatureTracker, match) {
 
   // cv::imshow("Matches", matches_img);
   // cv::waitKey();
+
+  return 0;
 }
 
-TEST(FeatureTracker, purge) {
+int test_FeatureTracker_purge() {
   FeatureTracker tracker;
   const cv::Mat img0 = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
   const cv::Mat img1 = cv::imread(TEST_IMAGE_BOTTOM, CV_LOAD_IMAGE_COLOR);
@@ -302,11 +330,34 @@ TEST(FeatureTracker, purge) {
 
   // Assert
   TrackID index = 0;
-  EXPECT_EQ(10, tracks.size());
+  MU_CHECK_EQ(10, tracks.size());
   for (auto t : tracks) {
-    EXPECT_EQ(index, t.track_id);
+    MU_CHECK_EQ(index, t.track_id);
     index++;
   }
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_Feature_constructor);
+  MU_ADD_TEST(test_Feature_setTrackID);
+  MU_ADD_TEST(test_Feature_getKeyPoint);
+
+  MU_ADD_TEST(test_FeatureTrack_constructor);
+  MU_ADD_TEST(test_FeatureTrack_update);
+  MU_ADD_TEST(test_FeatureTrack_last);
+  MU_ADD_TEST(test_FeatureTrack_tracked_length);
+
+  MU_ADD_TEST(test_FeatureTracker_constructor);
+  MU_ADD_TEST(test_FeatureTracker_addTrack);
+  MU_ADD_TEST(test_FeatureTracker_removeTrack);
+  MU_ADD_TEST(test_FeatureTracker_updateTrack);
+  MU_ADD_TEST(test_FeatureTracker_conversions);
+  MU_ADD_TEST(test_FeatureTracker_match);
+  MU_ADD_TEST(test_FeatureTracker_purge);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

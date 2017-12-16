@@ -1,4 +1,4 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/util/data.hpp"
 #include "gvio/util/config.hpp"
 
@@ -6,22 +6,26 @@
 
 namespace gvio {
 
-TEST(ConfigParam, constructor) {
+int test_ConfigParam_constructor() {
   ConfigParam param;
 
-  ASSERT_EQ(TYPE_NOT_SET, param.type);
-  ASSERT_EQ("", param.key);
-  ASSERT_FALSE(param.optional);
-  ASSERT_EQ(NULL, param.data);
+  MU_CHECK_EQ(TYPE_NOT_SET, param.type);
+  MU_CHECK_EQ("", param.key);
+  MU_FALSE(param.optional);
+  MU_CHECK_EQ(NULL, param.data);
+
+  return 0;
 }
 
-TEST(ConfigParser, constructor) {
+int test_ConfigParser_constructor() {
   ConfigParser parser;
 
-  ASSERT_FALSE(parser.config_loaded);
+  MU_FALSE(parser.config_loaded);
+
+  return 0;
 }
 
-TEST(ConfigParser, addParam) {
+int test_ConfigParser_addParam() {
   bool b;
   int i;
   float f;
@@ -70,26 +74,30 @@ TEST(ConfigParser, addParam) {
   parser.addParam("matrix", &matx);
   parser.addParam("matrix", &cvmat);
 
-  ASSERT_EQ(19, (int) parser.params.size());
-  ASSERT_EQ(BOOL, parser.params[0].type);
-  ASSERT_EQ("bool", parser.params[0].key);
-  ASSERT_TRUE(parser.params[0].data != NULL);
+  MU_CHECK_EQ(19, (int) parser.params.size());
+  MU_CHECK_EQ(BOOL, parser.params[0].type);
+  MU_CHECK_EQ("bool", parser.params[0].key);
+  MU_CHECK(parser.params[0].data != NULL);
+
+  return 0;
 }
 
-TEST(ConfigParser, getYamlNode) {
+int test_ConfigParser_getYamlNode() {
   YAML::Node node1, node2;
   ConfigParser parser;
 
   parser.load(TEST_CONFIG);
 
   parser.getYamlNode("level3.a.b.c", node1);
-  ASSERT_EQ(3, node1.as<int>());
+  MU_CHECK_EQ(3, node1.as<int>());
 
   parser.getYamlNode("float", node2);
-  ASSERT_FLOAT_EQ(2.2, node2.as<float>());
+  MU_CHECK_FLOAT(2.2, node2.as<float>());
+
+  return 0;
 }
 
-TEST(ConfigParser, loadPrimitive) {
+int test_ConfigParser_loadPrimitive() {
   int i;
   float f;
   double d;
@@ -107,7 +115,7 @@ TEST(ConfigParser, loadPrimitive) {
   param.key = "int";
   param.data = &i;
   parser.loadPrimitive(param);
-  ASSERT_EQ(1, i);
+  MU_CHECK_EQ(1, i);
 
   // FLOAT
   param.optional = false;
@@ -115,7 +123,7 @@ TEST(ConfigParser, loadPrimitive) {
   param.key = "float";
   param.data = &f;
   parser.loadPrimitive(param);
-  ASSERT_FLOAT_EQ(2.2, f);
+  MU_CHECK_FLOAT(2.2, f);
 
   // DOUBLE
   param.optional = false;
@@ -123,7 +131,7 @@ TEST(ConfigParser, loadPrimitive) {
   param.key = "double";
   param.data = &d;
   parser.loadPrimitive(param);
-  ASSERT_FLOAT_EQ(3.3, d);
+  MU_CHECK_FLOAT(3.3, d);
 
   // STRING
   param.optional = false;
@@ -131,10 +139,12 @@ TEST(ConfigParser, loadPrimitive) {
   param.key = "string";
   param.data = &s;
   parser.loadPrimitive(param);
-  ASSERT_EQ("hello world!", s);
+  MU_CHECK_EQ("hello world!", s);
+
+  return 0;
 }
 
-TEST(ConfigParser, loadArray) {
+int test_ConfigParser_loadArray() {
   std::vector<bool> b_array;
   std::vector<int> i_array;
   std::vector<float> f_array;
@@ -154,10 +164,10 @@ TEST(ConfigParser, loadArray) {
   param.data = &b_array;
   parser.loadArray(param);
 
-  ASSERT_TRUE(b_array[0]);
-  ASSERT_FALSE(b_array[1]);
-  ASSERT_TRUE(b_array[2]);
-  ASSERT_FALSE(b_array[3]);
+  MU_CHECK(b_array[0]);
+  MU_FALSE(b_array[1]);
+  MU_CHECK(b_array[2]);
+  MU_FALSE(b_array[3]);
 
   // INTEGER
   param.optional = false;
@@ -167,7 +177,7 @@ TEST(ConfigParser, loadArray) {
   parser.loadArray(param);
 
   for (int i = 0; i < 4; i++) {
-    ASSERT_EQ(i + 1, i_array[i]);
+    MU_CHECK_EQ(i + 1, i_array[i]);
   }
 
   // FLOAT
@@ -178,7 +188,7 @@ TEST(ConfigParser, loadArray) {
   parser.loadArray(param);
 
   for (int i = 0; i < 4; i++) {
-    ASSERT_FLOAT_EQ((i + 1) * 1.1, f_array[i]);
+    MU_CHECK_FLOAT((i + 1) * 1.1, f_array[i]);
   }
 
   // DOUBLE
@@ -189,7 +199,7 @@ TEST(ConfigParser, loadArray) {
   parser.loadArray(param);
 
   for (int i = 0; i < 4; i++) {
-    ASSERT_FLOAT_EQ((i + 1) * 1.1, d_array[i]);
+    MU_CHECK_FLOAT((i + 1) * 1.1, d_array[i]);
   }
 
   // STRING
@@ -199,13 +209,15 @@ TEST(ConfigParser, loadArray) {
   param.data = &s_array;
   parser.loadArray(param);
 
-  ASSERT_EQ("1.1", s_array[0]);
-  ASSERT_EQ("2.2", s_array[1]);
-  ASSERT_EQ("3.3", s_array[2]);
-  ASSERT_EQ("4.4", s_array[3]);
+  MU_CHECK_EQ("1.1", s_array[0]);
+  MU_CHECK_EQ("2.2", s_array[1]);
+  MU_CHECK_EQ("3.3", s_array[2]);
+  MU_CHECK_EQ("4.4", s_array[3]);
+
+  return 0;
 }
 
-TEST(ConfigParser, loadVector) {
+int test_ConfigParser_loadVector() {
   Vec2 vec2;
   Vec3 vec3;
   Vec4 vec4;
@@ -224,8 +236,8 @@ TEST(ConfigParser, loadVector) {
   param.data = &vec2;
   parser.loadVector(param);
 
-  ASSERT_FLOAT_EQ(1.1, vec2(0));
-  ASSERT_FLOAT_EQ(2.2, vec2(1));
+  MU_CHECK_FLOAT(1.1, vec2(0));
+  MU_CHECK_FLOAT(2.2, vec2(1));
 
   // VECTOR 3
   param.optional = false;
@@ -234,9 +246,9 @@ TEST(ConfigParser, loadVector) {
   param.data = &vec3;
   parser.loadVector(param);
 
-  ASSERT_FLOAT_EQ(1.1, vec3(0));
-  ASSERT_FLOAT_EQ(2.2, vec3(1));
-  ASSERT_FLOAT_EQ(3.3, vec3(2));
+  MU_CHECK_FLOAT(1.1, vec3(0));
+  MU_CHECK_FLOAT(2.2, vec3(1));
+  MU_CHECK_FLOAT(3.3, vec3(2));
 
   // VECTOR 4
   param.optional = false;
@@ -245,10 +257,10 @@ TEST(ConfigParser, loadVector) {
   param.data = &vec4;
   parser.loadVector(param);
 
-  ASSERT_FLOAT_EQ(1.1, vec4(0));
-  ASSERT_FLOAT_EQ(2.2, vec4(1));
-  ASSERT_FLOAT_EQ(3.3, vec4(2));
-  ASSERT_FLOAT_EQ(4.4, vec4(3));
+  MU_CHECK_FLOAT(1.1, vec4(0));
+  MU_CHECK_FLOAT(2.2, vec4(1));
+  MU_CHECK_FLOAT(3.3, vec4(2));
+  MU_CHECK_FLOAT(4.4, vec4(3));
 
   // VECTOR X
   param.optional = false;
@@ -258,11 +270,13 @@ TEST(ConfigParser, loadVector) {
   parser.loadVector(param);
 
   for (int i = 0; i < 9; i++) {
-    ASSERT_FLOAT_EQ((i + 1) * 1.1, vecx(i));
+    MU_CHECK_FLOAT((i + 1) * 1.1, vecx(i));
   }
+
+  return 0;
 }
 
-TEST(ConfigParser, loadMatrix) {
+int test_ConfigParser_loadMatrix() {
   int index;
   Mat2 mat2;
   Mat3 mat3;
@@ -283,10 +297,10 @@ TEST(ConfigParser, loadMatrix) {
   param.data = &mat2;
   parser.loadMatrix(param);
 
-  ASSERT_FLOAT_EQ(1.1, mat2(0, 0));
-  ASSERT_FLOAT_EQ(2.2, mat2(0, 1));
-  ASSERT_FLOAT_EQ(3.3, mat2(1, 0));
-  ASSERT_FLOAT_EQ(4.4, mat2(1, 1));
+  MU_CHECK_FLOAT(1.1, mat2(0, 0));
+  MU_CHECK_FLOAT(2.2, mat2(0, 1));
+  MU_CHECK_FLOAT(3.3, mat2(1, 0));
+  MU_CHECK_FLOAT(4.4, mat2(1, 1));
 
   // MATRIX 3
   param.optional = false;
@@ -298,7 +312,7 @@ TEST(ConfigParser, loadMatrix) {
   index = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
-      ASSERT_FLOAT_EQ((index + 1) * 1.1, mat3(i, j));
+      MU_CHECK_FLOAT((index + 1) * 1.1, mat3(i, j));
       index++;
     }
   }
@@ -313,7 +327,7 @@ TEST(ConfigParser, loadMatrix) {
   index = 0;
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
-      ASSERT_FLOAT_EQ((index + 1) * 1.1, mat4(i, j));
+      MU_CHECK_FLOAT((index + 1) * 1.1, mat4(i, j));
       index++;
     }
   }
@@ -328,7 +342,7 @@ TEST(ConfigParser, loadMatrix) {
   index = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 4; j++) {
-      ASSERT_FLOAT_EQ((index + 1) * 1.1, matx(i, j));
+      MU_CHECK_FLOAT((index + 1) * 1.1, matx(i, j));
       index++;
     }
   }
@@ -343,13 +357,15 @@ TEST(ConfigParser, loadMatrix) {
   index = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 4; j++) {
-      ASSERT_FLOAT_EQ((index + 1) * 1.1, cvmat.at<double>(i, j));
+      MU_CHECK_FLOAT((index + 1) * 1.1, cvmat.at<double>(i, j));
       index++;
     }
   }
+
+  return 0;
 }
 
-TEST(ConfigParser, load) {
+int test_ConfigParser_load() {
   int retval;
   bool b;
   int i;
@@ -401,7 +417,7 @@ TEST(ConfigParser, load) {
 
   retval = parser.load(TEST_CONFIG);
   if (retval != 0) {
-    FAIL();
+    return -1;
   }
 
   std::cout << "bool: " << b << std::endl;
@@ -423,6 +439,22 @@ TEST(ConfigParser, load) {
   std::cout << "matrix: \n" << matx << std::endl;
   std::cout << "cvmatrix: \n" << cvmat << std::endl;
   std::cout << std::endl;
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_ConfigParam_constructor);
+  MU_ADD_TEST(test_ConfigParser_constructor);
+  MU_ADD_TEST(test_ConfigParser_addParam);
+  MU_ADD_TEST(test_ConfigParser_getYamlNode);
+  MU_ADD_TEST(test_ConfigParser_loadPrimitive);
+  MU_ADD_TEST(test_ConfigParser_loadArray);
+  MU_ADD_TEST(test_ConfigParser_loadVector);
+  MU_ADD_TEST(test_ConfigParser_loadMatrix);
+  MU_ADD_TEST(test_ConfigParser_load);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

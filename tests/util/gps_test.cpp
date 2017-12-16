@@ -1,9 +1,9 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/util/gps.hpp"
 
 namespace gvio {
 
-TEST(GPS, latlon_offset) {
+int test_latlon_offset() {
   // UWaterloo 110 yards Canadian Football field from one end to another
   double lat = 43.474357;
   double lon = -80.550415;
@@ -20,11 +20,13 @@ TEST(GPS, latlon_offset) {
   std::cout << "lon new: " << lon_new << std::endl;
 
   // gps coordinates should be close to (43.474754, -80.549298)
-  EXPECT_NEAR(43.474754, lat_new, 0.0015);
-  EXPECT_NEAR(-80.549298, lon_new, 0.0015);
+  MU_CHECK_NEAR(43.474754, lat_new, 0.0015);
+  MU_CHECK_NEAR(-80.549298, lon_new, 0.0015);
+
+  return 0;
 }
 
-TEST(GPS, latlon_diff) {
+int test_latlon_diff() {
   // UWaterloo 110 yards Canadian Football field from one end to another
   double lat_ref = 43.474357;
   double lon_ref = -80.550415;
@@ -41,10 +43,12 @@ TEST(GPS, latlon_diff) {
   std::cout << "distance east: " << dist_E << std::endl;
 
   // 110 yards is approx 100 meters
-  EXPECT_NEAR(100, dist, 1.0);
+  MU_CHECK_NEAR(100, dist, 1.0);
+
+  return 0;
 }
 
-TEST(GPS, latlon_dist) {
+int test_latlon_dist() {
   // UWaterloo 110 yards Canadian Football field from one end to another
   double lat_ref = 43.474357;
   double lon_ref = -80.550415;
@@ -56,7 +60,17 @@ TEST(GPS, latlon_dist) {
   std::cout << "distance: " << dist << std::endl;
 
   // 110 yards is approx 100 meters
-  EXPECT_NEAR(100, dist, 1.0);
+  MU_CHECK_NEAR(100, dist, 1.0);
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_latlon_offset);
+  MU_ADD_TEST(test_latlon_diff);
+  MU_ADD_TEST(test_latlon_dist);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

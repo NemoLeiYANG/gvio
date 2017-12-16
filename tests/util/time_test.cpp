@@ -1,17 +1,27 @@
-#include "gvio/gvio_test.hpp"
+#include <unistd.h>
+
+#include "gvio/munit.h"
 #include "gvio/util/time.hpp"
 
 namespace gvio {
 
-TEST(Time, ticAndtoc) {
+int test_ticAndToc() {
   struct timespec start;
 
   tic(&start);
   usleep(10 * 1000);
-  EXPECT_TRUE(toc(&start) < 0.011);
-  EXPECT_TRUE(toc(&start) > 0.009);
-  EXPECT_TRUE(mtoc(&start) < 11.0);
-  EXPECT_TRUE(mtoc(&start) > 9.0);
+  MU_CHECK(toc(&start) < 0.011);
+  MU_CHECK(toc(&start) > 0.009);
+  MU_CHECK(mtoc(&start) < 11.0);
+  MU_CHECK(mtoc(&start) > 9.0);
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_ticAndToc);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

@@ -51,11 +51,29 @@ static int failed = 0;
         }\
     } while (0)
 
+#define MU_CHECK_EQ(expected, actual) \
+    do { \
+        if (!(expected == actual)) { \
+            printf( \
+                "%sERROR!%s [%s:%d] %s != %s %sFAILED!%s\n", \
+                KRED, \
+                KNRM, \
+                __func__, \
+                __LINE__, \
+                #expected, \
+                #actual, \
+                KRED, \
+                KNRM \
+            ); \
+            return -1; \
+        }\
+    } while (0)
+
 #define MU_FALSE(test) \
     do { \
-        if (!(test != false)) { \
+        if (test != false) { \
             printf( \
-                "%sERROR!%s [%s:%d] %s %sFAILED!%s\n", \
+                "%sERROR!%s [%s:%d] %s != false %sFAILED!%s\n", \
                 KRED, \
                 KNRM, \
                 __func__, \

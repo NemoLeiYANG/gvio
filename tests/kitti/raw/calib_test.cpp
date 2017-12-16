@@ -1,16 +1,25 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/kitti/kitti.hpp"
 
 namespace gvio {
 
-TEST(CalibCamToCam, load) {
+int test_load() {
   CalibCamToCam calib;
 
-  calib.load("/data/kitti/raw/2011_09_26/calib_cam_to_cam.txt");
+  int retval = calib.load("/data/kitti/raw/2011_09_26/calib_cam_to_cam.txt");
+  MU_CHECK_EQ(retval, 0);
 
   const Vec2 S_00_exp{1.392000e+03, 5.120000e+02};
-  EXPECT_EQ("09-Jan-2012 13:57:47", calib.calib_time);
-  EXPECT_FLOAT_EQ(9.950000e-02, calib.corner_dist);
+  MU_CHECK_EQ("09-Jan-2012 13:57:47", calib.calib_time);
+  MU_CHECK_FLOAT(9.950000e-02, calib.corner_dist);
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_load);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

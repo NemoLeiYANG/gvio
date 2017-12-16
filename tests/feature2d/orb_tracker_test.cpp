@@ -1,14 +1,16 @@
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/kitti/kitti.hpp"
 #include "gvio/feature2d/orb_tracker.hpp"
 
 namespace gvio {
 
-TEST(ORBTracker, update) {
+int test_update() {
   ORBTracker tracker;
 
   RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
-  raw_dataset.load();
+  if (raw_dataset.load() != 0) {
+    return -1;
+  }
 
   // cv::VideoCapture capture(0);
   // cv::Mat img0;
@@ -31,6 +33,14 @@ TEST(ORBTracker, update) {
       break;
     }
   }
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_update);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);

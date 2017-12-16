@@ -1,11 +1,11 @@
 #include <sys/time.h>
 
-#include "gvio/gvio_test.hpp"
+#include "gvio/munit.h"
 #include "gvio/feature2d/gms_matcher.hpp"
 
 namespace gvio {
 
-TEST(GMSMatcher, demo) {
+int test_demo() {
   // Setup ORB
   cv::Ptr<cv::ORB> orb = cv::ORB::create();
   orb->setFastThreshold(0);
@@ -62,6 +62,14 @@ TEST(GMSMatcher, demo) {
       frame_counter = 0;
     }
   }
+
+  return 0;
+}
+
+void test_suite() {
+  // MU_ADD_TEST(test_demo);
 }
 
 } // namespace gvio
+
+MU_RUN_TESTS(gvio::test_suite);
