@@ -5,7 +5,7 @@
 
 namespace gvio {
 
-int test_constructor() {
+int test_Camera_constructor() {
   Camera camera;
 
   MU_FALSE(camera.configured);
@@ -21,7 +21,7 @@ int test_constructor() {
   return 0;
 }
 
-int test_configure() {
+int test_Camera_configure() {
   int retval;
   Camera camera;
 
@@ -31,7 +31,7 @@ int test_configure() {
   return 0;
 }
 
-int test_changeMode() {
+int test_Camera_changeMode() {
   cv::Mat image;
   Camera camera;
 
@@ -50,7 +50,7 @@ int test_changeMode() {
   return 0;
 }
 
-int test_getFrame() {
+int test_Camera_getFrame() {
   cv::Mat image;
   Camera camera;
 
@@ -63,7 +63,7 @@ int test_getFrame() {
   return 0;
 }
 
-int test_run() {
+int test_Camera_run() {
   Camera camera;
 
   camera.configure(TEST_CONFIG_PATH);
@@ -74,11 +74,11 @@ int test_run() {
 }
 
 void test_suite() {
-  MU_ADD_TEST(test_constructor);
-  MU_ADD_TEST(test_configure);
-  MU_ADD_TEST(test_changeMode);
-  MU_ADD_TEST(test_getFrame);
-  // MU_ADD_TEST(test_run);
+  MU_ADD_TEST(test_Camera_constructor);
+  MU_ADD_TEST(test_Camera_configure);
+  MU_ADD_TEST(test_Camera_changeMode);
+  MU_ADD_TEST(test_Camera_getFrame);
+  // MU_ADD_TEST(test_Camera_run);
 }
 
 } // namespace gvio

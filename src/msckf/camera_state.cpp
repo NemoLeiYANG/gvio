@@ -25,6 +25,8 @@ void CameraState::correct(const VecX &dx) {
   this->p_G = this->p_G + dp_G;
 }
 
-void CameraState::setFrameID(const int frame_id) { this->frame_id = frame_id; }
+void CameraState::setFrameID(const FrameID &frame_id) {
+  this->frame_id = frame_id;
+}
 
 } // namespace gvio

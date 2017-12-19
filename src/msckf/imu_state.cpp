@@ -23,7 +23,6 @@ MatX IMUState::F(const Vec3 &w_hat,
 }
 
 MatX IMUState::G(const Vec4 &q_hat) {
-  // G matrix
   MatX G = zeros(15, 12);
 
   // -- First row --
@@ -41,7 +40,7 @@ MatX IMUState::G(const Vec4 &q_hat) {
 MatX IMUState::J(const Vec4 &cam_q_CI,
                  const Vec3 &cam_p_IC,
                  const Vec4 &q_hat_IG,
-                 const double N) {
+                 const int N) {
   const Mat3 C_CI = C(cam_q_CI);
   const Mat3 C_IG = C(q_hat_IG);
 
@@ -59,6 +58,10 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   // Calculate new accel and gyro estimates
   const Vec3 a_hat = a_m;
   const Vec3 w_hat = w_m;
+
+  UNUSED(a_hat);
+  UNUSED(w_hat);
+  UNUSED(dt);
 
   // Propagate IMU states
   // clang-format off
@@ -82,7 +85,7 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
 
   // Update covariance
   this->Phi = I(this->size) + F * dt;
-  this->P = Phi * P * Phi.transpose() + G * this->Q * G.transpose() * dt;
+  this->P = Phi * P * Phi.transpose() + (G * this->Q * G.transpose()) * dt;
   this->P = enforce_psd(P);
 }
 

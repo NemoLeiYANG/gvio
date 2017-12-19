@@ -1,7 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
 PROJECT(gvio)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -fPIC -g")
+# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -fPIC -g")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC -g")
 IF (CMAKE_COMPILER_IS_GNUCXX)
   ADD_DEFINITIONS(-std=gnu++0x)
 ENDIF()
@@ -25,11 +26,13 @@ ADD_LIBRARY(
 	# camera
 	src/camera/camera.cpp
 	src/camera/camera_config.cpp
+	src/camera/pinhole_model.cpp
 	# driver
 	src/driver/i2c.cpp
 	src/driver/uart.cpp
   # msckf
   src/msckf/camera_state.cpp
+  src/msckf/feature_estimator.cpp
   src/msckf/imu_state.cpp
   # feature
 	src/feature2d/feature_tracker.cpp
@@ -52,11 +55,12 @@ ADD_LIBRARY(
 	# utils
 	src/util/config.cpp
 	src/util/data.cpp
+	src/util/euler.cpp
 	src/util/file.cpp
 	src/util/gps.cpp
 	src/util/linalg.cpp
 	src/util/math.cpp
-	src/util/opencv.cpp
+	src/util/vision.cpp
 	src/util/stats.cpp
 	src/util/time.cpp
 )
@@ -75,8 +79,9 @@ FILE(COPY tests/test_data DESTINATION ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_configs DESTINATION ${PROJECT_BINARY_DIR}/tests)
 SET(UNITTESTS
   apriltag-mit_test
-  camera-camera_config_test
   camera-camera_test
+  camera-camera_config_test
+  camera-pinhole_model_test
   feature2d-feature_tracker_test
   feature2d-gms_matcher_test
   feature2d-klt_tracker_test
@@ -86,6 +91,9 @@ SET(UNITTESTS
   kitti-raw-oxts_test
   kitti-raw-parse_test
   kitti-raw-raw_test
+  msckf-camera_state_test
+  msckf-feature_estimator_test
+  msckf-imu_state_test
   util-config_test
   util-data_test
   util-file_test

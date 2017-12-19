@@ -6,6 +6,7 @@
 #define GVIO_CAMERA_PINHOLE_MODEL_HPP
 
 #include "gvio/util/util.hpp"
+#include "gvio/camera/camera_model.hpp"
 
 namespace gvio {
 /**
@@ -14,25 +15,25 @@ namespace gvio {
  */
 
 /**
- * PinHole camera model
+ * Pinhole camera model
  */
-class PinHoleModel {
+class PinholeModel : public CameraModel {
 public:
   int image_width = 0;
   int image_height = 0;
-  MatX K;          ///< Camera intrinsics
-  double cx = 0.0; ///< Principle center in x-axis
-  double cy = 0.0; ///< Principle center in y-axis
-  double fx = 0.0; ///< Focal length in x-axis
-  double fy = 0.0; ///< Focal length in y-axis
+  MatX K = zeros(3, 3); ///< Camera intrinsics
+  double cx = 0.0;      ///< Principle center in x-axis
+  double cy = 0.0;      ///< Principle center in y-axis
+  double fx = 0.0;      ///< Focal length in x-axis
+  double fy = 0.0;      ///< Focal length in y-axis
 
-  PinHoleModel() {}
+  PinholeModel() {}
 
-  PinHoleModel(const int image_width, const int image_height, const MatX &K)
+  PinholeModel(const int image_width, const int image_height, const MatX &K)
       : image_width{image_width}, image_height{image_height}, K{K}, cx{K(0, 2)},
         cy{K(1, 2)}, fx{K(0, 0)}, fy{K(1, 1)} {}
 
-  PinHoleModel(const int image_width,
+  PinholeModel(const int image_width,
                const int image_height,
                const double fx,
                const double fy,
@@ -106,6 +107,30 @@ public:
    * @returns Pixel measurement to image coordinates
    */
   Vec2 pixel2image(const Vec2 &pixel);
+
+  /**
+   * Convert pixel measurement to image coordinates
+   *
+   * @param pixel Pixel measurement
+   * @returns Pixel measurement to image coordinates
+   */
+  Vec2 pixel2image(const cv::Point2f &pixel);
+
+  /**
+   * Convert pixel measurement to image coordinates
+   *
+   * @param pixel Pixel measurement
+   * @returns Pixel measurement to image coordinates
+   */
+  Vec2 pixel2image(const Vec2 &pixel) const;
+
+  /**
+   * Convert pixel measurement to image coordinates
+   *
+   * @param pixel Pixel measurement
+   * @returns Pixel measurement to image coordinates
+   */
+  Vec2 pixel2image(const cv::Point2f &pixel) const;
 
   /**
    * Return features are observed by camera

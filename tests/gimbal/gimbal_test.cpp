@@ -19,7 +19,7 @@ static void print_target_relative_to_body_planar_frame(Vec3 &target) {
   std::cout << std::fixed << std::setprecision(2) << target(2) << std::endl;
 }
 
-int test_constructor() {
+int test_Gimbal_constructor() {
   Gimbal gimbal;
 
   MU_FALSE(gimbal.configured);
@@ -28,7 +28,7 @@ int test_constructor() {
   return 0;
 }
 
-int test_configure() {
+int test_Gimbal_configure() {
   Gimbal gimbal;
 
   gimbal.configure(TEST_CONFIG);
@@ -51,7 +51,7 @@ int test_configure() {
   return 0;
 }
 
-int test_getTargetInBF() {
+int test_Gimbal_getTargetInBF() {
   Gimbal gimbal;
   Vec3 target_C;
   Vec3 target_B;
@@ -149,7 +149,7 @@ int test_getTargetInBF() {
   return 0;
 }
 
-int test_getTargetInBPF() {
+int test_Gimbal_getTargetInBPF() {
   Gimbal gimbal;
   Quaternion joint;
   Vec3 euler;
@@ -251,7 +251,7 @@ int test_getTargetInBPF() {
   return 0;
 }
 
-int test_getTargetInIF() {
+int test_Gimbal_getTargetInIF() {
   Quaternion frame;
   Vec3 euler, target_P, gimbal_position, target_W;
 
@@ -306,7 +306,7 @@ int test_getTargetInIF() {
   return 0;
 }
 
-int test_trackTarget() {
+int test_Gimbal_trackTarget() {
   Gimbal gimbal;
   Quaternion imu;
   Vec3 euler;
@@ -338,11 +338,11 @@ int test_trackTarget() {
 }
 
 void test_suite() {
-  MU_ADD_TEST(test_constructor);
-  MU_ADD_TEST(test_getTargetInBF);
-  MU_ADD_TEST(test_getTargetInBPF);
-  MU_ADD_TEST(test_getTargetInIF);
-  MU_ADD_TEST(test_trackTarget);
+  MU_ADD_TEST(test_Gimbal_constructor);
+  MU_ADD_TEST(test_Gimbal_getTargetInBF);
+  MU_ADD_TEST(test_Gimbal_getTargetInBPF);
+  MU_ADD_TEST(test_Gimbal_getTargetInIF);
+  MU_ADD_TEST(test_Gimbal_trackTarget);
 }
 
 } // namespace gvio

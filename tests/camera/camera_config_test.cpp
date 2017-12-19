@@ -1,12 +1,12 @@
 #include "gvio/munit.h"
-#include "gvio/util/opencv.hpp"
+#include "gvio/util/vision.hpp"
 #include "gvio/camera/camera_config.hpp"
 
 #define TEST_CONFIG "test_configs/camera/webcam/640x480.yaml"
 
 namespace gvio {
 
-int test_constructor() {
+int test_CameraConfig_constructor() {
   CameraConfig config;
 
   MU_FALSE(config.loaded);
@@ -34,7 +34,7 @@ int test_constructor() {
   return 0;
 }
 
-int test_load() {
+int test_CameraConfig_load() {
   // clang-format off
   CameraConfig config;
   double camera_matrix[] = {1.0, 2.0, 3.0,
@@ -86,8 +86,8 @@ int test_load() {
 }
 
 void test_suite() {
-  MU_ADD_TEST(test_constructor);
-  MU_ADD_TEST(test_load);
+  MU_ADD_TEST(test_CameraConfig_constructor);
+  MU_ADD_TEST(test_CameraConfig_load);
 }
 
 } // namespace gvio

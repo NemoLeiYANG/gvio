@@ -1,17 +1,8 @@
-/**
- * @file
+/** * @file
  * @defgroup camera camera
  */
-#ifndef GVIO_VISION_CAMERA_HPP
-#define GVIO_VISION_CAMERA_HPP
-
-#include <algorithm>
-
-#include <yaml-cpp/yaml.h>
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#ifndef GVIO_CAMERA_CAMERA_HPP
+#define GVIO_CAMERA_CAMERA_HPP
 
 #include "gvio/util/util.hpp"
 #include "gvio/camera/camera_config.hpp"
@@ -125,4 +116,4 @@ public:
 
 /** @} group camera */
 } // namespace gvio
-#endif
+#endif // GVIO_CAMERA_CAMERA_HPP

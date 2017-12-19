@@ -2,8 +2,7 @@
 
 namespace gvio {
 
-int ORBTracker::detect(const cv::Mat &image,
-                       std::vector<Feature> &features) {
+int ORBTracker::detect(const cv::Mat &image, std::vector<Feature> &features) {
   // Feature descriptor extraction
   std::vector<cv::KeyPoint> keypoints;
   cv::Mat mask;

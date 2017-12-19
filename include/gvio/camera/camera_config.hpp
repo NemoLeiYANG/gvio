@@ -2,8 +2,8 @@
  * @file
  * @ingroup camera camera
  */
-#ifndef GVIO_VISION_CAMERA_CAMERA_CONFIG_HPP
-#define GVIO_VISION_CAMERA_CAMERA_CONFIG_HPP
+#ifndef GVIO_CAMERA_CAMERA_CONFIG_HPP
+#define GVIO_CAMERA_CAMERA_CONFIG_HPP
 
 #include <yaml-cpp/yaml.h>
 
@@ -66,4 +66,4 @@ public:
 
 /** @} group camera */
 } // namespace gvio
-#endif
+#endif // GVIO_CAMERA_CAMERA_CONFIG_HPP

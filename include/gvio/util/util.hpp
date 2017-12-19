@@ -7,14 +7,15 @@
 
 #include "gvio/util/config.hpp"
 #include "gvio/util/data.hpp"
+#include "gvio/util/euler.hpp"
 #include "gvio/util/file.hpp"
 #include "gvio/util/gps.hpp"
 #include "gvio/util/linalg.hpp"
 #include "gvio/util/log.hpp"
 #include "gvio/util/math.hpp"
-#include "gvio/util/opencv.hpp"
 #include "gvio/util/stats.hpp"
 #include "gvio/util/time.hpp"
+#include "gvio/util/vision.hpp"
 
 namespace gvio {
 /**

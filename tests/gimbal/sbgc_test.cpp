@@ -3,7 +3,7 @@
 
 namespace gvio {
 
-int test_connectDisconnect() {
+int test_SBGC_connectDisconnect() {
   SBGC sbgc("/dev/ttyUSB0");
   MU_CHECK_EQ(0, sbgc.connect());
   MU_CHECK_EQ(0, sbgc.disconnect());
@@ -11,7 +11,7 @@ int test_connectDisconnect() {
   return 0;
 }
 
-int test_sendFrame() {
+int test_SBGC_sendFrame() {
   int retval;
   SBGCFrame frame;
   SBGC sbgc("/dev/ttyUSB0");
@@ -34,7 +34,7 @@ int test_sendFrame() {
   return 0;
 }
 
-int test_readFrame() {
+int test_SBGC_readFrame() {
   int retval;
   SBGCFrame frame;
   SBGC sbgc("/dev/ttyUSB0");
@@ -54,7 +54,7 @@ int test_readFrame() {
   return 0;
 }
 
-int test_getBoardInfo() {
+int test_SBGC_getBoardInfo() {
   SBGC sbgc("/dev/ttyUSB0");
 
   // setup
@@ -74,7 +74,7 @@ int test_getBoardInfo() {
   return 0;
 }
 
-int test_getRealTimeData() {
+int test_SBGC_getRealTimeData() {
   SBGC sbgc("/dev/ttyUSB0");
 
   // setup
@@ -92,7 +92,7 @@ int test_getRealTimeData() {
   return 0;
 }
 
-int test_setAngle() {
+int test_SBGC_setAngle() {
   SBGC sbgc("/dev/ttyUSB0");
 
   MU_CHECK_EQ(0, sbgc.connect());
@@ -108,7 +108,7 @@ int test_setAngle() {
   return 0;
 }
 
-int test_setSpeedAngle() {
+int test_SBGC_setSpeedAngle() {
   SBGC sbgc("/dev/ttyUSB0");
 
   MU_CHECK_EQ(0, sbgc.connect());
@@ -123,13 +123,13 @@ int test_setSpeedAngle() {
 }
 
 void test_suite() {
-  MU_ADD_TEST(test_connectDisconnect);
-  MU_ADD_TEST(test_sendFrame);
-  MU_ADD_TEST(test_readFrame);
-  MU_ADD_TEST(test_getBoardInfo);
-  MU_ADD_TEST(test_getRealTimeData);
-  MU_ADD_TEST(test_setAngle);
-  MU_ADD_TEST(test_setSpeedAngle);
+  MU_ADD_TEST(test_SBGC_connectDisconnect);
+  MU_ADD_TEST(test_SBGC_sendFrame);
+  MU_ADD_TEST(test_SBGC_readFrame);
+  MU_ADD_TEST(test_SBGC_getBoardInfo);
+  MU_ADD_TEST(test_SBGC_getRealTimeData);
+  MU_ADD_TEST(test_SBGC_setAngle);
+  MU_ADD_TEST(test_SBGC_setSpeedAngle);
 }
 
 } // namespace gvio

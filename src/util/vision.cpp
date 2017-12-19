@@ -1,4 +1,4 @@
-#include "gvio/util/opencv.hpp"
+#include "gvio/util/vision.hpp"
 
 namespace gvio {
 
@@ -24,5 +24,9 @@ bool cvMatIsEqual(const cv::Mat m1, const cv::Mat m2) {
 
   return cv::countNonZero(diff) ? false : true;
 }
+
+Vec3 homogeneous(const Vec2 &x) { return Vec3{x(0), x(1), 1.0}; }
+
+Vec4 homogeneous(const Vec3 &x) { return Vec4{x(0), x(1), x(2), 1.0}; }
 
 } // namespace gvio

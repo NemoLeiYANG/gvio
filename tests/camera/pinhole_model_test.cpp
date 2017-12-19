@@ -8,16 +8,16 @@ struct test_config {
   const int image_height = 640;
   const double fov = 60.0;
 
-  const double fx = PinHoleModel::focalLengthX(image_width, fov);
-  const double fy = PinHoleModel::focalLengthY(image_height, fov);
+  const double fx = PinholeModel::focalLengthX(image_width, fov);
+  const double fy = PinholeModel::focalLengthY(image_height, fov);
   const double cx = image_width / 2.0;
   const double cy = image_height / 2.0;
 };
 
-PinHoleModel setup_pinhole_model() {
+PinholeModel setup_pinhole_model() {
   struct test_config config;
 
-  PinHoleModel cam_model(config.image_width,
+  PinholeModel cam_model(config.image_width,
                          config.image_height,
                          config.fx,
                          config.fy,
@@ -26,8 +26,8 @@ PinHoleModel setup_pinhole_model() {
   return cam_model;
 }
 
-int test_PinHoleModel_constructor() {
-  PinHoleModel cam_model;
+int test_PinholeModel_constructor() {
+  PinholeModel cam_model;
 
   MU_CHECK_EQ(0, cam_model.image_width);
   MU_CHECK_EQ(0, cam_model.image_height);
@@ -39,7 +39,7 @@ int test_PinHoleModel_constructor() {
   return 0;
 }
 
-int test_PinHoleModel_constructor2() {
+int test_PinholeModel_constructor2() {
   const int image_width = 600;
   const int image_height = 400;
 
@@ -54,7 +54,7 @@ int test_PinHoleModel_constructor2() {
   K(0, 2) = cx;
   K(1, 2) = cy;
 
-  PinHoleModel cam_model(image_width, image_height, K);
+  PinholeModel cam_model(image_width, image_height, K);
 
   MU_CHECK_EQ(image_width, cam_model.image_width);
   MU_CHECK_EQ(image_height, cam_model.image_height);
@@ -66,7 +66,7 @@ int test_PinHoleModel_constructor2() {
   return 0;
 }
 
-int test_PinHoleModel_constructor3() {
+int test_PinholeModel_constructor3() {
   const int image_width = 600;
   const int image_height = 400;
 
@@ -75,7 +75,7 @@ int test_PinHoleModel_constructor3() {
   const double cx = 3.0;
   const double cy = 4.0;
 
-  PinHoleModel cam_model(image_width, image_height, fx, fy, cx, cy);
+  PinholeModel cam_model(image_width, image_height, fx, fy, cx, cy);
 
   MU_CHECK_EQ(image_width, cam_model.image_width);
   MU_CHECK_EQ(image_height, cam_model.image_height);
@@ -87,10 +87,10 @@ int test_PinHoleModel_constructor3() {
   return 0;
 }
 
-int test_PinHoleModel_focalLength() {
-  const double fx = PinHoleModel::focalLengthX(600, 90.0);
-  const double fy = PinHoleModel::focalLengthY(600, 90.0);
-  const Vec2 focal_length = PinHoleModel::focalLength(600, 600, 90.0);
+int test_PinholeModel_focalLength() {
+  const double fx = PinholeModel::focalLengthX(600, 90.0);
+  const double fy = PinholeModel::focalLengthY(600, 90.0);
+  const Vec2 focal_length = PinholeModel::focalLength(600, 600, 90.0);
 
   MU_CHECK_FLOAT(300.0, fy);
   MU_CHECK_FLOAT(fx, fy);
@@ -100,9 +100,9 @@ int test_PinHoleModel_focalLength() {
   return 0;
 }
 
-int test_PinHoleModel_P() {
+int test_PinholeModel_P() {
   struct test_config config;
-  PinHoleModel cam_model = setup_pinhole_model();
+  PinholeModel cam_model = setup_pinhole_model();
   Mat3 R = euler321ToRot(Vec3{0.0, 0.0, 0.0});
   Vec3 t{1.0, 2.0, 3.0};
   Mat34 P = cam_model.P(R, t);
@@ -114,16 +114,13 @@ int test_PinHoleModel_P() {
                 0.0, 0.0, 1.0, -3.0;
   // clang-format on
 
-  // std::cout << P << std::endl;
-  // std::cout << P_expected << std::endl;
-
   MU_CHECK(((P - P_expected).norm() < 0.01));
 
   return 0;
 }
 
-int test_PinHoleModel_project() {
-  PinHoleModel cam_model = setup_pinhole_model();
+int test_PinholeModel_project() {
+  PinholeModel cam_model = setup_pinhole_model();
   Mat3 R = euler321ToRot(Vec3{0.0, 0.0, 0.0});
   Vec3 t{0.0, 0.0, 0.0};
   Vec3 X{0.0, 0.0, 10.0};
@@ -136,8 +133,8 @@ int test_PinHoleModel_project() {
   return 0;
 }
 
-int test_PinHoleModel_pixel2image() {
-  PinHoleModel cam_model = setup_pinhole_model();
+int test_PinholeModel_pixel2image() {
+  PinholeModel cam_model = setup_pinhole_model();
   Vec2 point = cam_model.pixel2image(Vec2{320, 320});
 
   MU_CHECK_FLOAT(0.0, point(0));
@@ -146,9 +143,9 @@ int test_PinHoleModel_pixel2image() {
   return 0;
 }
 
-int test_PinHoleModel_observedFeatures() {
+int test_PinholeModel_observedFeatures() {
   struct test_config config;
-  PinHoleModel cam_model = setup_pinhole_model();
+  PinholeModel cam_model = setup_pinhole_model();
 
   MatX features;
   features.resize(3, 1);
@@ -172,14 +169,14 @@ int test_PinHoleModel_observedFeatures() {
 }
 
 void test_suite() {
-  MU_ADD_TEST(test_PinHoleModel_constructor);
-  MU_ADD_TEST(test_PinHoleModel_constructor2);
-  MU_ADD_TEST(test_PinHoleModel_constructor3);
-  MU_ADD_TEST(test_PinHoleModel_focalLength);
-  MU_ADD_TEST(test_PinHoleModel_P);
-  MU_ADD_TEST(test_PinHoleModel_project);
-  MU_ADD_TEST(test_PinHoleModel_pixel2image);
-  MU_ADD_TEST(test_PinHoleModel_observedFeatures);
+  MU_ADD_TEST(test_PinholeModel_constructor);
+  MU_ADD_TEST(test_PinholeModel_constructor2);
+  MU_ADD_TEST(test_PinholeModel_constructor3);
+  MU_ADD_TEST(test_PinholeModel_focalLength);
+  MU_ADD_TEST(test_PinholeModel_P);
+  MU_ADD_TEST(test_PinholeModel_project);
+  MU_ADD_TEST(test_PinholeModel_pixel2image);
+  MU_ADD_TEST(test_PinholeModel_observedFeatures);
 }
 
 } // namespace gvio

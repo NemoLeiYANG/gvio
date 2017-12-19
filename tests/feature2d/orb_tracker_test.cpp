@@ -4,7 +4,7 @@
 
 namespace gvio {
 
-int test_update() {
+int test_ORBDetector_update() {
   ORBTracker tracker;
 
   RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
@@ -37,9 +37,7 @@ int test_update() {
   return 0;
 }
 
-void test_suite() {
-  MU_ADD_TEST(test_update);
-}
+void test_suite() { MU_ADD_TEST(test_ORBDetector_update); }
 
 } // namespace gvio
 

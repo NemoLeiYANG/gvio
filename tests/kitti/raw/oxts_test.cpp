@@ -7,7 +7,7 @@
 
 namespace gvio {
 
-int test_load() {
+int test_OXTS_load() {
   OXTS oxts;
 
   std::string oxts_path = "/raw/2011_09_26/2011_09_26_drive_0001_sync/oxts";
@@ -16,9 +16,7 @@ int test_load() {
   return 0;
 }
 
-void test_suite() {
-  MU_ADD_TEST(test_load);
-}
+void test_suite() { MU_ADD_TEST(test_OXTS_load); }
 
 } // namespace gvio
 

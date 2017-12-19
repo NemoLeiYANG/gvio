@@ -2,25 +2,25 @@
 
 namespace gvio {
 
-double PinHoleModel::focalLengthX(const int image_width, const double fov) {
+double PinholeModel::focalLengthX(const int image_width, const double fov) {
   double fx = ((image_width / 2.0) / tan(deg2rad(fov) / 2.0));
   return fx;
 }
 
-double PinHoleModel::focalLengthY(const int image_height, const double fov) {
+double PinholeModel::focalLengthY(const int image_height, const double fov) {
   double fy = ((image_height / 2.0) / tan(deg2rad(fov) / 2.0));
   return fy;
 }
 
-Vec2 PinHoleModel::focalLength(const int image_width,
+Vec2 PinholeModel::focalLength(const int image_width,
                                const int image_height,
                                const double fov) {
-  auto focal_length = Vec2{PinHoleModel::focalLengthX(image_width, fov),
-                           PinHoleModel::focalLengthY(image_height, fov)};
+  auto focal_length = Vec2{PinholeModel::focalLengthX(image_width, fov),
+                           PinholeModel::focalLengthY(image_height, fov)};
   return focal_length;
 }
 
-Mat34 PinHoleModel::P(const Mat3 &R, const Vec3 &t) {
+Mat34 PinholeModel::P(const Mat3 &R, const Vec3 &t) {
   Mat34 A;
   A.block(0, 0, 3, 3) = R;
   A.block(0, 3, 3, 1) = -R * t;
@@ -31,7 +31,7 @@ Mat34 PinHoleModel::P(const Mat3 &R, const Vec3 &t) {
   return P;
 }
 
-Vec3 PinHoleModel::project(const Vec3 &X, const Mat3 &R, const Vec3 &t) {
+Vec3 PinholeModel::project(const Vec3 &X, const Mat3 &R, const Vec3 &t) {
   // Convert 3D features to homogenous coordinates
   const Vec4 X_homo = homogeneous(X);
 
@@ -47,13 +47,26 @@ Vec3 PinHoleModel::project(const Vec3 &X, const Mat3 &R, const Vec3 &t) {
   return x;
 }
 
-Vec2 PinHoleModel::pixel2image(const Vec2 &pixel) {
+Vec2 PinholeModel::pixel2image(const Vec2 &pixel) {
   Vec2 pt((pixel(0) - this->cx) / this->fx, (pixel(1) - this->cy) / this->fy);
   return pt;
 }
 
+Vec2 PinholeModel::pixel2image(const cv::Point2f &pixel) {
+  return this->pixel2image(Vec2{pixel.x, pixel.y});
+}
+
+Vec2 PinholeModel::pixel2image(const Vec2 &pixel) const {
+  Vec2 pt((pixel(0) - this->cx) / this->fx, (pixel(1) - this->cy) / this->fy);
+  return pt;
+}
+
+Vec2 PinholeModel::pixel2image(const cv::Point2f &pixel) const {
+  return this->pixel2image(Vec2{pixel.x, pixel.y});
+}
+
 // TODO: Need to a more robust test for when feature is behind camera
-MatX PinHoleModel::observedFeatures(const MatX &features,
+MatX PinholeModel::observedFeatures(const MatX &features,
                                     const Vec3 &rpy,
                                     const Vec3 &t,
                                     std::vector<int> &mask) {

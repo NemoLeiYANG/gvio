@@ -17,22 +17,22 @@ namespace gvio {
 /**
  * IMU State
  */
-struct IMUState {
+class IMUState {
+public:
   const double size = 15; ///< Size of state vector
 
-  Vec4 q_IG; ///< JPL Quaternion of IMU in Global frame
-  Vec3 b_g;  ///< Bias of gyroscope
-  Vec3 v_G;  ///< Velocity of IMU in Global frame
-  Vec3 b_a;  ///< Bias of accelerometer
-  Vec3 p_G;  ///< Position of IMU in Global frame
+  Vec4 q_IG = zeros(4, 1); ///< JPL Quaternion of IMU in Global frame
+  Vec3 b_g = zeros(3, 1);  ///< Bias of gyroscope
+  Vec3 v_G = zeros(3, 1);  ///< Velocity of IMU in Global frame
+  Vec3 b_a = zeros(3, 1);  ///< Bias of accelerometer
+  Vec3 p_G = zeros(3, 1);  ///< Position of IMU in Global frame
 
-  Vec3 w_G; ///< Gravitational angular velocity
-  Vec3 g_G; ///< Gravitational acceleration
+  Vec3 w_G = zeros(3, 1); ///< Earth's angular velocity
+  Vec3 g_G = zeros(3, 1); ///< Gravitational acceleration
 
-  MatX P; ///< Covariance matrix
-  MatX Q; ///< Noise matrix
-
-  MatX Phi; ///< Phi matrix
+  MatX P = zeros(15);   ///< Covariance matrix
+  MatX Q = zeros(12);   ///< Noise matrix
+  MatX Phi = zeros(15); ///< Phi matrix
 
   IMUState() {}
 
@@ -72,7 +72,7 @@ struct IMUState {
   MatX J(const Vec4 &cam_q_CI,
          const Vec3 &cam_p_IC,
          const Vec4 &q_hat_IG,
-         const double N);
+         const int N);
 
   /**
    * Update

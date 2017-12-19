@@ -9,10 +9,11 @@
 
 #include "gvio/util/util.hpp"
 #include "gvio/quaternion/jpl.hpp"
+#include "gvio/feature2d/feature_tracker.hpp"
 
-#include "gvio/estimation/camera_state.hpp"
-#include "gvio/estimation/imu_state.hpp"
-#include "gvio/estimation/msckf.hpp"
+#include "gvio/msckf/camera_state.hpp"
+#include "gvio/msckf/imu_state.hpp"
+#include "gvio/msckf/msckf.hpp"
 
 namespace gvio {
 /**
@@ -34,9 +35,6 @@ namespace gvio {
  *   [http://www.ee.ucr.edu/~mourikis/tech_reports/TR_MSCKF.pdf]
  */
 struct MSCKF {
-  std::vector<CameraState> cam_states;
-  IMUState imu_state;
-
   // Covariance matrices
   MatX P_cam;
   MatX P_imu_cam;
@@ -46,7 +44,7 @@ struct MSCKF {
 
   // Camera
   // -- State
-  std::vector<CamereaState> cam_states;
+  CameraStates cam_states;
   FrameID counter_frame_id = 0;
   // -- Extrinsics
   Vec3 ext_p_IC;
@@ -73,7 +71,7 @@ struct MSCKF {
    * Get camera states the feature track was observed in
    */
   int getTrackCameraStates(const FeatureTrack &track,
-                           std::vector<CameraState> &track_cam_states);
+                           CameraStates &track_cam_states);
 
   /**
    * Return covariance matrix P
@@ -93,7 +91,7 @@ struct MSCKF {
   /**
    * Prediction update
    */
-  void predictionUpdate(const Vec3 &a_m, const Ve3 &w_m, const double dt);
+  void predictionUpdate(const Vec3 &a_m, const Vec3 &w_m, const double dt);
 
   /**
    * Calculate track residuals

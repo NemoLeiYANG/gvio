@@ -4,7 +4,7 @@
 
 namespace gvio {
 
-int test_detect() {
+int test_KLTTracker_detect() {
   KLTTracker tracker;
 
   RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
@@ -25,7 +25,7 @@ int test_detect() {
   return 0;
 }
 
-int test_track() {
+int test_KLTTracker_track() {
   KLTTracker tracker;
 
   // Setup test data
@@ -57,7 +57,7 @@ int test_track() {
   return 0;
 }
 
-int test_demo() {
+int test_KLTTracker_demo() {
   KLTTracker tracker;
 
   cv::VideoCapture capture(0);
@@ -82,9 +82,9 @@ int test_demo() {
 }
 
 void test_suite() {
-  MU_ADD_TEST(test_detect);
-  MU_ADD_TEST(test_track);
-  // MU_ADD_TEST(test_demo);
+  MU_ADD_TEST(test_KLTTracker_detect);
+  MU_ADD_TEST(test_KLTTracker_track);
+  // MU_ADD_TEST(test_KLTTracker_demo);
 }
 
 } // namespace gvio

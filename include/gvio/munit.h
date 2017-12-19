@@ -36,7 +36,7 @@ static int failed = 0;
 
 #define MU_CHECK(test) \
     do { \
-        if (!(test)) { \
+        if ((test) == false) { \
             printf( \
                 "%sERROR!%s [%s:%d] %s %sFAILED!%s\n", \
                 KRED, \

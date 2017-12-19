@@ -16,7 +16,7 @@
 
 namespace gvio {
 
-int test_constructor() {
+int test_MITDetector_constructor() {
   MITDetector detector;
 
   MU_FALSE(detector.configured);
@@ -32,7 +32,7 @@ int test_constructor() {
   return 0;
 }
 
-int test_configure() {
+int test_MITDetector_configure() {
   MITDetector detector;
 
   detector.configure(TEST_CONFIG);
@@ -50,7 +50,7 @@ int test_configure() {
   return 0;
 }
 
-int test_illuminationInvarientTransform() {
+int test_MITDetector_illuminationInvarientTransform() {
   cv::Mat image;
   MITDetector detector;
   std::vector<AprilTags::TagDetection> tags;
@@ -70,7 +70,7 @@ int test_illuminationInvarientTransform() {
   return 0;
 }
 
-int test_extractTags() {
+int test_MITDetector_extractTags() {
   // setup
   MITDetector detector;
   detector.configure(TEST_CONFIG);
@@ -118,7 +118,7 @@ int test_extractTags() {
   return 0;
 }
 
-int test_changeMode() {
+int test_MITDetector_changeMode() {
   MITDetector detector;
   cv::Mat image1, image2, image3;
 
@@ -140,7 +140,7 @@ int test_changeMode() {
   return 0;
 }
 
-int test_maskImage() {
+int test_MITDetector_maskImage() {
   // setup
   MITDetector detector;
   detector.configure(TEST_CONFIG);
@@ -157,7 +157,7 @@ int test_maskImage() {
   return 0;
 }
 
-int test_cropImage() {
+int test_MITDetector_cropImage() {
   // setup
   MITDetector detector;
   detector.configure(TEST_CONFIG);
@@ -184,13 +184,13 @@ int test_cropImage() {
 }
 
 void test_suite() {
-  MU_ADD_TEST(test_constructor);
-  MU_ADD_TEST(test_configure);
-  MU_ADD_TEST(test_illuminationInvarientTransform);
-  MU_ADD_TEST(test_extractTags);
-  MU_ADD_TEST(test_changeMode);
-  MU_ADD_TEST(test_maskImage);
-  MU_ADD_TEST(test_cropImage);
+  MU_ADD_TEST(test_MITDetector_constructor);
+  MU_ADD_TEST(test_MITDetector_configure);
+  MU_ADD_TEST(test_MITDetector_illuminationInvarientTransform);
+  MU_ADD_TEST(test_MITDetector_extractTags);
+  MU_ADD_TEST(test_MITDetector_changeMode);
+  MU_ADD_TEST(test_MITDetector_maskImage);
+  MU_ADD_TEST(test_MITDetector_cropImage);
 }
 
 } // namespace gvio

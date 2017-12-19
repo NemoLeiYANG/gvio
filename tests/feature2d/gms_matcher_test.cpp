@@ -5,7 +5,7 @@
 
 namespace gvio {
 
-int test_demo() {
+int test_GMSMatcher_demo() {
   // Setup ORB
   cv::Ptr<cv::ORB> orb = cv::ORB::create();
   orb->setFastThreshold(0);
@@ -67,7 +67,7 @@ int test_demo() {
 }
 
 void test_suite() {
-  // MU_ADD_TEST(test_demo);
+  // MU_ADD_TEST(test_GMSMatcher_demo);
 }
 
 } // namespace gvio

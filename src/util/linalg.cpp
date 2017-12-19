@@ -38,6 +38,8 @@ Mat3 skewsq(const Vec3 &w) {
 MatX enforce_psd(const MatX &A) {
   MatX A_psd;
 
+  A_psd.resize(A.rows(), A.cols());
+
   for (int i = 0; i < A.rows(); i++) {
     for (int j = 0; j < A.cols(); j++) {
       if (i == j) {

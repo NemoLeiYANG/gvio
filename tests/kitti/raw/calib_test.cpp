@@ -3,7 +3,7 @@
 
 namespace gvio {
 
-int test_load() {
+int test_Calib_load() {
   CalibCamToCam calib;
 
   int retval = calib.load("/data/kitti/raw/2011_09_26/calib_cam_to_cam.txt");
@@ -16,9 +16,7 @@ int test_load() {
   return 0;
 }
 
-void test_suite() {
-  MU_ADD_TEST(test_load);
-}
+void test_suite() { MU_ADD_TEST(test_Calib_load); }
 
 } // namespace gvio
 

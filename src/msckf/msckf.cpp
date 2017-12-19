@@ -7,12 +7,14 @@ void MSCKF::augmentState() {
   const int x_cam_size = this->N() ? this->cam_states[0].size : 0;
 
   // Camera pose Jacobian
-  const MatX J = this->imu_state.J(this->ext_q_CI, this->ext_p_IC,
-                                   this->imu_state.q_IG, this->N());
+  const MatX J = this->imu_state.J(this->ext_q_CI,
+                                   this->ext_p_IC,
+                                   this->imu_state.q_IG,
+                                   this->N());
 
   // Augment MSCKF covariance matrix (with new camera state)
-  X = np.block([[I(x_imu_size + x_cam_size * this->N())], [J]])
-  const MatX P = X * this->P() * X.transpose();
+  X = np.block([ [I(x_imu_size + x_cam_size * this->N())], [J] ]) const MatX P =
+      X * this->P() * X.transpose();
   // this->imu_state.P = P[0:x_imu_size, 0:x_imu_size]
   // this->P_cam = P[x_imu_size:, x_imu_size:]
   // this->P_imu_cam = P[0:x_imu_size, x_imu_size:]
@@ -31,16 +33,17 @@ void MSCKF::augmentState() {
 
 int MSCKF::getTrackCameraStates(const FeatureTrack &track,
                                 std::vector<CameraState> &track_cam_states);
-  const FrameID frame_start = track.frame_start;
-  const FrameID frame_end = track.frame_end;
-  const FrameID index_start = frame_start - this->cam_states[0].frame_id;
-  const FrameID index_end = this->N() - (this->cam_states[-1].frame_id - frame_end);
+const FrameID frame_start = track.frame_start;
+const FrameID frame_end = track.frame_end;
+const FrameID index_start = frame_start - this->cam_states[0].frame_id;
+const FrameID index_end =
+    this->N() - (this->cam_states[-1].frame_id - frame_end);
 
-  // track_cam_states = this->cam_states[index_start:index_end]
-  // assert track_cam_states[0].frame_id == track.frame_start
-  // assert track_cam_states[-1].frame_id == track.frame_end
+// track_cam_states = this->cam_states[index_start:index_end]
+// assert track_cam_states[0].frame_id == track.frame_start
+// assert track_cam_states[-1].frame_id == track.frame_end
 
-  return 0;
+return 0;
 }
 
 MatX MSCKF::P() {
@@ -56,16 +59,14 @@ MatX MSCKF::P() {
   return P;
 }
 
-int MSCKF::N() {
-  return (int) this->cam_states.size();
-}
+int MSCKF::N() { return (int) this->cam_states.size(); }
 
 void MSCKF::H(MatX &H_f_j, MatX &H_x_j) {
-  const double x_imu_size = this->imu_state.size;      // Size of imu state
-  const double x_cam_size = this->cam_states[0].size;  // Size of cam state
+  const double x_imu_size = this->imu_state.size;     // Size of imu state
+  const double x_cam_size = this->cam_states[0].size; // Size of cam state
 
-  const int N = this->N();               // Number of camera states
-  const int M = track.tracked_length();  // Length of feature track
+  const int N = this->N();              // Number of camera states
+  const int M = track.tracked_length(); // Length of feature track
 
   // Measurement jacobian w.r.t feature
   MatX H_f_j = zeros(2 * M, 3);
@@ -78,7 +79,7 @@ void MSCKF::H(MatX &H_f_j, MatX &H_x_j) {
   assert track_cam_states[0].frame_id == track.frame_start;
   assert track_cam_states[-1].frame_id == track.frame_end;
   assert pose_idx == track.frame_start;
-  assert (pose_idx + (M - 1)) == track.frame_end;
+  assert(pose_idx + (M - 1)) == track.frame_end;
 
   // // Form measurement jacobians
   // for (int i = 0; i < M; i++) {

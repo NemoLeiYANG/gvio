@@ -2,8 +2,7 @@
 
 namespace gvio {
 
-int KLTTracker::detect(const cv::Mat &image,
-                       std::vector<Feature> &features) {
+int KLTTracker::detect(const cv::Mat &image, std::vector<Feature> &features) {
   // Convert image to gray scale
   cv::Mat gray_image;
   cv::cvtColor(image, gray_image, CV_BGR2GRAY);
@@ -61,13 +60,13 @@ int KLTTracker::track(const std::vector<Feature> &features) {
   std::vector<uchar> status;
   std::vector<float> err;
   cv::Size win_size(21, 21);
-  cv::calcOpticalFlowPyrLK(gray_img_ref,  // Reference image
-                           gray_img_cur,  // Current image
-                           p0,            // Input points
-                           p1,            // Output points
-                           status,        // Tracking status
-                           err,           // Tracking error
-                           win_size);     // Window size
+  cv::calcOpticalFlowPyrLK(gray_img_ref, // Reference image
+                           gray_img_cur, // Current image
+                           p0,           // Input points
+                           p1,           // Output points
+                           status,       // Tracking status
+                           err,          // Tracking error
+                           win_size);    // Window size
 
   // Show matches
   if (this->show_matches) {

@@ -26,7 +26,8 @@ namespace gvio {
 //   this->gyro.pitch = (this->gyro.y * dt) + this->pitch;
 // }
 
-// Vec2 complementary_filter(const Gyroscope gyro, const Accelerometer accel, const double dt) {
+// Vec2 complementary_filter(const Gyroscope gyro, const Accelerometer accel,
+// const double dt) {
 //   // complimentary filter
 //   this->accelerometerCalcAngle();
 //   this->pitch = (0.98 * this->gyro.pitch) + (0.02 * this->accel.pitch);

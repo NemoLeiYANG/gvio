@@ -37,6 +37,7 @@ struct Feature {
   cv::Mat desc;
 
   Feature() {}
+  Feature(const Vec2 &pt) : kp{cv::Point2f(pt(0), pt(1)), 1.0f} {}
   Feature(const cv::Point2f &pt) : kp{pt, 1.0f} {}
   Feature(const cv::KeyPoint &kp) : kp{kp} {}
   Feature(const cv::KeyPoint &kp, const cv::Mat &desc) : kp{kp}, desc{desc} {}
@@ -72,7 +73,7 @@ struct CompareFeatureByKeyPoint {
   bool operator()(const Feature &a, const Feature &b) const {
     const double dx = b.kp.pt.x - a.kp.pt.x;
     const double dy = b.kp.pt.y - a.kp.pt.y;
-    const double dist = sqrtf(dx*dx + dy*dy);
+    const double dist = sqrtf(dx * dx + dy * dy);
     return dist;
   }
 };
@@ -92,10 +93,8 @@ struct FeatureTrack {
                const FrameID &frame_id,
                const Feature &f1,
                const Feature &f2)
-      : track_id{track_id}, frame_start{frame_id - 1}, frame_end{frame_id} {
-    this->track.push_back(f1);
-    this->track.push_back(f2);
-  }
+      : track_id{track_id}, frame_start{frame_id - 1}, frame_end{frame_id},
+        track{f1, f2} {}
 
   /**
    * Update feature track
@@ -252,7 +251,8 @@ public:
    * @param f1 List of features in current frame
    * @returns 0 for success, -1 for failure
    */
-  virtual int match(const std::vector<Feature> &f1, std::vector<cv::DMatch> &matches);
+  virtual int match(const std::vector<Feature> &f1,
+                    std::vector<cv::DMatch> &matches);
 
   /**
    * Purge old feature tracks

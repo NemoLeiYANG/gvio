@@ -3,7 +3,7 @@
 
 namespace gvio {
 
-int test_configure() {
+int test_MPU6050_configure() {
   int retval;
   MPU6050 imu;
 
@@ -13,9 +13,7 @@ int test_configure() {
   return 0;
 }
 
-void test_suite() {
-  MU_ADD_TEST(test_configure);
-}
+void test_suite() { MU_ADD_TEST(test_MPU6050_configure); }
 
 } // namespace gvio
 
