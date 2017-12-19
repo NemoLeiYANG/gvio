@@ -44,6 +44,7 @@
       <li class="current"><a href="functions.html"><span>All</span></a></li>
       <li><a href="functions_func.html"><span>Functions</span></a></li>
       <li><a href="functions_vars.html"><span>Variables</span></a></li>
+      <li><a href="functions_rela.html"><span>Related&#160;Functions</span></a></li>
     </ul>
   </div>
   <div id="navrow4" class="tabs3">
@@ -83,12 +84,19 @@
 
 <h3><a class="anchor" id="index_p"></a>- p -</h3><ul>
 <li>P
-: <a class="el" href="structgvio_1_1IMUState.html#a989126c756c739826431456566d80e93">gvio::IMUState</a>
-, <a class="el" href="structgvio_1_1MSCKF.html#a47848fb01560f73bb7a793ffe15c0ab0">gvio::MSCKF</a>
+: <a class="el" href="classgvio_1_1IMUState.html#a989126c756c739826431456566d80e93">gvio::IMUState</a>
+, <a class="el" href="structgvio_1_1MSCKF.html#a10f8c28ef2bcbddf3efff14db5ed4ef1">gvio::MSCKF</a>
+, <a class="el" href="classgvio_1_1PinholeModel.html#aeac258dd8734a019e99d93d80521adaf">gvio::PinholeModel</a>
+</li>
+<li>P_cam
+: <a class="el" href="structgvio_1_1MSCKF.html#a8e65a3285b59c6720622c4e1688b4888">gvio::MSCKF</a>
 </li>
 <li>p_G
-: <a class="el" href="structgvio_1_1CameraState.html#a148af4aa1193a66d7dedd2d9c30821a0">gvio::CameraState</a>
-, <a class="el" href="structgvio_1_1IMUState.html#ae7deea56232433389b7095b35d4d2d05">gvio::IMUState</a>
+: <a class="el" href="classgvio_1_1CameraState.html#a148af4aa1193a66d7dedd2d9c30821a0">gvio::CameraState</a>
+, <a class="el" href="classgvio_1_1IMUState.html#ae7deea56232433389b7095b35d4d2d05">gvio::IMUState</a>
+</li>
+<li>P_imu_cam
+: <a class="el" href="structgvio_1_1MSCKF.html#ad6cb100daf5615b210c97fe2590f2cd9">gvio::MSCKF</a>
 </li>
 <li>P_rect
 : <a class="el" href="structgvio_1_1CalibCamToCam.html#a5124dbd7040ff892bc9eaaf77dc59063">gvio::CalibCamToCam</a>
@@ -118,23 +126,27 @@
 : <a class="el" href="structgvio_1_1OXTS.html#a007f69e6209d0a1a034ddfb6c6bda479">gvio::OXTS</a>
 </li>
 <li>Phi
-: <a class="el" href="structgvio_1_1IMUState.html#a4a1dc93919dc4a57a0b0cfbba36f188b">gvio::IMUState</a>
+: <a class="el" href="classgvio_1_1IMUState.html#a4a1dc93919dc4a57a0b0cfbba36f188b">gvio::IMUState</a>
 </li>
 <li>ping()
-: <a class="el" href="classgvio_1_1MPU6050.html#a3121f82be741ab2fe34f8e45b5641fad">gvio::MPU6050</a>
+: <a class="el" href="structgvio_1_1IMU.html#a4ebe350d23925234dba0dfc7a74acb35">gvio::IMU</a>
+, <a class="el" href="structgvio_1_1MPU6050.html#a3121f82be741ab2fe34f8e45b5641fad">gvio::MPU6050</a>
 , <a class="el" href="classgvio_1_1MPU9250.html#a5eeae563ce3a8976691e65e9431fb9c8">gvio::MPU9250</a>
 </li>
+<li>PinholeModel()
+: <a class="el" href="classgvio_1_1PinholeModel.html#aaab6d4a9d438ebe9c92a2f8b91b77914">gvio::PinholeModel</a>
+</li>
 <li>pitch
-: <a class="el" href="classgvio_1_1MPU6050.html#a763ceaff0dcda5e3d11efd651ca165b8">gvio::MPU6050</a>
-, <a class="el" href="classgvio_1_1MPU6050Accelerometer.html#a5822464892f92aef80e456ff26d405f1">gvio::MPU6050Accelerometer</a>
-, <a class="el" href="classgvio_1_1MPU6050Gyroscope.html#a807eeb360ac6aac4e4963bee9be66750">gvio::MPU6050Gyroscope</a>
-, <a class="el" href="classgvio_1_1MPU9250.html#a4673e9f39b530df6303acb6013a0ab6b">gvio::MPU9250</a>
+: <a class="el" href="classgvio_1_1MPU9250.html#a4673e9f39b530df6303acb6013a0ab6b">gvio::MPU9250</a>
 , <a class="el" href="classgvio_1_1MPU9250Accelerometer.html#a6f7c4f934fc4ecf2e8f461bf4ea1edb4">gvio::MPU9250Accelerometer</a>
 , <a class="el" href="classgvio_1_1MPU9250Gyroscope.html#a71718b7244c63284a8c893d1b5d91269">gvio::MPU9250Gyroscope</a>
 </li>
 <li>pitch_offset
-: <a class="el" href="classgvio_1_1MPU6050.html#a6b9c1005837143b7b0e36295831a2ef1">gvio::MPU6050</a>
-, <a class="el" href="classgvio_1_1MPU9250.html#a2224f6cd3b7acb0067bda2f666b9fe83">gvio::MPU9250</a>
+: <a class="el" href="classgvio_1_1MPU9250.html#a2224f6cd3b7acb0067bda2f666b9fe83">gvio::MPU9250</a>
+</li>
+<li>pixel2image()
+: <a class="el" href="classgvio_1_1CameraModel.html#a6d438072b4d99ed03835c23c2044b402">gvio::CameraModel</a>
+, <a class="el" href="classgvio_1_1PinholeModel.html#a0500ba93890b882ca3c597c869b511c3">gvio::PinholeModel</a>
 </li>
 <li>port
 : <a class="el" href="classgvio_1_1SBGC.html#a74b9c9fa88154636f44183ce73e185d0">gvio::SBGC</a>
@@ -147,7 +159,7 @@
 : <a class="el" href="classgvio_1_1TagPose.html#ad55350b4f7250af59038e8d47ee37569">gvio::TagPose</a>
 </li>
 <li>predictionUpdate()
-: <a class="el" href="structgvio_1_1MSCKF.html#ad75d486ddfdc24f7e0e2d87e82159dc0">gvio::MSCKF</a>
+: <a class="el" href="structgvio_1_1MSCKF.html#aca51915c6ae01d91617fa76560282bf4">gvio::MSCKF</a>
 </li>
 <li>prev_tag
 : <a class="el" href="classgvio_1_1BaseDetector.html#a77b0af73761a3668f8b49874b4e045eb">gvio::BaseDetector</a>
@@ -160,7 +172,6 @@
 </li>
 <li>print()
 : <a class="el" href="classgvio_1_1CameraConfig.html#ad56827c8e47b7243f36804b32530226c">gvio::CameraConfig</a>
-, <a class="el" href="classgvio_1_1MPU6050.html#a4ffd490cb8a491362b7b244218821f28">gvio::MPU6050</a>
 , <a class="el" href="classgvio_1_1TagPose.html#a148585762254049c8e61de9d5b217d8a">gvio::TagPose</a>
 </li>
 <li>printData()
@@ -174,6 +185,10 @@
 </li>
 <li>printTag()
 : <a class="el" href="classgvio_1_1BaseDetector.html#afacc5b92dd7b322dde1f2b6df3c380bb">gvio::BaseDetector</a>
+</li>
+<li>project()
+: <a class="el" href="classgvio_1_1CameraModel.html#ab86eceebacd690f9964ffdbd898c6b56">gvio::CameraModel</a>
+, <a class="el" href="classgvio_1_1PinholeModel.html#a8333ed5c979839897f62292690bb71f7">gvio::PinholeModel</a>
 </li>
 <li>projection_matrix
 : <a class="el" href="classgvio_1_1CameraConfig.html#adfa5665811e22e222dfb428263ed406e">gvio::CameraConfig</a>

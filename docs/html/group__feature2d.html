@@ -54,16 +54,26 @@ Files</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gms__matcher_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gms__matcher_8hpp.html">gms_matcher.hpp</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:klt__tracker_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="klt__tracker_8hpp.html">klt_tracker.hpp</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:orb__tracker_8hpp"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orb__tracker_8hpp.html">orb_tracker.hpp</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1Feature.html">gvio::Feature</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CompareFeatureByKeyPoint.html">gvio::CompareFeatureByKeyPoint</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1FeatureTrack.html">gvio::FeatureTrack</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html">gvio::FeatureTracker</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1GMSMatcher.html">gvio::GMSMatcher</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html">gvio::KLTTracker</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1ORBTracker.html">gvio::ORBTracker</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -80,10 +90,6 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaf9c478a072b5e350ac99a8dd30f03d45"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#gaf9c478a072b5e350ac99a8dd30f03d45">gvio::f2kd</a> (const std::vector&lt; Feature &gt; &amp;features, std::vector&lt; cv::KeyPoint &gt; &amp;keypoints, cv::Mat &amp;descriptors)</td></tr>
-<tr class="separator:gaf9c478a072b5e350ac99a8dd30f03d45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0c7ec56539b978c50857dd59be2c7dab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#ga0c7ec56539b978c50857dd59be2c7dab">gvio::kd2f</a> (const std::vector&lt; cv::KeyPoint &gt; &amp;keypoints, const cv::Mat &amp;descriptors, std::vector&lt; Feature &gt; &amp;features)</td></tr>
-<tr class="separator:ga0c7ec56539b978c50857dd59be2c7dab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3db75956895fe89f7e8f954fc0880002"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#ga3db75956895fe89f7e8f954fc0880002">gvio::draw_inliers</a> (const cv::Mat &amp;src1, const cv::Mat &amp;src2, const std::vector&lt; cv::KeyPoint &gt; &amp;kpt1, const std::vector&lt; cv::KeyPoint &gt; &amp;kpt2, const std::vector&lt; cv::DMatch &gt; &amp;inlier, int type=1)</td></tr>
 <tr class="separator:ga3db75956895fe89f7e8f954fc0880002"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -189,88 +195,6 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="gaf9c478a072b5e350ac99a8dd30f03d45"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void gvio::f2kd </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="structgvio_1_1Feature.html">Feature</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>features</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; cv::KeyPoint &gt; &amp;&#160;</td>
-          <td class="paramname"><em>keypoints</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">cv::Mat &amp;&#160;</td>
-          <td class="paramname"><em>descriptors</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Features to keypoints and descriptors </p>
-
-</div>
-</div>
-<a class="anchor" id="ga0c7ec56539b978c50857dd59be2c7dab"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void gvio::kd2f </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; cv::KeyPoint &gt; &amp;&#160;</td>
-          <td class="paramname"><em>keypoints</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const cv::Mat &amp;&#160;</td>
-          <td class="paramname"><em>descriptors</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; <a class="el" href="structgvio_1_1Feature.html">Feature</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>features</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Keypoints and descriptors to Features </p>
 
 </div>
 </div>

@@ -2,6 +2,12 @@
 
 **G**imbal **V**isual **I**nertial **O**dometry (GVIO)
 
+
+## Generate Documentation
+
+    # At the root of gvio
+    doxygen Doxyfile
+
 ## LICENCE
 
 Copyright (C) <2016>  <Chris Choi>

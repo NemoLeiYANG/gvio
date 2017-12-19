@@ -41,6 +41,7 @@ public:
    * @param p2 Feature point 2 in pixel coordinates
    * @param C_C0C1 Rotation matrix from frame C1 to C0
    * @param t_C0_C0C1 Translation vector from frame C0 to C1 expressed in C0
+   * @param p_C0_f Initial feature position
    *
    * @returns 0 for success, -1 for failure
    */
@@ -53,19 +54,34 @@ public:
   /**
    * Calculate initial estimate
    *
-   * @param cam_model Camera model
-   * @param track Feature track
-   * @param track_cam_states Camera states
    * @param p_C0_f Initial feature position
-   *
    * @returns 0 for success, -1 for failure
    */
   int initialEstimate(Vec3 &p_C0_f);
 
   /**
    * Jacobian
+   *
+   * @param x Optimization parameters
+   * @returns Jacobian
    */
-  int jacobian();
+  MatX jacobian(const VecX &x);
+
+  /**
+   * Reprojection error
+   *
+   * @param x Optimization parameters
+   * @returns Jacobian
+   */
+  VecX reprojectionError(const VecX &x);
+
+  /**
+   * Estimate feature position in global frame
+   *
+   * @param p_G_f Feature position in global frame
+   * @returns 0 for success, -1 for failure
+   */
+  int estimate(Vec3 &p_G_f);
 };
 
 /** @} group msckf */

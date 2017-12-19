@@ -28,7 +28,7 @@ int FeatureEstimator::triangulate(const Vec2 &p1,
 }
 
 int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
-  // Calculate rotation and translation of first and last camera states
+  // Calculate rotation and translation of first and second camera states
   // -- Get rotation and translation of camera 0 and camera 1
   const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
   const Mat3 C_C1G = C(this->track_cam_states[1].q_CG);
@@ -49,206 +49,130 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
   return 0;
 }
 
-// def jacobian(self, x, *args):
-//     """Jacobian
-//
-//     Parameters
-//     ----------
-//     cam_model : CameraModel
-//         Camera model
-//     track : FeatureTrack
-//         Feature track
-//     track_cam_states : list of CameraState
-//         Camera states where feature track was observed
-//
-//     Returns
-//     -------
-//     J : np.array
-//         Jacobian
-//
-//     """
-//     cam_model, track, track_cam_states = args
-//
-//     N = len(track_cam_states)
-//     J = zeros((2 * N, 3))
-//
-//     C_C0G = C(track_cam_states[0].q_CG)
-//     p_G_C0 = track_cam_states[0].p_G
-//     alpha, beta, rho = x.ravel()
-//
-//     # Form the Jacobian
-//     for i in range(N):
-//         # Get camera current rotation and translation
-//         C_CiG = C(track_cam_states[i].q_CG)
-//         p_G_Ci = track_cam_states[i].p_G
-//
-//         # Set camera 0 as origin, work out rotation and translation
-//         # of camera i relative to to camera 0
-//         C_CiC0 = dot(C_CiG, C_C0G.T)
-//         t_Ci_CiC0 = dot(C_CiG, (p_G_C0 - p_G_Ci))
-//
-//         # Project estimated feature location to image plane
-//         h = dot(C_CiC0, np.array([[alpha], [beta], [1]])) + rho * t_Ci_CiC0
-//         # noqa
-//
-//         drdalpha = np.array([
-//             -C_CiC0[0, 0] / h[2, 0] + (h[0, 0] / h[2, 0]**2) * C_CiC0[2, 0],
-//             # noqa
-//             -C_CiC0[1, 0] / h[2, 0] + (h[1, 0] / h[2, 0]**2) * C_CiC0[2, 0]
-//             # noqa
-//         ])
-//         drdbeta = np.array([
-//             -C_CiC0[0, 1] / h[2, 0] + (h[0, 0] / h[2, 0]**2) * C_CiC0[2, 1],
-//             # noqa
-//             -C_CiC0[1, 1] / h[2, 0] + (h[1, 0] / h[2, 0]**2) * C_CiC0[2, 1]
-//             # noqa
-//         ])
-//         drdrho = np.array([
-//             -t_Ci_CiC0[0, 0] / h[2, 0] + (h[0, 0] / h[2, 0]**2) *
-//             t_Ci_CiC0[2, 0],  # noqa
-//             -t_Ci_CiC0[1, 0] / h[2, 0] + (h[1, 0] / h[2, 0]**2) *
-//             t_Ci_CiC0[2, 0]   # noqa
-//         ])
-//         J[2 * i:(2 * (i + 1)), 0] = drdalpha.ravel()
-//         J[2 * i:(2 * (i + 1)), 1] = drdbeta.ravel()
-//         J[2 * i:(2 * (i + 1)), 2] = drdrho.ravel()
-//
-//     return J
-//
-// def reprojection_error(self, x, *args):
-//     """Reprojection error
-//
-//     Parameters
-//     ----------
-//     cam_model : CameraModel
-//         Camera model
-//     track : FeatureTrack
-//         Feature track
-//     track_cam_states : list of CameraState
-//         Camera states where feature track was observed
-//
-//     Returns
-//     -------
-//     r : np.array
-//         Residual
-//
-//     """
-//     cam_model, track, track_cam_states = args
-//
-//     # Calculate residuals
-//     N = len(track_cam_states)
-//     r = zeros((2 * N, 1))
-//     C_C0G = C(track_cam_states[0].q_CG)
-//     p_G_C0 = track_cam_states[0].p_G
-//
-//     alpha, beta, rho = x.ravel()
-//
-//     for i in range(N):
-//         # Get camera current rotation and translation
-//         C_CiG = C(track_cam_states[i].q_CG)
-//         p_G_Ci = track_cam_states[i].p_G
-//
-//         # Set camera 0 as origin, work out rotation and translation
-//         # of camera i relative to to camera 0
-//         C_CiC0 = dot(C_CiG, C_C0G.T)
-//         t_Ci_CiC0 = dot(C_CiG, (p_G_C0 - p_G_Ci))
-//
-//         # Project estimated feature location to image plane
-//         h = dot(C_CiC0, np.array([[alpha], [beta], [1]])) + rho * t_Ci_CiC0
-//         # noqa
-//
-//         # Calculate reprojection error
-//         # -- Convert measurment to image coordinates
-//         z = cam_model.pixel2image(track.track[i].pt).reshape((2, 1))
-//         # -- Convert feature location to normalized coordinates
-//         z_hat = np.array([[h[0, 0] / h[2, 0]], [h[1, 0] / h[2, 0]]])
-//         # -- Reprojcetion error
-//         r[2 * i:(2 * (i + 1))] = z - z_hat
-//
-//     return r.ravel()
-//
-// def estimate(self, cam_model, track, track_cam_states, debug=False):
-//     """Estimate feature 3D location by optimizing over inverse depth
-//     parameterization using Gauss Newton Optimization
-//
-//     Parameters
-//     ----------
-//     cam_model : CameraModel
-//         Camera model
-//     track : FeatureTrack
-//         Feature track
-//     track_cam_states : list of CameraState
-//         Camera states where feature track was observed
-//     debug :
-//         Debug mode (default: False)
-//
-//     Returns
-//     -------
-//     p_G_f : np.array - 3x1
-//         Estimated feature position in global frame
-//
-//     """
-//     # # Calculate initial estimate of 3D position
-//     p_C0_f, residual = self.initial_estimate(cam_model, track,
-//                                               track_cam_states)
-//
-//     print("init: ", p_C0_f.ravel())
-//
-//     # Get ground truth
-//     p_G_f = track.ground_truth
-//
-//     # Convert ground truth expressed in global frame
-//     # to be expressed in camera 0
-//     C_C0G = C(track_cam_states[0].q_CG)
-//     p_G_C0 = track_cam_states[0].p_G
-//     p_C0_f = dot(C_C0G, (p_G_f - p_G_C0))
-//
-//     print("true: ", p_C0_f.ravel())
-//
-//     # Create inverse depth params (these are to be optimized)
-//     alpha = p_C0_f[0, 0] / p_C0_f[2, 0]
-//     beta = p_C0_f[1, 0] / p_C0_f[2, 0]
-//     rho = 1.0 / p_C0_f[2, 0]
-//     theta_k = np.array([alpha, beta, rho])
-//
-//     # z = 1 / rho
-//     # X = np.array([[alpha], [beta], [1.0]])
-//     # C_C0G = C(track_cam_states[0].q_CG)
-//     # p_G_C0 = track_cam_states[0].p_G
-//     # init = z * dot(C_C0G.T, X) + p_G_C0
-//
-//     # Optimize feature location
-//     args = (cam_model, track, track_cam_states)
-//     result = least_squares(self.reprojection_error,
-//                             theta_k,
-//                             args=args,
-//                             jac=self.jacobian,
-//                             verbose=1,
-//                             method="lm")
-//
-//     # if result.cost > 1e-4:
-//     #     return None
-//
-//     # Calculate feature position in global frame
-//     alpha, beta, rho = result.x.ravel()
-//     z = 1 / rho
-//     X = np.array([[alpha], [beta], [1.0]])
-//     C_C0G = C(track_cam_states[0].q_CG)
-//     p_G_C0 = track_cam_states[0].p_G
-//     p_G_f = z * dot(C_C0G.T, X) + p_G_C0
-//
-//     # print("ground truth: ", track.ground_truth.ravel())
-//     # print("cost: ", result.cost)
-//     print()
-//     # print("initial: ", init.ravel())
-//     # print("final: ", p_G_f.ravel())
-//
-//     # p_C_f = dot(C_C0G, (p_G_f - p_G_C0))
-//     # if p_C_f[2, 0] < 2.0:
-//     #     return None
-//     # if p_C_f[2, 0] > 200.0:
-//     #     return None
-//
-//     return p_G_f
+MatX FeatureEstimator::jacobian(const VecX &x) {
+  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
+  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
+
+  const int N = this->track_cam_states.size();
+  MatX J = zeros(2 * N, 3);
+
+  double alpha = x(0);
+  double beta = x(1);
+  double rho = x(2);
+
+  for (int i = 0; i < N; i++) {
+    // Get camera current rotation and translation
+    const Mat3 C_CiG = C(track_cam_states[i].q_CG);
+    const Vec3 p_G_Ci = track_cam_states[i].p_G;
+
+    // Set camera 0 as origin, work out rotation and translation
+    // of camera i relative to to camera 0
+    const Mat3 C_CiC0 = C_CiG * C_C0G.transpose();
+    const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
+
+    // Project estimated feature location to image plane
+    const Vec3 A{alpha, beta, 1.0};
+    const Vec3 h = C_CiC0 * A + rho * t_Ci_CiC0;
+
+    // clang-format off
+    const Vec2 drdalpha{-C_CiC0(0, 0) / h(2) + (h(0) / pow(h(2), 2)) * C_CiC0(2, 0),
+                        -C_CiC0(1, 0) / h(2) + (h(1) / pow(h(2), 2)) * C_CiC0(2, 0)};
+
+    const Vec2 drdbeta{-C_CiC0(0, 1) / h(2) + (h(0) / pow(h(2), 2)) * C_CiC0(2, 1),
+                       -C_CiC0(1, 1) / h(2) + (h(1) / pow(h(2), 2)) * C_CiC0(2, 1)};
+
+    const Vec2 drdrho{-t_Ci_CiC0(0) / h(2) + (h(0) / pow(h(2), 2)) * t_Ci_CiC0(2),
+                      -t_Ci_CiC0(1) / h(2) + (h(1) / pow(h(2), 2)) * t_Ci_CiC0(2)};
+    // clang-format on
+
+    // Fill in the jacobian
+    J.block(2 * i, 0, 2, 1) = drdalpha;
+    J.block(2 * i, 1, 2, 1) = drdbeta;
+    J.block(2 * i, 2, 2, 1) = drdrho;
+  }
+
+  return J;
+}
+
+VecX FeatureEstimator::reprojectionError(const VecX &x) {
+  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
+  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
+
+  const int N = this->track_cam_states.size();
+  VecX residuals = zeros(2 * N, 1);
+
+  double alpha = x(0);
+  double beta = x(1);
+  double rho = x(2);
+
+  for (int i = 0; i < N; i++) {
+    // Get camera current rotation and translation
+    const Mat3 C_CiG = C(track_cam_states[i].q_CG);
+    const Vec3 p_G_Ci = track_cam_states[i].p_G;
+
+    // Set camera 0 as origin, work out rotation and translation
+    // of camera i relative to to camera 0
+    const Mat3 C_CiC0 = C_CiG * C_C0G.transpose();
+    const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
+
+    // Project estimated feature location to image plane
+    const Vec3 A{alpha, beta, 1.0};
+    const Vec3 h = C_CiC0 * A + rho * t_Ci_CiC0;
+
+    // Calculate reprojection error
+    // -- Convert measurment to image coordinates
+    const Vec2 z = this->cam_model->pixel2image(track.track[i].kp.pt);
+    // -- Convert feature location to normalized coordinates
+    const Vec2 z_hat{h(0) / h(2), h(1) / h(2)};
+    // -- Reprojcetion error
+    residuals.block(2 * i, 0, 2, 1) = z - z_hat;
+  }
+
+  return residuals;
+}
+
+int FeatureEstimator::estimate(Vec3 &p_G_f) {
+  // Calculate initial estimate of 3D position
+  Vec3 p_C0_f;
+  if (this->initialEstimate(p_C0_f) != 0) {
+    return -1;
+  }
+
+  // Get ground truth
+  // p_G_f = track.ground_truth;
+  // Convert ground truth expressed in global frame
+  // to be expressed in camera 0
+  // const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
+  // const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
+  // p_C0_f = C_C0G * (p_G_f - p_G_C0);
+
+  // Create inverse depth params (these are to be optimized)
+  const double alpha = p_C0_f(0) / p_C0_f(2);
+  const double beta = p_C0_f(1) / p_C0_f(2);
+  const double rho = 1.0 / p_C0_f(2);
+  Vec3 x0{alpha, beta, rho};
+
+  //     // Optimize feature location
+  //     args = (cam_model, track, track_cam_states)
+  //     result = least_squares(self.reprojection_error,
+  //                             theta_k,
+  //                             args=args,
+  //                             jac=self.jacobian,
+  //                             verbose=1,
+  //                             method="lm")
+  //
+  //     // if result.cost > 1e-4:
+  //     //     return None
+
+  // Transform feature position from camera to global frame
+  // alpha, beta, rho = result.x.ravel() const double z = 1 / rho;
+  const Vec3 X{alpha, beta, 1.0};
+  const double z = 1 / rho;
+  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
+  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
+  p_G_f = z * (C_C0G.transpose() * X) + p_G_C0;
+
+  return 0;
+}
 
 } // namespace gvio

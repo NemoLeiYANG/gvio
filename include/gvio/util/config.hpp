@@ -86,7 +86,7 @@ public:
  *
  * Currently `ConfigParser` supports parsing the following data types:
  * - **Primitives**: `bool`, `int`, `float`, `double`, `std::string`
- * - **Arrays**: `std::vector<bool>`, `std::vector<int>`,
+ * - **Arrays**: `std::vector<bool>`, `std::vector<int>`, *
  * `std::vector<float>`,
  * `std::vector<double>`, `std::vector<std::string>`
  * - **Vectors**: `Eigen::Vector2d`, `Eigen::Vector3d`, `Eigen::Vector4d`,
@@ -98,6 +98,7 @@ public:
  * order
  * for `ConfigParser` to operate properly. They are `rows`, `cols` and `data`.
  * For example:
+ *
  * ```yaml
  * some_matrix:
  *   rows: 3
@@ -106,7 +107,6 @@ public:
  *          4.4, 5.5, 6.6,
  *          7.7, 8.8, 9.9]
  * ```
- *
  */
 class ConfigParser {
 public:
@@ -163,14 +163,14 @@ public:
   /**
    * @return a status code meaning
    *
-    * - `0`: On success
-    * - `-1`: Config file is not loaded
-    * - `-2`: `key` not found in yaml file, parameter is not optional
-    * - `-3`: `key` not found in yaml file, parameter is optional
-    * - `-4`: Invalid vector (wrong size)
-    * - `-5`: Invalid matrix (missing yaml key 'rows', 'cols' or 'data' for
-    * matrix)
-    */
+   * - `0`: On success
+   * - `-1`: Config file is not loaded
+   * - `-2`: `key` not found in yaml file, parameter is not optional
+   * - `-3`: `key` not found in yaml file, parameter is optional
+   * - `-4`: Invalid vector (wrong size)
+   * - `-5`: Invalid matrix (missing yaml key 'rows', 'cols' or 'data' for
+   * matrix)
+   */
   /** @return see `getYamlNode` */
   int checkKey(const std::string &key, bool optional);
 

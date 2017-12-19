@@ -38,6 +38,7 @@ typedef Eigen::Quaterniond Quaternion;
 
 /**
  * Create random integer
+ *
  * @param ub Upper bound
  * @param lb Lower bound
  * @return Random integer
@@ -46,6 +47,7 @@ int randi(const int ub, const int lb);
 
 /**
  * Create random double
+ *
  * @param ub Upper bound
  * @param lb Lower bound
  * @return Random floating point
@@ -54,6 +56,7 @@ double randf(const double ub, const double lb);
 
 /**
  * Sign of number
+ *
  * @param x Number to check sign
  * @return
  *    - 0: Number is zero
@@ -64,6 +67,7 @@ int sign(const double x);
 
 /**
  * Floating point comparator
+ *
  * @param f1 First value
  * @param f2 Second value
  * @return
@@ -75,6 +79,7 @@ int fltcmp(const double f1, const double f2);
 
 /**
  * Calculate median given an array of numbers
+ *
  * @param v Array of numbers
  * @return Median of given array
  */
@@ -82,6 +87,7 @@ double median(const std::vector<double> &v);
 
 /**
  * Degrees to radians
+ *
  * @param d Degree to be converted
  * @return Degree in radians
  */
@@ -89,6 +95,7 @@ double deg2rad(const double d);
 
 /**
  * Radians to degree
+ *
  * @param r Radian to be converted
  * @return Radian in degrees
  */
@@ -96,6 +103,7 @@ double rad2deg(const double r);
 
 /**
  * Load std::vector of doubles to an Eigen::Matrix
+ *
  * @param x Matrix values
  * @param rows Number of matrix rows
  * @param cols Number of matrix colums
@@ -108,6 +116,7 @@ void load_matrix(const std::vector<double> &x,
 
 /**
  * Load an Eigen::Matrix into a std::vector of doubles
+ *
  * @param A Matrix
  * @param x Output vector of matrix values
  */

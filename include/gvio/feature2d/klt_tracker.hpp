@@ -57,7 +57,7 @@ public:
    * The idea is that with the current features, we want to match it against
    * the current list of FeatureTrack.
    *
-   * @param f1 List of features in current frame
+   * @param features List of features in current frame
    * @returns 0 for success, -1 for failure
    */
   int track(const std::vector<Feature> &features);

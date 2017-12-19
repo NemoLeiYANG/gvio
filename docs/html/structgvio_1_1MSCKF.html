@@ -55,7 +55,14 @@
 <div class="contents">
 
 <p><code>#include &lt;<a class="el" href="msckf_8hpp_source.html">msckf.hpp</a>&gt;</code></p>
-<h2 class="groupheader">Constructors and Destructors</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Multi-State Constraint Kalman Filter</p>
+<p>This class implements the <a class="el" href="structgvio_1_1MSCKF.html">MSCKF</a> based on:</p>
+<p>Mourikis, Anastasios I., and Stergios I. Roumeliotis. "A multi-state
+  constraint Kalman filter for vision-aided inertial navigation." Robotics and automation, 2007 IEEE international conference on. IEEE, 2007. APA</p>
+<p>A.I. Mourikis, S.I. Roumeliotis: "A Multi-state Kalman Filter for
+  Vision-Aided Inertial Navigation," Technical Report, September 2006 [<a href="http://www.ee.ucr.edu/~mourikis/tech_reports/TR_MSCKF.pdf">http://www.ee.ucr.edu/~mourikis/tech_reports/TR_MSCKF.pdf</a>] </p>
+</div><h2 class="groupheader">Constructors and Destructors</h2>
 <a class="anchor" id="a85caf5f85be2e7fa826eb6c6384fc031"></a>
 <div class="memitem">
 <div class="memproto">
@@ -82,10 +89,28 @@
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:aa6e7329d5f1bbcf3ea512aca8c097a79"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structgvio_1_1CameraState.html">CameraState</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#aa6e7329d5f1bbcf3ea512aca8c097a79">cam_states</a></td></tr>
-<tr class="separator:aa6e7329d5f1bbcf3ea512aca8c097a79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2896564620e87628e8bd10267309d72b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgvio_1_1IMUState.html">IMUState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a2896564620e87628e8bd10267309d72b">imu_state</a></td></tr>
+<tr class="memitem:a8e65a3285b59c6720622c4e1688b4888"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a8e65a3285b59c6720622c4e1688b4888">P_cam</a></td></tr>
+<tr class="separator:a8e65a3285b59c6720622c4e1688b4888"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6cb100daf5615b210c97fe2590f2cd9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#ad6cb100daf5615b210c97fe2590f2cd9">P_imu_cam</a></td></tr>
+<tr class="separator:ad6cb100daf5615b210c97fe2590f2cd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2896564620e87628e8bd10267309d72b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgvio_1_1IMUState.html">IMUState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a2896564620e87628e8bd10267309d72b">imu_state</a></td></tr>
 <tr class="separator:a2896564620e87628e8bd10267309d72b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66db52a354c919a50e8d58b59485cff8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__msckf.html#ga6fbc7373ac8581feb06eeb07b0e64537">CameraStates</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a66db52a354c919a50e8d58b59485cff8">cam_states</a></td></tr>
+<tr class="separator:a66db52a354c919a50e8d58b59485cff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac94716a3977d0694d4a1ce66ff351050"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#ac94716a3977d0694d4a1ce66ff351050">counter_frame_id</a> = 0</td></tr>
+<tr class="separator:ac94716a3977d0694d4a1ce66ff351050"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad14e7a4cf6786e935472a2cf71914be2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#ad14e7a4cf6786e935472a2cf71914be2">ext_p_IC</a></td></tr>
+<tr class="separator:ad14e7a4cf6786e935472a2cf71914be2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4ddd97a40ea62c118e94c7cc06a795d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#aa4ddd97a40ea62c118e94c7cc06a795d">ext_q_CI</a></td></tr>
+<tr class="separator:aa4ddd97a40ea62c118e94c7cc06a795d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4331d908370e43c7cc0a22dac398d3df"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a4331d908370e43c7cc0a22dac398d3df">n_u</a></td></tr>
+<tr class="separator:a4331d908370e43c7cc0a22dac398d3df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15689c830ca58db8c7a96ad7cb303541"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a15689c830ca58db8c7a96ad7cb303541">n_v</a></td></tr>
+<tr class="separator:a15689c830ca58db8c7a96ad7cb303541"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5b2a7dfee7d6fd24aa6f5e93c824811"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#aa5b2a7dfee7d6fd24aa6f5e93c824811">enable_ns_trick</a> = true</td></tr>
+<tr class="separator:aa5b2a7dfee7d6fd24aa6f5e93c824811"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64adc1e9f2d712f2aea876c6fe09b08c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a64adc1e9f2d712f2aea876c6fe09b08c">enable_qr_trick</a> = true</td></tr>
+<tr class="separator:a64adc1e9f2d712f2aea876c6fe09b08c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Methods</h2></td></tr>
@@ -93,16 +118,16 @@ Public Methods</h2></td></tr>
 <tr class="separator:a85caf5f85be2e7fa826eb6c6384fc031"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefa249180289fff5c2b8d1e00e005132"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#aefa249180289fff5c2b8d1e00e005132">augmentState</a> ()</td></tr>
 <tr class="separator:aefa249180289fff5c2b8d1e00e005132"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5f4bd7fa074ccecdb9fef7c2e085cd4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#ae5f4bd7fa074ccecdb9fef7c2e085cd4">getTrackCameraStates</a> (const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &amp;track)</td></tr>
-<tr class="separator:ae5f4bd7fa074ccecdb9fef7c2e085cd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47848fb01560f73bb7a793ffe15c0ab0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a47848fb01560f73bb7a793ffe15c0ab0">P</a> ()</td></tr>
-<tr class="separator:a47848fb01560f73bb7a793ffe15c0ab0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0137e1dc4dfa286f1607639f5de1ca2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#af0137e1dc4dfa286f1607639f5de1ca2">N</a> ()</td></tr>
-<tr class="separator:af0137e1dc4dfa286f1607639f5de1ca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6405bdd1f9704cb192c531c9c3b32f66"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a6405bdd1f9704cb192c531c9c3b32f66">H</a> ()</td></tr>
-<tr class="separator:a6405bdd1f9704cb192c531c9c3b32f66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad75d486ddfdc24f7e0e2d87e82159dc0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#ad75d486ddfdc24f7e0e2d87e82159dc0">predictionUpdate</a> ()</td></tr>
-<tr class="separator:ad75d486ddfdc24f7e0e2d87e82159dc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70d24fd4d3702adaab7998d33721939c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a70d24fd4d3702adaab7998d33721939c">getTrackCameraStates</a> (const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &amp;track, <a class="el" href="group__msckf.html#ga6fbc7373ac8581feb06eeb07b0e64537">CameraStates</a> &amp;track_cam_states)</td></tr>
+<tr class="separator:a70d24fd4d3702adaab7998d33721939c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10f8c28ef2bcbddf3efff14db5ed4ef1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a10f8c28ef2bcbddf3efff14db5ed4ef1">P</a> ()</td></tr>
+<tr class="separator:a10f8c28ef2bcbddf3efff14db5ed4ef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3b6e9e71b3a598d84fe6125e531d764"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#ad3b6e9e71b3a598d84fe6125e531d764">N</a> ()</td></tr>
+<tr class="separator:ad3b6e9e71b3a598d84fe6125e531d764"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75ad53284b0e16781ce0262a1e56bc49"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a75ad53284b0e16781ce0262a1e56bc49">H</a> (<a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;H_f_j, <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;H_x_j)</td></tr>
+<tr class="separator:a75ad53284b0e16781ce0262a1e56bc49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca51915c6ae01d91617fa76560282bf4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#aca51915c6ae01d91617fa76560282bf4">predictionUpdate</a> (const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;a_m, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;w_m, const double dt)</td></tr>
+<tr class="separator:aca51915c6ae01d91617fa76560282bf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a985bee8945e92c8d63f622030ec9dca2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a985bee8945e92c8d63f622030ec9dca2">calTrackResiduals</a> ()</td></tr>
 <tr class="separator:a985bee8945e92c8d63f622030ec9dca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8285840ed3fdaead276919210caad93a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html#a8285840ed3fdaead276919210caad93a">measurementUpdate</a> ()</td></tr>
@@ -121,6 +146,8 @@ Public Methods</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Augment state vector with new camera state</p>
+<p>Augment state and covariance matrix with a copy of the current camera pose estimate when a new image is recorded </p>
 
 </div>
 </div>
@@ -136,37 +163,61 @@ Public Methods</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Calculate track residuals </p>
 
 </div>
 </div>
-<a class="anchor" id="ae5f4bd7fa074ccecdb9fef7c2e085cd4"></a>
+<a class="anchor" id="a70d24fd4d3702adaab7998d33721939c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void gvio::MSCKF::getTrackCameraStates </td>
+          <td class="memname">int gvio::MSCKF::getTrackCameraStates </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &amp;&#160;</td>
-          <td class="paramname"><em>track</em></td><td>)</td>
+          <td class="paramname"><em>track</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group__msckf.html#ga6fbc7373ac8581feb06eeb07b0e64537">CameraStates</a> &amp;&#160;</td>
+          <td class="paramname"><em>track_cam_states</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Get camera states the feature track was observed in </p>
 
 </div>
 </div>
-<a class="anchor" id="a6405bdd1f9704cb192c531c9c3b32f66"></a>
+<a class="anchor" id="a75ad53284b0e16781ce0262a1e56bc49"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void gvio::MSCKF::H </td>
+          <td class="memname">void MSCKF::H </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;&#160;</td>
+          <td class="paramname"><em>H_f_j</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;&#160;</td>
+          <td class="paramname"><em>H_x_j</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Return measurement matrix H </p>
 
 </div>
 </div>
@@ -182,56 +233,78 @@ Public Methods</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Measurmement update </p>
 
 </div>
 </div>
-<a class="anchor" id="af0137e1dc4dfa286f1607639f5de1ca2"></a>
+<a class="anchor" id="ad3b6e9e71b3a598d84fe6125e531d764"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void gvio::MSCKF::N </td>
+          <td class="memname">int MSCKF::N </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Return length of sliding window </p>
 
 </div>
 </div>
-<a class="anchor" id="a47848fb01560f73bb7a793ffe15c0ab0"></a>
+<a class="anchor" id="a10f8c28ef2bcbddf3efff14db5ed4ef1"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void gvio::MSCKF::P </td>
+          <td class="memname"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> MSCKF::P </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Return covariance matrix P </p>
 
 </div>
 </div>
-<a class="anchor" id="ad75d486ddfdc24f7e0e2d87e82159dc0"></a>
+<a class="anchor" id="aca51915c6ae01d91617fa76560282bf4"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void gvio::MSCKF::predictionUpdate </td>
+          <td class="memname">void MSCKF::predictionUpdate </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>a_m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>w_m</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>dt</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Prediction update </p>
 
 </div>
 </div>
-<hr/>The documentation for this struct was generated from the following file:<ul>
+<hr/>The documentation for this struct was generated from the following files:<ul>
 <li>include/gvio/msckf/<a class="el" href="msckf_8hpp_source.html">msckf.hpp</a></li>
+<li>src/msckf/<a class="el" href="msckf_8cpp.html">msckf.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

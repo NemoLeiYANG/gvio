@@ -18,58 +18,58 @@ INCLUDE_DIRECTORIES(include /usr/include/eigen3)
 
 # LIBRARY
 ADD_LIBRARY(
-	${PROJECT_NAME}
-	# apriltag
-	src/apriltag/base_detector.cpp
-	src/apriltag/mit.cpp
-	src/apriltag/michigan.cpp
-	# camera
-	src/camera/camera.cpp
-	src/camera/camera_config.cpp
-	src/camera/pinhole_model.cpp
-	# driver
-	src/driver/i2c.cpp
-	src/driver/uart.cpp
+  ${PROJECT_NAME}
+  # apriltag
+  src/apriltag/base_detector.cpp
+  src/apriltag/mit.cpp
+  src/apriltag/michigan.cpp
+  # camera
+  src/camera/camera.cpp
+  src/camera/camera_config.cpp
+  src/camera/pinhole_model.cpp
+  # driver
+  src/driver/i2c.cpp
+  src/driver/uart.cpp
   # msckf
   src/msckf/camera_state.cpp
   src/msckf/feature_estimator.cpp
   src/msckf/imu_state.cpp
   # feature
-	src/feature2d/feature_tracker.cpp
-	src/feature2d/gms_matcher.cpp
-	src/feature2d/orb_tracker.cpp
-	src/feature2d/klt_tracker.cpp
-	# gimbal
-	# src/gimbal/gimbal.cpp
-	src/gimbal/sbgc.cpp
-	# imu
-	src/imu/imu.cpp
-	src/imu/mpu6050.cpp
+  src/feature2d/feature_tracker.cpp
+  src/feature2d/gms_matcher.cpp
+  src/feature2d/orb_tracker.cpp
+  src/feature2d/klt_tracker.cpp
+  # gimbal
+  # src/gimbal/gimbal.cpp
+  src/gimbal/sbgc.cpp
+  # imu
+  src/imu/imu.cpp
+  src/imu/mpu6050.cpp
   # kitti
-	src/kitti/raw/calib.cpp
-	src/kitti/raw/oxts.cpp
-	src/kitti/raw/parse.cpp
-	src/kitti/raw/raw.cpp
-	# quaternion
-	src/quaternion/jpl.cpp
-	# utils
-	src/util/config.cpp
-	src/util/data.cpp
-	src/util/euler.cpp
-	src/util/file.cpp
-	src/util/gps.cpp
-	src/util/linalg.cpp
-	src/util/math.cpp
-	src/util/vision.cpp
-	src/util/stats.cpp
-	src/util/time.cpp
+  src/kitti/raw/calib.cpp
+  src/kitti/raw/oxts.cpp
+  src/kitti/raw/parse.cpp
+  src/kitti/raw/raw.cpp
+  # quaternion
+  src/quaternion/jpl.cpp
+  # utils
+  src/util/config.cpp
+  src/util/data.cpp
+  src/util/euler.cpp
+  src/util/file.cpp
+  src/util/gps.cpp
+  src/util/linalg.cpp
+  src/util/math.cpp
+  src/util/vision.cpp
+  src/util/stats.cpp
+  src/util/time.cpp
 )
 SET(${PROJECT_NAME}_DEPS
-	${OpenCV_LIBS}
-	apriltags_mit
-	apriltag
-	yaml-cpp
-	pthread
+  ${OpenCV_LIBS}
+  apriltags_mit
+  apriltag
+  yaml-cpp
+  pthread
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 

@@ -39,7 +39,8 @@
   <div class="summary">
 <a href="#files">Files</a> &#124;
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#define-members">Macros</a>  </div>
+<a href="#define-members">Macros</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">imu</div>  </div>
 </div><!--header-->
@@ -54,11 +55,13 @@ Files</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MPU6050Gyroscope.html">gvio::MPU6050Gyroscope</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1GyroData.html">gvio::GyroData</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MPU6050Accelerometer.html">gvio::MPU6050Accelerometer</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1AccelData.html">gvio::AccelData</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MPU6050.html">gvio::MPU6050</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1IMU.html">gvio::IMU</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MPU6050.html">gvio::MPU6050</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MPU9250Gyroscope.html">gvio::MPU9250Gyroscope</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -503,6 +506,17 @@ Macros</h2></td></tr>
 <tr class="separator:ga07a5772c1b74e5b451e661a31fd614c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8c267aa0f7ddc8c333dfc4bdc7cb913a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__imu.html#ga8c267aa0f7ddc8c333dfc4bdc7cb913a">MPU9250_ZA_OFFSET_L</a>&#160;&#160;&#160;0x7E</td></tr>
 <tr class="separator:ga8c267aa0f7ddc8c333dfc4bdc7cb913a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ga44f9b9b24be7b3046602bb9600be067e"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__imu.html#ga44f9b9b24be7b3046602bb9600be067e">gvio::operator&lt;&lt;</a> (std::ostream &amp;os, const MPU6050 &amp;imu)</td></tr>
+<tr class="separator:ga44f9b9b24be7b3046602bb9600be067e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac6e21de95e2656eb1c3186a9f8d7cb6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__imu.html#gac6e21de95e2656eb1c3186a9f8d7cb6b">gvio::IMU::recordHeader</a> (FILE *output_file)</td></tr>
+<tr class="separator:gac6e21de95e2656eb1c3186a9f8d7cb6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga965fb23e6bd709a0b02fb30784d5f208"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__imu.html#ga965fb23e6bd709a0b02fb30784d5f208">gvio::IMU::recordData</a> (FILE *output_file)</td></tr>
+<tr class="separator:ga965fb23e6bd709a0b02fb30784d5f208"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaec1c1412fd3da21965fee42300a4ca3d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__imu.html#gaec1c1412fd3da21965fee42300a4ca3d">gvio::IMU::record</a> (std::string output_path, int nb_samples)</td></tr>
+<tr class="separator:gaec1c1412fd3da21965fee42300a4ca3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -3095,6 +3109,95 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="ga44f9b9b24be7b3046602bb9600be067e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gvio::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structgvio_1_1MPU6050.html">MPU6050</a> &amp;&#160;</td>
+          <td class="paramname"><em>imu</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><a class="el" href="structgvio_1_1MPU6050.html">MPU6050</a> to string </p>
+
+</div>
+</div>
+<a class="anchor" id="gaec1c1412fd3da21965fee42300a4ca3d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::IMU::record </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>output_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nb_samples</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Record </p>
+
+</div>
+</div>
+<a class="anchor" id="ga965fb23e6bd709a0b02fb30784d5f208"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void gvio::IMU::recordData </td>
+          <td>(</td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>output_file</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Record data </p>
+
+</div>
+</div>
+<a class="anchor" id="gac6e21de95e2656eb1c3186a9f8d7cb6b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void gvio::IMU::recordHeader </td>
+          <td>(</td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>output_file</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Record header </p>
 
 </div>
 </div>

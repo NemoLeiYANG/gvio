@@ -249,6 +249,7 @@ public:
    * the current list of FeatureTrack.
    *
    * @param f1 List of features in current frame
+   * @param matches List of matches
    * @returns 0 for success, -1 for failure
    */
   virtual int match(const std::vector<Feature> &f1,
@@ -274,7 +275,6 @@ public:
    * Update feature tracker
    *
    * @param img_cur Current image frame
-   * @param show_matches Show matches
    * @returns 0 for success, -1 for failure
    */
   virtual int update(const cv::Mat &img_cur);
