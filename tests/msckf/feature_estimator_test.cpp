@@ -164,9 +164,11 @@ int test_FeatureEstimator_estimate() {
   // Test jacobian
   Vec3 p_G_f;
   FeatureEstimator estimator(&cam_model, track, track_cam_states);
+  estimator.debug_mode = true;
   int retval = estimator.estimate(p_G_f);
 
   MU_CHECK_EQ(0, retval);
+  MU_CHECK(((config.landmark - p_G_f).norm() < 1e-6));
 
   return 0;
 }

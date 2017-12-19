@@ -25,6 +25,7 @@ public:
   const FeatureTrack track;
   const CameraStates track_cam_states;
 
+  bool debug_mode = false;
   int max_iter = 30;
 
   FeatureEstimator(const CameraModel *cam_model,

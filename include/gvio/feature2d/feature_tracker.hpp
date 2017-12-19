@@ -119,7 +119,14 @@ struct FeatureTrack {
    *
    * @returns Size of feature track
    */
-  size_t tracked_length() { return this->track.size(); }
+  size_t trackedLength() { return this->track.size(); }
+
+  /**
+   * Return feature track length
+   *
+   * @returns Size of feature track
+   */
+  size_t trackedLength() const { return this->track.size(); }
 
   /**
    * FeatureTrack to string

@@ -98,7 +98,7 @@ int test_FeatureTrack_last() {
   return 0;
 }
 
-int test_FeatureTrack_tracked_length() {
+int test_FeatureTrack_trackedLength() {
   cv::KeyPoint kp1;
   cv::KeyPoint kp2;
   Feature f1(kp1);
@@ -112,7 +112,7 @@ int test_FeatureTrack_tracked_length() {
   MU_CHECK_EQ(0, track.track_id);
   MU_CHECK_EQ(0, track.frame_start);
   MU_CHECK_EQ(2, track.frame_end);
-  MU_CHECK_EQ(3, (int) track.tracked_length());
+  MU_CHECK_EQ(3, (int) track.trackedLength());
 
   return 0;
 }
@@ -186,7 +186,7 @@ int test_FeatureTracker_updateTrack() {
   const int retval = tracker.updateTrack(0, f3);
 
   MU_CHECK_EQ(0, retval);
-  MU_CHECK_EQ(3, (int) tracker.buffer[0].tracked_length());
+  MU_CHECK_EQ(3, (int) tracker.buffer[0].trackedLength());
 
   return 0;
 }
@@ -347,7 +347,7 @@ void test_suite() {
   MU_ADD_TEST(test_FeatureTrack_constructor);
   MU_ADD_TEST(test_FeatureTrack_update);
   MU_ADD_TEST(test_FeatureTrack_last);
-  MU_ADD_TEST(test_FeatureTrack_tracked_length);
+  MU_ADD_TEST(test_FeatureTrack_trackedLength);
 
   MU_ADD_TEST(test_FeatureTracker_constructor);
   MU_ADD_TEST(test_FeatureTracker_addTrack);

@@ -138,39 +138,51 @@ int FeatureEstimator::estimate(Vec3 &p_G_f) {
     return -1;
   }
 
-  // Get ground truth
-  // p_G_f = track.ground_truth;
-  // Convert ground truth expressed in global frame
-  // to be expressed in camera 0
-  // const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
-  // const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
-  // p_C0_f = C_C0G * (p_G_f - p_G_C0);
-
   // Create inverse depth params (these are to be optimized)
   const double alpha = p_C0_f(0) / p_C0_f(2);
   const double beta = p_C0_f(1) / p_C0_f(2);
   const double rho = 1.0 / p_C0_f(2);
-  Vec3 x0{alpha, beta, rho};
+  Vec3 x{alpha, beta, rho};
 
-  //     // Optimize feature location
-  //     args = (cam_model, track, track_cam_states)
-  //     result = least_squares(self.reprojection_error,
-  //                             theta_k,
-  //                             args=args,
-  //                             jac=self.jacobian,
-  //                             verbose=1,
-  //                             method="lm")
-  //
-  //     // if result.cost > 1e-4:
-  //     //     return None
+  // Optimize feature position
+  for (int k = 0; k < this->max_iter; k++) {
+    // Calculate residuals and jacobian
+    const VecX r = this->reprojectionError(x);
+    const MatX J = this->jacobian(x);
+
+    // Update optimization params using Gauss Newton
+    MatX H_approx = J.transpose() * J;
+    const VecX delta = H_approx.inverse() * J.transpose() * r;
+    x = x - delta;
+
+    // Debug
+    if (this->debug_mode) {
+      printf("iteration: %d  ", k);
+      printf("track_length: %ld  ", track.trackedLength());
+      printf("delta norm: %f  ", delta.norm());
+      printf("max_residual: %.2f  ", r.maxCoeff());
+      printf("\n");
+    }
+
+    // Converged?
+    if (delta.norm() < 1e-8) {
+      if (this->debug_mode) {
+        printf("Converged!\n");
+      }
+      break;
+    }
+  }
 
   // Transform feature position from camera to global frame
-  // alpha, beta, rho = result.x.ravel() const double z = 1 / rho;
-  const Vec3 X{alpha, beta, 1.0};
-  const double z = 1 / rho;
+  const Vec3 X{x(0), x(1), 1.0};
+  const double z = 1 / x(2);
   const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
   const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
   p_G_f = z * (C_C0G.transpose() * X) + p_G_C0;
+
+  if (this->debug_mode) {
+    std::cout << "p_G_f: " << p_G_f.transpose() << std::endl;
+  }
 
   return 0;
 }
