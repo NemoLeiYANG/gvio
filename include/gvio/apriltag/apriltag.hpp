@@ -9,4 +9,4 @@
 #include "gvio/data.hpp"
 #include "gvio/mit.hpp"
 
-#endif
+#endif // GVIO_APRILTAG_HPP

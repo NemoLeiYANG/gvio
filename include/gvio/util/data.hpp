@@ -3,8 +3,8 @@
  * @defgroup data data
  * @ingroup util
  */
-#ifndef GVIO_UTILS_DATA_HPP
-#define GVIO_UTILS_DATA_HPP
+#ifndef GVIO_UTIL_DATA_HPP
+#define GVIO_UTIL_DATA_HPP
 
 #include <fstream>
 #include <iomanip>
@@ -60,4 +60,4 @@ int mat2csv(const std::string &file_path, const MatX &data);
 
 /** @} group data */
 } // namespace gvio
-#endif
+#endif // GVIO_UTIL_DATA_HPP

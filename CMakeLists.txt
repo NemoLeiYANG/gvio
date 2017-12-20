@@ -23,6 +23,8 @@ ADD_LIBRARY(
   src/apriltag/base_detector.cpp
   src/apriltag/mit.cpp
   src/apriltag/michigan.cpp
+  # ceres
+  src/ceres/jpl_quaternion_parameterization.cpp
   # camera
   src/camera/camera.cpp
   src/camera/camera_config.cpp
@@ -70,6 +72,7 @@ SET(${PROJECT_NAME}_DEPS
   apriltag
   yaml-cpp
   pthread
+  ceres
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 

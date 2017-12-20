@@ -8,4 +8,4 @@
 #include "gvio/feature2d/feature_estimator.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 
-#endif
+#endif // GVIO_FEATURE2D_HPP

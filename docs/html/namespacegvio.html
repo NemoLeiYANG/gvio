@@ -73,6 +73,10 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html">CameraState</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html">CeresFeatureEstimator</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html">CeresReprojectionError</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CompareFeatureByKeyPoint.html">CompareFeatureByKeyPoint</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1ConfigParam.html">ConfigParam</a></td></tr>
@@ -98,6 +102,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1IMU.html">IMU</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IMUState.html">IMUState</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1JPLQuaternionParameterization.html">JPLQuaternionParameterization</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html">KLTTracker</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -232,6 +238,15 @@ Functions</h2></td></tr>
 <tr class="memitem:gac3f7a9df3fee25b99499cd3cfcb085b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gaf26fbb7c0f985483116db92701d9bcc1">Mat34</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kitti.html#gac3f7a9df3fee25b99499cd3cfcb085b2">parseMat34</a> (const std::string &amp;line)</td></tr>
 <tr class="memdesc:gac3f7a9df3fee25b99499cd3cfcb085b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse 3x4 matrix.  <a href="group__kitti.html#gac3f7a9df3fee25b99499cd3cfcb085b2">More...</a><br /></td></tr>
 <tr class="separator:gac3f7a9df3fee25b99499cd3cfcb085b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafab49d60c273bc56629fcdc0ad88ad2b"><td class="memTemplParams" colspan="2">template&lt;typename Derived , typename OtherDerived &gt; </td></tr>
+<tr class="memitem:gafab49d60c273bc56629fcdc0ad88ad2b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__quaternion.html#gafab49d60c273bc56629fcdc0ad88ad2b">skew</a> (const Eigen::MatrixBase&lt; Derived &gt; &amp;vector, Eigen::MatrixBase&lt; OtherDerived &gt; const &amp;matrix_const)</td></tr>
+<tr class="separator:gafab49d60c273bc56629fcdc0ad88ad2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga37eb7a79a6542c5b317cfe193c7ac0fe"><td class="memTemplParams" colspan="2">template&lt;typename Derived1 , typename Derived2 , typename Derived3 &gt; </td></tr>
+<tr class="memitem:ga37eb7a79a6542c5b317cfe193c7ac0fe"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__quaternion.html#ga37eb7a79a6542c5b317cfe193c7ac0fe">signed_quatmul</a> (const Eigen::MatrixBase&lt; Derived1 &gt; &amp;q1, const Eigen::MatrixBase&lt; Derived2 &gt; &amp;q2, const Eigen::MatrixBase&lt; Derived3 &gt; &amp;product_const)</td></tr>
+<tr class="separator:ga37eb7a79a6542c5b317cfe193c7ac0fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa42398437db5a2f21faf354738bb9d6c"><td class="memTemplParams" colspan="2">template&lt;typename Derived1 , typename Derived2 , typename Derived3 &gt; </td></tr>
+<tr class="memitem:gaa42398437db5a2f21faf354738bb9d6c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__quaternion.html#gaa42398437db5a2f21faf354738bb9d6c">positive_quatmul</a> (const Eigen::MatrixBase&lt; Derived1 &gt; &amp;q1, const Eigen::MatrixBase&lt; Derived2 &gt; &amp;q2, const Eigen::MatrixBase&lt; Derived3 &gt; &amp;product_const)</td></tr>
+<tr class="separator:gaa42398437db5a2f21faf354738bb9d6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5bc36f24eddb918bbe14c9c2a93aa93d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__quaternion.html#ga5bc36f24eddb918bbe14c9c2a93aa93d">quatnorm</a> (const <a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a> &amp;q)</td></tr>
 <tr class="separator:ga5bc36f24eddb918bbe14c9c2a93aa93d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga95d42bfb6ac663b75d86e05637567df4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__quaternion.html#ga95d42bfb6ac663b75d86e05637567df4">quatnormalize</a> (const <a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a> &amp;q)</td></tr>
@@ -250,6 +265,8 @@ Functions</h2></td></tr>
 <tr class="separator:gac66f4bd9626690802f1b92e56d74d6ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga519e7b266abd2f8ae2e5b743fa3d0e5d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__quaternion.html#ga519e7b266abd2f8ae2e5b743fa3d0e5d">euler2quat</a> (const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;rpy)</td></tr>
 <tr class="separator:ga519e7b266abd2f8ae2e5b743fa3d0e5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac4e4d8a8d6f89a529621b8c24d502931"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__quaternion.html#gac4e4d8a8d6f89a529621b8c24d502931">rot2quat</a> (const <a class="el" href="group__math.html#gaf38a3c10ffaa28bc0416362cc3187cbd">Mat3</a> &amp;rot)</td></tr>
+<tr class="separator:gac4e4d8a8d6f89a529621b8c24d502931"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga59b273f8e9ff9431427559badb5b3594"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gaf38a3c10ffaa28bc0416362cc3187cbd">Mat3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__quaternion.html#ga59b273f8e9ff9431427559badb5b3594">C</a> (const <a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a> &amp;q)</td></tr>
 <tr class="separator:ga59b273f8e9ff9431427559badb5b3594"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac98c7c8912132ce3e54afc83fef5d4e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gad6137468753e88454ec5454e8d2a5151">Mat4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__quaternion.html#gac98c7c8912132ce3e54afc83fef5d4e6">Omega</a> (const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;w)</td></tr>
@@ -312,6 +329,10 @@ Functions</h2></td></tr>
 <tr class="separator:gad0fe7b391e044f4f4bb8e82b6fb4102e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad67f5f738a9dd31edf278303491903e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#gad67f5f738a9dd31edf278303491903e1">enforce_psd</a> (const <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;A)</td></tr>
 <tr class="separator:gad67f5f738a9dd31edf278303491903e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad2aa0e79d97feb59052c5f90dc06ca76"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#gad2aa0e79d97feb59052c5f90dc06ca76">vec2array</a> (const <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;v)</td></tr>
+<tr class="separator:gad2aa0e79d97feb59052c5f90dc06ca76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga584b18f5428697e054f4e1019632d990"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga584b18f5428697e054f4e1019632d990">mat2array</a> (const <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;m)</td></tr>
+<tr class="separator:ga584b18f5428697e054f4e1019632d990"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga408be3005f87322fb12aa25fbb8f982d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga408be3005f87322fb12aa25fbb8f982d">randi</a> (const int ub, const int lb)</td></tr>
 <tr class="separator:ga408be3005f87322fb12aa25fbb8f982d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga88c71ae54db8e5f3b33cc654cb07b2d5"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga88c71ae54db8e5f3b33cc654cb07b2d5">randf</a> (const double ub, const double lb)</td></tr>
@@ -426,8 +447,8 @@ Functions</h2></td></tr>
 <tr class="separator:a39a6acacc9f6a9d75d19fe5a45f75191"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a344a6ce92f323f2df8518ed43ca5ea7f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a344a6ce92f323f2df8518ed43ca5ea7f">test_FeatureTrack_last</a> ()</td></tr>
 <tr class="separator:a344a6ce92f323f2df8518ed43ca5ea7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15d15d89c221620f549e69e641412fb9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a15d15d89c221620f549e69e641412fb9">test_FeatureTrack_tracked_length</a> ()</td></tr>
-<tr class="separator:a15d15d89c221620f549e69e641412fb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab27f589c8cdd650a661cec64b650fee3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#ab27f589c8cdd650a661cec64b650fee3">test_FeatureTrack_trackedLength</a> ()</td></tr>
+<tr class="separator:ab27f589c8cdd650a661cec64b650fee3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e7d8f7871c90985dd3a18b9d01022a2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a9e7d8f7871c90985dd3a18b9d01022a2">test_FeatureTracker_constructor</a> ()</td></tr>
 <tr class="separator:a9e7d8f7871c90985dd3a18b9d01022a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd61ab261800ad362f6c1d2225490dc5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#acd61ab261800ad362f6c1d2225490dc5">test_FeatureTracker_addTrack</a> ()</td></tr>
@@ -520,6 +541,16 @@ Functions</h2></td></tr>
 <tr class="separator:a725edeb23e4e1f3c5e17b50c98cc137d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4580dfa0a9b91f2a27d32d45e8570de"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#af4580dfa0a9b91f2a27d32d45e8570de">test_FeatureEstimator_estimate</a> ()</td></tr>
 <tr class="separator:af4580dfa0a9b91f2a27d32d45e8570de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a588bac9e6a3014a5798c3e35bc19e6c3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a588bac9e6a3014a5798c3e35bc19e6c3">test_CeresReprojectionError_constructor</a> ()</td></tr>
+<tr class="separator:a588bac9e6a3014a5798c3e35bc19e6c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac601a966990d155469c8c668d61144c7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#ac601a966990d155469c8c668d61144c7">test_CeresReprojectionError_formK</a> ()</td></tr>
+<tr class="separator:ac601a966990d155469c8c668d61144c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fc2daed849c2c94262bf8b729400a85"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a0fc2daed849c2c94262bf8b729400a85">test_CeresReprojectionError_quatToRot</a> ()</td></tr>
+<tr class="separator:a0fc2daed849c2c94262bf8b729400a85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a453bdacaebbe2f960fdad8484458e22b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a453bdacaebbe2f960fdad8484458e22b">test_CeresReprojectionError_error</a> ()</td></tr>
+<tr class="separator:a453bdacaebbe2f960fdad8484458e22b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d15458f8043db8f4c3ce5000d47ebd7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a9d15458f8043db8f4c3ce5000d47ebd7">test_CeresFeatureEstimator_constructor</a> ()</td></tr>
+<tr class="separator:a9d15458f8043db8f4c3ce5000d47ebd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0471422ea01d9f4dfd78c5881bef2cb8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a0471422ea01d9f4dfd78c5881bef2cb8">test_IMUState_constructor</a> ()</td></tr>
 <tr class="separator:a0471422ea01d9f4dfd78c5881bef2cb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec3a0cb1dfde5a6945f55d666c0ca421"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#aec3a0cb1dfde5a6945f55d666c0ca421">test_IMUState_F</a> ()</td></tr>
@@ -846,6 +877,81 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">int gvio::test_CameraState_setFrameID </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a9d15458f8043db8f4c3ce5000d47ebd7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_CeresFeatureEstimator_constructor </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a588bac9e6a3014a5798c3e35bc19e6c3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_CeresReprojectionError_constructor </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a453bdacaebbe2f960fdad8484458e22b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_CeresReprojectionError_error </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac601a966990d155469c8c668d61144c7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_CeresReprojectionError_formK </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0fc2daed849c2c94262bf8b729400a85"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_CeresReprojectionError_quatToRot </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -1230,12 +1336,12 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a15d15d89c221620f549e69e641412fb9"></a>
+<a class="anchor" id="ab27f589c8cdd650a661cec64b650fee3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gvio::test_FeatureTrack_tracked_length </td>
+          <td class="memname">int gvio::test_FeatureTrack_trackedLength </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>

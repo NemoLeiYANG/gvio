@@ -224,4 +224,4 @@ public:
 
 /** @} group imu */
 } // namespace gvio
-#endif
+#endif // GVIO_IMU_MPU9250_HPP

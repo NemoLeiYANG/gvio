@@ -2,8 +2,8 @@
  * @file
  * @ingroup apriltag
  */
-#ifndef GVIO_VISION_APRILTAG_MIT_HPP
-#define GVIO_VISION_APRILTAG_MIT_HPP
+#ifndef GVIO_APRILTAG_MIT_HPP
+#define GVIO_APRILTAG_MIT_HPP
 
 #include <cmath>
 #include <fstream>
@@ -60,4 +60,4 @@ public:
 
 /** @} group apriltag */
 } // namespace gvio
-#endif
+#endif // GVIO_APRILTAG_MIT_HPP

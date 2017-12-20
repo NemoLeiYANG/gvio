@@ -263,4 +263,4 @@ std::ostream &operator<<(std::ostream &os, const MPU6050 &imu);
 
 /** @} group imu */
 } // namespace gvio
-#endif
+#endif // GVIO_IMU_MPU6050_HPP

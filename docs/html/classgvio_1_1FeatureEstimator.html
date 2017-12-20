@@ -56,10 +56,19 @@
 <div class="contents">
 
 <p><code>#include &lt;<a class="el" href="feature__estimator_8hpp_source.html">feature_estimator.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for gvio::FeatureEstimator:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classgvio_1_1FeatureEstimator.png" usemap="#gvio::FeatureEstimator_map" alt=""/>
+  <map id="gvio::FeatureEstimator_map" name="gvio::FeatureEstimator_map">
+<area href="classgvio_1_1CeresFeatureEstimator.html" alt="gvio::CeresFeatureEstimator" shape="rect" coords="0,56,171,80"/>
+</map>
+ </div></div>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="structgvio_1_1Feature.html">Feature</a> estimator </p>
 </div><h2 class="groupheader">Constructors and Destructors</h2>
-<a class="anchor" id="aafb741dee06a8e5a7bc2ab4f62d25b48"></a>
+<a class="anchor" id="a56f00e6da1289727482dc8cebd1e30ee"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -75,13 +84,13 @@
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &amp;&#160;</td>
           <td class="paramname"><em>track</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="group__msckf.html#ga6fbc7373ac8581feb06eeb07b0e64537">CameraStates</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__msckf.html#ga6fbc7373ac8581feb06eeb07b0e64537">CameraStates</a> &amp;&#160;</td>
           <td class="paramname"><em>track_cam_states</em>&#160;</td>
         </tr>
         <tr>
@@ -108,20 +117,22 @@ Public Attributes</h2></td></tr>
 <tr class="separator:affe179b09415b1071e3bb43a9f532b78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1f6dae2c26f8fb2a4aa9198e3824b09"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group__msckf.html#ga6fbc7373ac8581feb06eeb07b0e64537">CameraStates</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#ad1f6dae2c26f8fb2a4aa9198e3824b09">track_cam_states</a></td></tr>
 <tr class="separator:ad1f6dae2c26f8fb2a4aa9198e3824b09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a733801268246b013177f9ae7bafc32a5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#a733801268246b013177f9ae7bafc32a5">debug_mode</a> = false</td></tr>
+<tr class="separator:a733801268246b013177f9ae7bafc32a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f10dc5cfeb2fe370246a5785cfe89e0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#a3f10dc5cfeb2fe370246a5785cfe89e0">max_iter</a> = 30</td></tr>
 <tr class="separator:a3f10dc5cfeb2fe370246a5785cfe89e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Methods</h2></td></tr>
-<tr class="memitem:aafb741dee06a8e5a7bc2ab4f62d25b48"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#aafb741dee06a8e5a7bc2ab4f62d25b48">FeatureEstimator</a> (const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *<a class="el" href="classgvio_1_1FeatureEstimator.html#ac91306818390cb2cd889c4b9ef147dec">cam_model</a>, const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> <a class="el" href="classgvio_1_1FeatureEstimator.html#affe179b09415b1071e3bb43a9f532b78">track</a>, const <a class="el" href="group__msckf.html#ga6fbc7373ac8581feb06eeb07b0e64537">CameraStates</a> <a class="el" href="classgvio_1_1FeatureEstimator.html#ad1f6dae2c26f8fb2a4aa9198e3824b09">track_cam_states</a>)</td></tr>
-<tr class="separator:aafb741dee06a8e5a7bc2ab4f62d25b48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56f00e6da1289727482dc8cebd1e30ee"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#a56f00e6da1289727482dc8cebd1e30ee">FeatureEstimator</a> (const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *<a class="el" href="classgvio_1_1FeatureEstimator.html#ac91306818390cb2cd889c4b9ef147dec">cam_model</a>, const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &amp;<a class="el" href="classgvio_1_1FeatureEstimator.html#affe179b09415b1071e3bb43a9f532b78">track</a>, const <a class="el" href="group__msckf.html#ga6fbc7373ac8581feb06eeb07b0e64537">CameraStates</a> &amp;<a class="el" href="classgvio_1_1FeatureEstimator.html#ad1f6dae2c26f8fb2a4aa9198e3824b09">track_cam_states</a>)</td></tr>
+<tr class="separator:a56f00e6da1289727482dc8cebd1e30ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23f0414082d3592dc117bfa167917a31"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#a23f0414082d3592dc117bfa167917a31">initialEstimate</a> (<a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;p_C0_f)</td></tr>
 <tr class="separator:a23f0414082d3592dc117bfa167917a31"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ba3627348d00082ec28ca48be0e25e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#a6ba3627348d00082ec28ca48be0e25e1">jacobian</a> (const <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;x)</td></tr>
 <tr class="separator:a6ba3627348d00082ec28ca48be0e25e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21bd714bf3c0e9ca80a90b83f9eddf4b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#a21bd714bf3c0e9ca80a90b83f9eddf4b">reprojectionError</a> (const <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;x)</td></tr>
 <tr class="separator:a21bd714bf3c0e9ca80a90b83f9eddf4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa28890af37babd9afef02e716de137cf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#aa28890af37babd9afef02e716de137cf">estimate</a> (<a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;p_G_f)</td></tr>
+<tr class="memitem:aa28890af37babd9afef02e716de137cf"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#aa28890af37babd9afef02e716de137cf">estimate</a> (<a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;p_G_f)</td></tr>
 <tr class="separator:aa28890af37babd9afef02e716de137cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
@@ -133,6 +144,9 @@ Static Methods</h2></td></tr>
 <a class="anchor" id="aa28890af37babd9afef02e716de137cf"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int gvio::FeatureEstimator::estimate </td>
@@ -142,6 +156,11 @@ Static Methods</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Estimate feature position in global frame</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -151,6 +170,8 @@ Static Methods</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a93054337daa0bd93e8ed911f140f220f">gvio::CeresFeatureEstimator</a>.</p>
 
 </div>
 </div>

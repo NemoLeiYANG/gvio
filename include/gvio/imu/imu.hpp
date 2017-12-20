@@ -93,4 +93,4 @@ struct IMU {
 
 /** @} group imu */
 } // namespace gvio
-#endif
+#endif // GVIO_IMU_IMU_HPP

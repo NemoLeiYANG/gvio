@@ -3,8 +3,8 @@
  * @defgroup math math
  * @ingroup util
  */
-#ifndef GVIO_UTILS_MATH_HPP
-#define GVIO_UTILS_MATH_HPP
+#ifndef GVIO_UTIL_MATH_HPP
+#define GVIO_UTIL_MATH_HPP
 
 #include <iostream>
 
@@ -35,6 +35,22 @@ typedef Eigen::Matrix<double, 3, 4> Mat34;
 
 typedef Eigen::Quaterniond Quaternion;
 #endif
+
+/**
+ * Vector to array
+ *
+ * @param v Vector
+ * @returns Array
+ */
+double *vec2array(const VecX &v);
+
+/**
+ * Matrix to array
+ *
+ * @param m Matrix
+ * @returns Array
+ */
+double *mat2array(const MatX &m);
 
 /**
  * Create random integer
@@ -205,4 +221,4 @@ Vec2 lerp(const Vec2 &a, const Vec2 &b, const double mu);
 
 /** @} group math */
 } // namespace gvio
-#endif
+#endif // GVIO_UTIL_MATH_HPP

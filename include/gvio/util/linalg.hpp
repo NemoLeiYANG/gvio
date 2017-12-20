@@ -3,8 +3,8 @@
  * @defgroup linalg linalg
  * @ingroup util
  */
-#ifndef GVIO_UTILS_LINALG_HPP
-#define GVIO_UTILS_LINALG_HPP
+#ifndef GVIO_UTIL_LINALG_HPP
+#define GVIO_UTIL_LINALG_HPP
 
 #include "gvio/util/math.hpp"
 
@@ -61,4 +61,4 @@ MatX enforce_psd(const MatX &A);
 
 /** @} group linalg */
 } // namepsace gvio
-#endif // GVIO_UTILS_LINALG_HPP
+#endif // GVIO_UTIL_LINALG_HPP

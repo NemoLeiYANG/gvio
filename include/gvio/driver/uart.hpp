@@ -1,9 +1,9 @@
 /**
  * @file
- * @ingroup driver driver
+ * @ingroup driver
  */
-#ifndef GVIO_DRIVERS_UART_HPP
-#define GVIO_DRIVERS_UART_HPP
+#ifndef GVIO_DRIVER_UART_HPP
+#define GVIO_DRIVER_UART_HPP
 
 #include <errno.h>
 #include <fcntl.h>
@@ -43,4 +43,4 @@ void set_blocking(int fd, int should_block);
 
 /** @} group driver */
 } // namespace gvio
-#endif
+#endif // GVIO_DRIVER_UART_HPP

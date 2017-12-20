@@ -13,4 +13,4 @@
 #include "gvio/quaternion/quaternion.hpp"
 #include "gvio/util/util.hpp"
 
-#endif
+#endif // GVIO_HPP

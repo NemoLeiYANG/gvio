@@ -3,8 +3,8 @@
  * @defgroup config config
  * @ingroup util
  */
-#ifndef GVIO_UTILS_CONFIG_HPP
-#define GVIO_UTILS_CONFIG_HPP
+#ifndef GVIO_UTIL_CONFIG_HPP
+#define GVIO_UTIL_CONFIG_HPP
 
 #include <iostream>
 #include <sstream>
@@ -222,4 +222,4 @@ public:
 
 /** @} group config */
 } // namespace gvio
-#endif // GVIO_UTILS_CONFIG_HPP
+#endif // GVIO_UTIL_CONFIG_HPP

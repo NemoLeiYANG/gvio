@@ -61,4 +61,4 @@ public:
 
 } // namespace gvio
 /** @} group gimbal */
-#endif
+#endif // GVIO_GIMBAL_HPP

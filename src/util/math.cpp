@@ -2,6 +2,27 @@
 
 namespace gvio {
 
+double *vec2array(const VecX &v) {
+  double *array = (double *) malloc(sizeof(double) * v.size());
+  for (int i = 0; i < v.size(); i++) {
+    array[i] = v(i);
+  }
+  return array;
+}
+
+double *mat2array(const MatX &m) {
+  double *array = (double *) malloc(sizeof(double) * m.size());
+
+  int index = 0;
+  for (int i = 0; i < m.rows(); i++) {
+    for (int j = 0; j < m.cols(); j++) {
+      array[index] = m(i, j);
+      index++;
+    }
+  }
+  return array;
+}
+
 int randi(int ub, int lb) { return rand() % lb + ub; }
 
 double randf(const double ub, const double lb) {

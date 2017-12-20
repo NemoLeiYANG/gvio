@@ -3,8 +3,8 @@
  * @defgroup gps gps
  * @ingroup util
  */
-#ifndef GVIO_UTILS_GPS_HPP
-#define GVIO_UTILS_GPS_HPP
+#ifndef GVIO_UTIL_GPS_HPP
+#define GVIO_UTIL_GPS_HPP
 
 #include <cmath>
 
@@ -67,4 +67,4 @@ double latlon_dist(double lat_ref, double lon_ref, double lat, double lon);
 
 /** @} group gps */
 } // namepsace gvio
-#endif // GVIO_UTILS_GPS_HPP
+#endif // GVIO_UTIL_GPS_HPP

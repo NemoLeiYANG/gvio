@@ -3,8 +3,8 @@
  * @defgroup euler euler
  * @ingroup util
  */
-#ifndef GVIO_UTILS_EULER_HPP
-#define GVIO_UTILS_EULER_HPP
+#ifndef GVIO_UTIL_EULER_HPP
+#define GVIO_UTIL_EULER_HPP
 
 #include "gvio/util/math.hpp"
 
@@ -74,4 +74,4 @@ Mat3 euler321ToRot(const Vec3 &euler);
 
 /** @} group data */
 } // namespace gvio
-#endif
+#endif // GVIO_UTIL_EULER_HPP

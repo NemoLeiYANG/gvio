@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup driver driver
+ * @ingroup driver
  */
 #ifndef GVIO_DRIVER_I2C_HPP
 #define GVIO_DRIVER_I2C_HPP

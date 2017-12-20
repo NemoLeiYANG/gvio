@@ -3,8 +3,8 @@
  * @defgroup vision vision
  * @ingroup util
  */
-#ifndef GVIO_UTIL_OPENCV_HPP
-#define GVIO_UTIL_OPENCV_HPP
+#ifndef GVIO_UTIL_VISION_HPP
+#define GVIO_UTIL_VISION_HPP
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -50,4 +50,4 @@ Vec2 normalize(const Vec2 &x);
 
 /** @} group vision */
 } // namespace gvio
-#endif
+#endif // GVIO_UTIL_VISION_HPP

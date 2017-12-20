@@ -3,8 +3,8 @@
  * @defgroup file file
  * @ingroup util
  */
-#ifndef GVIO_UTILS_FILE_HPP
-#define GVIO_UTILS_FILE_HPP
+#ifndef GVIO_UTIL_FILE_HPP
+#define GVIO_UTIL_FILE_HPP
 
 #include <dirent.h>
 #include <stdio.h>
@@ -95,4 +95,4 @@ void paths_combine(const std::string path1,
 
 /** @} group file */
 } // end of gvio namepsace
-#endif
+#endif // GVIO_UTIL_FILE_HPP

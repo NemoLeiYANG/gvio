@@ -14,6 +14,40 @@ namespace gvio {
  */
 
 /**
+ * Skew
+ *
+ * @param vector Quaternion
+ * @param matrix_const Skew matrix
+ */
+template <typename Derived, typename OtherDerived>
+void skew(const Eigen::MatrixBase<Derived> &vector,
+          Eigen::MatrixBase<OtherDerived> const &matrix_const);
+
+/**
+ * Signed quaternion product
+ *
+ * @param q1 First quaternion
+ * @param q2 Second quaternion
+ * @param product_const Quaternion product
+ */
+template <typename Derived1, typename Derived2, typename Derived3>
+void signed_quatmul(const Eigen::MatrixBase<Derived1> &q1,
+                    const Eigen::MatrixBase<Derived2> &q2,
+                    const Eigen::MatrixBase<Derived3> &product_const);
+
+/**
+ * Positive quaternion product
+ *
+ * @param q1 First quaternion
+ * @param q2 Second quaternion
+ * @param product_const Quaternion product
+ */
+template <typename Derived1, typename Derived2, typename Derived3>
+void positive_quatmul(const Eigen::MatrixBase<Derived1> &q1,
+                      const Eigen::MatrixBase<Derived2> &q2,
+                      const Eigen::MatrixBase<Derived3> &product_const);
+
+/**
  * Quaternion norm
  *
  * @param q Quaternion in (x, y, z, w)
@@ -107,6 +141,11 @@ Vec3 quat2euler(const Vec4 &q);
 Vec4 euler2quat(const Vec3 &rpy);
 
 /**
+ * Rotation matrix to Quaternion
+ */
+Vec4 rot2quat(const Mat3 &rot);
+
+/**
  * Quaternion to Rotation Matrix
  *
  * @param q Quaternion in (x, y, z, w)
@@ -124,4 +163,7 @@ Mat4 Omega(const Vec3 &w);
 
 /** @} group quaternion */
 } // namespace gvio
+
+#include "impl/jpl.hpp"
+
 #endif // GVIO_QUATERNION_JPL_HPP

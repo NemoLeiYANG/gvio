@@ -3,8 +3,8 @@
  * @defgroup time time
  * @ingroup util
  */
-#ifndef GVIO_UTILS_TIME_HPP
-#define GVIO_UTILS_TIME_HPP
+#ifndef GVIO_UTIL_TIME_HPP
+#define GVIO_UTIL_TIME_HPP
 
 #include <sys/time.h>
 #include <time.h>
@@ -26,4 +26,4 @@ double time_now();
 
 /** @} group time */
 } // namespace gvio
-#endif
+#endif // GVIO_UTIL_TIME_HPP

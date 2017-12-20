@@ -129,6 +129,41 @@ Vec4 euler2quat(const Vec3 &rpy) {
   return quatnormalize(q);
 }
 
+Vec4 rot2quat(const Mat3 &rot) {
+  Vec4 q{0.0, 0.0, 0.0, 0.0};
+
+  double T = rot.trace();
+  if ((rot(0, 0) > T) && (rot(0, 0) > rot(1, 1)) && (rot(0, 0) > rot(2, 2))) {
+    q(0) = sqrt((1.0 + (2 * rot(0, 0)) - T) / 4.0);
+    q(1) = (1.0 / (4.0 * q(0))) * (rot(0, 1) + rot(1, 0));
+    q(2) = (1.0 / (4.0 * q(0))) * (rot(0, 2) + rot(2, 0));
+    q(3) = (1.0 / (4.0 * q(0))) * (rot(1, 2) - rot(2, 1));
+  } else if ((rot(1, 1) > T) && (rot(1, 1) > rot(0, 0)) &&
+             (rot(1, 1) > rot(2, 2))) {
+    q(1) = sqrt((1.0 + (2 * rot(1, 1)) - T) / 4.0);
+    q(0) = (1.0 / (4.0 * q(1))) * (rot(0, 1) + rot(1, 0));
+    q(2) = (1.0 / (4.0 * q(1))) * (rot(1, 2) + rot(2, 1));
+    q(3) = (1.0 / (4.0 * q(1))) * (rot(2, 0) - rot(0, 2));
+  } else if ((rot(2, 2) > T) && (rot(2, 2) > rot(0, 0)) &&
+             (rot(2, 2) > rot(1, 1))) {
+    q(2) = sqrt((1.0 + (2 * rot(2, 2)) - T) / 4.0);
+    q(0) = (1.0 / (4.0 * q(2))) * (rot(0, 2) + rot(2, 0));
+    q(1) = (1.0 / (4.0 * q(2))) * (rot(1, 2) + rot(2, 1));
+    q(3) = (1.0 / (4.0 * q(2))) * (rot(0, 1) - rot(1, 0));
+  } else {
+    q(3) = sqrt((1.0 + T) / 4.0);
+    q(0) = (1.0 / (4.0 * q(3))) * (rot(1, 2) - rot(2, 1));
+    q(1) = (1.0 / (4.0 * q(3))) * (rot(2, 0) - rot(0, 2));
+    q(2) = (1.0 / (4.0 * q(3))) * (rot(0, 1) - rot(1, 0));
+  }
+  if (q(3) < 0.0) {
+    q = -q;
+  }
+  q.normalize();
+
+  return q;
+}
+
 Mat3 C(const Vec4 &q) {
   Mat4 A = quatrcomp(q).transpose() * quatlcomp(q);
   const Mat3 R = A.block(0, 0, 3, 3);

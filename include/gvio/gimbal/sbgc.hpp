@@ -2,8 +2,8 @@
  * @file
  * @ingroup gimbal
  */
-#ifndef GVIO_VISION_GIMBAL_SBGC_HPP
-#define GVIO_VISION_GIMBAL_SBGC_HPP
+#ifndef GVIO_GIMBAL_SBGC_HPP
+#define GVIO_GIMBAL_SBGC_HPP
 
 #include <errno.h>
 #include <fcntl.h>
@@ -192,4 +192,4 @@ public:
 
 /** @} group feature2d */
 } // namespace gvio
-#endif // GVIO_FEATURE2D_GMS_MATCHER_HPP
+#endif // GVIO_GIMBAL_SBGC_HPP

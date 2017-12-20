@@ -240,4 +240,4 @@ public:
 
 /** @} group apriltag */
 } // namespace gvio
-#endif
+#endif // GVIO_APRILTAG_BASE_HPP
