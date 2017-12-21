@@ -53,6 +53,22 @@ double *vec2array(const VecX &v);
 double *mat2array(const MatX &m);
 
 /**
+ * Vector to array
+ *
+ * @param v Vector
+ * @param out Output array
+ */
+void vec2array(const VecX &v, double *out);
+
+/**
+ * Matrix to array
+ *
+ * @param m Matrix
+ * @param out Output array
+ */
+void mat2array(const MatX &m, double *out);
+
+/**
  * Create random integer
  *
  * @param ub Upper bound

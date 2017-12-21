@@ -4,23 +4,6 @@
 namespace gvio {
 
 template <typename T>
-Eigen::Matrix<T, 3, 3> CeresReprojectionError::formK() const {
-  Eigen::Matrix<T, 3, 3> K;
-  K(0, 0) = T(this->fx);
-  K(0, 1) = T(0.0);
-  K(0, 2) = T(this->cx);
-
-  K(1, 0) = T(0.0);
-  K(1, 1) = T(this->fy);
-  K(1, 2) = T(this->cy);
-
-  K(2, 0) = T(0.0);
-  K(2, 1) = T(0.0);
-  K(2, 2) = T(1.0);
-  return K;
-}
-
-template <typename T>
 Eigen::Matrix<T, 3, 3>
 CeresReprojectionError::quatToRot(const Eigen::Matrix<T, 4, 1> &q) const {
   const T q1 = q(0);
@@ -45,34 +28,53 @@ CeresReprojectionError::quatToRot(const Eigen::Matrix<T, 4, 1> &q) const {
 }
 
 template <typename T>
-bool CeresReprojectionError::operator()(const T *const cam_q,
-                                        const T *const cam_p,
-                                        const T *const landmark,
-                                        T *residual) const {
-  // Form camera intrinsics matrix K
-  Eigen::Matrix<T, 3, 3> K = this->formK<T>();
+Eigen::Matrix<T, 2, 1>
+CeresReprojectionError::pixel2image(const T &pixel_x, const T &pixel_y) const {
+  Eigen::Matrix<T, 2, 1> pt{(pixel_x - this->cx) / this->fx,
+                            (pixel_y - this->cy) / this->fy};
 
-  // Form rotation matrix from quaternion q = (x, y, z, w)
-  const Eigen::Matrix<T, 4, 1> q{cam_q[0], cam_q[1], cam_q[2], cam_q[3]};
-  const Eigen::Matrix<T, 3, 3> R = this->quatToRot<T>(q);
+  return pt;
+}
 
-  // Form landmark
-  const Eigen::Matrix<T, 3, 1> X{landmark[0], landmark[1], landmark[2]};
+template <typename T>
+bool CeresReprojectionError::operator()(const T *const x, T *residual) const {
+  // Inverse depth parameters
+  const T alpha = x[0];
+  const T beta = x[1];
+  const T rho = x[2];
 
-  // Form translation
-  const Eigen::Matrix<T, 3, 1> t{cam_p[0], cam_p[1], cam_p[2]};
+  // Form rotation matrix
+  Eigen::Matrix<T, 3, 3> C_CiC0;
+  int index = 0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      C_CiC0(i, j) = T(this->C_CiC0[index]);
+      index++;
+    }
+  }
 
-  // Project 3D point to image plane
-  const Eigen::Matrix<T, 3, 1> est = K * R.transpose() * (X - t);
+  // Form translation matrix
+  Eigen::Matrix<T, 3, 1> t_Ci_CiC0;
+  index = 0;
+  for (int i = 0; i < 3; i++) {
+    t_Ci_CiC0(i) = T(this->t_Ci_CiC0[index]);
+    index++;
+  }
 
-  // Convert projected point in homogenous coordinates to image coordinates
-  Eigen::Matrix<T, 2, 1> est_pixel;
-  est_pixel(0) = est(0) / est(2);
-  est_pixel(1) = est(1) / est(2);
+  // Project estimated feature location to image plane
+  const Eigen::Matrix<T, 3, 1> A(alpha, beta, T(1.0));
+  const Eigen::Matrix<T, 3, 1> h = C_CiC0 * A + rho * t_Ci_CiC0;
+
+  // Calculate reprojection error
+  // -- Convert measurment to image coordinates
+  const Eigen::Matrix<T, 2, 1> z =
+      this->pixel2image(T(this->pixel_x), T(this->pixel_y));
+  // -- Convert feature location to normalized coordinates
+  const Eigen::Matrix<T, 2, 1> z_hat{h(0) / h(2), h(1) / h(2)};
 
   // Calculate residual error
-  residual[0] = ceres::abs(T(this->pixel_x) - est_pixel(0));
-  residual[1] = ceres::abs(T(this->pixel_y) - est_pixel(1));
+  residual[0] = z(0) - z_hat(0);
+  residual[1] = z(1) - z_hat(1);
 
   return true;
 }

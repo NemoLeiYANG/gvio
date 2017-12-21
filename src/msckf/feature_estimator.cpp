@@ -187,96 +187,112 @@ int FeatureEstimator::estimate(Vec3 &p_G_f) {
   return 0;
 }
 
-// void CeresFeatureEstimator::addResidualBlock(const cv::KeyPoint &kp,
-//                                              double *cam_q,
-//                                              double *cam_p,
-//                                              double *landmark) {
-//   // Build residual
-//   auto residual =
-//       new CeresReprojectionError(((PinholeModel *) cam_model)->K, kp);
-//
-//   // Build cost function
-//   auto cost_func = new ceres::AutoDiffCostFunction<
-//       CeresReprojectionError, // Residual
-//       2,                      // Size of residual
-//       4,                      // Size of 1st parameter - quaternion (x, y, z,
-//       w)
-//       3,                      // Size of 2nd parameter - translation (x, y,
-//       z)
-//       3                       // Size of 3rd parameter - landmark (x, y, z)
-//       >(residual);
-//
-//   // Add residual block to problem
-//   this->problem.AddResidualBlock(cost_func, // Cost function
-//                                  NULL,      // Loss function
-//                                  cam_q,     // Camera rotation
-//                                  cam_p,     // Camera translation
-//                                  landmark); // Landmark
-//
-//   // Add quaternion local parameterization
-//   auto quat_param = new JPLQuaternionParameterization();
-//   this->problem.SetParameterization(cam_q, quat_param);
-// }
-//
-// int CeresFeatureEstimator::setupProblem() {
-//   // Setup landmark
-//   if (this->initialEstimate(this->landmark) != 0) {
-//     return -1;
-//   }
-//
-//   // Setup camera poses
-//   const int N = this->track_cam_states.size();
-//   const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
-//   const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
-//
-//   for (int i = 0; i < N; i++) {
-//     // Get camera's current rotation and translation
-//     const Mat3 C_CiG = C(track_cam_states[i].q_CG);
-//     const Vec3 p_G_Ci = track_cam_states[i].p_G;
-//
-//     // Set camera 0 as origin, work out rotation and translation
-//     // of camera i relative to to camera 0
-//     const Mat3 C_CiC0 = C_CiG * C_C0G.transpose();
-//     const Vec4 q_CiC0 = rot2quat(C_CiC0);
-//     const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
-//
-//     this->cam_q.push_back(q_CiC0);
-//     this->cam_p.push_back(t_Ci_CiC0);
-//   }
-//
-//   // Add residual blocks
-//   for (int i = 0; i < N; i++) {
-//     this->addResidualBlock(this->track.track[i].kp,
-//                            this->cam_q[i].data(),
-//                            this->cam_p[i].data(),
-//                            this->landmark.data());
-//   }
-//
-//   return 0;
-// }
-//
-// int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
-//   // Set options
-//   this->options.max_num_iterations = 200;
-//   this->options.use_nonmonotonic_steps = false;
-//   this->options.use_inner_iterations = true;
-//   this->options.preconditioner_type = ceres::SCHUR_JACOBI;
-//   this->options.linear_solver_type = ceres::SPARSE_SCHUR;
-//   this->options.parameter_tolerance = 1e-10;
-//   this->options.num_threads = 8;
-//   this->options.num_linear_solver_threads = 8;
-//   this->options.minimizer_progress_to_stdout = true;
-//
-//   // Setup problem
-//   if (this->setupProblem() != 0) {
-//     return -1;
-//   }
-//
-//   // Solve
-//   ceres::Solve(this->options, &this->problem, &this->summary);
-//   std::cout << summary.FullReport() << "\n";
-//
-//   return 0;
-// }
+CeresReprojectionError::CeresReprojectionError(const Mat3 &K,
+                                               const Mat3 &C_CiC0,
+                                               const Vec3 &t_Ci_CiC0,
+                                               const cv::KeyPoint &keypoint) {
+  // Camera intrinsics
+  this->fx = K(0, 0);
+  this->fy = K(1, 1);
+  this->cx = K(0, 2);
+  this->cy = K(1, 2);
+
+  // Camera extrinsics
+  mat2array(C_CiC0, this->C_CiC0);
+  vec2array(t_Ci_CiC0, this->t_Ci_CiC0);
+
+  // Measurement
+  this->pixel_x = keypoint.pt.x;
+  this->pixel_y = keypoint.pt.y;
+}
+
+void CeresFeatureEstimator::addResidualBlock(const cv::KeyPoint &kp,
+                                             const Mat3 &C_CiC0,
+                                             const Vec3 &t_Ci_CiC0,
+                                             double *x) {
+  // Build residual
+  auto residual = new CeresReprojectionError(((PinholeModel *) cam_model)->K,
+                                             C_CiC0,
+                                             t_Ci_CiC0,
+                                             kp);
+
+  // Build cost function
+  auto cost_func =
+      new ceres::AutoDiffCostFunction<CeresReprojectionError, // Residual
+                                      2, // Size of residual
+                                      3 // Size of 1st parameter - inverse depth
+                                      >(residual);
+
+  // Add residual block to problem
+  this->problem.AddResidualBlock(cost_func, // Cost function
+                                 NULL,      // Loss function
+                                 x);        // Optimization parameters
+}
+
+int CeresFeatureEstimator::setupProblem() {
+  // Setup landmark
+  Vec3 p_C0_f;
+  if (this->initialEstimate(p_C0_f) != 0) {
+    return -1;
+  }
+
+  // Create inverse depth params (these are to be optimized)
+  this->x[0] = p_C0_f(0) / p_C0_f(2); // Alpha
+  this->x[1] = p_C0_f(1) / p_C0_f(2); // Beta
+  this->x[2] = 1.0 / p_C0_f(2);       // Rho
+
+  // Add residual blocks
+  const int N = this->track_cam_states.size();
+  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
+  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
+
+  for (int i = 0; i < N; i++) {
+    // Get camera's current rotation and translation
+    const Mat3 C_CiG = C(track_cam_states[i].q_CG);
+    const Vec3 p_G_Ci = track_cam_states[i].p_G;
+
+    // Set camera 0 as origin, work out rotation and translation
+    // of camera i relative to to camera 0
+    const Mat3 C_CiC0 = C_CiG * C_C0G.transpose();
+    const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
+
+    // Add residual block
+    this->addResidualBlock(this->track.track[i].kp, C_CiC0, t_Ci_CiC0, this->x);
+  }
+
+  return 0;
+}
+
+int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
+  // Set options
+  this->options.max_num_iterations = 30;
+  this->options.use_nonmonotonic_steps = false;
+  this->options.use_inner_iterations = true;
+  this->options.preconditioner_type = ceres::SCHUR_JACOBI;
+  this->options.linear_solver_type = ceres::SPARSE_SCHUR;
+  this->options.parameter_tolerance = 1e-10;
+  this->options.num_threads = 8;
+  this->options.num_linear_solver_threads = 8;
+  this->options.minimizer_progress_to_stdout = true;
+
+  // Setup problem
+  if (this->setupProblem() != 0) {
+    return -1;
+  }
+
+  // Solve
+  ceres::Solve(this->options, &this->problem, &this->summary);
+  std::cout << summary.FullReport() << std::endl;
+
+  // Transform feature position from camera to global frame
+  const Vec3 X{this->x[0], this->x[1], 1.0};
+  const double z = 1 / this->x[2];
+  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
+  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
+  p_G_f = z * (C_C0G.transpose() * X) + p_G_C0;
+  std::cout << "p_G_f: " << p_G_f.transpose() << std::endl;
+
+  return 0;
+}
 
 } // namespace gvio

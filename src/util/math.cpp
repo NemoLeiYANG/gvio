@@ -23,6 +23,22 @@ double *mat2array(const MatX &m) {
   return array;
 }
 
+void vec2array(const VecX &v, double *out) {
+  for (int i = 0; i < v.size(); i++) {
+    out[i] = v(i);
+  }
+}
+
+void mat2array(const MatX &A, double *out) {
+  int index = 0;
+  for (int i = 0; i < A.rows(); i++) {
+    for (int j = 0; j < A.cols(); j++) {
+      out[index] = A(i, j);
+      index++;
+    }
+  }
+}
+
 int randi(int ub, int lb) { return rand() % lb + ub; }
 
 double randf(const double ub, const double lb) {

@@ -186,124 +186,153 @@ int test_CeresReprojectionError_constructor() {
   FeatureTrack track;
   setup_test(config, cam_model, track_cam_states, track);
 
+  // Get camera 0 rotation and translation
+  const Mat3 C_C0G = C(track_cam_states[0].q_CG);
+  const Vec3 p_G_C0 = track_cam_states[0].p_G;
+  // Get camera i rotation and translation
+  const int camera_index = 0;
+  const Mat3 C_CiG = C(track_cam_states[camera_index].q_CG);
+  const Vec3 p_G_Ci = track_cam_states[camera_index].p_G;
+  // Set camera 0 as origin, work out rotation and translation
+  // between camera i to to camera 0
+  const Mat3 C_CiC0 = C_CiG * C_C0G.transpose();
+  const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
+
   // Ceres reprojection error
-  CeresReprojectionError error{cam_model.K, track.track[1].kp};
+  CeresReprojectionError error{cam_model.K,
+                               C_CiC0,
+                               t_Ci_CiC0,
+                               track.track[camera_index].kp};
 
   return 0;
 }
 
-// int test_CeresReprojectionError_formK() {
-//   // Setup test
-//   const struct test_config config;
-//   PinholeModel cam_model;
-//   CameraStates track_cam_states;
-//   FeatureTrack track;
-//   setup_test(config, cam_model, track_cam_states, track);
-//
-//   // Ceres reprojection error
-//   CeresReprojectionError error{cam_model.K, track.track[1].kp};
-//   MU_CHECK(error.formK<double>().isApprox(cam_model.K));
-//
-//   return 0;
-// }
-//
-// int test_CeresReprojectionError_quatToRot() {
-//   // Setup test
-//   const struct test_config config;
-//   PinholeModel cam_model;
-//   CameraStates track_cam_states;
-//   FeatureTrack track;
-//   setup_test(config, cam_model, track_cam_states, track);
-//
-//   // Ceres reprojection error
-//   CeresReprojectionError error{cam_model.K, track.track[1].kp};
-//
-//   const Vec4 q = euler2quat(Vec3{0.0, 0.0, 0.0});
-//   const Mat3 R = error.quatToRot<double>(q);
-//
-//   MU_CHECK(R.isApprox(quat2rot(q)));
-//
-//   return 0;
-// }
-//
-// int test_CeresReprojectionError_error() {
-//   // Setup test
-//   const struct test_config config;
-//   PinholeModel cam_model;
-//   CameraStates track_cam_states;
-//   FeatureTrack track;
-//   setup_test(config, cam_model, track_cam_states, track);
-//
-//   // Calculate reprojection error for first measurement
-//   double r1[2] = {1.0, 1.0};
-//   CeresReprojectionError error1{cam_model.K, track.track[0].kp};
-//   error1(track_cam_states[0].q_CG.data(),
-//          track_cam_states[0].p_G.data(),
-//          config.landmark.data(),
-//          r1);
-//   MU_CHECK_FLOAT(0.0, r1[0]);
-//   MU_CHECK_FLOAT(0.0, r1[1]);
-//
-//   // Calculate reprojection error for second measurement
-//   double r2[2] = {1.0, 1.0};
-//   CeresReprojectionError error2{cam_model.K, track.track[1].kp};
-//   error2(track_cam_states[1].q_CG.data(),
-//          track_cam_states[1].p_G.data(),
-//          config.landmark.data(),
-//          r2);
-//   MU_CHECK_NEAR(0.0, r2[0], 1e-5);
-//   MU_CHECK_NEAR(0.0, r2[1], 1e-5);
-//
-//   return 0;
-// }
+int test_CeresReprojectionError_quatToRot() {
+  // Setup test
+  const struct test_config config;
+  PinholeModel cam_model;
+  CameraStates track_cam_states;
+  FeatureTrack track;
+  setup_test(config, cam_model, track_cam_states, track);
 
-// int test_CeresFeatureEstimator_constructor() {
-//   // Setup test
-//   const struct test_config config;
-//   PinholeModel cam_model;
-//   CameraStates track_cam_states;
-//   FeatureTrack track;
-//   setup_test(config, cam_model, track_cam_states, track);
-//
-//   // Setup CeresFeatureEstimator
-//   CeresFeatureEstimator estimator{&cam_model, track, track_cam_states};
-//
-//   return 0;
-// }
+  // Get camera 0 rotation and translation
+  const Mat3 C_C0G = C(track_cam_states[0].q_CG);
+  const Vec3 p_G_C0 = track_cam_states[0].p_G;
+  // Get camera i rotation and translation
+  const int camera_index = 0;
+  const Mat3 C_CiG = C(track_cam_states[camera_index].q_CG);
+  const Vec3 p_G_Ci = track_cam_states[camera_index].p_G;
+  // Set camera 0 as origin, work out rotation and translation
+  // between camera i to to camera 0
+  const Mat3 C_CiC0 = C_CiG * C_C0G.transpose();
+  const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
 
-// int test_CeresFeatureEstimator_setupProblem() {
-//   // Setup test
-//   const struct test_config config;
-//   PinholeModel cam_model;
-//   CameraStates track_cam_states;
-//   FeatureTrack track;
-//   setup_test(config, cam_model, track_cam_states, track);
-//
-//   // Setup CeresFeatureEstimator
-//   CeresFeatureEstimator estimator{&cam_model, track, track_cam_states};
-//   estimator.setupProblem();
-//
-//   return 0;
-// }
-//
-// int test_CeresFeatureEstimator_estimate() {
-//   // Setup test
-//   const struct test_config config;
-//   PinholeModel cam_model;
-//   CameraStates track_cam_states;
-//   FeatureTrack track;
-//   setup_test(config, cam_model, track_cam_states, track);
-//
-//   // Setup CeresFeatureEstimator
-//   CeresFeatureEstimator estimator{&cam_model, track, track_cam_states};
-//
-//   Vec3 p_G_f;
-//   estimator.estimate(p_G_f);
-//
-//   // std::cout << p_G_f.transpose() << std::endl;
-//
-//   return 0;
-// }
+  // Ceres reprojection error
+  CeresReprojectionError error{cam_model.K,
+                               C_CiC0,
+                               t_Ci_CiC0,
+                               track.track[camera_index].kp};
+
+  const Vec4 q = euler2quat(Vec3{0.0, 0.0, 0.0});
+  const Mat3 R = error.quatToRot<double>(q);
+
+  MU_CHECK(R.isApprox(quat2rot(q)));
+
+  return 0;
+}
+
+int test_CeresReprojectionError_error() {
+  // Setup test
+  const struct test_config config;
+  PinholeModel cam_model;
+  CameraStates track_cam_states;
+  FeatureTrack track;
+  setup_test(config, cam_model, track_cam_states, track);
+
+  // Get camera 0 rotation and translation
+  const Mat3 C_C0G = C(track_cam_states[0].q_CG);
+  const Vec3 p_G_C0 = track_cam_states[0].p_G;
+
+  for (int i = 0; i < 2; i++) {
+    // Get camera 0 rotation and translation
+    const Mat3 C_CiG = C(track_cam_states[i].q_CG);
+    const Vec3 p_G_Ci = track_cam_states[i].p_G;
+    // Set camera 0 as origin, work out rotation and translation
+    // between camera 0 to to camera 0
+    const Mat3 C_CiC0 = C_CiG * C_C0G.transpose();
+    const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
+
+    // Calculate reprojection error for first measurement
+    double r[2] = {1.0, 1.0};
+    CeresReprojectionError error{cam_model.K,
+                                 C_CiC0,
+                                 t_Ci_CiC0,
+                                 track.track[i].kp};
+
+    // Create inverse depth params (these are to be optimized)
+    const double alpha = config.landmark(0) / config.landmark(2);
+    const double beta = config.landmark(1) / config.landmark(2);
+    const double rho = 1.0 / config.landmark(2);
+    const double x[3] = {alpha, beta, rho};
+
+    // Test and assert
+    error(x, r);
+    std::cout << "residuals: " << r[0] << ", " << r[1] << std::endl;
+
+    MU_CHECK_NEAR(0.0, r[0], 1e-5);
+    MU_CHECK_NEAR(0.0, r[1], 1e-5);
+  }
+
+  return 0;
+}
+
+int test_CeresFeatureEstimator_constructor() {
+  // Setup test
+  const struct test_config config;
+  PinholeModel cam_model;
+  CameraStates track_cam_states;
+  FeatureTrack track;
+  setup_test(config, cam_model, track_cam_states, track);
+
+  // Setup CeresFeatureEstimator
+  CeresFeatureEstimator estimator{&cam_model, track, track_cam_states};
+
+  return 0;
+}
+
+int test_CeresFeatureEstimator_setupProblem() {
+  // Setup test
+  const struct test_config config;
+  PinholeModel cam_model;
+  CameraStates track_cam_states;
+  FeatureTrack track;
+  setup_test(config, cam_model, track_cam_states, track);
+
+  // Setup CeresFeatureEstimator
+  CeresFeatureEstimator estimator{&cam_model, track, track_cam_states};
+  estimator.setupProblem();
+
+  return 0;
+}
+
+int test_CeresFeatureEstimator_estimate() {
+  // Setup test
+  const struct test_config config;
+  PinholeModel cam_model;
+  CameraStates track_cam_states;
+  FeatureTrack track;
+  setup_test(config, cam_model, track_cam_states, track);
+
+  // Setup CeresFeatureEstimator
+  CeresFeatureEstimator estimator{&cam_model, track, track_cam_states};
+
+  Vec3 p_G_f;
+  estimator.estimate(p_G_f);
+
+  // std::cout << p_G_f.transpose() << std::endl;
+
+  return 0;
+}
 
 void test_suite() {
   // FeatureEstimator
@@ -315,14 +344,13 @@ void test_suite() {
 
   // CeresReprojectionError
   MU_ADD_TEST(test_CeresReprojectionError_constructor);
-  // MU_ADD_TEST(test_CeresReprojectionError_formK);
-  // MU_ADD_TEST(test_CeresReprojectionError_quatToRot);
-  // MU_ADD_TEST(test_CeresReprojectionError_error);
+  MU_ADD_TEST(test_CeresReprojectionError_quatToRot);
+  MU_ADD_TEST(test_CeresReprojectionError_error);
 
-  // // CeresFeatureEstimator
-  // MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
-  // MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
-  // MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
+  // CeresFeatureEstimator
+  MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
+  MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
+  MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
 }
 
 } // namespace gvio

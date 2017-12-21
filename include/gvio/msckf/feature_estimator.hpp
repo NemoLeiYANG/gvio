@@ -94,24 +94,24 @@ public:
  */
 struct CeresReprojectionError {
 public:
+  // Camera intrinsics
   double fx = 0.0;
   double fy = 0.0;
   double cx = 0.0;
   double cy = 0.0;
 
+  // Camera extrinsics
+  double C_CiC0[9];
+  double t_Ci_CiC0[3];
+
+  // Measurement
   double pixel_x = 0.0;
   double pixel_y = 0.0;
 
-  CeresReprojectionError(const Mat3 &K, const cv::KeyPoint &keypoint)
-      : fx(K(0, 0)), fy(K(1, 1)), cx(K(0, 2)), cy(K(1, 2)),
-        pixel_x(keypoint.pt.x), pixel_y(keypoint.pt.y) {}
-
-  /**
-   * Form camera intrinsics matrix K
-   *
-   * @returns Camera intrinsics matrix K
-   */
-  template <typename T> Eigen::Matrix<T, 3, 3> formK() const;
+  CeresReprojectionError(const Mat3 &K,
+                         const Mat3 &C_CiC0,
+                         const Vec3 &t_Ci_CiC0,
+                         const cv::KeyPoint &keypoint);
 
   /**
    * JPL Quaternion to rotation matrix R
@@ -127,76 +127,73 @@ public:
   Eigen::Matrix<T, 3, 3> quatToRot(const Eigen::Matrix<T, 4, 1> &q) const;
 
   /**
+   * Convert pixel measurement to image coordinates
+   *
+   * @param pixel_x Pixel measurement in x-axis
+   * @param pixel_y Pixel measurement in y-axis
+   * @returns Point in image coordinates
+   */
+  template <typename T>
+  Eigen::Matrix<T, 2, 1> pixel2image(const T &pixel_x, const T &pixel_y) const;
+
+  /**
    * Calculate Bundle Adjustment Residual
    *
-   * @param cam_q Camera rotation as quaternion (x, y, z, w)
-   * @param cam_p Camera position (x, y, z)
-   * @param landmark Landmark (x, y, z)
+   * @param x Inverse depth parameters (alpha, beta, rho)
    * @param residual Calculated residual
    **/
-  template <typename T>
-  bool operator()(const T *const cam_q,
-                  const T *const cam_p,
-                  const T *const landmark,
-                  T *residual) const;
+  template <typename T> bool operator()(const T *const x, T *residual) const;
 };
 
-// #<{(|*
-//  * Ceres-Solver based feature estimator
-//  |)}>#
-// class CeresFeatureEstimator : public FeatureEstimator {
-// public:
-//   ceres::Problem problem;
-//   ceres::Solver::Options options;
-//   ceres::Solver::Summary summary;
-//
-//   Vec3 landmark{0.0, 0.0, 0.0};
-//   std::vector<Vec4> cam_q;
-//   std::vector<Vec3> cam_p;
-//
-//   CeresFeatureEstimator(const CameraModel *cam_model,
-//                         const FeatureTrack track,
-//                         const CameraStates track_cam_states)
-//       : FeatureEstimator{cam_model, track, track_cam_states} {}
-//
-//   #<{(|*
-//    * Add residual block
-//    *
-//    * @param kp Keypoint
-//    * @param cam_q_CG Camera rotation as JPL quaternion
-//    * @param cam_p_G Camera translation
-//    * @param landmark Landmark
-//    |)}>#
-//   void addResidualBlock(const cv::KeyPoint &kp,
-//                         double *cam_q_CG,
-//                         double *cam_p_G,
-//                         double *landmark);
-//
-//   #<{(|*
-//    * Setup the optimization problem
-//    *
-//    * It performs the following 3 tasks:
-//    *
-//    * 1. Calculates an initial estimate of the landmark position
-//    * 2. Setup camera poses such that the first camera state is the origin,
-//    since
-//    * here we are performing a bundle adjustment of a feature track relative
-//    to
-//    * the first camera pose.
-//    * 3. Setup residual blocks
-//    *
-//    * @returns 0 for success, -1 for failure
-//    |)}>#
-//   int setupProblem();
-//
-//   #<{(|*
-//    * Estimate feature position in global frame
-//    *
-//    * @param p_G_f Feature position in global frame
-//    * @returns 0 for success, -1 for failure
-//    |)}>#
-//   int estimate(Vec3 &p_G_f);
-// };
+/**
+ * Ceres-Solver based feature estimator
+ */
+class CeresFeatureEstimator : public FeatureEstimator {
+public:
+  ceres::Problem problem;
+  ceres::Solver::Options options;
+  ceres::Solver::Summary summary;
+  double x[3] = {0.0, 0.0, 0.0};
+
+  CeresFeatureEstimator(const CameraModel *cam_model,
+                        const FeatureTrack track,
+                        const CameraStates track_cam_states)
+      : FeatureEstimator{cam_model, track, track_cam_states} {}
+
+  /**
+   * Add residual block
+   *
+   * @param kp Keypoint
+   * @param x Optimization parameters
+   */
+  void addResidualBlock(const cv::KeyPoint &kp,
+                        const Mat3 &C_CiC0,
+                        const Vec3 &t_Ci_CiC0,
+                        double *x);
+
+  /**
+   * Setup the optimization problem
+   *
+   * It performs the following 3 tasks:
+   *
+   * 1. Calculates an initial estimate of the landmark position
+   * 2. Setup camera poses such that the first camera state is the origin,
+   * since here we are performing a bundle adjustment of a feature track
+   * relative to the first camera pose.
+   * 3. Setup residual blocks
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int setupProblem();
+
+  /**
+   * Estimate feature position in global frame
+   *
+   * @param p_G_f Feature position in global frame
+   * @returns 0 for success, -1 for failure
+   */
+  int estimate(Vec3 &p_G_f);
+};
 
 /** @} group msckf */
 } // namespace gvio
