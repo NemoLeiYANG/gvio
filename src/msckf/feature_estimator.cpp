@@ -74,16 +74,18 @@ MatX FeatureEstimator::jacobian(const VecX &x) {
     const Vec3 A{alpha, beta, 1.0};
     const Vec3 h = C_CiC0 * A + rho * t_Ci_CiC0;
 
-    // clang-format off
-    const Vec2 drdalpha{-C_CiC0(0, 0) / h(2) + (h(0) / pow(h(2), 2)) * C_CiC0(2, 0),
-                        -C_CiC0(1, 0) / h(2) + (h(1) / pow(h(2), 2)) * C_CiC0(2, 0)};
+    // Compute jacobian
+    const double hx_div_hz2 = (h(0) / pow(h(2), 2));
+    const double hy_div_hz2 = (h(1) / pow(h(2), 2));
 
-    const Vec2 drdbeta{-C_CiC0(0, 1) / h(2) + (h(0) / pow(h(2), 2)) * C_CiC0(2, 1),
-                       -C_CiC0(1, 1) / h(2) + (h(1) / pow(h(2), 2)) * C_CiC0(2, 1)};
+    const Vec2 drdalpha{-C_CiC0(0, 0) / h(2) + hx_div_hz2 * C_CiC0(2, 0),
+                        -C_CiC0(1, 0) / h(2) + hy_div_hz2 * C_CiC0(2, 0)};
 
-    const Vec2 drdrho{-t_Ci_CiC0(0) / h(2) + (h(0) / pow(h(2), 2)) * t_Ci_CiC0(2),
-                      -t_Ci_CiC0(1) / h(2) + (h(1) / pow(h(2), 2)) * t_Ci_CiC0(2)};
-    // clang-format on
+    const Vec2 drdbeta{-C_CiC0(0, 1) / h(2) + hx_div_hz2 * C_CiC0(2, 1),
+                       -C_CiC0(1, 1) / h(2) + hy_div_hz2 * C_CiC0(2, 1)};
+
+    const Vec2 drdrho{-t_Ci_CiC0(0) / h(2) + hx_div_hz2 * t_Ci_CiC0(2),
+                      -t_Ci_CiC0(1) / h(2) + hy_div_hz2 * t_Ci_CiC0(2)};
 
     // Fill in the jacobian
     J.block(2 * i, 0, 2, 1) = drdalpha;
@@ -187,23 +189,78 @@ int FeatureEstimator::estimate(Vec3 &p_G_f) {
   return 0;
 }
 
-CeresReprojectionError::CeresReprojectionError(const Mat3 &K,
-                                               const Mat3 &C_CiC0,
-                                               const Vec3 &t_Ci_CiC0,
-                                               const cv::KeyPoint &keypoint) {
-  // Camera intrinsics
-  this->fx = K(0, 0);
-  this->fy = K(1, 1);
-  this->cx = K(0, 2);
-  this->cy = K(1, 2);
+bool CeresReprojectionError::Evaluate(double const *const *x,
+                                      double *residuals,
+                                      double **jacobians) const {
+  // Inverse depth parameters
+  const double alpha = x[0][0];
+  const double beta = x[0][1];
+  const double rho = x[0][2];
 
-  // Camera extrinsics
-  mat2array(C_CiC0, this->C_CiC0);
-  vec2array(t_Ci_CiC0, this->t_Ci_CiC0);
+  // Project estimated feature location to image plane
+  const Vec3 A{alpha, beta, 1.0};
+  const Vec3 h = this->C_CiC0 * A + rho * this->t_Ci_CiC0;
 
-  // Measurement
-  this->pixel_x = keypoint.pt.x;
-  this->pixel_y = keypoint.pt.y;
+  // Calculate reprojection error
+  // -- Convert measurment to image coordinates
+  const Vec2 z = this->cam_model->pixel2image(this->keypoint.pt);
+  // -- Convert feature location to normalized coordinates
+  const Vec2 z_hat{h(0) / h(2), h(1) / h(2)};
+
+  // Calculate residual error
+  residuals[0] = z(0) - z_hat(0);
+  residuals[1] = z(1) - z_hat(1);
+
+  // Compute the Jacobian if asked for.
+  if (jacobians != NULL && jacobians[0] != NULL) {
+    // Pre-compute common terms
+    const double hx_div_hz2 = (h(0) / pow(h(2), 2));
+    const double hy_div_hz2 = (h(1) / pow(h(2), 2));
+
+    // **IMPORTANT** The ceres-solver documentation does not explain very well
+    // how one goes about forming the jacobian. In a ceres analytical cost
+    // function, the jacobian ceres needs is a local jacobian only, in this
+    // problem we have:
+    //
+    // - 2 Residuals (Reprojection Error in x, y axis)
+    // - 1 Parameter block of size 3 (Inverse depth, alpha, beta, rho)
+    //
+    // The resultant local jacobian should be of size 2x3 (2 residuals, 1st
+    // parameter of size 3). The way we fill in the `jacobians` double array
+    // variable is that since we are only calculating 1 local jacobian, we only
+    // need to access the first index (i.e. 0), and then we fill in the
+    // jacobian in ROW-MAJOR-ORDER, `jacobians[0][0...5]` for the 2x3
+    // analytical jacobian, Ceres then in turn uses that information and forms
+    // the global jacobian themselves.
+    //
+    // **IF** the problem had n parameter blocks, you would have filled in the
+    // `jacobians[0..n][...]` local jacobians.
+    //
+    // For this problem our local jacobian has the form:
+    //
+    //   [drx / dalpha, drx / dbeta, drx / drho]
+    //   [dry / dalpha, dry / dbeta, dry / drho]
+    //
+    // Or in row-major index form:
+    //
+    //   [0, 1, 2]
+    //   [3, 4, 5]
+    //
+
+    // dr / dalpha
+    jacobians[0][0] = -C_CiC0(0, 0) / h(2) + hx_div_hz2 * C_CiC0(2, 0);
+    jacobians[0][3] = -C_CiC0(1, 0) / h(2) + hy_div_hz2 * C_CiC0(2, 0);
+
+    // dr / dbeta
+    jacobians[0][1] = -C_CiC0(0, 1) / h(2) + hx_div_hz2 * C_CiC0(2, 1);
+    jacobians[0][4] = -C_CiC0(1, 1) / h(2) + hy_div_hz2 * C_CiC0(2, 1);
+
+    // dr / drho
+    jacobians[0][2] = -t_Ci_CiC0(0) / h(2) + hx_div_hz2 * t_Ci_CiC0(2);
+    jacobians[0][5] = -t_Ci_CiC0(1) / h(2) + hy_div_hz2 * t_Ci_CiC0(2);
+  }
+
+  return true;
 }
 
 void CeresFeatureEstimator::addResidualBlock(const cv::KeyPoint &kp,
@@ -211,17 +268,7 @@ void CeresFeatureEstimator::addResidualBlock(const cv::KeyPoint &kp,
                                              const Vec3 &t_Ci_CiC0,
                                              double *x) {
   // Build residual
-  auto residual = new CeresReprojectionError(((PinholeModel *) cam_model)->K,
-                                             C_CiC0,
-                                             t_Ci_CiC0,
-                                             kp);
-
-  // Build cost function
-  auto cost_func =
-      new ceres::AutoDiffCostFunction<CeresReprojectionError, // Residual
-                                      2, // Size of residual
-                                      3 // Size of 1st parameter - inverse depth
-                                      >(residual);
+  auto cost_func = new CeresReprojectionError(cam_model, C_CiC0, t_Ci_CiC0, kp);
 
   // Add residual block to problem
   this->problem.AddResidualBlock(cost_func, // Cost function
@@ -240,6 +287,10 @@ int CeresFeatureEstimator::setupProblem() {
   this->x[0] = p_C0_f(0) / p_C0_f(2); // Alpha
   this->x[1] = p_C0_f(1) / p_C0_f(2); // Beta
   this->x[2] = 1.0 / p_C0_f(2);       // Rho
+
+  this->x[0] += 0.1;
+  this->x[1] += 0.1;
+  this->x[2] += 10;
 
   // Add residual blocks
   const int N = this->track_cam_states.size();
@@ -267,12 +318,12 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // Set options
   this->options.max_num_iterations = 30;
   this->options.use_nonmonotonic_steps = false;
-  this->options.use_inner_iterations = true;
+  this->options.use_inner_iterations = false;
   this->options.preconditioner_type = ceres::SCHUR_JACOBI;
   this->options.linear_solver_type = ceres::SPARSE_SCHUR;
   this->options.parameter_tolerance = 1e-10;
-  this->options.num_threads = 8;
-  this->options.num_linear_solver_threads = 8;
+  this->options.num_threads = 1;
+  this->options.num_linear_solver_threads = 1;
   this->options.minimizer_progress_to_stdout = true;
 
   // Setup problem

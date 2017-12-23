@@ -92,8 +92,10 @@ public:
 /**
  * Ceres-solver reprojection error
  */
-struct CeresReprojectionError {
+struct CeresReprojectionError : public ceres::SizedCostFunction<2, 3> {
 public:
+  const CameraModel *cam_model;
+
   // Camera intrinsics
   double fx = 0.0;
   double fy = 0.0;
@@ -101,48 +103,29 @@ public:
   double cy = 0.0;
 
   // Camera extrinsics
-  double C_CiC0[9];
-  double t_Ci_CiC0[3];
+  Mat3 C_CiC0;
+  Vec3 t_Ci_CiC0;
 
   // Measurement
-  double pixel_x = 0.0;
-  double pixel_y = 0.0;
+  cv::KeyPoint keypoint;
 
-  CeresReprojectionError(const Mat3 &K,
+  CeresReprojectionError(const CameraModel *cam_model,
                          const Mat3 &C_CiC0,
                          const Vec3 &t_Ci_CiC0,
-                         const cv::KeyPoint &keypoint);
+                         const cv::KeyPoint &keypoint)
+      : cam_model{cam_model}, C_CiC0{C_CiC0}, t_Ci_CiC0{t_Ci_CiC0},
+        keypoint{keypoint} {}
 
   /**
-   * JPL Quaternion to rotation matrix R
+   * Calculate reprojection residual
    *
-   * Page 9. of Trawny, Nikolas, and Stergios I. Roumeliotis. "Indirect
-   * Kalman filter for 3D attitude estimation." University of Minnesota,
-   * Dept. of Comp. Sci. & Eng., Tech. Rep 2 (2005): 2005.
-   *
-   * @param q JPL quaternion (x, y, z, w)
-   * @returns Rotation matrix
-   */
-  template <typename T>
-  Eigen::Matrix<T, 3, 3> quatToRot(const Eigen::Matrix<T, 4, 1> &q) const;
-
-  /**
-   * Convert pixel measurement to image coordinates
-   *
-   * @param pixel_x Pixel measurement in x-axis
-   * @param pixel_y Pixel measurement in y-axis
-   * @returns Point in image coordinates
-   */
-  template <typename T>
-  Eigen::Matrix<T, 2, 1> pixel2image(const T &pixel_x, const T &pixel_y) const;
-
-  /**
-   * Calculate Bundle Adjustment Residual
-   *
-   * @param x Inverse depth parameters (alpha, beta, rho)
-   * @param residual Calculated residual
+   * @param parameters Optimization parameters
+   * @param residuals Residuals
+   * @param jacobians Jacobians
    **/
-  template <typename T> bool operator()(const T *const x, T *residual) const;
+  virtual bool Evaluate(double const *const *parameters,
+                        double *residuals,
+                        double **jacobians) const;
 };
 
 /**
@@ -197,7 +180,4 @@ public:
 
 /** @} group msckf */
 } // namespace gvio
-
-#include "impl/feature_estimator.hpp"
-
 #endif // GVIO_MSCKF_FEATURE_ESTIMATOR_HPP
