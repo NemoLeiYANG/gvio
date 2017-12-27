@@ -2,7 +2,7 @@
 
 namespace gvio {
 
-static int colormode2bpp(int mode) {
+int ueye_colormode2bpp(int mode) {
   switch (mode) {
     case IS_CM_SENSOR_RAW8:
     case IS_CM_MONO8: return 8;
@@ -38,7 +38,190 @@ static int colormode2bpp(int mode) {
   }
 }
 
+int ueye_colormode2channels(int mode) {
+  switch (mode) {
+    case IS_CM_SENSOR_RAW8:
+    case IS_CM_MONO8:
+    case IS_CM_SENSOR_RAW10:
+    case IS_CM_SENSOR_RAW12:
+    case IS_CM_SENSOR_RAW16:
+    case IS_CM_MONO10:
+    case IS_CM_MONO12:
+    case IS_CM_MONO16: return 1;
+    case IS_CM_BGR5_PACKED:
+    case IS_CM_BGR565_PACKED:
+    case IS_CM_UYVY_PACKED:
+    case IS_CM_UYVY_MONO_PACKED:
+    case IS_CM_UYVY_BAYER_PACKED:
+    case IS_CM_CBYCRY_PACKED:
+    case IS_CM_RGB8_PACKED:
+    case IS_CM_BGR8_PACKED:
+    case IS_CM_RGB8_PLANAR:
+    case IS_CM_RGBA8_PACKED:
+    case IS_CM_BGRA8_PACKED:
+    case IS_CM_RGBY8_PACKED:
+    case IS_CM_BGRY8_PACKED:
+    case IS_CM_RGB10_PACKED:
+    case IS_CM_BGR10_PACKED:
+    case IS_CM_RGB10_UNPACKED:
+    case IS_CM_BGR10_UNPACKED:
+    case IS_CM_RGB12_UNPACKED:
+    case IS_CM_BGR12_UNPACKED:
+    case IS_CM_RGBA12_UNPACKED:
+    case IS_CM_BGRA12_UNPACKED: return 3;
+    case IS_CM_JPEG:
+    default: return 0;
+  }
+}
+
+void ueye_list_cameras() {
+  int nb_cameras = -1;
+  int retval = 0;
+  if ((retval = is_GetNumberOfCameras(&nb_cameras)) != IS_SUCCESS) {
+    LOG_ERROR("Failed to get number of connected UEye cameras!");
+
+  } else if (nb_cameras < 1) {
+    LOG_ERROR("No UEye cameras are connected!");
+    LOG_ERROR("Hint: is the IDS daemon (/etc/init.d/ueyeusbdrc) is running?");
+  }
+  LOG_INFO("Number of cameras %d", nb_cameras);
+}
+
+void ueye_print_error(const HIDS &handle) {
+  char *err_msg = (char *) malloc(sizeof(char) * 200);
+  memset(err_msg, 0, 200);
+  int err_code = 0;
+
+  is_GetError(handle, &err_code, &err_msg);
+  LOG_ERROR("Error[%d]: %s\n", err_code, err_msg);
+
+  free(err_msg);
+}
+
+void ueye_print_sensor_info(const SENSORINFO &info) {
+  std::cout << "Sensor ID: " << info.SensorID << std::endl;
+  std::cout << "Sensor name: " << info.strSensorName << std::endl;
+
+  std::cout << "Color mode: ";
+  if (info.nColorMode == IS_COLORMODE_MONOCHROME) {
+    std::cout << "Monochrome" << std::endl;
+  } else if (info.nColorMode == IS_COLORMODE_BAYER) {
+    std::cout << "Bayer" << std::endl;
+  } else if (info.nColorMode == IS_COLORMODE_CBYCRY) {
+    std::cout << "CBYCRY" << std::endl;
+  } else if (info.nColorMode == IS_COLORMODE_JPEG) {
+    std::cout << "JPEG" << std::endl;
+  } else if (info.nColorMode == IS_COLORMODE_INVALID) {
+    std::cout << "INVALID" << std::endl;
+  } else {
+    std::cout << "UNKNOWN" << std::endl;
+  }
+
+  std::cout << "Image max width: " << info.nMaxWidth << std::endl;
+  std::cout << "Image max height: " << info.nMaxHeight << std::endl;
+  std::cout << "Has analogue master gain: " << info.bMasterGain << std::endl;
+  std::cout << "Has analogue red channel gain: " << info.bRGain << std::endl;
+  std::cout << "Has analogue green channel gain: " << info.bGGain << std::endl;
+  std::cout << "Has analogue blue channel gain: " << info.bBGain << std::endl;
+
+  std::cout << "Shutter type: ";
+  if (info.bGlobShutter) {
+    std::cout << "Global shutter" << std::endl;
+  } else {
+    std::cout << "Rolling shutter" << std::endl;
+  }
+
+  std::cout << "Pixel size (um): " << info.wPixelSize / 100.0 << std::endl;
+
+  std::cout << "Color of first pixel (top left): ";
+  if (info.nUpperLeftBayerPixel == BAYER_PIXEL_RED) {
+    std::cout << "Red" << std::endl;
+  } else if (info.nUpperLeftBayerPixel == BAYER_PIXEL_GREEN) {
+    std::cout << "Green" << std::endl;
+  } else if (info.nUpperLeftBayerPixel == BAYER_PIXEL_BLUE) {
+    std::cout << "Blue" << std::endl;
+  }
+}
+
+void ueye_print_camera_info(const CAMINFO &info) {
+  std::cout << "Serial No.: " << info.SerNo << std::endl;
+  std::cout << "ID: " << info.ID << std::endl;
+  std::cout << "Version: " << info.Version << std::endl;
+  std::cout << "Date: " << info.Date << std::endl;
+  std::cout << "Select: " << info.Select << std::endl;
+
+  std::cout << "Type: ";
+  if (info.Type == IS_CAMERA_TYPE_UEYE_USB_SE) {
+    std::cout << "USB uEye SE" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB_LE) {
+    std::cout << "USB uEye LE" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB_ML) {
+    std::cout << "USB uEye ML" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB3_CP) {
+    std::cout << "USB3 uEye CP" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB3_LE) {
+    std::cout << "USB3 uEye LE" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB3_ML) {
+    std::cout << "USB3 uEye ML" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB3_XC) {
+    std::cout << "USB3 uEye XC" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_ETH_SE) {
+    std::cout << "GigE uEye SE" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_ETH_REP) {
+    std::cout << "GigE uEye RE Poe" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_ETH_CP) {
+    std::cout << "GigE uEye CP" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_ETH_LE) {
+    std::cout << "GigE uEye LE" << std::endl;
+  } else if (info.Type == IS_CAMERA_TYPE_UEYE_PMC) {
+    std::cout << "Virtual Multicast Camera" << std::endl;
+  }
+}
+
+int raw2cvmat(void *image_data,
+              const int image_width,
+              const int image_height,
+              const int channels,
+              const int bpp,
+              cv::Mat &output) {
+  // Setup
+  const size_t image_size = image_width * image_height * channels;
+  const size_t image_rows = image_height;
+  const size_t image_cols = image_width;
+  const size_t row_bytes = image_size / image_rows;
+
+  // Get cv::Mat type
+  int cv_type = -1;
+  if (bpp == 8) {
+    switch (channels) {
+      case 1: cv_type = CV_8UC1; break;
+      case 3: cv_type = CV_8UC3; break;
+      default: LOG_ERROR("Not implemented!"); return -1;
+    }
+  } else if (bpp == 16) {
+    switch (channels) {
+      case 1: cv_type = CV_16UC1; break;
+      case 3: cv_type = CV_16UC3; break;
+      default: LOG_ERROR("Not implemented!"); return -1;
+    }
+  } else {
+    LOG_ERROR("Not implemented!");
+    return -1;
+  }
+
+  // Convert raw image data to cv::Mat
+  cv::Mat(image_rows, image_cols, cv_type, image_data, row_bytes)
+      .copyTo(output);
+
+  return 0;
+}
+
 IDSCamera::~IDSCamera() {
+  // Pre-check
+  if (this->configured == false) {
+    return;
+  }
+
   // Close camera driver
   int retval = is_ExitCamera(this->cam_handle);
   if (retval != IS_SUCCESS) {
@@ -92,24 +275,46 @@ int IDSCamera::configure(const std::string &config_file) {
   // Set display mode
   retval = is_SetDisplayMode(this->cam_handle, IS_SET_DM_DIB);
   if (retval != IS_SUCCESS) {
-    LOG_ERROR("UEye camera does not support Device Independent Bitmap mode");
+    LOG_ERROR("This camera does not support Device Independent Bitmap mode");
     return -1;
   }
 
   // Set color mode
-  retval = is_SetColorMode(this->cam_handle, IS_CM_MONO8);
-  if (retval != IS_SUCCESS) {
+  retval = this->setColorMode(this->color_mode);
+  if (retval != 0) {
     LOG_ERROR("Failed to set color mode!");
     return -1;
   }
 
+  // // Set frame rate
+  // retval = this->setFrameRate(this->frame_rate);
+  // if (retval != 0) {
+  //   LOG_ERROR("Failed to set frame rate!");
+  //   return -1;
+  // }
+  //
+  // // Set gain
+  // retval = this->setGain(this->gain);
+  // if (retval != 0) {
+  //   LOG_ERROR("Failed to set gain!");
+  //   return -1;
+  // }
+
+  // // Set ROI
+  // retval = this->setROI(0, 0, );
+  // if (retval != 0) {
+  //   LOG_ERROR("Failed to set gain!");
+  //   return -1;
+  // }
+
   // Allocate frame buffer memory
-  retval = this->allocBuffers(2, colormode2bpp(IS_CM_MONO8));
+  retval = this->allocBuffers(2, ueye_colormode2bpp(this->color_mode));
   if (retval != 0) {
     LOG_ERROR("Failed to allocate memory for frame buffers!");
     return -1;
   }
 
+  this->configured = true;
   return 0;
 }
 
@@ -119,7 +324,8 @@ int IDSCamera::allocBuffers(const int nb_buffers, const int bpp) {
 
   // Query camera's current resolution settings
   int img_width, img_height;
-  if (this->getResolution(img_width, img_height) != 0) {
+  if (this->getImageSize(img_width, img_height) != 0) {
+    LOG_ERROR("Failed to get image size!");
     return -1;
   }
 
@@ -134,6 +340,7 @@ int IDSCamera::allocBuffers(const int nb_buffers, const int bpp) {
                               &this->buffers[i],
                               &this->buffer_id[i]);
     if (retval != IS_SUCCESS) {
+      LOG_ERROR("Failed to allocate memory for frame buffers!");
       return -1;
     }
 
@@ -141,6 +348,7 @@ int IDSCamera::allocBuffers(const int nb_buffers, const int bpp) {
     retval =
         is_SetImageMem(this->cam_handle, this->buffers[i], this->buffer_id[i]);
     if (retval != IS_SUCCESS) {
+      LOG_ERROR("Failed to set memory for frame buffers!");
       return -1;
     }
   }
@@ -153,33 +361,13 @@ int IDSCamera::freeBuffers() {
     if (is_FreeImageMem(this->cam_handle,
                         this->buffers[i],
                         this->buffer_id[i]) != IS_SUCCESS) {
+      LOG_ERROR("Failed to free frame memory!");
       return -1;
     }
   }
 
   buffers.clear();
   buffer_id.clear();
-
-  return 0;
-}
-
-int IDSCamera::setPixelClock() {
-  UINT nNumberOfSupportedPixelClocks = 0;
-  int retval = is_PixelClock(this->cam_handle,
-                             IS_PIXELCLOCK_CMD_GET_NUMBER,
-                             (void *) &nNumberOfSupportedPixelClocks,
-                             sizeof(nNumberOfSupportedPixelClocks));
-
-  if ((retval == IS_SUCCESS) && (nNumberOfSupportedPixelClocks > 0)) {
-    // No camera has more than 150 different pixel clocks.
-    // Of course, the list can be allocated dynamically
-    UINT nPixelClockList[150];
-    ZeroMemory(&nPixelClockList, sizeof(nPixelClockList));
-    retval = is_PixelClock(this->cam_handle,
-                           IS_PIXELCLOCK_CMD_GET_LIST,
-                           (void *) nPixelClockList,
-                           nNumberOfSupportedPixelClocks * sizeof(UINT));
-  }
 
   return 0;
 }
@@ -195,7 +383,9 @@ int IDSCamera::setCaptureMode(const enum CaptureMode &capture_mode) {
     case CaptureMode::SOFTWARE_TRIGGER:
       retval = is_SetExternalTrigger(this->cam_handle, IS_SET_TRIGGER_SOFTWARE);
       break;
-    default: return -1; break;
+    default:
+      LOG_ERROR("Not implemented!");
+      return -1; break;
   }
 
   // Check return status
@@ -203,6 +393,7 @@ int IDSCamera::setCaptureMode(const enum CaptureMode &capture_mode) {
     return -1;
   }
 
+  this->capture_mode = capture_mode;
   return 0;
 }
 
@@ -211,130 +402,225 @@ int IDSCamera::getCaptureMode(enum CaptureMode &capture_mode) {
   return 0;
 }
 
-int IDSCamera::getResolution(int &width, int &height) {
-  IS_RECT aoi;
-  int retval = is_AOI(this->cam_handle,
-                      IS_AOI_IMAGE_GET_AOI,
-                      (void *) &aoi,
-                      sizeof(aoi));
-  if (retval != IS_SUCCESS) {
-    LOG_ERROR("Failed to retrieve camera resolution!");
+int IDSCamera::setPixelClock(const int clock_rate) {
+  // Get number of supported pixel clock rates
+  int nb_pixel_clock_rates = 0;
+  int retval = is_PixelClock(this->cam_handle,
+                             IS_PIXELCLOCK_CMD_GET_NUMBER,
+                             (void *) &nb_pixel_clock_rates,
+                             sizeof(nb_pixel_clock_rates));
+  if ((retval != IS_SUCCESS) || (nb_pixel_clock_rates == 0)) {
+    LOG_ERROR("Failed to get number of pixel clock rates!");
     return -1;
   }
 
-  width = aoi.s32Width;
-  height = aoi.s32Height;
+  // Get valid pixel clock rates
+  // -- No camera has more than 150 different pixel clocks.
+  int pixel_clock_rates[150];
+  ZeroMemory(&pixel_clock_rates, sizeof(pixel_clock_rates));
+  retval = is_PixelClock(this->cam_handle,
+                         IS_PIXELCLOCK_CMD_GET_LIST,
+                         (void *) pixel_clock_rates,
+                         nb_pixel_clock_rates * sizeof(int));
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to get valid pixel clock rates!");
+    return -1;
+  }
+
+  // Set pixel clock
+  bool rate_valid = false;
+  for (int i = 0; i < nb_pixel_clock_rates; i++) {
+    if (clock_rate == pixel_clock_rates[i]) {
+      rate_valid = true;
+      break;
+    }
+  }
+  if (rate_valid &&
+      is_PixelClock(this->cam_handle,
+                    IS_PIXELCLOCK_CMD_SET,
+                    (void *) &clock_rate,
+                    sizeof(clock_rate)) == IS_SUCCESS) {
+    this->pixel_clock = clock_rate;
+    return 0;
+  } else {
+    return -1;
+  }
+}
+
+int IDSCamera::getPixelClock(int &clock_rate) {
+  if (is_PixelClock(this->cam_handle,
+                    IS_PIXELCLOCK_CMD_GET,
+                    (void *) &clock_rate,
+                    sizeof(clock_rate)) == IS_SUCCESS) {
+    this->pixel_clock = clock_rate;
+    return 0;
+  } else {
+    return -1;
+  }
 
   return 0;
+}
+
+int IDSCamera::setColorMode(const int color_mode) {
+  const int retval = is_SetColorMode(this->cam_handle, color_mode);
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
+  this->color_mode = color_mode;
+  return 0;
+}
+
+int IDSCamera::getColorMode(int &color_mode) {
+  color_mode = this->color_mode;
+  return 0;
+}
+
+int IDSCamera::setFrameRate(const double frame_rate) {
+  // Get frame rate range
+  double time_min = 0.0;
+  double time_max = 0.0;
+  double time_interval = 0.0;
+
+  if (is_GetFrameTimeRange(this->cam_handle,
+                           &time_min,
+                           &time_max,
+                           &time_interval) != IS_SUCCESS) {
+    LOG_ERROR("Failed to the range of frame rates available!");
+    return -1;
+  }
+
+  // Check if frame rate is valid
+  const double rate_max = 1.0 / time_min;
+  const double rate_min = 1.0 / time_max;
+  if (frame_rate > rate_max || frame_rate < rate_min) {
+    LOG_ERROR("Invalid frame rate [%f]", frame_rate);
+    LOG_ERROR("Frame rate max: %f", rate_max);
+    LOG_ERROR("Frame rate min: %f", rate_min);
+    return -1;
+  }
+
+  // Set frame rate
+  if (is_SetFrameRate(this->cam_handle, frame_rate, &this->frame_rate) !=
+      IS_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::getFrameRate(double &frame_rate) {
+  frame_rate = this->frame_rate;
+  return 0;
+}
+
+int IDSCamera::setGain(const int gain) {
+  // Pre-check gain value
+  if (gain < 0 || gain > 100) {
+    return -1;
+  }
+
+  // Set hardware gain
+  int retval = 0;
+  retval = is_SetHardwareGain(this->cam_handle,
+                              gain,
+                              IS_IGNORE_PARAMETER,
+                              IS_IGNORE_PARAMETER,
+                              IS_IGNORE_PARAMETER);
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::getGain(int &gain) {
+  // Get hardware gain
+  gain = is_SetHardwareGain(this->cam_handle,
+                            IS_GET_MASTER_GAIN,
+                            IS_IGNORE_PARAMETER,
+                            IS_IGNORE_PARAMETER,
+                            IS_IGNORE_PARAMETER);
+  this->gain = gain;
+
+  return 0;
+}
+
+int IDSCamera::setROI(const int offset_x,
+                      const int offset_y,
+                      const int image_width,
+                      const int image_height) {
+  // Set ROI
+  const IS_RECT aoi = {.s32X = offset_x,
+                       .s32Y = offset_y,
+                       .s32Width = image_width,
+                       .s32Height = image_height};
+
+  if (is_AOI(this->cam_handle,
+             IS_AOI_IMAGE_SET_AOI,
+             (void *) &aoi,
+             sizeof(aoi)) != IS_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::getROI(int &offset_x,
+                      int &offset_y,
+                      int &image_width,
+                      int &image_height) {
+  IS_RECT aoi;
+
+  // Get ROI
+  if (is_AOI(this->cam_handle,
+             IS_AOI_IMAGE_GET_AOI,
+             (void *) &aoi,
+             sizeof(aoi)) != IS_SUCCESS) {
+    return -1;
+  }
+
+  // Set output variables
+  offset_x = aoi.s32X;
+  offset_y = aoi.s32Y;
+  image_width = aoi.s32Width;
+  image_height = aoi.s32Height;
+
+  return 0;
+}
+
+int IDSCamera::getImageSize(int &image_width, int &image_height) {
+  int offset_x, offset_y;
+  return this->getROI(offset_x, offset_y, image_width, image_height);
 }
 
 int IDSCamera::getFrame(cv::Mat &image) {
   // Query camera's current resolution settings
-  int img_width, img_height;
-  if (this->getResolution(img_width, img_height) != 0) {
+  int image_width = 0;
+  int image_height = 0;
+  if (this->getImageSize(image_width, image_height) != 0) {
+    LOG_ERROR("Failed to get image size!");
     return -1;
   }
 
-  for (int i = 0; i < 100; i++) {
-    if (is_FreezeVideo(this->cam_handle, IS_WAIT) == IS_SUCCESS) {
-      void *img_data;
-      if (is_GetImageMem(this->cam_handle, &img_data) != IS_SUCCESS) {
-        return -1;
-      }
+  if (is_FreezeVideo(this->cam_handle, IS_WAIT) == IS_SUCCESS) {
+    void *image_data;
+    if (is_GetImageMem(this->cam_handle, &image_data) != IS_SUCCESS) {
+      LOG_ERROR("Failed to get image data!");
+      return -1;
+    }
 
-      const size_t channels = 1;
-      const size_t img_size = img_width * img_height * channels;
-      const size_t img_rows = img_height;
-      const size_t img_cols = img_width;
-      const size_t row_bytes = img_size / img_rows;
-      cv::Mat(img_rows, img_cols, CV_8UC1, img_data, row_bytes).copyTo(image);
-
-      cv::imshow("Image", image);
-      cv::waitKey(1);
+    if (raw2cvmat(image_data,
+                  image_width,
+                  image_height,
+                  ueye_colormode2channels(this->color_mode),
+                  ueye_colormode2bpp(this->color_mode),
+                  image) != 0) {
+      return -1;
     }
   }
 
   return 0;
-}
-
-void IDSCamera::printSensorInfo(const SENSORINFO &info) {
-  std::cout << "Sensor ID: " << info.SensorID << std::endl;
-  std::cout << "Sensor name: " << info.strSensorName << std::endl;
-
-  std::cout << "Color mode: ";
-  if (info.nColorMode == IS_COLORMODE_MONOCHROME) {
-    std::cout << "Monochrome" << std::endl;
-  } else if (info.nColorMode == IS_COLORMODE_BAYER) {
-    std::cout << "Bayer" << std::endl;
-  } else if (info.nColorMode == IS_COLORMODE_CBYCRY) {
-    std::cout << "CBYCRY" << std::endl;
-  } else if (info.nColorMode == IS_COLORMODE_JPEG) {
-    std::cout << "JPEG" << std::endl;
-  } else if (info.nColorMode == IS_COLORMODE_INVALID) {
-    std::cout << "INVALID" << std::endl;
-  } else {
-    std::cout << "UNKNOWN" << std::endl;
-  }
-
-  std::cout << "Image max width: " << info.nMaxWidth << std::endl;
-  std::cout << "Image max height: " << info.nMaxHeight << std::endl;
-  std::cout << "Has analogue master gain: " << info.bMasterGain << std::endl;
-  std::cout << "Has analogue red channel gain: " << info.bRGain << std::endl;
-  std::cout << "Has analogue green channel gain: " << info.bGGain << std::endl;
-  std::cout << "Has analogue blue channel gain: " << info.bBGain << std::endl;
-
-  std::cout << "Shutter type: ";
-  if (info.bGlobShutter) {
-    std::cout << "Global shutter" << std::endl;
-  } else {
-    std::cout << "Rolling shutter" << std::endl;
-  }
-
-  std::cout << "Pixel size (um): " << info.wPixelSize / 100.0 << std::endl;
-
-  std::cout << "Color of first pixel (top left): ";
-  if (info.nUpperLeftBayerPixel == BAYER_PIXEL_RED) {
-    std::cout << "Red" << std::endl;
-  } else if (info.nUpperLeftBayerPixel == BAYER_PIXEL_GREEN) {
-    std::cout << "Green" << std::endl;
-  } else if (info.nUpperLeftBayerPixel == BAYER_PIXEL_BLUE) {
-    std::cout << "Blue" << std::endl;
-  }
-}
-
-void IDSCamera::printCameraInfo(const CAMINFO &info) {
-  std::cout << "Serial No.: " << info.SerNo << std::endl;
-  std::cout << "ID: " << info.ID << std::endl;
-  std::cout << "Version: " << info.Version << std::endl;
-  std::cout << "Date: " << info.Date << std::endl;
-  std::cout << "Select: " << info.Select << std::endl;
-
-  std::cout << "Type: ";
-  if (info.Type == IS_CAMERA_TYPE_UEYE_USB_SE) {
-    std::cout << "USB uEye SE" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB_LE) {
-    std::cout << "USB uEye LE" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB_ML) {
-    std::cout << "USB uEye ML" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB3_CP) {
-    std::cout << "USB3 uEye CP" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB3_LE) {
-    std::cout << "USB3 uEye LE" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB3_ML) {
-    std::cout << "USB3 uEye ML" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_USB3_XC) {
-    std::cout << "USB3 uEye XC" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_ETH_SE) {
-    std::cout << "GigE uEye SE" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_ETH_REP) {
-    std::cout << "GigE uEye RE Poe" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_ETH_CP) {
-    std::cout << "GigE uEye CP" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_ETH_LE) {
-    std::cout << "GigE uEye LE" << std::endl;
-  } else if (info.Type == IS_CAMERA_TYPE_UEYE_PMC) {
-    std::cout << "Virtual Multicast Camera" << std::endl;
-  }
 }
 
 // int IDSCamera::run() {

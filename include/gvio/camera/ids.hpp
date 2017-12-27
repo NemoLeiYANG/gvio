@@ -16,41 +16,76 @@ namespace gvio {
 
 enum class CaptureMode { NOT_SET, FREE_RUN, SOFTWARE_TRIGGER };
 
-static inline void ueye_list_cameras() {
-  int nb_cameras = -1;
-  int retval = 0;
-  if ((retval = is_GetNumberOfCameras(&nb_cameras)) != IS_SUCCESS) {
-    LOG_ERROR("Failed to get number of connected UEye cameras!");
+/**
+ * Color mode to bytes per pixel
+ *
+ * @param mode Color mode
+ * @returns 0 for success, -1 for failure
+ */
+int ueye_colormode2bpp(int mode);
 
-  } else if (nb_cameras < 1) {
-    LOG_ERROR("No UEye cameras are connected!");
-    LOG_ERROR("Hint: is the IDS daemon (/etc/init.d/ueyeusbdrc) is running?");
-  }
-  LOG_INFO("Number of cameras %d", nb_cameras);
-}
+/**
+ * Color mode to number of channels
+ *
+ * @param mode Color mode
+ * @returns 0 for success, -1 for failure
+ */
+int ueye_colormode2channels(int mode);
 
-static inline void ueye_print_error(const HIDS &handle) {
-  char *err_msg = (char *) malloc(sizeof(char) * 200);
-  memset(err_msg, 0, 200);
-  int err_code = 0;
+/**
+ * List uEye cameras detected
+ */
+void ueye_list_cameras();
 
-  is_GetError(handle, &err_code, &err_msg);
-  LOG_ERROR("Error[%d]: %s\n", err_code, err_msg);
+/**
+ * Print uEye camera error
+ *
+ * @param handle Camera handle
+ */
+void ueye_print_error(const HIDS &handle);
 
-  free(err_msg);
-}
+/**
+  * Print sensor information
+  *
+  * @param info Sensor info
+  */
+void ueye_print_sensor_info(const SENSORINFO &info);
+
+/**
+  * Print camera information
+  *
+  * @param info Camera info
+  */
+void ueye_print_camera_info(const CAMINFO &info);
+
+/**
+  * Convert raw image data to `cv::Mat`
+  *
+  * @param image_width Image width
+  * @param image_height Image height
+  * @returns 0 for success, -1 for failure
+  */
+int raw2cvmat(void *image_data,
+              const int image_width,
+              const int image_height,
+              const int channels,
+              const int bpp,
+              cv::Mat &output);
 
 /** IDS Camera **/
 class IDSCamera {
 public:
   bool configured = false;
-  bool connected = false;
 
   SENSORINFO sensor_info;
   CAMINFO camera_info;
 
   HIDS cam_handle = 0;
   enum CaptureMode capture_mode = CaptureMode::NOT_SET;
+  int pixel_clock = 0;
+  int color_mode = IS_CM_MONO8;
+  double frame_rate = 0.0;
+  int gain = 0.0;
 
   std::vector<char *> buffers;
   std::vector<int> buffer_id;
@@ -101,48 +136,112 @@ public:
   /**
    * Set pixel clock
    *
+   * @param clock_rate Pixel clock rate (MHz)
    * @returns 0 for success, -1 for failure
    */
-  int setPixelClock();
+  int setPixelClock(const int clock_rate);
 
   /**
    * Get pixel clock
    *
+   * @param clock_rate Pixel clock rate (MHz)
    * @returns 0 for success, -1 for failure
    */
-  int getPixelClock();
+  int getPixelClock(int &clock_rate);
 
   /**
-   * Set gain boost
+   * Set color mode
+   *
+   * @param color_mode Color mode
+   * @returns 0 for success, -1 for failure
+   */
+  int setColorMode(const int color_mode);
+
+  /**
+   * Get color mode
+   *
+   * @param color_mode Color mode
+   * @returns 0 for success, -1 for failure
+   */
+  int getColorMode(int &color_mode);
+
+  /**
+   * Set frame rate
+   *
+   * @param frame_rate Frame rate (Hz)
+   * @returns 0 for success, -1 for failure
+   */
+  int setFrameRate(const double frame_rate);
+
+  /**
+   * Get frame rate
+   *
+   * @param frame_rate Frame rate (Hz)
+   * @returns 0 for success, -1 for failure
+   */
+  int getFrameRate(double &frame_rate);
+
+  /**
+   * Set gain
    *
    * @returns 0 for success, -1 for failure
    */
-  int setGainBoost();
+  int setGain(const int gain);
 
   /**
-   * Get gain boost
+   * Get gain
    *
    * @returns 0 for success, -1 for failure
    */
-  int getGainBoost();
+  int getGain(int &gain);
 
   /**
-   * Set resolution
+   * Set ROI
+   *
+   * @param offset_x Offset in x-axis
+   * @param offset_y Offset in y-axis
+   * @param image_width Image width
+   * @param image_height Image height
+   * @returns 0 for success, -1 for failure
+   */
+  int setROI(const int offset_x,
+             const int offset_y,
+             const int image_width,
+             const int image_height);
+
+  /**
+   * Get ROI
+   *
+   * @param offset_x Offset in x-axis
+   * @param offset_y Offset in y-axis
+   * @param image_width Image width
+   * @param image_height Image height
+   * @returns 0 for success, -1 for failure
+   */
+  int getROI(int &offset_x, int &offset_y, int &image_width, int &image_height);
+
+  /**
+   * Get image size in pixels
    *
    * @param image_width Image width
    * @param image_height Image height
    * @returns 0 for success, -1 for failure
    */
-  int setResolution(const int &width, const int &height);
+  int getImageSize(int &image_width, int &image_height);
 
   /**
-   * Get resolution
+   * Set HDR mode
    *
-   * @param image_width Image width
-   * @param image_height Image height
    * @returns 0 for success, -1 for failure
    */
-  int getResolution(int &width, int &height);
+  int setHDRMode();
+
+  /**
+   * Get HDR mode
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int getHDRMode();
 
   /**
    * Get camera frame
@@ -151,20 +250,6 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int getFrame(cv::Mat &image);
-
-  /**
-   * Print sensor information
-   *
-   * @param info Sensor info
-   */
-  static void printSensorInfo(const SENSORINFO &info);
-
-  /**
-   * Print camera information
-   *
-   * @param info Camera info
-   */
-  static void printCameraInfo(const CAMINFO &info);
 };
 
 /** @} group camera */
