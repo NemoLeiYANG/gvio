@@ -37,6 +37,16 @@ typedef Eigen::Quaterniond Quaternion;
 #endif
 
 /**
+ * Print shape of a matrix
+ */
+void print_shape(const MatX &A);
+
+/**
+ * Print shape of a vector
+ */
+void print_shape(const VecX &v);
+
+/**
  * Vector to array
  *
  * @param v Vector

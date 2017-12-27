@@ -2,23 +2,19 @@
 
 namespace gvio {
 
-MatX zeros(const double rows, const double cols) {
-  return MatX::Zero(rows, cols);
-}
+MatX zeros(const int rows, const int cols) { return MatX::Zero(rows, cols); }
 
-MatX zeros(const double size) { return MatX::Zero(size, size); }
+MatX zeros(const int size) { return MatX::Zero(size, size); }
 
-MatX I(const double rows, const double cols) {
-  return MatX::Identity(rows, cols);
-}
+MatX I(const int rows, const int cols) { return MatX::Identity(rows, cols); }
 
-MatX I(const double size) { return MatX::Identity(size, size); }
+MatX I(const int size) { return MatX::Identity(size, size); }
 
-MatX ones(const double rows, const double cols) {
+MatX ones(const int rows, const int cols) {
   return 1.0 * MatX::Identity(rows, cols);
 }
 
-MatX ones(const double size) { return 1.0 * MatX::Identity(size, size); }
+MatX ones(const int size) { return 1.0 * MatX::Identity(size, size); }
 
 Mat3 skew(const Vec3 &w) {
   Mat3 S;

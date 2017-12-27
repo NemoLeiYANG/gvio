@@ -1,7 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
 PROJECT(gvio)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -fPIC -g")
+# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -fPIC -g")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC -g")
 IF (CMAKE_COMPILER_IS_GNUCXX)
   ADD_DEFINITIONS(-std=gnu++0x)
 ENDIF()
@@ -27,6 +28,7 @@ ADD_LIBRARY(
   # camera
   src/camera/camera.cpp
   src/camera/camera_config.cpp
+  src/camera/ids.cpp
   src/camera/pinhole_model.cpp
   # driver
   src/driver/i2c.cpp
@@ -35,6 +37,7 @@ ADD_LIBRARY(
   src/msckf/camera_state.cpp
   src/msckf/feature_estimator.cpp
   src/msckf/imu_state.cpp
+  src/msckf/msckf.cpp
   # feature
   src/feature2d/feature_tracker.cpp
   src/feature2d/gms_matcher.cpp
@@ -72,6 +75,7 @@ SET(${PROJECT_NAME}_DEPS
   yaml-cpp
   pthread
   ceres
+  ueye_api
 )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 
@@ -83,6 +87,7 @@ SET(UNITTESTS
   apriltag-mit_test
   camera-camera_test
   camera-camera_config_test
+  camera-ids_test
   camera-pinhole_model_test
   feature2d-feature_tracker_test
   feature2d-gms_matcher_test
@@ -96,6 +101,7 @@ SET(UNITTESTS
   msckf-camera_state_test
   msckf-feature_estimator_test
   msckf-imu_state_test
+  msckf-msckf_test
   util-config_test
   util-data_test
   util-file_test

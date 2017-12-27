@@ -19,7 +19,7 @@ namespace gvio {
  */
 class IMUState {
 public:
-  const double size = 15; ///< Size of state vector
+  static const int size = 15; ///< Size of state vector
 
   Vec4 q_IG = zeros(4, 1); ///< JPL Quaternion of IMU in Global frame
   Vec3 b_g = zeros(3, 1);  ///< Bias of gyroscope

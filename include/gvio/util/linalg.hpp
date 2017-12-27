@@ -17,32 +17,32 @@ namespace gvio {
 /**
  * Zeros-matrix
  */
-MatX zeros(const double rows, const double cols);
+MatX zeros(const int rows, const int cols);
 
 /**
  * Zeros square matrix
  */
-MatX zeros(const double size);
+MatX zeros(const int size);
 
 /**
  * Identity-matrix
  */
-MatX I(const double rows, const double cols);
+MatX I(const int rows, const int cols);
 
 /**
  * Identity square matrix
  */
-MatX I(const double size);
+MatX I(const int size);
 
 /**
  * Ones-matrix
  */
-MatX ones(const double rows, const double cols);
+MatX ones(const int rows, const int cols);
 
 /**
  * Ones square matrix
  */
-MatX ones(const double size);
+MatX ones(const int size);
 
 /**
  * Skew symmetric-matrix

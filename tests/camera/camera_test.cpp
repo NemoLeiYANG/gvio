@@ -9,7 +9,7 @@ int test_Camera_constructor() {
   Camera camera;
 
   MU_FALSE(camera.configured);
-  MU_FALSE(camera.initialized);
+  MU_FALSE(camera.connected);
 
   MU_FALSE(camera.config.loaded);
   MU_CHECK(0 == (int) camera.modes.size());
@@ -36,7 +36,7 @@ int test_Camera_changeMode() {
   Camera camera;
 
   camera.configure(TEST_CONFIG_PATH);
-  camera.initialize();
+  camera.connect();
 
   camera.getFrame(image);
   MU_CHECK(640 == image.cols);
@@ -55,7 +55,7 @@ int test_Camera_getFrame() {
   Camera camera;
 
   camera.configure(TEST_CONFIG_PATH);
-  camera.initialize();
+  camera.connect();
   camera.getFrame(image);
 
   MU_FALSE(image.empty());
@@ -67,7 +67,7 @@ int test_Camera_run() {
   Camera camera;
 
   camera.configure(TEST_CONFIG_PATH);
-  camera.initialize();
+  camera.connect();
   camera.run();
 
   return 0;

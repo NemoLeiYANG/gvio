@@ -13,62 +13,59 @@ namespace gvio {
  * @{
  */
 
-/** Generic Camera **/
+/**
+ * Generic Camera
+ */
 class Camera {
 public:
-  bool configured;
-  bool initialized;
+  bool configured = false;
+  bool connected = false;
 
   CameraConfig config;
   std::vector<std::string> modes;
   std::map<std::string, CameraConfig> configs;
 
-  cv::Mat image;
-  double last_tic;
+  cv::Mat image = cv::Mat(0, 0, CV_64F);
+  double last_tic = 0.0;
 
-  cv::VideoCapture *capture;
+  cv::VideoCapture *capture = nullptr;
 
-  Camera();
-  ~Camera();
+  Camera() {}
+  virtual ~Camera();
 
   /**
    * Configure camera
+   *
    * @param config_path Path to config file (YAML)
-   * @returns
-   *    - 0 for success
-   *    - -1 for failure
+   * @returns 0 for success, -1 for failure
    */
   virtual int configure(const std::string &config_path);
 
   /**
-   * Initialize camera
-   * @returns
-   *    - 0 for success
-   *    - -1 for failure
+   * Connect camera
+   *
+   * @returns 0 for success, -1 for failure
    */
-  virtual int initialize();
+  virtual int connect();
 
   /**
-   * Shutdown camera
-   * @returns
-   *    - 0 for success
-   *    - -1 for failure
+   * Disconncet camera
+   *
+   * @returns 0 for success, -1 for failure
    */
-  virtual int shutdown();
+  virtual int disconnect();
 
   /**
    * Change camera mode
-   * @returns
-   *    - 0 for success
-   *    - -1 for failure
+   *
+   * @returns 0 for success, -1 for failure
    */
   virtual int changeMode(const std::string &mode);
 
   /**
    * ROI Image
-   * @returns
-   *    - 0 for success
-   *    - -1 for failure
+
+   * @returns 0 for success, -1 for failure
    */
   virtual int roiImage(cv::Mat &image);
 
@@ -76,42 +73,33 @@ public:
    * Get camera frame
    *
    * @param image Camera frame image
-   * @returns
-   *    - 0 for success
-   *    - -1 for failure
+   * @returns 0 for success, -1 for failure
    */
   virtual int getFrame(cv::Mat &image);
 
   /**
    * Run camera
    *
-   * Run Camera and attempt to detect any Apriltags. The AprilTags detected
-   * will be recorded in `Camera::apriltags`.
-   *
-   * @returns
-   *    - 0 for success
-   *    - -1 for failure
+   * @returns 0 for success, -1 for failure
    */
-  int run();
+  virtual int run();
 
   /**
    * Show FPS
+
    * @param last_tic Last tic in seconds
    * @param frame Frame number
-   * @returns
-   *    - 0 for success
-   *    - -1 for failure
+   * @returns 0 for success, -1 for failure
    */
-  int showFPS(double &last_tic, int &frame);
+  virtual int showFPS(double &last_tic, int &frame);
 
   /**
    * Show image
+
    * @param image Image
-   * @returns
-   *    - 0 for success
-   *    - -1 for failure
+   * @returns 0 for success, -1 for failure
    */
-  int showImage(cv::Mat &image);
+  virtual int showImage(cv::Mat &image);
 };
 
 /** @} group camera */

@@ -2,26 +2,7 @@
 
 namespace gvio {
 
-Camera::Camera() {
-  this->configured = false;
-  this->initialized = false;
-
-  this->config = CameraConfig();
-  this->modes.clear();
-  this->configs.clear();
-
-  this->image = cv::Mat(0, 0, CV_64F);
-  this->last_tic = 0.0;
-
-  this->capture = NULL;
-}
-
-Camera::~Camera() {
-  if (this->initialized && this->capture) {
-    this->capture->release();
-    this->capture = NULL;
-  }
-}
+Camera::~Camera() { this->disconnect(); }
 
 int Camera::configure(const std::string &config_path) {
   ConfigParser parser;
@@ -57,20 +38,16 @@ int Camera::configure(const std::string &config_path) {
   return 0;
 }
 
-int Camera::initialize() {
-  int camera_index;
-  int image_width;
-  int image_height;
-
+int Camera::connect() {
   // pre-check
   if (this->configured == false) {
     return -1;
   }
 
   // setup
-  camera_index = this->config.index;
-  image_width = this->config.image_width;
-  image_height = this->config.image_height;
+  const int camera_index = this->config.index;
+  const int image_width = this->config.image_width;
+  const int image_height = this->config.image_height;
 
   // open
   this->capture = new cv::VideoCapture(camera_index);
@@ -81,7 +58,7 @@ int Camera::initialize() {
   } else {
     this->capture->set(CV_CAP_PROP_FRAME_WIDTH, image_width);
     this->capture->set(CV_CAP_PROP_FRAME_HEIGHT, image_height);
-    this->initialized = true;
+    this->connected = true;
     LOG_INFO("Camera initialized!\n");
     return 0;
   }
@@ -89,11 +66,11 @@ int Camera::initialize() {
   return 0;
 }
 
-int Camera::shutdown() {
-  if (this->initialized && this->capture) {
+int Camera::disconnect() {
+  if (this->connected && this->capture) {
     this->capture->release();
     this->capture = NULL;
-    this->initialized = false;
+    this->connected = false;
   }
 
   return 0;
@@ -139,7 +116,7 @@ int Camera::getFrame(cv::Mat &image) {
   // pre-check
   if (this->configured == false) {
     return -1;
-  } else if (this->initialized == false) {
+  } else if (this->connected == false) {
     return -2;
   }
 
@@ -153,7 +130,7 @@ int Camera::run() {
   // pre-check
   if (this->configured == false) {
     return -1;
-  } else if (this->initialized == false) {
+  } else if (this->connected == false) {
     return -2;
   }
 
@@ -180,7 +157,7 @@ int Camera::showFPS(double &last_tic, int &frame_count) {
   // pre-check
   if (this->configured == false) {
     return -1;
-  } else if (this->initialized == false) {
+  } else if (this->connected == false) {
     return -2;
   }
 
@@ -200,7 +177,7 @@ int Camera::showImage(cv::Mat &image) {
   // pre-check
   if (this->configured == false) {
     return -1;
-  } else if (this->initialized == false) {
+  } else if (this->connected == false) {
     return -2;
   }
 
