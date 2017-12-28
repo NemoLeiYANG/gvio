@@ -123,7 +123,7 @@ int ConfigParser::getYamlNode(const std::string &key, YAML::Node &node) {
   std::istringstream iss(key);
   std::vector<YAML::Node> traversal;
 
-  // pre-check
+  // Pre-check
   if (this->config_loaded == false) {
     return -1;
   }
@@ -148,7 +148,7 @@ int ConfigParser::getYamlNode(const std::string &key, YAML::Node &node) {
 int ConfigParser::checkKey(const std::string &key, const bool optional) {
   YAML::Node node;
 
-  // pre-check
+  // Pre-check
   if (this->config_loaded == false) {
     return -1;
   }
@@ -173,7 +173,7 @@ int ConfigParser::checkVector(const std::string &key,
   int retval;
   int vector_size;
 
-  // pre-check
+  // Pre-check
   if (this->config_loaded == false) {
     return -1;
   }
@@ -207,7 +207,7 @@ int ConfigParser::checkMatrix(const std::string &key, const bool optional) {
   int retval;
   const std::string targets[3] = {"rows", "cols", "data"};
 
-  // pre-check
+  // Pre-check
   if (this->config_loaded == false) {
     return -1;
   }
@@ -235,7 +235,7 @@ int ConfigParser::loadPrimitive(ConfigParam &param) {
   int retval;
   YAML::Node node;
 
-  // pre-check
+  // Pre-check
   retval = this->checkKey(param.key, param.optional);
   if (retval != 0) {
     return retval;
@@ -261,7 +261,7 @@ int ConfigParser::loadArray(ConfigParam &param) {
   int retval;
   YAML::Node node;
 
-  // pre-check
+  // Pre-check
   if (this->config_loaded == false) {
     return -1;
   }
@@ -312,7 +312,7 @@ int ConfigParser::loadVector(ConfigParam &param) {
   int retval;
   YAML::Node node;
 
-  // pre-check
+  // Pre-check
   if (this->config_loaded == false) {
     return -1;
   }
@@ -325,38 +325,32 @@ int ConfigParser::loadVector(ConfigParam &param) {
 
   // parse
   this->getYamlNode(param.key, node);
-  // clang-format off
-    switch (param.type) {
-        case VEC2:
-            *static_cast<Vec2 *>(param.data) << node[0].as<double>(),
-                                                node[1].as<double>();
-            break;
+  switch (param.type) {
+    case VEC2:
+      *static_cast<Vec2 *>(param.data) << node[0].as<double>(),
+          node[1].as<double>();
+      break;
 
-        case VEC3:
-            *static_cast<Vec3 *>(param.data) << node[0].as<double>(),
-                                                node[1].as<double>(),
-                                                node[2].as<double>();
-            break;
+    case VEC3:
+      *static_cast<Vec3 *>(param.data) << node[0].as<double>(),
+          node[1].as<double>(), node[2].as<double>();
+      break;
 
-        case VEC4:
-            *static_cast<Vec4 *>(param.data) << node[0].as<double>(),
-                                                node[1].as<double>(),
-                                                node[2].as<double>(),
-                                                node[3].as<double>();
-            break;
+    case VEC4:
+      *static_cast<Vec4 *>(param.data) << node[0].as<double>(),
+          node[1].as<double>(), node[2].as<double>(), node[3].as<double>();
+      break;
 
-        case VECX: {
-            VecX &vecx = *static_cast<VecX *>(param.data);
-            vecx = VecX((int) node.size());
-            for (size_t i = 0; i < node.size(); i++) {
-                vecx(i) = node[i].as<double>();
-            }
-        } break;
+    case VECX: {
+      VecX &vecx = *static_cast<VecX *>(param.data);
+      vecx = VecX((int) node.size());
+      for (size_t i = 0; i < node.size(); i++) {
+        vecx(i) = node[i].as<double>();
+      }
+    } break;
 
-        default:
-            return -6;
-    }
-  // clang-format on
+    default: return -6;
+  }
 
   return 0;
 }
@@ -368,7 +362,7 @@ int ConfigParser::loadMatrix(ConfigParam &param) {
   int cols;
   YAML::Node node;
 
-  // pre-check
+  // Pre-check
   if (this->config_loaded == false) {
     return -1;
   }
@@ -450,7 +444,7 @@ int ConfigParser::loadMatrix(ConfigParam &param) {
 int ConfigParser::load(const std::string &config_file) {
   int retval;
 
-  // pre-check
+  // Pre-check
   if (file_exists(config_file) == false) {
     LOG_ERROR("File not found: %s", config_file.c_str());
     return 1;

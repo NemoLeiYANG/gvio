@@ -99,6 +99,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1I2C.html">I2C</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html">IDSCamera</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1IMU.html">IMU</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IMUState.html">IMUState</a></td></tr>
@@ -121,7 +123,7 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MPU9250Magnetometer.html">MPU9250Magnetometer</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1MSCKF.html">MSCKF</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1ORBTracker.html">ORBTracker</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -175,6 +177,12 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
+<tr class="memitem:ga1d1ae2bdce686a3b4580c15cecf83802"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga1d1ae2bdce686a3b4580c15cecf83802">CaptureMode</a> { <a class="el" href="group__camera.html#gga1d1ae2bdce686a3b4580c15cecf83802a1c250a21210b7b88a14db9a0cbe71162">CaptureMode::NOT_SET</a>, 
+<a class="el" href="group__camera.html#gga1d1ae2bdce686a3b4580c15cecf83802af2c5f7ea4bb11bc579158954bcd7136c">CaptureMode::FREE_RUN</a>, 
+<a class="el" href="group__camera.html#gga1d1ae2bdce686a3b4580c15cecf83802a78edfa2e81e9f91c3244a14f31812a20">CaptureMode::SOFTWARE_TRIGGER</a>, 
+<a class="el" href="group__camera.html#gga1d1ae2bdce686a3b4580c15cecf83802accc0377a8afbf50e7094f5c23a8af223">CaptureMode::INVALID</a>
+ }</td></tr>
+<tr class="separator:ga1d1ae2bdce686a3b4580c15cecf83802"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga66831da6111bb2e879c2702d63d728c4"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#ga66831da6111bb2e879c2702d63d728c4">ConfigDataType</a> { <br />
 &#160;&#160;<a class="el" href="group__config.html#gga66831da6111bb2e879c2702d63d728c4a19521ec3f2f6a84fb7207a0a97c8731d">TYPE_NOT_SET</a> = 0, 
 <a class="el" href="group__config.html#gga66831da6111bb2e879c2702d63d728c4ab48f81019cbc5580e33f661d0e20d33d">BOOL</a> = 1, 
@@ -206,6 +214,24 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga35b9120b3f2845947378c902dcb63da8"><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="group__camera.html#ga1d1ae2bdce686a3b4580c15cecf83802">CaptureMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga35b9120b3f2845947378c902dcb63da8">ueye_str2capturemode</a> (const std::string &amp;mode)</td></tr>
+<tr class="separator:ga35b9120b3f2845947378c902dcb63da8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafa8eeb5281c4373606f71e6876022b39"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gafa8eeb5281c4373606f71e6876022b39">ueye_str2colormode</a> (const std::string &amp;mode)</td></tr>
+<tr class="separator:gafa8eeb5281c4373606f71e6876022b39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf44c962b36bb7eb45a95771e28351f55"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gaf44c962b36bb7eb45a95771e28351f55">ueye_colormode2bpp</a> (int mode)</td></tr>
+<tr class="separator:gaf44c962b36bb7eb45a95771e28351f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga19ae1ccb9e6166d176dfaba4d6457c8d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga19ae1ccb9e6166d176dfaba4d6457c8d">ueye_colormode2channels</a> (int mode)</td></tr>
+<tr class="separator:ga19ae1ccb9e6166d176dfaba4d6457c8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaebcd0aa3ec3e5c9ab41b0e82c4e6d07d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gaebcd0aa3ec3e5c9ab41b0e82c4e6d07d">ueye_list_cameras</a> ()</td></tr>
+<tr class="separator:gaebcd0aa3ec3e5c9ab41b0e82c4e6d07d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab745a014bec44f76d36367409b3bdcb7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gab745a014bec44f76d36367409b3bdcb7">ueye_print_error</a> (const HIDS &amp;handle)</td></tr>
+<tr class="separator:gab745a014bec44f76d36367409b3bdcb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga788c6a8d88140bbe25260cb8da3e6674"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga788c6a8d88140bbe25260cb8da3e6674">ueye_print_sensor_info</a> (const SENSORINFO &amp;info)</td></tr>
+<tr class="separator:ga788c6a8d88140bbe25260cb8da3e6674"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaeaf5b072a6c4514f8879fd80fbe6e05a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gaeaf5b072a6c4514f8879fd80fbe6e05a">ueye_print_camera_info</a> (const CAMINFO &amp;info)</td></tr>
+<tr class="separator:gaeaf5b072a6c4514f8879fd80fbe6e05a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaad68f8c91d0847e65cf9ef72f6833d55"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gaad68f8c91d0847e65cf9ef72f6833d55">raw2cvmat</a> (void *image_data, const int image_width, const int image_height, const int channels, const int bpp, cv::Mat &amp;output)</td></tr>
+<tr class="separator:gaad68f8c91d0847e65cf9ef72f6833d55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab144e95bd8bffa34d4e77fdc1285f1e6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__driver.html#gab144e95bd8bffa34d4e77fdc1285f1e6">set_interface_attribs</a> (int fd, int speed, int parity)</td></tr>
 <tr class="separator:gab144e95bd8bffa34d4e77fdc1285f1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga61e7009ac1f1c059d2393b55e00b86bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__driver.html#ga61e7009ac1f1c059d2393b55e00b86bb">set_blocking</a> (int fd, int should_block)</td></tr>
@@ -311,28 +337,36 @@ Functions</h2></td></tr>
 <tr class="separator:ga6d2f17729a0f6b0de5f04c5e34d0794f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafab5b84173d2ef451f400d4342f40894"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__gps.html#gafab5b84173d2ef451f400d4342f40894">latlon_dist</a> (double lat_ref, double lon_ref, double lat, double lon)</td></tr>
 <tr class="separator:gafab5b84173d2ef451f400d4342f40894"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga62da566d65f56aced50e27a20e3c61d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga62da566d65f56aced50e27a20e3c61d1">zeros</a> (const double rows, const double cols)</td></tr>
-<tr class="separator:ga62da566d65f56aced50e27a20e3c61d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga695428904965622d6fe5cbfc1aa5bdc1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga695428904965622d6fe5cbfc1aa5bdc1">zeros</a> (const double size)</td></tr>
-<tr class="separator:ga695428904965622d6fe5cbfc1aa5bdc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5cee8b5f45ec7a1de7f438327fe1c14f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga5cee8b5f45ec7a1de7f438327fe1c14f">I</a> (const double rows, const double cols)</td></tr>
-<tr class="separator:ga5cee8b5f45ec7a1de7f438327fe1c14f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4afa144da02c5a88cd3d786cfa6faca1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga4afa144da02c5a88cd3d786cfa6faca1">I</a> (const double size)</td></tr>
-<tr class="separator:ga4afa144da02c5a88cd3d786cfa6faca1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga997b38363edefe590e580212addf6280"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga997b38363edefe590e580212addf6280">ones</a> (const double rows, const double cols)</td></tr>
-<tr class="separator:ga997b38363edefe590e580212addf6280"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9245021275c9f824c3e89f95e6eabfa6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga9245021275c9f824c3e89f95e6eabfa6">ones</a> (const double size)</td></tr>
-<tr class="separator:ga9245021275c9f824c3e89f95e6eabfa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga84aec64e7a14b94ddcca06b66ce17e65"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga84aec64e7a14b94ddcca06b66ce17e65">zeros</a> (const int rows, const int cols)</td></tr>
+<tr class="separator:ga84aec64e7a14b94ddcca06b66ce17e65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga391d617b383863c50af1845f7457111e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga391d617b383863c50af1845f7457111e">zeros</a> (const int size)</td></tr>
+<tr class="separator:ga391d617b383863c50af1845f7457111e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab77df2d4368ea06209a562abbb764f51"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#gab77df2d4368ea06209a562abbb764f51">I</a> (const int rows, const int cols)</td></tr>
+<tr class="separator:gab77df2d4368ea06209a562abbb764f51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5bca9456d55a66a1e457b3e366f765a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga5bca9456d55a66a1e457b3e366f765a0">I</a> (const int size)</td></tr>
+<tr class="separator:ga5bca9456d55a66a1e457b3e366f765a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga91ce5bf6ff9f0fd5cf6e135c7ae5ee87"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga91ce5bf6ff9f0fd5cf6e135c7ae5ee87">ones</a> (const int rows, const int cols)</td></tr>
+<tr class="separator:ga91ce5bf6ff9f0fd5cf6e135c7ae5ee87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf8e6094147a821fbc320cbe3e8ca066d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#gaf8e6094147a821fbc320cbe3e8ca066d">ones</a> (const int size)</td></tr>
+<tr class="separator:gaf8e6094147a821fbc320cbe3e8ca066d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga836cdf1eb04d002c2b9988654278e286"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gaf38a3c10ffaa28bc0416362cc3187cbd">Mat3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#ga836cdf1eb04d002c2b9988654278e286">skew</a> (const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;w)</td></tr>
 <tr class="separator:ga836cdf1eb04d002c2b9988654278e286"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad0fe7b391e044f4f4bb8e82b6fb4102e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gaf38a3c10ffaa28bc0416362cc3187cbd">Mat3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#gad0fe7b391e044f4f4bb8e82b6fb4102e">skewsq</a> (const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;w)</td></tr>
 <tr class="separator:gad0fe7b391e044f4f4bb8e82b6fb4102e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad67f5f738a9dd31edf278303491903e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__linalg.html#gad67f5f738a9dd31edf278303491903e1">enforce_psd</a> (const <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;A)</td></tr>
 <tr class="separator:gad67f5f738a9dd31edf278303491903e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaacd94b5a27ee067e752f9a09e0bc0a7a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#gaacd94b5a27ee067e752f9a09e0bc0a7a">print_shape</a> (const <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;A)</td></tr>
+<tr class="separator:gaacd94b5a27ee067e752f9a09e0bc0a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8b0b62604d417a6d4bb009095c4ea845"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga8b0b62604d417a6d4bb009095c4ea845">print_shape</a> (const <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;v)</td></tr>
+<tr class="separator:ga8b0b62604d417a6d4bb009095c4ea845"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad2aa0e79d97feb59052c5f90dc06ca76"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#gad2aa0e79d97feb59052c5f90dc06ca76">vec2array</a> (const <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;v)</td></tr>
 <tr class="separator:gad2aa0e79d97feb59052c5f90dc06ca76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga584b18f5428697e054f4e1019632d990"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga584b18f5428697e054f4e1019632d990">mat2array</a> (const <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;m)</td></tr>
 <tr class="separator:ga584b18f5428697e054f4e1019632d990"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga55d86c67c9a8e4cabf1c26a92aad7580"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga55d86c67c9a8e4cabf1c26a92aad7580">vec2array</a> (const <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;v, double *out)</td></tr>
+<tr class="separator:ga55d86c67c9a8e4cabf1c26a92aad7580"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7899f9d9695fe9b8097261695278ee6a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga7899f9d9695fe9b8097261695278ee6a">mat2array</a> (const <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;m, double *out)</td></tr>
+<tr class="separator:ga7899f9d9695fe9b8097261695278ee6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga408be3005f87322fb12aa25fbb8f982d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga408be3005f87322fb12aa25fbb8f982d">randi</a> (const int ub, const int lb)</td></tr>
 <tr class="separator:ga408be3005f87322fb12aa25fbb8f982d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga88c71ae54db8e5f3b33cc654cb07b2d5"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga88c71ae54db8e5f3b33cc654cb07b2d5">randf</a> (const double ub, const double lb)</td></tr>
@@ -417,6 +451,28 @@ Functions</h2></td></tr>
 <tr class="separator:aaa7a6c2610a0f32e7bc6c90778db68f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a740f4b5d57dfe6a753644c4629b5c6dc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a740f4b5d57dfe6a753644c4629b5c6dc">test_Camera_run</a> ()</td></tr>
 <tr class="separator:a740f4b5d57dfe6a753644c4629b5c6dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0377dbf445e7082fdae53e5fa9bf6d47"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a0377dbf445e7082fdae53e5fa9bf6d47">test_IDSCamera_constructor</a> ()</td></tr>
+<tr class="separator:a0377dbf445e7082fdae53e5fa9bf6d47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a821039f8966a3daca63278d1f5537321"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a821039f8966a3daca63278d1f5537321">test_IDSCamera_configure</a> ()</td></tr>
+<tr class="separator:a821039f8966a3daca63278d1f5537321"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebe0ea253008f3ab4ba174929d71d2e8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#aebe0ea253008f3ab4ba174929d71d2e8">test_IDSCamera_allocBuffers_and_freeBuffers</a> ()</td></tr>
+<tr class="separator:aebe0ea253008f3ab4ba174929d71d2e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4069f78b07b35d5a69e09e4d877dd577"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a4069f78b07b35d5a69e09e4d877dd577">test_IDSCamera_setCaptureMode_and_getCaptureMode</a> ()</td></tr>
+<tr class="separator:a4069f78b07b35d5a69e09e4d877dd577"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afde2bd911fed9da374bdcdebc0643fe2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#afde2bd911fed9da374bdcdebc0643fe2">test_IDSCamera_setPixelClock_and_getPixelClock</a> ()</td></tr>
+<tr class="separator:afde2bd911fed9da374bdcdebc0643fe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5571e2dc460d3d8d18df442ea3aee090"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a5571e2dc460d3d8d18df442ea3aee090">test_IDSCamera_setColorMode_and_getColorMode</a> ()</td></tr>
+<tr class="separator:a5571e2dc460d3d8d18df442ea3aee090"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a459c73083e00bf17fc5339994f6bdf3a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a459c73083e00bf17fc5339994f6bdf3a">test_IDSCamera_setFrameRate_and_getFrameRate</a> ()</td></tr>
+<tr class="separator:a459c73083e00bf17fc5339994f6bdf3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4ef01154df41217c8a9be7028551518"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#ab4ef01154df41217c8a9be7028551518">test_IDSCamera_setGain_and_getGain</a> ()</td></tr>
+<tr class="separator:ab4ef01154df41217c8a9be7028551518"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49ee50d53cb1a66f06d531ba8f1399e7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a49ee50d53cb1a66f06d531ba8f1399e7">test_IDSCamera_setROI_and_getROI</a> ()</td></tr>
+<tr class="separator:a49ee50d53cb1a66f06d531ba8f1399e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d0157ad68c5929377e1181558c78680"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a0d0157ad68c5929377e1181558c78680">test_IDSCamera_getImageSize</a> ()</td></tr>
+<tr class="separator:a0d0157ad68c5929377e1181558c78680"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a912fddb9b3fd3a5b975cb7e3d14f1169"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a912fddb9b3fd3a5b975cb7e3d14f1169">test_IDSCamera_getFrame</a> ()</td></tr>
+<tr class="separator:a912fddb9b3fd3a5b975cb7e3d14f1169"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92122395142ab9f792c67cee88ae3dfb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgvio_1_1PinholeModel.html">PinholeModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a92122395142ab9f792c67cee88ae3dfb">setup_pinhole_model</a> ()</td></tr>
 <tr class="separator:a92122395142ab9f792c67cee88ae3dfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa158e7fa2d4f2a4d94b801e61263638e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#aa158e7fa2d4f2a4d94b801e61263638e">test_PinholeModel_constructor</a> ()</td></tr>
@@ -543,14 +599,14 @@ Functions</h2></td></tr>
 <tr class="separator:af4580dfa0a9b91f2a27d32d45e8570de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a588bac9e6a3014a5798c3e35bc19e6c3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a588bac9e6a3014a5798c3e35bc19e6c3">test_CeresReprojectionError_constructor</a> ()</td></tr>
 <tr class="separator:a588bac9e6a3014a5798c3e35bc19e6c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac601a966990d155469c8c668d61144c7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#ac601a966990d155469c8c668d61144c7">test_CeresReprojectionError_formK</a> ()</td></tr>
-<tr class="separator:ac601a966990d155469c8c668d61144c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fc2daed849c2c94262bf8b729400a85"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a0fc2daed849c2c94262bf8b729400a85">test_CeresReprojectionError_quatToRot</a> ()</td></tr>
-<tr class="separator:a0fc2daed849c2c94262bf8b729400a85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a453bdacaebbe2f960fdad8484458e22b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a453bdacaebbe2f960fdad8484458e22b">test_CeresReprojectionError_error</a> ()</td></tr>
-<tr class="separator:a453bdacaebbe2f960fdad8484458e22b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae106fc64738f6574f26e7bb85c9756b4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#ae106fc64738f6574f26e7bb85c9756b4">test_CeresReprojectionError_evaluate</a> ()</td></tr>
+<tr class="separator:ae106fc64738f6574f26e7bb85c9756b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d15458f8043db8f4c3ce5000d47ebd7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a9d15458f8043db8f4c3ce5000d47ebd7">test_CeresFeatureEstimator_constructor</a> ()</td></tr>
 <tr class="separator:a9d15458f8043db8f4c3ce5000d47ebd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d18435e03a057aa414eed829d71cb0b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a5d18435e03a057aa414eed829d71cb0b">test_CeresFeatureEstimator_setupProblem</a> ()</td></tr>
+<tr class="separator:a5d18435e03a057aa414eed829d71cb0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40a7409ba6d3eaa021945b04234f0372"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a40a7409ba6d3eaa021945b04234f0372">test_CeresFeatureEstimator_estimate</a> ()</td></tr>
+<tr class="separator:a40a7409ba6d3eaa021945b04234f0372"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0471422ea01d9f4dfd78c5881bef2cb8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a0471422ea01d9f4dfd78c5881bef2cb8">test_IMUState_constructor</a> ()</td></tr>
 <tr class="separator:a0471422ea01d9f4dfd78c5881bef2cb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec3a0cb1dfde5a6945f55d666c0ca421"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#aec3a0cb1dfde5a6945f55d666c0ca421">test_IMUState_F</a> ()</td></tr>
@@ -563,6 +619,20 @@ Functions</h2></td></tr>
 <tr class="separator:a87f724d471b1643bee6e1350f65086fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada13fb8775dc9579c847afa2d8f5d86b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#ada13fb8775dc9579c847afa2d8f5d86b">test_IMUState_correct</a> ()</td></tr>
 <tr class="separator:ada13fb8775dc9579c847afa2d8f5d86b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3653b4401cd0a865ed4266ee75ba0f44"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a3653b4401cd0a865ed4266ee75ba0f44">test_MSCKF_constructor</a> ()</td></tr>
+<tr class="separator:a3653b4401cd0a865ed4266ee75ba0f44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7eb97de96f0b972982b97d52041ee826"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a7eb97de96f0b972982b97d52041ee826">test_MSCKF_P</a> ()</td></tr>
+<tr class="separator:a7eb97de96f0b972982b97d52041ee826"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acff20bce7683aefd506fb0558be09867"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#acff20bce7683aefd506fb0558be09867">test_MSCKF_N</a> ()</td></tr>
+<tr class="separator:acff20bce7683aefd506fb0558be09867"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4537f53a18a0593a11906566d6124df4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a4537f53a18a0593a11906566d6124df4">test_MSCKF_H</a> ()</td></tr>
+<tr class="separator:a4537f53a18a0593a11906566d6124df4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09c3c2d4f503bc7729c5156f33bb4c5f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a09c3c2d4f503bc7729c5156f33bb4c5f">test_MSCKF_augmentState</a> ()</td></tr>
+<tr class="separator:a09c3c2d4f503bc7729c5156f33bb4c5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a279ede4dc1ee204425cfab07fe0f28d9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a279ede4dc1ee204425cfab07fe0f28d9">test_MSCKF_getTrackCameraStates</a> ()</td></tr>
+<tr class="separator:a279ede4dc1ee204425cfab07fe0f28d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a497512959bdd40e9664a97c0206dc4d3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a497512959bdd40e9664a97c0206dc4d3">test_MSCKF_predictionUpdate</a> ()</td></tr>
+<tr class="separator:a497512959bdd40e9664a97c0206dc4d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae14c5faa5ec7061f6b4dcd4034bea15d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#ae14c5faa5ec7061f6b4dcd4034bea15d">test_hello</a> ()</td></tr>
 <tr class="separator:ae14c5faa5ec7061f6b4dcd4034bea15d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44bb3873ebe12a2a4c804f9e0400a2b6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a44bb3873ebe12a2a4c804f9e0400a2b6">test_ConfigParam_constructor</a> ()</td></tr>
@@ -630,16 +700,6 @@ Variables</h2></td></tr>
 <tr class="separator:gadf0d5d61db857d78b2527073c485b87b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaae50f928a6774603661f6be6f58fcf8c"><td class="memItemLeft" align="right" valign="top">const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#gaae50f928a6774603661f6be6f58fcf8c">mScaleRatios</a> [5] = {1.0, 1.0 / 2, 1.0 / sqrt(2.0), sqrt(2.0), 2.0}</td></tr>
 <tr class="separator:gaae50f928a6774603661f6be6f58fcf8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbd79cc0c67ffa58a04d2614cd0033ac"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#abbd79cc0c67ffa58a04d2614cd0033ac">frame_start</a> = track.frame_start</td></tr>
-<tr class="separator:abbd79cc0c67ffa58a04d2614cd0033ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac7d5996b39db58a423eebb926685d0d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#aac7d5996b39db58a423eebb926685d0d">frame_end</a> = track.frame_end</td></tr>
-<tr class="separator:aac7d5996b39db58a423eebb926685d0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af086a68a9b99f60fcee7d065dd074364"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#af086a68a9b99f60fcee7d065dd074364">index_start</a> = <a class="el" href="namespacegvio.html#abbd79cc0c67ffa58a04d2614cd0033ac">frame_start</a> - this-&gt;cam_states[0].frame_id</td></tr>
-<tr class="separator:af086a68a9b99f60fcee7d065dd074364"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a181728af069045671e808afe4e68e23e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a181728af069045671e808afe4e68e23e">index_end</a></td></tr>
-<tr class="separator:a181728af069045671e808afe4e68e23e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a227c71790de1cc1f90cbf4ea13b4055e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a227c71790de1cc1f90cbf4ea13b4055e">return</a></td></tr>
-<tr class="separator:a227c71790de1cc1f90cbf4ea13b4055e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="ac0469f7ced61d32fe1814142e984e794"></a>
@@ -901,6 +961,36 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a40a7409ba6d3eaa021945b04234f0372"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_CeresFeatureEstimator_estimate </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5d18435e03a057aa414eed829d71cb0b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_CeresFeatureEstimator_setupProblem </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a588bac9e6a3014a5798c3e35bc19e6c3"></a>
 <div class="memitem">
 <div class="memproto">
@@ -916,42 +1006,12 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a453bdacaebbe2f960fdad8484458e22b"></a>
+<a class="anchor" id="ae106fc64738f6574f26e7bb85c9756b4"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gvio::test_CeresReprojectionError_error </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac601a966990d155469c8c668d61144c7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int gvio::test_CeresReprojectionError_formK </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0fc2daed849c2c94262bf8b729400a85"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int gvio::test_CeresReprojectionError_quatToRot </td>
+          <td class="memname">int gvio::test_CeresReprojectionError_evaluate </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -1606,6 +1666,171 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aebe0ea253008f3ab4ba174929d71d2e8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_allocBuffers_and_freeBuffers </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a821039f8966a3daca63278d1f5537321"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_configure </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0377dbf445e7082fdae53e5fa9bf6d47"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_constructor </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a912fddb9b3fd3a5b975cb7e3d14f1169"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_getFrame </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0d0157ad68c5929377e1181558c78680"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_getImageSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4069f78b07b35d5a69e09e4d877dd577"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_setCaptureMode_and_getCaptureMode </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5571e2dc460d3d8d18df442ea3aee090"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_setColorMode_and_getColorMode </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a459c73083e00bf17fc5339994f6bdf3a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_setFrameRate_and_getFrameRate </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab4ef01154df41217c8a9be7028551518"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_setGain_and_getGain </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="afde2bd911fed9da374bdcdebc0643fe2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_setPixelClock_and_getPixelClock </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a49ee50d53cb1a66f06d531ba8f1399e7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_setROI_and_getROI </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a0471422ea01d9f4dfd78c5881bef2cb8"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1957,6 +2182,111 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">int gvio::test_MPU6050_configure </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a09c3c2d4f503bc7729c5156f33bb4c5f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_MSCKF_augmentState </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3653b4401cd0a865ed4266ee75ba0f44"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_MSCKF_constructor </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a279ede4dc1ee204425cfab07fe0f28d9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_MSCKF_getTrackCameraStates </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4537f53a18a0593a11906566d6124df4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_MSCKF_H </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="acff20bce7683aefd506fb0558be09867"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_MSCKF_N </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7eb97de96f0b972982b97d52041ee826"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_MSCKF_P </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a497512959bdd40e9664a97c0206dc4d3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_MSCKF_predictionUpdate </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -2455,68 +2785,6 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a class="anchor" id="aac7d5996b39db58a423eebb926685d0d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a> gvio::frame_end = track.frame_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="abbd79cc0c67ffa58a04d2614cd0033ac"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a> gvio::frame_start = track.frame_start</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a181728af069045671e808afe4e68e23e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a> gvio::index_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">    this-&gt;N() - (this-&gt;cam_states[-1].frame_id - <a class="code" href="namespacegvio.html#aac7d5996b39db58a423eebb926685d0d">frame_end</a>)</div><div class="ttc" id="namespacegvio_html_aac7d5996b39db58a423eebb926685d0d"><div class="ttname"><a href="namespacegvio.html#aac7d5996b39db58a423eebb926685d0d">gvio::frame_end</a></div><div class="ttdeci">const FrameID frame_end</div><div class="ttdef"><b>Definition:</b> msckf.cpp:37</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="af086a68a9b99f60fcee7d065dd074364"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a> gvio::index_start = <a class="el" href="namespacegvio.html#abbd79cc0c67ffa58a04d2614cd0033ac">frame_start</a> - this-&gt;cam_states[0].frame_id</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a227c71790de1cc1f90cbf4ea13b4055e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">gvio::return</td>
         </tr>
       </table>
 </div><div class="memdoc">

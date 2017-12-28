@@ -1,4 +1,5 @@
-/** * @file
+/**
+ * @file
  * @defgroup camera camera
  */
 #ifndef GVIO_CAMERA_CAMERA_HPP

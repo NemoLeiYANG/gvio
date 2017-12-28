@@ -81,6 +81,9 @@
 &#160;
 
 <h3><a class="anchor" id="index_c"></a>- c -</h3><ul>
+<li>C_CiC0
+: <a class="el" href="structgvio_1_1CeresReprojectionError.html#afa51b13b1b234acda641fe0fb6630ead">gvio::CeresReprojectionError</a>
+</li>
 <li>calib_cam_to_cam
 : <a class="el" href="classgvio_1_1RawDataset.html#af9368b454cf7939f98de85219d2b3012">gvio::RawDataset</a>
 </li>
@@ -107,17 +110,15 @@
 <li>cam3
 : <a class="el" href="classgvio_1_1RawDataset.html#a3a33667af95cf12a38050b6f657cb391">gvio::RawDataset</a>
 </li>
+<li>cam_handle
+: <a class="el" href="classgvio_1_1IDSCamera.html#ad30381e98f997e35dae3c696c1c53cb2">gvio::IDSCamera</a>
+</li>
 <li>cam_model
-: <a class="el" href="classgvio_1_1FeatureEstimator.html#ac91306818390cb2cd889c4b9ef147dec">gvio::FeatureEstimator</a>
-</li>
-<li>cam_p
-: <a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a29a67dde96061a0a899c5975dcb4092f">gvio::CeresFeatureEstimator</a>
-</li>
-<li>cam_q
-: <a class="el" href="classgvio_1_1CeresFeatureEstimator.html#aca23eee11a522376242b435865ddf306">gvio::CeresFeatureEstimator</a>
+: <a class="el" href="structgvio_1_1CeresReprojectionError.html#a07d784c953cd7c010d15e5fa17ed9c5f">gvio::CeresReprojectionError</a>
+, <a class="el" href="classgvio_1_1FeatureEstimator.html#ac91306818390cb2cd889c4b9ef147dec">gvio::FeatureEstimator</a>
 </li>
 <li>cam_states
-: <a class="el" href="structgvio_1_1MSCKF.html#a66db52a354c919a50e8d58b59485cff8">gvio::MSCKF</a>
+: <a class="el" href="classgvio_1_1MSCKF.html#a66db52a354c919a50e8d58b59485cff8">gvio::MSCKF</a>
 </li>
 <li>camera_angles
 : <a class="el" href="group__gimbal.html#ga25da4b76cdd19b362eddc40f080fa17d">gvio::Gimbal</a>
@@ -125,6 +126,9 @@
 </li>
 <li>camera_configs
 : <a class="el" href="classgvio_1_1BaseDetector.html#a7b1487abcbd124ef60b7eba0847c5623">gvio::BaseDetector</a>
+</li>
+<li>camera_info
+: <a class="el" href="classgvio_1_1IDSCamera.html#a7ef807ffd5e9e8dac23131b86a2304d1">gvio::IDSCamera</a>
 </li>
 <li>camera_matrix
 : <a class="el" href="classgvio_1_1CameraConfig.html#a5bb77f8719a7bfefbd3c5672b4cba693">gvio::CameraConfig</a>
@@ -141,8 +145,14 @@
 <li>capture
 : <a class="el" href="classgvio_1_1Camera.html#a1ccf206f09798569523ea5e5f8e699de">gvio::Camera</a>
 </li>
+<li>capture_mode
+: <a class="el" href="classgvio_1_1IDSCamera.html#adf9a1000d8ab80a54168c79192febe85">gvio::IDSCamera</a>
+</li>
 <li>cmd_id
 : <a class="el" href="classgvio_1_1SBGCFrame.html#a3b785bcd3ad457220ae992fd7d3ec192">gvio::SBGCFrame</a>
+</li>
+<li>color_mode
+: <a class="el" href="classgvio_1_1IDSCamera.html#acbc32ac42b12fff0bdaf41d1e3279aea">gvio::IDSCamera</a>
 </li>
 <li>config
 : <a class="el" href="classgvio_1_1Camera.html#a59b5f0942875b2f90fc92ae5c630c2cb">gvio::Camera</a>
@@ -157,10 +167,12 @@
 : <a class="el" href="classgvio_1_1BaseDetector.html#abc587cc4aabc648331f614fa36a6719d">gvio::BaseDetector</a>
 , <a class="el" href="classgvio_1_1Camera.html#a074b877ba0a308eadca14587175287ae">gvio::Camera</a>
 , <a class="el" href="group__gimbal.html#ga75650c5d83045afc3bdabc759f315b79">gvio::Gimbal</a>
+, <a class="el" href="classgvio_1_1IDSCamera.html#a6e62a0e0adb6db03f91c8b6cb5a0e90a">gvio::IDSCamera</a>
 , <a class="el" href="classgvio_1_1SBGC.html#a5b680db857e8dce44f886acc1a8ee916">gvio::SBGC</a>
 </li>
 <li>connected
-: <a class="el" href="classgvio_1_1UART.html#a08755ac9e0ba6e0d2353e5cf89d63739">gvio::UART</a>
+: <a class="el" href="classgvio_1_1Camera.html#a43d35ce2c8162f77a8d787f950c9c856">gvio::Camera</a>
+, <a class="el" href="classgvio_1_1UART.html#a08755ac9e0ba6e0d2353e5cf89d63739">gvio::UART</a>
 </li>
 <li>connection
 : <a class="el" href="classgvio_1_1UART.html#afc57041ebb9762b85b3864444b50975d">gvio::UART</a>
@@ -173,7 +185,7 @@
 </li>
 <li>counter_frame_id
 : <a class="el" href="classgvio_1_1FeatureTracker.html#a36dea4d7eeaeb05d6a12f903f467c4ad">gvio::FeatureTracker</a>
-, <a class="el" href="structgvio_1_1MSCKF.html#ac94716a3977d0694d4a1ce66ff351050">gvio::MSCKF</a>
+, <a class="el" href="classgvio_1_1MSCKF.html#ac94716a3977d0694d4a1ce66ff351050">gvio::MSCKF</a>
 </li>
 <li>counter_track_id
 : <a class="el" href="classgvio_1_1FeatureTracker.html#ad8106d3a2ddce333bba6fd76ddc94749">gvio::FeatureTracker</a>

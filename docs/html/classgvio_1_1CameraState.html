@@ -47,6 +47,7 @@
 <div class="header">
   <div class="summary">
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pub-static-attribs">Static Attributes</a> &#124;
 <a href="#pub-methods">Public Methods</a> &#124;
 <a href="classgvio_1_1CameraState-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -115,21 +116,64 @@
 
 </div>
 </div>
+<a class="anchor" id="a89122046aeb09c1877bb1fd654b38462"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">gvio::CameraState::CameraState </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a>&#160;</td>
+          <td class="paramname"><em>frame_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>p_G</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a> &amp;&#160;</td>
+          <td class="paramname"><em>q_CG</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ad544e02e95c1c457ed65408cbe3741a4"><td class="memItemLeft" align="right" valign="top">const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#ad544e02e95c1c457ed65408cbe3741a4">size</a> = 6</td></tr>
-<tr class="memdesc:ad544e02e95c1c457ed65408cbe3741a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of state vector.  <a href="#ad544e02e95c1c457ed65408cbe3741a4">More...</a><br /></td></tr>
-<tr class="separator:ad544e02e95c1c457ed65408cbe3741a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a089e44cb0b73028642f60a5e56028d61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#a089e44cb0b73028642f60a5e56028d61">frame_id</a> = -1</td></tr>
 <tr class="memdesc:a089e44cb0b73028642f60a5e56028d61"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classgvio_1_1Camera.html">Camera</a> frame id.  <a href="#a089e44cb0b73028642f60a5e56028d61">More...</a><br /></td></tr>
 <tr class="separator:a089e44cb0b73028642f60a5e56028d61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a148af4aa1193a66d7dedd2d9c30821a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#a148af4aa1193a66d7dedd2d9c30821a0">p_G</a> = <a class="el" href="group__linalg.html#ga62da566d65f56aced50e27a20e3c61d1">zeros</a>(3, 1)</td></tr>
+<tr class="memitem:a148af4aa1193a66d7dedd2d9c30821a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#a148af4aa1193a66d7dedd2d9c30821a0">p_G</a> = <a class="el" href="group__linalg.html#ga84aec64e7a14b94ddcca06b66ce17e65">zeros</a>(3, 1)</td></tr>
 <tr class="memdesc:a148af4aa1193a66d7dedd2d9c30821a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Position of camera in Global frame.  <a href="#a148af4aa1193a66d7dedd2d9c30821a0">More...</a><br /></td></tr>
 <tr class="separator:a148af4aa1193a66d7dedd2d9c30821a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcc52e1f6bd9311f73f894468b4829d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#adcc52e1f6bd9311f73f894468b4829d9">q_CG</a> = <a class="el" href="group__linalg.html#ga62da566d65f56aced50e27a20e3c61d1">zeros</a>(4, 1)</td></tr>
+<tr class="memitem:adcc52e1f6bd9311f73f894468b4829d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#adcc52e1f6bd9311f73f894468b4829d9">q_CG</a> = <a class="el" href="group__linalg.html#ga84aec64e7a14b94ddcca06b66ce17e65">zeros</a>(4, 1)</td></tr>
 <tr class="memdesc:adcc52e1f6bd9311f73f894468b4829d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Orientation of camera in Global frame.  <a href="#adcc52e1f6bd9311f73f894468b4829d9">More...</a><br /></td></tr>
 <tr class="separator:adcc52e1f6bd9311f73f894468b4829d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+Static Attributes</h2></td></tr>
+<tr class="memitem:ad544e02e95c1c457ed65408cbe3741a4"><td class="memItemLeft" align="right" valign="top">static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#ad544e02e95c1c457ed65408cbe3741a4">size</a> = 6</td></tr>
+<tr class="memdesc:ad544e02e95c1c457ed65408cbe3741a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of state vector.  <a href="#ad544e02e95c1c457ed65408cbe3741a4">More...</a><br /></td></tr>
+<tr class="separator:ad544e02e95c1c457ed65408cbe3741a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Methods</h2></td></tr>
@@ -137,6 +181,8 @@ Public Methods</h2></td></tr>
 <tr class="separator:a032ca530b9b71c2fcd1539e04b2fbe77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37e646313088bb1fd999250235a0511a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#a37e646313088bb1fd999250235a0511a">CameraState</a> (const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;<a class="el" href="classgvio_1_1CameraState.html#a148af4aa1193a66d7dedd2d9c30821a0">p_G</a>, const <a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a> &amp;<a class="el" href="classgvio_1_1CameraState.html#adcc52e1f6bd9311f73f894468b4829d9">q_CG</a>)</td></tr>
 <tr class="separator:a37e646313088bb1fd999250235a0511a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89122046aeb09c1877bb1fd654b38462"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#a89122046aeb09c1877bb1fd654b38462">CameraState</a> (const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a> <a class="el" href="classgvio_1_1CameraState.html#a089e44cb0b73028642f60a5e56028d61">frame_id</a>, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;<a class="el" href="classgvio_1_1CameraState.html#a148af4aa1193a66d7dedd2d9c30821a0">p_G</a>, const <a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a> &amp;<a class="el" href="classgvio_1_1CameraState.html#adcc52e1f6bd9311f73f894468b4829d9">q_CG</a>)</td></tr>
+<tr class="separator:a89122046aeb09c1877bb1fd654b38462"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e5e3aa0d335fe4a10159f1b67336ca9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#a1e5e3aa0d335fe4a10159f1b67336ca9">correct</a> (const <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;dx)</td></tr>
 <tr class="separator:a1e5e3aa0d335fe4a10159f1b67336ca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27404551171bd7e203a6a19162ccda30"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CameraState.html#a27404551171bd7e203a6a19162ccda30">setFrameID</a> (const <a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a> &amp;<a class="el" href="classgvio_1_1CameraState.html#a089e44cb0b73028642f60a5e56028d61">frame_id</a>)</td></tr>

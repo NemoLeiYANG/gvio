@@ -427,6 +427,18 @@ int IDSCamera::configure(const std::string &config_file) {
     return -1;
   }
 
+  // Enable frame event
+  if (is_EnableEvent(this->cam_handle, IS_SET_EVENT_FRAME) != IS_SUCCESS) {
+    LOG_ERROR("Failed to enable frame event!");
+    return -1;
+  }
+
+  // Start capturing
+  if (is_CaptureVideo(this->cam_handle, IS_DONT_WAIT) != IS_SUCCESS) {
+    LOG_ERROR("Failed to start capture!");
+    return -1;
+  }
+
   this->configured = true;
   return 0;
 }
@@ -620,9 +632,6 @@ int IDSCamera::setFrameRate(const double frame_rate) {
     return -1;
   }
 
-  std::cout << "Actual frame rate configured: " << this->frame_rate
-            << std::endl;
-  this->frame_rate = frame_rate;
   return 0;
 }
 
@@ -750,21 +759,30 @@ int IDSCamera::getFrame(cv::Mat &image) {
     return -1;
   }
 
-  if (is_FreezeVideo(this->cam_handle, IS_WAIT) == IS_SUCCESS) {
-    void *image_data;
-    if (is_GetImageMem(this->cam_handle, &image_data) != IS_SUCCESS) {
-      LOG_ERROR("Failed to get image data!");
-      return -1;
-    }
+  // Wait for new frame
+  if (is_WaitEvent(this->cam_handle,
+                   IS_SET_EVENT_FRAME,
+                   (int) (2000 / this->frame_rate)) != IS_SUCCESS) {
+    LOG_ERROR("Image wait timeout!");
+    return -1;
+  }
 
-    if (raw2cvmat(image_data,
-                  image_width,
-                  image_height,
-                  ueye_colormode2channels(this->color_mode),
-                  ueye_colormode2bpp(this->color_mode),
-                  image) != 0) {
-      return -1;
-    }
+  // Obtain image data
+  void *image_data;
+  if (is_GetImageMem(this->cam_handle, &image_data) != IS_SUCCESS) {
+    LOG_ERROR("Failed to get image memory!");
+    return -1;
+  }
+
+  // Convert image data to cv::Mat
+  if (raw2cvmat(image_data,
+                image_width,
+                image_height,
+                ueye_colormode2channels(this->color_mode),
+                ueye_colormode2bpp(this->color_mode),
+                image) != 0) {
+    LOG_ERROR("Failed to convert image data to cv::Mat!");
+    return -1;
   }
 
   return 0;

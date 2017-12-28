@@ -55,10 +55,18 @@
 <div class="contents">
 
 <p><code>#include &lt;<a class="el" href="feature__estimator_8hpp_source.html">feature_estimator.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for gvio::CeresReprojectionError:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="structgvio_1_1CeresReprojectionError.png" usemap="#gvio::CeresReprojectionError_map" alt=""/>
+  <map id="gvio::CeresReprojectionError_map" name="gvio::CeresReprojectionError_map">
+</map>
+ </div></div>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Ceres-solver reprojection error </p>
 </div><h2 class="groupheader">Constructors and Destructors</h2>
-<a class="anchor" id="affd85ec4034b09ac44ad985c2d234f60"></a>
+<a class="anchor" id="a7933d8a25744234cbfd6e09fcd464a3d"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -68,8 +76,20 @@
         <tr>
           <td class="memname">gvio::CeresReprojectionError::CeresReprojectionError </td>
           <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *&#160;</td>
+          <td class="paramname"><em>cam_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const <a class="el" href="group__math.html#gaf38a3c10ffaa28bc0416362cc3187cbd">Mat3</a> &amp;&#160;</td>
-          <td class="paramname"><em>K</em>, </td>
+          <td class="paramname"><em>C_CiC0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>t_Ci_CiC0</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -95,6 +115,8 @@
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:a07d784c953cd7c010d15e5fa17ed9c5f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#a07d784c953cd7c010d15e5fa17ed9c5f">cam_model</a></td></tr>
+<tr class="separator:a07d784c953cd7c010d15e5fa17ed9c5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65a4f3947db17eaf4b1f2a691c465606"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#a65a4f3947db17eaf4b1f2a691c465606">fx</a> = 0.0</td></tr>
 <tr class="separator:a65a4f3947db17eaf4b1f2a691c465606"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f947959db752507e19903a60e969866"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#a8f947959db752507e19903a60e969866">fy</a> = 0.0</td></tr>
@@ -103,85 +125,45 @@ Public Attributes</h2></td></tr>
 <tr class="separator:aa101a44fd49175356e811d8028b655d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a503fdb59be618c8990803e3d3375bb1d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#a503fdb59be618c8990803e3d3375bb1d">cy</a> = 0.0</td></tr>
 <tr class="separator:a503fdb59be618c8990803e3d3375bb1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac784765cd6a3fae9d5e5c2bb0613956b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#ac784765cd6a3fae9d5e5c2bb0613956b">pixel_x</a> = 0.0</td></tr>
-<tr class="separator:ac784765cd6a3fae9d5e5c2bb0613956b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6a9cec187d7811d34ecbc7a8e971cf6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#ae6a9cec187d7811d34ecbc7a8e971cf6">pixel_y</a> = 0.0</td></tr>
-<tr class="separator:ae6a9cec187d7811d34ecbc7a8e971cf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa51b13b1b234acda641fe0fb6630ead"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#gaf38a3c10ffaa28bc0416362cc3187cbd">Mat3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#afa51b13b1b234acda641fe0fb6630ead">C_CiC0</a></td></tr>
+<tr class="separator:afa51b13b1b234acda641fe0fb6630ead"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a699ea53c80fd0d050282857db63e34f1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#a699ea53c80fd0d050282857db63e34f1">t_Ci_CiC0</a></td></tr>
+<tr class="separator:a699ea53c80fd0d050282857db63e34f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dd652449081d2d83ebc9d1c85f24738"><td class="memItemLeft" align="right" valign="top">cv::KeyPoint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#a6dd652449081d2d83ebc9d1c85f24738">keypoint</a></td></tr>
+<tr class="separator:a6dd652449081d2d83ebc9d1c85f24738"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Methods</h2></td></tr>
-<tr class="memitem:affd85ec4034b09ac44ad985c2d234f60"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#affd85ec4034b09ac44ad985c2d234f60">CeresReprojectionError</a> (const <a class="el" href="group__math.html#gaf38a3c10ffaa28bc0416362cc3187cbd">Mat3</a> &amp;K, const cv::KeyPoint &amp;keypoint)</td></tr>
-<tr class="separator:affd85ec4034b09ac44ad985c2d234f60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d3718d47557f1b28c58b29a5125a988"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a5d3718d47557f1b28c58b29a5125a988"><td class="memTemplItemLeft" align="right" valign="top">Eigen::Matrix&lt; T, 3, 3 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#a5d3718d47557f1b28c58b29a5125a988">formK</a> () const </td></tr>
-<tr class="separator:a5d3718d47557f1b28c58b29a5125a988"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaac12e867f0c1f92d8ea3eaaa3b79af0"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:aaac12e867f0c1f92d8ea3eaaa3b79af0"><td class="memTemplItemLeft" align="right" valign="top">Eigen::Matrix&lt; T, 3, 3 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#aaac12e867f0c1f92d8ea3eaaa3b79af0">quatToRot</a> (const Eigen::Matrix&lt; T, 4, 1 &gt; &amp;q) const </td></tr>
-<tr class="separator:aaac12e867f0c1f92d8ea3eaaa3b79af0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0002450fa389b2474b105ceafea66a1e"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a0002450fa389b2474b105ceafea66a1e"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#a0002450fa389b2474b105ceafea66a1e">operator()</a> (const T *const cam_q, const T *const cam_p, const T *const landmark, T *residual) const </td></tr>
-<tr class="separator:a0002450fa389b2474b105ceafea66a1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7933d8a25744234cbfd6e09fcd464a3d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#a7933d8a25744234cbfd6e09fcd464a3d">CeresReprojectionError</a> (const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *<a class="el" href="structgvio_1_1CeresReprojectionError.html#a07d784c953cd7c010d15e5fa17ed9c5f">cam_model</a>, const <a class="el" href="group__math.html#gaf38a3c10ffaa28bc0416362cc3187cbd">Mat3</a> &amp;<a class="el" href="structgvio_1_1CeresReprojectionError.html#afa51b13b1b234acda641fe0fb6630ead">C_CiC0</a>, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;<a class="el" href="structgvio_1_1CeresReprojectionError.html#a699ea53c80fd0d050282857db63e34f1">t_Ci_CiC0</a>, const cv::KeyPoint &amp;<a class="el" href="structgvio_1_1CeresReprojectionError.html#a6dd652449081d2d83ebc9d1c85f24738">keypoint</a>)</td></tr>
+<tr class="separator:a7933d8a25744234cbfd6e09fcd464a3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a725650b021e5892fe079034ec6aac5cb"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CeresReprojectionError.html#a725650b021e5892fe079034ec6aac5cb">Evaluate</a> (double const *const *parameters, double *residuals, double **jacobians) const </td></tr>
+<tr class="separator:a725650b021e5892fe079034ec6aac5cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Method Descriptions</h2>
-<a class="anchor" id="a5d3718d47557f1b28c58b29a5125a988"></a>
+<a class="anchor" id="a725650b021e5892fe079034ec6aac5cb"></a>
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;typename T &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Eigen::Matrix&lt;T, 3, 3&gt; gvio::CeresReprojectionError::formK </td>
+          <td class="memname">bool gvio::CeresReprojectionError::Evaluate </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Form camera intrinsics matrix K</p>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classgvio_1_1Camera.html">Camera</a> intrinsics matrix K </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a0002450fa389b2474b105ceafea66a1e"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool gvio::CeresReprojectionError::operator() </td>
-          <td>(</td>
-          <td class="paramtype">const T *const&#160;</td>
-          <td class="paramname"><em>cam_q</em>, </td>
+          <td class="paramtype">double const *const *&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const T *const&#160;</td>
-          <td class="paramname"><em>cam_p</em>, </td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>residuals</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const T *const&#160;</td>
-          <td class="paramname"><em>landmark</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">T *&#160;</td>
-          <td class="paramname"><em>residual</em>&#160;</td>
+          <td class="paramtype">double **&#160;</td>
+          <td class="paramname"><em>jacobians</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -191,61 +173,25 @@ template&lt;typename T &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Calculate Bundle Adjustment Residual</p>
+<p>Calculate reprojection residual</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">cam_q</td><td><a class="el" href="classgvio_1_1Camera.html">Camera</a> rotation as quaternion (x, y, z, w) </td></tr>
-    <tr><td class="paramname">cam_p</td><td><a class="el" href="classgvio_1_1Camera.html">Camera</a> position (x, y, z) </td></tr>
-    <tr><td class="paramname">landmark</td><td>Landmark (x, y, z) </td></tr>
-    <tr><td class="paramname">residual</td><td>Calculated residual </td></tr>
+    <tr><td class="paramname">parameters</td><td>Optimization parameters </td></tr>
+    <tr><td class="paramname">residuals</td><td>Residuals </td></tr>
+    <tr><td class="paramname">jacobians</td><td>Jacobians </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="aaac12e867f0c1f92d8ea3eaaa3b79af0"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Eigen::Matrix&lt;T, 3, 3&gt; gvio::CeresReprojectionError::quatToRot </td>
-          <td>(</td>
-          <td class="paramtype">const Eigen::Matrix&lt; T, 4, 1 &gt; &amp;&#160;</td>
-          <td class="paramname"><em>q</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>JPL Quaternion to rotation matrix R</p>
-<p>Page 9. of Trawny, Nikolas, and Stergios I. Roumeliotis. "Indirect
-Kalman filter for 3D attitude estimation." University of Minnesota, Dept. of Comp. Sci. &amp; Eng., Tech. Rep 2 (2005): 2005.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">q</td><td>JPL quaternion (x, y, z, w) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Rotation matrix </dd></dl>
-
-</div>
-</div>
-<hr/>The documentation for this struct was generated from the following file:<ul>
+<hr/>The documentation for this struct was generated from the following files:<ul>
 <li>include/gvio/msckf/<a class="el" href="feature__estimator_8hpp_source.html">feature_estimator.hpp</a></li>
+<li>src/msckf/<a class="el" href="feature__estimator_8cpp.html">feature_estimator.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

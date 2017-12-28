@@ -1,4 +1,5 @@
-/** * @file
+/**
+ * @file
  * @ingroup msckf
  */
 #ifndef GVIO_MSCKF_FEATURE_ESTIMATOR_HPP

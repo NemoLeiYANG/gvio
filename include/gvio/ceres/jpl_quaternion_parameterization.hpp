@@ -1,4 +1,5 @@
-/** * @file
+/**
+ * @file
  * @ingroup ceres
  */
 #ifndef GVIO_CERES_JPL_QUATERNION_HPP

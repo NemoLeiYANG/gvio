@@ -1,5 +1,6 @@
-/** * @file
- * @defgroup camera camera
+/**
+ * @file
+ * @ingroup camera
  */
 #ifndef GVIO_CAMERA_IDS_HPP
 #define GVIO_CAMERA_IDS_HPP

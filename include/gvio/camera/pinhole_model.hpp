@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup camera camera
+ * @ingroup camera
  */
 #ifndef GVIO_CAMERA_PINHOLE_MODEL_HPP
 #define GVIO_CAMERA_PINHOLE_MODEL_HPP

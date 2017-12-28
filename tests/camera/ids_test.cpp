@@ -215,24 +215,24 @@ int test_IDSCamera_getFrame() {
   IDSCamera camera;
   camera.configure(TEST_CONFIG);
 
-  cv::Mat image;
-
   struct timespec start;
   tic(&start);
-
   int index = 0;
+
   while (true) {
+    cv::Mat image;
     if (camera.getFrame(image) != 0) {
       return -1;
     }
 
+    cv::imshow("Image", image);
+    if (cv::waitKey(1) == 113) {
+      break;
+    }
+
     index++;
-    if (index == 5) {
-      cv::imshow("Image", image);
-      if (cv::waitKey(1) == 113) {
-        break;
-      }
-      printf("fps: %fs\n", 5.0 / toc(&start));
+    if (index == 10) {
+      printf("fps: %fs\n", 10.0 / toc(&start));
       tic(&start);
       index = 0;
     }
@@ -242,16 +242,16 @@ int test_IDSCamera_getFrame() {
 }
 
 void test_suite() {
-  MU_ADD_TEST(test_IDSCamera_constructor);
-  MU_ADD_TEST(test_IDSCamera_configure);
-  MU_ADD_TEST(test_IDSCamera_allocBuffers_and_freeBuffers);
-  MU_ADD_TEST(test_IDSCamera_setCaptureMode_and_getCaptureMode);
-  MU_ADD_TEST(test_IDSCamera_setPixelClock_and_getPixelClock);
-  MU_ADD_TEST(test_IDSCamera_setColorMode_and_getColorMode);
-  MU_ADD_TEST(test_IDSCamera_setFrameRate_and_getFrameRate);
-  MU_ADD_TEST(test_IDSCamera_setGain_and_getGain);
-  MU_ADD_TEST(test_IDSCamera_setROI_and_getROI);
-  MU_ADD_TEST(test_IDSCamera_getImageSize);
+  // MU_ADD_TEST(test_IDSCamera_constructor);
+  // MU_ADD_TEST(test_IDSCamera_configure);
+  // MU_ADD_TEST(test_IDSCamera_allocBuffers_and_freeBuffers);
+  // MU_ADD_TEST(test_IDSCamera_setCaptureMode_and_getCaptureMode);
+  // MU_ADD_TEST(test_IDSCamera_setPixelClock_and_getPixelClock);
+  // MU_ADD_TEST(test_IDSCamera_setColorMode_and_getColorMode);
+  // MU_ADD_TEST(test_IDSCamera_setFrameRate_and_getFrameRate);
+  // MU_ADD_TEST(test_IDSCamera_setGain_and_getGain);
+  // MU_ADD_TEST(test_IDSCamera_setROI_and_getROI);
+  // MU_ADD_TEST(test_IDSCamera_getImageSize);
   MU_ADD_TEST(test_IDSCamera_getFrame);
 }
 

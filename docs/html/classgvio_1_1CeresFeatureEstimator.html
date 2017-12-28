@@ -116,12 +116,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:aa6866e845a509869133286267a2aa15d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ececdb7df97137840ed741eaf769a74"><td class="memItemLeft" align="right" valign="top">ceres::Solver::Summary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a2ececdb7df97137840ed741eaf769a74">summary</a></td></tr>
 <tr class="separator:a2ececdb7df97137840ed741eaf769a74"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee437c2baf332b0cdc2107d9d9fb7271"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html#aee437c2baf332b0cdc2107d9d9fb7271">landmark</a> {0.0, 0.0, 0.0}</td></tr>
-<tr class="separator:aee437c2baf332b0cdc2107d9d9fb7271"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca23eee11a522376242b435865ddf306"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="group__math.html#gad114f8585078121b9c732a72ad37e4fe">Vec4</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html#aca23eee11a522376242b435865ddf306">cam_q</a></td></tr>
-<tr class="separator:aca23eee11a522376242b435865ddf306"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29a67dde96061a0a899c5975dcb4092f"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a29a67dde96061a0a899c5975dcb4092f">cam_p</a></td></tr>
-<tr class="separator:a29a67dde96061a0a899c5975dcb4092f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a424c7ea91112c8102911d32b63e4aacb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a424c7ea91112c8102911d32b63e4aacb">x</a> [3] = {0.0, 0.0, 0.0}</td></tr>
+<tr class="separator:a424c7ea91112c8102911d32b63e4aacb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_classgvio_1_1FeatureEstimator"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classgvio_1_1FeatureEstimator')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classgvio_1_1FeatureEstimator.html">gvio::FeatureEstimator</a></td></tr>
 <tr class="memitem:ac91306818390cb2cd889c4b9ef147dec inherit pub_attribs_classgvio_1_1FeatureEstimator"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureEstimator.html#ac91306818390cb2cd889c4b9ef147dec">cam_model</a></td></tr>
 <tr class="separator:ac91306818390cb2cd889c4b9ef147dec inherit pub_attribs_classgvio_1_1FeatureEstimator"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -138,8 +134,8 @@ Public Attributes</h2></td></tr>
 Public Methods</h2></td></tr>
 <tr class="memitem:a50efe1754269a8ce73891cb4329db9e9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a50efe1754269a8ce73891cb4329db9e9">CeresFeatureEstimator</a> (const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *<a class="el" href="classgvio_1_1FeatureEstimator.html#ac91306818390cb2cd889c4b9ef147dec">cam_model</a>, const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> <a class="el" href="classgvio_1_1FeatureEstimator.html#affe179b09415b1071e3bb43a9f532b78">track</a>, const <a class="el" href="group__msckf.html#ga6fbc7373ac8581feb06eeb07b0e64537">CameraStates</a> <a class="el" href="classgvio_1_1FeatureEstimator.html#ad1f6dae2c26f8fb2a4aa9198e3824b09">track_cam_states</a>)</td></tr>
 <tr class="separator:a50efe1754269a8ce73891cb4329db9e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fedb84b40dd5040de4c54fc03a5f45d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a0fedb84b40dd5040de4c54fc03a5f45d">addResidualBlock</a> (const cv::KeyPoint &amp;kp, double *cam_q_CG, double *cam_p_G, double *<a class="el" href="classgvio_1_1CeresFeatureEstimator.html#aee437c2baf332b0cdc2107d9d9fb7271">landmark</a>)</td></tr>
-<tr class="separator:a0fedb84b40dd5040de4c54fc03a5f45d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a765adf3da5c7188a5f0abf181d96b589"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a765adf3da5c7188a5f0abf181d96b589">addResidualBlock</a> (const cv::KeyPoint &amp;kp, const <a class="el" href="group__math.html#gaf38a3c10ffaa28bc0416362cc3187cbd">Mat3</a> &amp;C_CiC0, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;t_Ci_CiC0, double *<a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a424c7ea91112c8102911d32b63e4aacb">x</a>)</td></tr>
+<tr class="separator:a765adf3da5c7188a5f0abf181d96b589"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6083e8725772d0e0b74727f276df8148"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a6083e8725772d0e0b74727f276df8148">setupProblem</a> ()</td></tr>
 <tr class="separator:a6083e8725772d0e0b74727f276df8148"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93054337daa0bd93e8ed911f140f220f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1CeresFeatureEstimator.html#a93054337daa0bd93e8ed911f140f220f">estimate</a> (<a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;p_G_f)</td></tr>
@@ -161,7 +157,7 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:af76929105c80ba56ccdd43c2768025ec inherit pub_static_methods_classgvio_1_1FeatureEstimator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Method Descriptions</h2>
-<a class="anchor" id="a0fedb84b40dd5040de4c54fc03a5f45d"></a>
+<a class="anchor" id="a765adf3da5c7188a5f0abf181d96b589"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -174,20 +170,20 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>cam_q_CG</em>, </td>
+          <td class="paramtype">const <a class="el" href="group__math.html#gaf38a3c10ffaa28bc0416362cc3187cbd">Mat3</a> &amp;&#160;</td>
+          <td class="paramname"><em>C_CiC0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>t_Ci_CiC0</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>cam_p_G</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>landmark</em>&#160;</td>
+          <td class="paramname"><em>x</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -200,9 +196,7 @@ Additional Inherited Members</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">kp</td><td>Keypoint </td></tr>
-    <tr><td class="paramname">cam_q_CG</td><td><a class="el" href="classgvio_1_1Camera.html">Camera</a> rotation as JPL quaternion </td></tr>
-    <tr><td class="paramname">cam_p_G</td><td><a class="el" href="classgvio_1_1Camera.html">Camera</a> translation </td></tr>
-    <tr><td class="paramname">landmark</td><td>Landmark </td></tr>
+    <tr><td class="paramname">x</td><td>Optimization parameters </td></tr>
   </table>
   </dd>
 </dl>
