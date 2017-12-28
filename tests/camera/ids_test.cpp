@@ -5,24 +5,47 @@
 
 namespace gvio {
 
+static const std::string TEST_CONFIG = "test_configs/camera/ueye/config.yaml";
+
 int test_IDSCamera_constructor() {
   IDSCamera camera;
 
   MU_FALSE(camera.configured);
 
+  // Camera settings
+  MU_CHECK_EQ(0, camera.cam_handle);
+  MU_CHECK_EQ(CaptureMode::NOT_SET, camera.capture_mode);
+
+  // Image settings
+  MU_CHECK_EQ(0, camera.image_width);
+  MU_CHECK_EQ(0, camera.image_height);
+  MU_CHECK_EQ(0, camera.offset_x);
+  MU_CHECK_EQ(0, camera.offset_y);
+  MU_CHECK_EQ(IS_CM_MONO8, camera.color_mode);
+
+  // Capture settings
+  MU_CHECK_EQ(0, camera.pixel_clock);
+  MU_CHECK_FLOAT(0.0, camera.frame_rate);
+  MU_CHECK_FLOAT(0.0, camera.gain);
+
   return 0;
 }
 
 int test_IDSCamera_configure() {
+  int retval;
   IDSCamera camera;
-  camera.configure("");
+
+  retval = camera.configure(TEST_CONFIG);
+  MU_CHECK_EQ(0, retval);
 
   return 0;
 }
 
 int test_IDSCamera_allocBuffers_and_freeBuffers() {
+  int retval;
   IDSCamera camera;
-  camera.configure("");
+  retval = camera.configure(TEST_CONFIG);
+  MU_CHECK_EQ(0, retval);
 
   // Allocate buffers
   camera.allocBuffers(2, 1);
@@ -38,11 +61,12 @@ int test_IDSCamera_allocBuffers_and_freeBuffers() {
 }
 
 int test_IDSCamera_setCaptureMode_and_getCaptureMode() {
+  int retval;
   IDSCamera camera;
-  camera.configure("");
+  retval = camera.configure(TEST_CONFIG);
+  MU_CHECK_EQ(0, retval);
 
   // Set capture mode
-  int retval = 0;
   enum CaptureMode set_capture_mode = CaptureMode::FREE_RUN;
   retval = camera.setCaptureMode(set_capture_mode);
   MU_CHECK_EQ(0, retval);
@@ -57,11 +81,12 @@ int test_IDSCamera_setCaptureMode_and_getCaptureMode() {
 }
 
 int test_IDSCamera_setPixelClock_and_getPixelClock() {
+  int retval;
   IDSCamera camera;
-  camera.configure("");
+  retval = camera.configure(TEST_CONFIG);
+  MU_CHECK_EQ(0, retval);
 
   // Set pixel clock
-  int retval;
   int set_clock_rate = 32;
   retval = camera.setPixelClock(set_clock_rate);
   MU_CHECK_EQ(0, retval);
@@ -76,11 +101,12 @@ int test_IDSCamera_setPixelClock_and_getPixelClock() {
 }
 
 int test_IDSCamera_setColorMode_and_getColorMode() {
+  int retval;
   IDSCamera camera;
-  camera.configure("");
+  retval = camera.configure(TEST_CONFIG);
+  MU_CHECK_EQ(0, retval);
 
   // Set color mode
-  int retval;
   int set_color_mode = IS_COLORMODE_MONOCHROME;
   retval = camera.setColorMode(set_color_mode);
   MU_CHECK_EQ(0, retval);
@@ -95,11 +121,12 @@ int test_IDSCamera_setColorMode_and_getColorMode() {
 }
 
 int test_IDSCamera_setFrameRate_and_getFrameRate() {
+  int retval;
   IDSCamera camera;
-  camera.configure("");
+  retval = camera.configure(TEST_CONFIG);
+  MU_CHECK_EQ(0, retval);
 
   // Set frame rate
-  int retval;
   double set_frame_rate = 20;
   retval = camera.setFrameRate(set_frame_rate);
   MU_CHECK_EQ(0, retval);
@@ -114,11 +141,12 @@ int test_IDSCamera_setFrameRate_and_getFrameRate() {
 }
 
 int test_IDSCamera_setGain_and_getGain() {
+  int retval;
   IDSCamera camera;
-  camera.configure("");
+  retval = camera.configure(TEST_CONFIG);
+  MU_CHECK_EQ(0, retval);
 
   // Set frame rate
-  int retval;
   double set_gain = 20;
   retval = camera.setGain(set_gain);
   MU_CHECK_EQ(0, retval);
@@ -133,11 +161,12 @@ int test_IDSCamera_setGain_and_getGain() {
 }
 
 int test_IDSCamera_setROI_and_getROI() {
+  int retval;
   IDSCamera camera;
-  camera.configure("");
+  retval = camera.configure(TEST_CONFIG);
+  MU_CHECK_EQ(0, retval);
 
   // Set ROI
-  int retval = 0;
   int set_offset_x = 0;
   int set_offset_y = 0;
   int set_image_width = 100;
@@ -167,12 +196,14 @@ int test_IDSCamera_setROI_and_getROI() {
 }
 
 int test_IDSCamera_getImageSize() {
+  int retval;
   IDSCamera camera;
-  camera.configure("");
+  retval = camera.configure(TEST_CONFIG);
+  MU_CHECK_EQ(0, retval);
 
   int image_width = -1;
   int image_height = -1;
-  int retval = camera.getImageSize(image_width, image_height);
+  retval = camera.getImageSize(image_width, image_height);
   MU_CHECK_EQ(0, retval);
   MU_CHECK(image_width > 0);
   MU_CHECK(image_height > 0);
@@ -182,10 +213,30 @@ int test_IDSCamera_getImageSize() {
 
 int test_IDSCamera_getFrame() {
   IDSCamera camera;
-  camera.configure("");
+  camera.configure(TEST_CONFIG);
 
   cv::Mat image;
-  camera.getFrame(image);
+
+  struct timespec start;
+  tic(&start);
+
+  int index = 0;
+  while (true) {
+    if (camera.getFrame(image) != 0) {
+      return -1;
+    }
+
+    index++;
+    if (index == 5) {
+      cv::imshow("Image", image);
+      if (cv::waitKey(1) == 113) {
+        break;
+      }
+      printf("fps: %fs\n", 5.0 / toc(&start));
+      tic(&start);
+      index = 0;
+    }
+  }
 
   return 0;
 }

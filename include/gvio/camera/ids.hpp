@@ -14,7 +14,23 @@ namespace gvio {
  * @{
  */
 
-enum class CaptureMode { NOT_SET, FREE_RUN, SOFTWARE_TRIGGER };
+enum class CaptureMode { NOT_SET, FREE_RUN, SOFTWARE_TRIGGER, INVALID };
+
+/**
+ * String to capture mode
+ *
+ * @param mode Capture mode in string form
+ * @returns Capture mode as enum
+ */
+enum CaptureMode ueye_str2capturemode(const std::string &mode);
+
+/**
+ * String to color mode
+ *
+ * @param mode Color mode in string form
+ * @returns Color mode, else -1 for failure
+ */
+int ueye_str2colormode(const std::string &mode);
 
 /**
  * Color mode to bytes per pixel
@@ -77,16 +93,27 @@ class IDSCamera {
 public:
   bool configured = false;
 
-  SENSORINFO sensor_info;
+  // Camera and sensor info
   CAMINFO camera_info;
+  SENSORINFO sensor_info;
 
+  // Camera settings
   HIDS cam_handle = 0;
   enum CaptureMode capture_mode = CaptureMode::NOT_SET;
-  int pixel_clock = 0;
+
+  // Image settings
+  int image_width = 0;
+  int image_height = 0;
+  int offset_x = 0;
+  int offset_y = 0;
   int color_mode = IS_CM_MONO8;
+
+  // Capture settings
+  int pixel_clock = 0;
   double frame_rate = 0.0;
   int gain = 0.0;
 
+  // Buffers
   std::vector<char *> buffers;
   std::vector<int> buffer_id;
 

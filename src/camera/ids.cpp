@@ -2,6 +2,80 @@
 
 namespace gvio {
 
+enum CaptureMode ueye_str2capturemode(const std::string &mode) {
+  if (mode == "FREE_RUN") {
+    return CaptureMode::FREE_RUN;
+  } else if (mode == "SOFTARE_TRIGGER") {
+    return CaptureMode::SOFTWARE_TRIGGER;
+  }
+  return CaptureMode::INVALID;
+}
+
+int ueye_str2colormode(const std::string &mode) {
+  if (mode == "RAW8")
+    return IS_CM_SENSOR_RAW8;
+  else if (mode == "MONO8")
+    return IS_CM_MONO8;
+  else if (mode == "RAW10")
+    return IS_CM_SENSOR_RAW10;
+  else if (mode == "RAW12")
+    return IS_CM_SENSOR_RAW12;
+  else if (mode == "RAW16")
+    return IS_CM_SENSOR_RAW16;
+  else if (mode == "MONO10")
+    return IS_CM_MONO10;
+  else if (mode == "MONO12")
+    return IS_CM_MONO12;
+  else if (mode == "MONO12")
+    return IS_CM_MONO16;
+  else if (mode == "BGR5")
+    return IS_CM_BGR5_PACKED;
+  else if (mode == "BGR565")
+    return IS_CM_BGR565_PACKED;
+  else if (mode == "UYVY")
+    return IS_CM_UYVY_PACKED;
+  else if (mode == "UYVY_MONO")
+    return IS_CM_UYVY_MONO_PACKED;
+  else if (mode == "UYVY_BAYER")
+    return IS_CM_UYVY_BAYER_PACKED;
+  else if (mode == "CBYCRY_PACKED")
+    return IS_CM_CBYCRY_PACKED;
+  else if (mode == "RGB8_PACKED")
+    return IS_CM_RGB8_PACKED;
+  else if (mode == "BGR8_PACKED")
+    return IS_CM_BGR8_PACKED;
+  else if (mode == "RGB8_PLANAR")
+    return IS_CM_RGB8_PLANAR;
+  else if (mode == "RGBA8_PACKED")
+    return IS_CM_RGBA8_PACKED;
+  else if (mode == "BGRA8_PACKED")
+    return IS_CM_BGRA8_PACKED;
+  else if (mode == "RGBY8_PACKED")
+    return IS_CM_RGBY8_PACKED;
+  else if (mode == "BGRY8_PACKED")
+    return IS_CM_BGRY8_PACKED;
+  else if (mode == "RGB10_PACKED")
+    return IS_CM_RGB10_PACKED;
+  else if (mode == "BGR10_PACKED")
+    return IS_CM_BGR10_PACKED;
+  else if (mode == "RGB10_UNPACKED")
+    return IS_CM_RGB10_UNPACKED;
+  else if (mode == "BGR10_UNPACKED")
+    return IS_CM_BGR10_UNPACKED;
+  else if (mode == "RGB12_UNPACKED")
+    return IS_CM_RGB12_UNPACKED;
+  else if (mode == "BGR12_UNPACKED")
+    return IS_CM_BGR12_UNPACKED;
+  else if (mode == "RGBA12_UNPACKED")
+    return IS_CM_RGBA12_UNPACKED;
+  else if (mode == "BGRA12_UNPACKED")
+    return IS_CM_BGRA12_UNPACKED;
+  else if (mode == "JPEG")
+    return IS_CM_JPEG;
+  else
+    return -1;
+}
+
 int ueye_colormode2bpp(int mode) {
   switch (mode) {
     case IS_CM_SENSOR_RAW8:
@@ -222,23 +296,42 @@ IDSCamera::~IDSCamera() {
     return;
   }
 
+  // Free buffers
+  this->freeBuffers();
+
   // Close camera driver
   int retval = is_ExitCamera(this->cam_handle);
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to exit camera!");
   }
-
-  // Free buffers
-  this->freeBuffers();
 }
 
 int IDSCamera::configure(const std::string &config_file) {
-  UNUSED(config_file);
+  int retval = -1;
+  ConfigParser parser;
+
+  int camera_index = 0;
+  std::string capture_mode;
+  std::string color_mode;
+  int nb_buffers = 2;
+  parser.addParam("camera_index", &camera_index);
+  parser.addParam("nb_buffers", &nb_buffers);
+  parser.addParam("capture_mode", &capture_mode);
+  parser.addParam("color_mode", &color_mode);
+  parser.addParam("image_width", &this->image_width);
+  parser.addParam("image_height", &this->image_height);
+  parser.addParam("offset_x", &this->offset_x);
+  parser.addParam("offset_y", &this->offset_y);
+  parser.addParam("pixel_clock", &this->pixel_clock);
+  parser.addParam("frame_rate", &this->frame_rate);
+  parser.addParam("gain", &this->gain);
+  if (parser.load(config_file) != 0) {
+    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
+    return -1;
+  }
 
   // Query for number of connected cameras
   int nb_cameras = -1;
-  int retval = 0;
-
   retval = is_GetNumberOfCameras(&nb_cameras);
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to get number of connected UEye cameras!");
@@ -258,17 +351,17 @@ int IDSCamera::configure(const std::string &config_file) {
     return -1;
   }
 
-  // Get sensor info
-  retval = is_GetSensorInfo(this->cam_handle, &this->sensor_info);
-  if (retval != IS_SUCCESS) {
-    LOG_ERROR("Failed to poll sensor information!");
-    return -1;
-  }
-
   // Get camera info
   retval = is_GetCameraInfo(this->cam_handle, &this->camera_info);
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to poll camera information!");
+    return -1;
+  }
+
+  // Get sensor info
+  retval = is_GetSensorInfo(this->cam_handle, &this->sensor_info);
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to poll sensor information!");
     return -1;
   }
 
@@ -279,36 +372,56 @@ int IDSCamera::configure(const std::string &config_file) {
     return -1;
   }
 
+  // Set capture mode
+  this->capture_mode = ueye_str2capturemode(capture_mode);
+  if (this->capture_mode == CaptureMode::INVALID) {
+    LOG_ERROR("Invalid capture mode [%s]!", capture_mode.c_str());
+    return -1;
+  }
+  retval = this->setCaptureMode(this->capture_mode);
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("This camera does not support Device Independent Bitmap mode");
+    return -1;
+  }
+
   // Set color mode
+  this->color_mode = ueye_str2colormode(color_mode);
+  if (this->color_mode == -1) {
+    LOG_ERROR("Invalid color mode [%s]!", color_mode.c_str());
+    return -1;
+  }
   retval = this->setColorMode(this->color_mode);
   if (retval != 0) {
     LOG_ERROR("Failed to set color mode!");
     return -1;
   }
 
-  // // Set frame rate
-  // retval = this->setFrameRate(this->frame_rate);
-  // if (retval != 0) {
-  //   LOG_ERROR("Failed to set frame rate!");
-  //   return -1;
-  // }
-  //
-  // // Set gain
-  // retval = this->setGain(this->gain);
-  // if (retval != 0) {
-  //   LOG_ERROR("Failed to set gain!");
-  //   return -1;
-  // }
+  // Set frame rate
+  retval = this->setFrameRate(this->frame_rate);
+  if (retval != 0) {
+    LOG_ERROR("Failed to set frame rate!");
+    return -1;
+  }
 
-  // // Set ROI
-  // retval = this->setROI(0, 0, );
-  // if (retval != 0) {
-  //   LOG_ERROR("Failed to set gain!");
-  //   return -1;
-  // }
+  // Set gain
+  retval = this->setGain(this->gain);
+  if (retval != 0) {
+    LOG_ERROR("Failed to set gain!");
+    return -1;
+  }
+
+  // Set ROI
+  retval = this->setROI(this->offset_x,
+                        this->offset_y,
+                        this->image_width,
+                        this->image_height);
+  if (retval != 0) {
+    LOG_ERROR("Failed to set ROI!");
+    return -1;
+  }
 
   // Allocate frame buffer memory
-  retval = this->allocBuffers(2, ueye_colormode2bpp(this->color_mode));
+  retval = this->allocBuffers(nb_buffers, ueye_colormode2bpp(this->color_mode));
   if (retval != 0) {
     LOG_ERROR("Failed to allocate memory for frame buffers!");
     return -1;
@@ -385,7 +498,8 @@ int IDSCamera::setCaptureMode(const enum CaptureMode &capture_mode) {
       break;
     default:
       LOG_ERROR("Not implemented!");
-      return -1; break;
+      return -1;
+      break;
   }
 
   // Check return status
@@ -506,6 +620,9 @@ int IDSCamera::setFrameRate(const double frame_rate) {
     return -1;
   }
 
+  std::cout << "Actual frame rate configured: " << this->frame_rate
+            << std::endl;
+  this->frame_rate = frame_rate;
   return 0;
 }
 
@@ -550,12 +667,42 @@ int IDSCamera::setROI(const int offset_x,
                       const int offset_y,
                       const int image_width,
                       const int image_height) {
-  // Set ROI
-  const IS_RECT aoi = {.s32X = offset_x,
-                       .s32Y = offset_y,
-                       .s32Width = image_width,
-                       .s32Height = image_height};
+  int retval;
 
+  // Get sensor info
+  retval = is_GetSensorInfo(this->cam_handle, &this->sensor_info);
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to poll sensor information!");
+    return -1;
+  }
+  const int max_height = this->sensor_info.nMaxHeight;
+  const int max_width = this->sensor_info.nMaxWidth;
+
+  // Check input
+  if ((image_width + offset_x) > max_width) {
+    LOG_ERROR("Image width + offset x > sensor max width!");
+    LOG_ERROR("ROI is out of bounds!");
+    return -1;
+  } else if ((image_width + offset_x) < 0) {
+    LOG_ERROR("Image width + offset x < 0!");
+    LOG_ERROR("ROI is out of bounds!");
+    return -1;
+  } else if ((image_height + offset_y) > max_height) {
+    LOG_ERROR("Image height + offset y > sensor max width!");
+    LOG_ERROR("ROI is out of bounds!");
+    return -1;
+  } else if ((image_height + offset_y) < 0) {
+    LOG_ERROR("Image height + offset y < 0!");
+    LOG_ERROR("ROI is out of bounds!");
+    return -1;
+  }
+
+  // Set ROI
+  IS_RECT aoi;
+  aoi.s32X = offset_x;
+  aoi.s32Y = offset_y;
+  aoi.s32Width = (image_width == 0) ? max_width : image_width;
+  aoi.s32Height = (image_height == 0) ? max_height : image_height;
   if (is_AOI(this->cam_handle,
              IS_AOI_IMAGE_SET_AOI,
              (void *) &aoi,

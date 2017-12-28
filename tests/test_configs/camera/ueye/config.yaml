@@ -1,0 +1,13 @@
+camera_index: 0
+nb_buffers: 8
+
+capture_mode: "FREE_RUN"
+color_mode: "MONO8"
+image_width: 0
+image_height: 0
+offset_x: 0
+offset_y: 0
+
+pixel_clock: 32
+frame_rate: 30.0
+gain: 20
