@@ -15,15 +15,56 @@ namespace gvio {
  * @{
  */
 
-enum class CaptureMode { NOT_SET, FREE_RUN, SOFTWARE_TRIGGER, INVALID };
+/**
+ * Trigger Modes
+ */
+enum class TriggerMode {
+  /** Not set **/
+  NOT_SET,
+
+  /** Free run (whenever the camera is ready) **/
+  FREE_RUN,
+
+  /** Software trigger **/
+  SOFTWARE_TRIGGER,
+
+  /** Hardware trigger (falling signal edge). Enables camera memory mode in
+   * post-trigger **/
+  TRIGGER_HI_LO,
+
+  /** Hardware trigger (rising signal edge). Enables camera memory mode in
+   * post-trigger. **/
+  TRIGGER_LO_HI,
+
+  /** Hardware trigger (falling signal edge). Enables the pre-trigger in the
+   * memory mode **/
+  TRIGGER_PRE_HI_LO,
+
+  /** Hardware trigger (rising signal edge). Enables the pre-trigger in the
+   * memory mode **/
+  TRIGGER_PRE_LO_HI,
+
+  /** Freerun synchronization / hardware trigger (falling signal edge). The
+   * freerun synchronization mode is currently only supported by the sensors of
+   * the UI-146x/UI-546x series **/
+  TRIGGER_HI_LO_SYNC,
+
+  /** Freerun synchronization / hardware trigger (rising signal edge). The
+   * freerun synchronization mode is currently only supported by the sensors of
+   * the UI-146x/UI-546x series **/
+  TRIGGER_LO_HI_SYNC,
+
+  /** Invalid capture mode **/
+  INVALID
+};
 
 /**
  * String to capture mode
  *
- * @param mode Capture mode in string form
- * @returns Capture mode as enum
+ * @param mode Trigger mode in string form
+ * @returns Trigger mode as enum
  */
-enum CaptureMode ueye_str2capturemode(const std::string &mode);
+enum TriggerMode ueye_str2capturemode(const std::string &mode);
 
 /**
  * String to color mode
@@ -34,7 +75,7 @@ enum CaptureMode ueye_str2capturemode(const std::string &mode);
 int ueye_str2colormode(const std::string &mode);
 
 /**
- * Color mode to bytes per pixel
+ * Color mode to bits per pixel (bpp)
  *
  * @param mode Color mode
  * @returns 0 for success, -1 for failure
@@ -99,15 +140,16 @@ public:
   SENSORINFO sensor_info;
 
   // Camera settings
-  HIDS cam_handle = 0;
-  enum CaptureMode capture_mode = CaptureMode::NOT_SET;
+  int camera_index = -1;
+  HIDS camera_handle = 0;
+  std::string trigger_mode = "NOT_SET";
 
   // Image settings
   int image_width = 0;
   int image_height = 0;
   int offset_x = 0;
   int offset_y = 0;
-  int color_mode = IS_CM_MONO8;
+  std::string color_mode = "MONO8";
 
   // Capture settings
   int pixel_clock = 0;
@@ -115,6 +157,7 @@ public:
   int gain = 0.0;
 
   // Buffers
+  int nb_buffers = 0;
   std::vector<char *> buffers;
   std::vector<int> buffer_id;
 
@@ -133,7 +176,7 @@ public:
    * Allocate buffers
    *
    * @param nb_buffers Number of buffers
-   * @param bpp Bytes per pixel
+   * @param bpp Bits per pixel (bpp)
    * @returns 0 for success, -1 for failure
    */
   int allocBuffers(const int nb_buffers, const int bpp);
@@ -148,18 +191,18 @@ public:
   /**
    * Set capture mode
    *
-   * @param capture_mode
+   * @param trigger_mode
    * @returns 0 for success, -1 for failure
    */
-  int setCaptureMode(const enum CaptureMode &capture_mode);
+  int setTriggerMode(const std::string &trigger_mode);
 
   /**
    * Get capture mode
    *
-   * @param capture_mode Capture mode
+   * @param trigger_mode Trigger mode
    * @returns 0 for success, -1 for failure
    */
-  int getCaptureMode(enum CaptureMode &capture_mode);
+  int getTriggerMode(std::string &trigger_mode);
 
   /**
    * Set pixel clock
@@ -180,10 +223,43 @@ public:
   /**
    * Set color mode
    *
+   * Supported color modes:
+   *
+   * - RAW8
+   * - MONO8
+   * - RAW10
+   * - RAW12
+   * - RAW16
+   * - MONO10
+   * - MONO12
+   * - MONO12
+   * - BGR5
+   * - BGR565
+   * - UYVY
+   * - UYVY_MONO
+   * - UYVY_BAYER
+   * - CBYCRY_PACKED
+   * - RGB8_PACKED
+   * - BGR8_PACKED
+   * - RGB8_PLANAR
+   * - RGBA8_PACKED
+   * - BGRA8_PACKED
+   * - RGBY8_PACKED
+   * - BGRY8_PACKED
+   * - RGB10_PACKED
+   * - BGR10_PACKED
+   * - RGB10_UNPACKED
+   * - BGR10_UNPACKED
+   * - RGB12_UNPACKED
+   * - BGR12_UNPACKED
+   * - RGBA12_UNPACKED
+   * - BGRA12_UNPACKED
+   * - JPEG
+   *
    * @param color_mode Color mode
    * @returns 0 for success, -1 for failure
    */
-  int setColorMode(const int color_mode);
+  int setColorMode(const std::string &color_mode);
 
   /**
    * Get color mode
@@ -191,7 +267,7 @@ public:
    * @param color_mode Color mode
    * @returns 0 for success, -1 for failure
    */
-  int getColorMode(int &color_mode);
+  int getColorMode(std::string &color_mode);
 
   /**
    * Set frame rate

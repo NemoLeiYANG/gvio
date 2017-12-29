@@ -105,10 +105,12 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a7ef807ffd5e9e8dac23131b86a2304d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7aeeff65ce9a0b8a8af51a83491699e1"><td class="memItemLeft" align="right" valign="top">SENSORINFO&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a7aeeff65ce9a0b8a8af51a83491699e1">sensor_info</a></td></tr>
 <tr class="separator:a7aeeff65ce9a0b8a8af51a83491699e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad30381e98f997e35dae3c696c1c53cb2"><td class="memItemLeft" align="right" valign="top">HIDS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#ad30381e98f997e35dae3c696c1c53cb2">cam_handle</a> = 0</td></tr>
-<tr class="separator:ad30381e98f997e35dae3c696c1c53cb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf9a1000d8ab80a54168c79192febe85"><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="group__camera.html#ga1d1ae2bdce686a3b4580c15cecf83802">CaptureMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#adf9a1000d8ab80a54168c79192febe85">capture_mode</a> = <a class="el" href="group__camera.html#gga1d1ae2bdce686a3b4580c15cecf83802a1c250a21210b7b88a14db9a0cbe71162">CaptureMode::NOT_SET</a></td></tr>
-<tr class="separator:adf9a1000d8ab80a54168c79192febe85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f4402c9934dfb19ec09efcb22ac9ab2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a3f4402c9934dfb19ec09efcb22ac9ab2">camera_index</a> = -1</td></tr>
+<tr class="separator:a3f4402c9934dfb19ec09efcb22ac9ab2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d77586e8ceff9aff05d9d8a55fd9827"><td class="memItemLeft" align="right" valign="top">HIDS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a7d77586e8ceff9aff05d9d8a55fd9827">camera_handle</a> = 0</td></tr>
+<tr class="separator:a7d77586e8ceff9aff05d9d8a55fd9827"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26d96dc796a5c5003d0ab008bcc90de6"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a26d96dc796a5c5003d0ab008bcc90de6">trigger_mode</a> = &quot;NOT_SET&quot;</td></tr>
+<tr class="separator:a26d96dc796a5c5003d0ab008bcc90de6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1fd89e89a4be8160e9384952e818455"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#af1fd89e89a4be8160e9384952e818455">image_width</a> = 0</td></tr>
 <tr class="separator:af1fd89e89a4be8160e9384952e818455"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab71f622fb06f8555ae6882ef00b15ee5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#ab71f622fb06f8555ae6882ef00b15ee5">image_height</a> = 0</td></tr>
@@ -117,14 +119,16 @@ Public Attributes</h2></td></tr>
 <tr class="separator:af64bb228bd558dec1dd0e6ac508a90d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2bc5cc39a3bc1730519d100fcbf33d7f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a2bc5cc39a3bc1730519d100fcbf33d7f">offset_y</a> = 0</td></tr>
 <tr class="separator:a2bc5cc39a3bc1730519d100fcbf33d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbc32ac42b12fff0bdaf41d1e3279aea"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#acbc32ac42b12fff0bdaf41d1e3279aea">color_mode</a> = IS_CM_MONO8</td></tr>
-<tr class="separator:acbc32ac42b12fff0bdaf41d1e3279aea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac39541c45bc8d5d407232dbb5ca2f70a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#ac39541c45bc8d5d407232dbb5ca2f70a">color_mode</a> = &quot;MONO8&quot;</td></tr>
+<tr class="separator:ac39541c45bc8d5d407232dbb5ca2f70a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe45a59545e1c0d73269a30722a8d18f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#abe45a59545e1c0d73269a30722a8d18f">pixel_clock</a> = 0</td></tr>
 <tr class="separator:abe45a59545e1c0d73269a30722a8d18f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02e66c92550623e0d7524b58abc7d074"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a02e66c92550623e0d7524b58abc7d074">frame_rate</a> = 0.0</td></tr>
 <tr class="separator:a02e66c92550623e0d7524b58abc7d074"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6749c684c86677e7637bc505f1107088"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a6749c684c86677e7637bc505f1107088">gain</a> = 0.0</td></tr>
 <tr class="separator:a6749c684c86677e7637bc505f1107088"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a214c14e3aa4684b94ea5ab695370b8b0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a214c14e3aa4684b94ea5ab695370b8b0">nb_buffers</a> = 0</td></tr>
+<tr class="separator:a214c14e3aa4684b94ea5ab695370b8b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b68f74132ad2d57ec68c5e872bcb09c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; char * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a8b68f74132ad2d57ec68c5e872bcb09c">buffers</a></td></tr>
 <tr class="separator:a8b68f74132ad2d57ec68c5e872bcb09c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a518dfc4009f0d5445a9c16fb9c51c758"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a518dfc4009f0d5445a9c16fb9c51c758">buffer_id</a></td></tr>
@@ -138,22 +142,22 @@ Public Methods</h2></td></tr>
 <tr class="separator:ae6ae1eeee27d2153dcf563fe58913574"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3dfcd30182355f1a6fd54e0860ebb69e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a3dfcd30182355f1a6fd54e0860ebb69e">configure</a> (const std::string &amp;config_file)</td></tr>
 <tr class="separator:a3dfcd30182355f1a6fd54e0860ebb69e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7eeb357e16f085983d636c0df73cc008"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a7eeb357e16f085983d636c0df73cc008">allocBuffers</a> (const int nb_buffers, const int bpp)</td></tr>
+<tr class="memitem:a7eeb357e16f085983d636c0df73cc008"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a7eeb357e16f085983d636c0df73cc008">allocBuffers</a> (const int <a class="el" href="classgvio_1_1IDSCamera.html#a214c14e3aa4684b94ea5ab695370b8b0">nb_buffers</a>, const int bpp)</td></tr>
 <tr class="separator:a7eeb357e16f085983d636c0df73cc008"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a891d6f680de61076bd5ada422f2deaf0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a891d6f680de61076bd5ada422f2deaf0">freeBuffers</a> ()</td></tr>
 <tr class="separator:a891d6f680de61076bd5ada422f2deaf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a489be392556e805498df92ca166e5e38"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a489be392556e805498df92ca166e5e38">setCaptureMode</a> (const enum <a class="el" href="group__camera.html#ga1d1ae2bdce686a3b4580c15cecf83802">CaptureMode</a> &amp;<a class="el" href="classgvio_1_1IDSCamera.html#adf9a1000d8ab80a54168c79192febe85">capture_mode</a>)</td></tr>
-<tr class="separator:a489be392556e805498df92ca166e5e38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2990baf035b74927cc3cb604c0fa3ac"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#ad2990baf035b74927cc3cb604c0fa3ac">getCaptureMode</a> (enum <a class="el" href="group__camera.html#ga1d1ae2bdce686a3b4580c15cecf83802">CaptureMode</a> &amp;<a class="el" href="classgvio_1_1IDSCamera.html#adf9a1000d8ab80a54168c79192febe85">capture_mode</a>)</td></tr>
-<tr class="separator:ad2990baf035b74927cc3cb604c0fa3ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81a7bdf0d62aa247b205e13b1ec86dff"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a81a7bdf0d62aa247b205e13b1ec86dff">setTriggerMode</a> (const std::string &amp;<a class="el" href="classgvio_1_1IDSCamera.html#a26d96dc796a5c5003d0ab008bcc90de6">trigger_mode</a>)</td></tr>
+<tr class="separator:a81a7bdf0d62aa247b205e13b1ec86dff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a415464535c8ca18228174cf95b48f63f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a415464535c8ca18228174cf95b48f63f">getTriggerMode</a> (std::string &amp;<a class="el" href="classgvio_1_1IDSCamera.html#a26d96dc796a5c5003d0ab008bcc90de6">trigger_mode</a>)</td></tr>
+<tr class="separator:a415464535c8ca18228174cf95b48f63f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad850d35fc96d11d698c5660ddb4f60f0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#ad850d35fc96d11d698c5660ddb4f60f0">setPixelClock</a> (const int clock_rate)</td></tr>
 <tr class="separator:ad850d35fc96d11d698c5660ddb4f60f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f023c875c309131e34db670d28f3d3a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a9f023c875c309131e34db670d28f3d3a">getPixelClock</a> (int &amp;clock_rate)</td></tr>
 <tr class="separator:a9f023c875c309131e34db670d28f3d3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d8865acbdb90304b8be50bed0b4ef71"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a2d8865acbdb90304b8be50bed0b4ef71">setColorMode</a> (const int <a class="el" href="classgvio_1_1IDSCamera.html#acbc32ac42b12fff0bdaf41d1e3279aea">color_mode</a>)</td></tr>
-<tr class="separator:a2d8865acbdb90304b8be50bed0b4ef71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42d781940d5060651ef75dea7d413cf0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a42d781940d5060651ef75dea7d413cf0">getColorMode</a> (int &amp;<a class="el" href="classgvio_1_1IDSCamera.html#acbc32ac42b12fff0bdaf41d1e3279aea">color_mode</a>)</td></tr>
-<tr class="separator:a42d781940d5060651ef75dea7d413cf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e6e43047646cdd4ade7d57910e79868"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a7e6e43047646cdd4ade7d57910e79868">setColorMode</a> (const std::string &amp;<a class="el" href="classgvio_1_1IDSCamera.html#ac39541c45bc8d5d407232dbb5ca2f70a">color_mode</a>)</td></tr>
+<tr class="separator:a7e6e43047646cdd4ade7d57910e79868"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1897c44a0d06fb6347d14a0587b53375"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a1897c44a0d06fb6347d14a0587b53375">getColorMode</a> (std::string &amp;<a class="el" href="classgvio_1_1IDSCamera.html#ac39541c45bc8d5d407232dbb5ca2f70a">color_mode</a>)</td></tr>
+<tr class="separator:a1897c44a0d06fb6347d14a0587b53375"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae462bed55bfff390da874decbd01ba6b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#ae462bed55bfff390da874decbd01ba6b">setFrameRate</a> (const double <a class="el" href="classgvio_1_1IDSCamera.html#a02e66c92550623e0d7524b58abc7d074">frame_rate</a>)</td></tr>
 <tr class="separator:ae462bed55bfff390da874decbd01ba6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a637c94376df2eca93f688d12ee586fdd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1IDSCamera.html#a637c94376df2eca93f688d12ee586fdd">getFrameRate</a> (double &amp;<a class="el" href="classgvio_1_1IDSCamera.html#a02e66c92550623e0d7524b58abc7d074">frame_rate</a>)</td></tr>
@@ -252,38 +256,14 @@ Public Methods</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ad2990baf035b74927cc3cb604c0fa3ac"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int gvio::IDSCamera::getCaptureMode </td>
-          <td>(</td>
-          <td class="paramtype">enum <a class="el" href="group__camera.html#ga1d1ae2bdce686a3b4580c15cecf83802">CaptureMode</a> &amp;&#160;</td>
-          <td class="paramname"><em>capture_mode</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Get capture mode</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">capture_mode</td><td>Capture mode </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a42d781940d5060651ef75dea7d413cf0"></a>
+<a class="anchor" id="a1897c44a0d06fb6347d14a0587b53375"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">int gvio::IDSCamera::getColorMode </td>
           <td>(</td>
-          <td class="paramtype">int &amp;&#160;</td>
+          <td class="paramtype">std::string &amp;&#160;</td>
           <td class="paramname"><em>color_mode</em></td><td>)</td>
           <td></td>
         </tr>
@@ -491,23 +471,23 @@ Public Methods</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a489be392556e805498df92ca166e5e38"></a>
+<a class="anchor" id="a415464535c8ca18228174cf95b48f63f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gvio::IDSCamera::setCaptureMode </td>
+          <td class="memname">int gvio::IDSCamera::getTriggerMode </td>
           <td>(</td>
-          <td class="paramtype">const enum <a class="el" href="group__camera.html#ga1d1ae2bdce686a3b4580c15cecf83802">CaptureMode</a> &amp;&#160;</td>
-          <td class="paramname"><em>capture_mode</em></td><td>)</td>
+          <td class="paramtype">std::string &amp;&#160;</td>
+          <td class="paramname"><em>trigger_mode</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Set capture mode</p>
+<p>Get capture mode</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">capture_mode</td><td></td></tr>
+    <tr><td class="paramname">trigger_mode</td><td>Trigger mode </td></tr>
   </table>
   </dd>
 </dl>
@@ -515,20 +495,53 @@ Public Methods</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a2d8865acbdb90304b8be50bed0b4ef71"></a>
+<a class="anchor" id="a7e6e43047646cdd4ade7d57910e79868"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">int gvio::IDSCamera::setColorMode </td>
           <td>(</td>
-          <td class="paramtype">const int&#160;</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>color_mode</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>Set color mode</p>
+<p>Supported color modes:</p>
+<ul>
+<li>RAW8</li>
+<li>MONO8</li>
+<li>RAW10</li>
+<li>RAW12</li>
+<li>RAW16</li>
+<li>MONO10</li>
+<li>MONO12</li>
+<li>MONO12</li>
+<li>BGR5</li>
+<li>BGR565</li>
+<li>UYVY</li>
+<li>UYVY_MONO</li>
+<li>UYVY_BAYER</li>
+<li>CBYCRY_PACKED</li>
+<li>RGB8_PACKED</li>
+<li>BGR8_PACKED</li>
+<li>RGB8_PLANAR</li>
+<li>RGBA8_PACKED</li>
+<li>BGRA8_PACKED</li>
+<li>RGBY8_PACKED</li>
+<li>BGRY8_PACKED</li>
+<li>RGB10_PACKED</li>
+<li>BGR10_PACKED</li>
+<li>RGB10_UNPACKED</li>
+<li>BGR10_UNPACKED</li>
+<li>RGB12_UNPACKED</li>
+<li>BGR12_UNPACKED</li>
+<li>RGBA12_UNPACKED</li>
+<li>BGRA12_UNPACKED</li>
+<li>JPEG</li>
+</ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">color_mode</td><td>Color mode </td></tr>
@@ -664,6 +677,30 @@ Public Methods</h2></td></tr>
     <tr><td class="paramname">offset_y</td><td>Offset in y-axis </td></tr>
     <tr><td class="paramname">image_width</td><td>Image width </td></tr>
     <tr><td class="paramname">image_height</td><td>Image height </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a81a7bdf0d62aa247b205e13b1ec86dff"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::IDSCamera::setTriggerMode </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>trigger_mode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set capture mode</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">trigger_mode</td><td></td></tr>
   </table>
   </dd>
 </dl>

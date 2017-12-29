@@ -13,15 +13,15 @@ int test_IDSCamera_constructor() {
   MU_FALSE(camera.configured);
 
   // Camera settings
-  MU_CHECK_EQ(0, camera.cam_handle);
-  MU_CHECK_EQ(CaptureMode::NOT_SET, camera.capture_mode);
+  MU_CHECK_EQ(0, camera.camera_handle);
+  MU_CHECK_EQ("NOT_SET", camera.trigger_mode);
 
   // Image settings
   MU_CHECK_EQ(0, camera.image_width);
   MU_CHECK_EQ(0, camera.image_height);
   MU_CHECK_EQ(0, camera.offset_x);
   MU_CHECK_EQ(0, camera.offset_y);
-  MU_CHECK_EQ(IS_CM_MONO8, camera.color_mode);
+  MU_CHECK_EQ("MONO8", camera.color_mode);
 
   // Capture settings
   MU_CHECK_EQ(0, camera.pixel_clock);
@@ -60,22 +60,22 @@ int test_IDSCamera_allocBuffers_and_freeBuffers() {
   return 0;
 }
 
-int test_IDSCamera_setCaptureMode_and_getCaptureMode() {
+int test_IDSCamera_setTriggerMode_and_getTriggerMode() {
   int retval;
   IDSCamera camera;
   retval = camera.configure(TEST_CONFIG);
   MU_CHECK_EQ(0, retval);
 
-  // Set capture mode
-  enum CaptureMode set_capture_mode = CaptureMode::FREE_RUN;
-  retval = camera.setCaptureMode(set_capture_mode);
+  // Set trigger mode
+  std::string set_trigger_mode = "FREE_RUN";
+  retval = camera.setTriggerMode(set_trigger_mode);
   MU_CHECK_EQ(0, retval);
 
-  // Get capture mode
-  enum CaptureMode get_capture_mode;
-  camera.getCaptureMode(get_capture_mode);
+  // Get trigger mode
+  std::string get_trigger_mode;
+  camera.getTriggerMode(get_trigger_mode);
   MU_CHECK_EQ(0, retval);
-  MU_CHECK_EQ(get_capture_mode, set_capture_mode);
+  MU_CHECK_EQ(get_trigger_mode, set_trigger_mode);
 
   return 0;
 }
@@ -107,12 +107,12 @@ int test_IDSCamera_setColorMode_and_getColorMode() {
   MU_CHECK_EQ(0, retval);
 
   // Set color mode
-  int set_color_mode = IS_COLORMODE_MONOCHROME;
+  std::string set_color_mode = "MONO8";
   retval = camera.setColorMode(set_color_mode);
   MU_CHECK_EQ(0, retval);
 
   // Get color mode
-  int get_color_mode = IS_COLORMODE_MONOCHROME;
+  std::string get_color_mode = "MONO8";
   retval = camera.getColorMode(get_color_mode);
   MU_CHECK_EQ(0, retval);
   MU_CHECK_EQ(get_color_mode, set_color_mode);
@@ -135,7 +135,7 @@ int test_IDSCamera_setFrameRate_and_getFrameRate() {
   double get_frame_rate = 0;
   retval = camera.getFrameRate(get_frame_rate);
   MU_CHECK_EQ(0, retval);
-  MU_CHECK_FLOAT(get_frame_rate, set_frame_rate);
+  MU_CHECK_NEAR(get_frame_rate, set_frame_rate, 0.1);
 
   return 0;
 }
@@ -217,7 +217,7 @@ int test_IDSCamera_getFrame() {
 
   struct timespec start;
   tic(&start);
-  int index = 0;
+  // int index = 0;
 
   while (true) {
     cv::Mat image;
@@ -230,29 +230,26 @@ int test_IDSCamera_getFrame() {
       break;
     }
 
-    index++;
-    if (index == 10) {
-      printf("fps: %fs\n", 10.0 / toc(&start));
-      tic(&start);
-      index = 0;
-    }
+    printf("fps: %fs\n", 1.0 / toc(&start));
+    tic(&start);
+    // index = 0;
   }
 
   return 0;
 }
 
 void test_suite() {
-  // MU_ADD_TEST(test_IDSCamera_constructor);
-  // MU_ADD_TEST(test_IDSCamera_configure);
-  // MU_ADD_TEST(test_IDSCamera_allocBuffers_and_freeBuffers);
-  // MU_ADD_TEST(test_IDSCamera_setCaptureMode_and_getCaptureMode);
-  // MU_ADD_TEST(test_IDSCamera_setPixelClock_and_getPixelClock);
-  // MU_ADD_TEST(test_IDSCamera_setColorMode_and_getColorMode);
-  // MU_ADD_TEST(test_IDSCamera_setFrameRate_and_getFrameRate);
-  // MU_ADD_TEST(test_IDSCamera_setGain_and_getGain);
-  // MU_ADD_TEST(test_IDSCamera_setROI_and_getROI);
-  // MU_ADD_TEST(test_IDSCamera_getImageSize);
-  MU_ADD_TEST(test_IDSCamera_getFrame);
+  MU_ADD_TEST(test_IDSCamera_constructor);
+  MU_ADD_TEST(test_IDSCamera_configure);
+  MU_ADD_TEST(test_IDSCamera_allocBuffers_and_freeBuffers);
+  MU_ADD_TEST(test_IDSCamera_setTriggerMode_and_getTriggerMode);
+  MU_ADD_TEST(test_IDSCamera_setPixelClock_and_getPixelClock);
+  MU_ADD_TEST(test_IDSCamera_setColorMode_and_getColorMode);
+  MU_ADD_TEST(test_IDSCamera_setFrameRate_and_getFrameRate);
+  MU_ADD_TEST(test_IDSCamera_setGain_and_getGain);
+  MU_ADD_TEST(test_IDSCamera_setROI_and_getROI);
+  MU_ADD_TEST(test_IDSCamera_getImageSize);
+  // MU_ADD_TEST(test_IDSCamera_getFrame);
 }
 
 } // namespace gvio

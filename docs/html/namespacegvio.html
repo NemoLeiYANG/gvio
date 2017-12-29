@@ -177,12 +177,22 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:ga1d1ae2bdce686a3b4580c15cecf83802"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga1d1ae2bdce686a3b4580c15cecf83802">CaptureMode</a> { <a class="el" href="group__camera.html#gga1d1ae2bdce686a3b4580c15cecf83802a1c250a21210b7b88a14db9a0cbe71162">CaptureMode::NOT_SET</a>, 
-<a class="el" href="group__camera.html#gga1d1ae2bdce686a3b4580c15cecf83802af2c5f7ea4bb11bc579158954bcd7136c">CaptureMode::FREE_RUN</a>, 
-<a class="el" href="group__camera.html#gga1d1ae2bdce686a3b4580c15cecf83802a78edfa2e81e9f91c3244a14f31812a20">CaptureMode::SOFTWARE_TRIGGER</a>, 
-<a class="el" href="group__camera.html#gga1d1ae2bdce686a3b4580c15cecf83802accc0377a8afbf50e7094f5c23a8af223">CaptureMode::INVALID</a>
+<tr class="memitem:ga45f84c3223c6bdf05eb0b8dd2bb0d06b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga45f84c3223c6bdf05eb0b8dd2bb0d06b">TriggerMode</a> { <br />
+&#160;&#160;<a class="el" href="group__camera.html#gga45f84c3223c6bdf05eb0b8dd2bb0d06ba1c250a21210b7b88a14db9a0cbe71162">TriggerMode::NOT_SET</a>, 
+<a class="el" href="group__camera.html#gga45f84c3223c6bdf05eb0b8dd2bb0d06baf2c5f7ea4bb11bc579158954bcd7136c">TriggerMode::FREE_RUN</a>, 
+<a class="el" href="group__camera.html#gga45f84c3223c6bdf05eb0b8dd2bb0d06ba78edfa2e81e9f91c3244a14f31812a20">TriggerMode::SOFTWARE_TRIGGER</a>, 
+<a class="el" href="group__camera.html#gga45f84c3223c6bdf05eb0b8dd2bb0d06ba432793cad1499deec617afb1cd69d677">TriggerMode::TRIGGER_HI_LO</a>, 
+<br />
+&#160;&#160;<a class="el" href="group__camera.html#gga45f84c3223c6bdf05eb0b8dd2bb0d06ba3de4b8f17918b2002f150e21326414e2">TriggerMode::TRIGGER_LO_HI</a>, 
+<a class="el" href="group__camera.html#gga45f84c3223c6bdf05eb0b8dd2bb0d06ba68b0405bfca46699d451b7bfe819f4cf">TriggerMode::TRIGGER_PRE_HI_LO</a>, 
+<a class="el" href="group__camera.html#gga45f84c3223c6bdf05eb0b8dd2bb0d06baa5a5d4fae635e03c7eb8502cef7fb93c">TriggerMode::TRIGGER_PRE_LO_HI</a>, 
+<a class="el" href="group__camera.html#gga45f84c3223c6bdf05eb0b8dd2bb0d06ba26f5c9dec0610c29d506ed12ca84e15e">TriggerMode::TRIGGER_HI_LO_SYNC</a>, 
+<br />
+&#160;&#160;<a class="el" href="group__camera.html#gga45f84c3223c6bdf05eb0b8dd2bb0d06baaa769c426b7e7cebb3e6c7c7a671ceac">TriggerMode::TRIGGER_LO_HI_SYNC</a>, 
+<a class="el" href="group__camera.html#gga45f84c3223c6bdf05eb0b8dd2bb0d06baccc0377a8afbf50e7094f5c23a8af223">TriggerMode::INVALID</a>
+<br />
  }</td></tr>
-<tr class="separator:ga1d1ae2bdce686a3b4580c15cecf83802"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ga45f84c3223c6bdf05eb0b8dd2bb0d06b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga66831da6111bb2e879c2702d63d728c4"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__config.html#ga66831da6111bb2e879c2702d63d728c4">ConfigDataType</a> { <br />
 &#160;&#160;<a class="el" href="group__config.html#gga66831da6111bb2e879c2702d63d728c4a19521ec3f2f6a84fb7207a0a97c8731d">TYPE_NOT_SET</a> = 0, 
 <a class="el" href="group__config.html#gga66831da6111bb2e879c2702d63d728c4ab48f81019cbc5580e33f661d0e20d33d">BOOL</a> = 1, 
@@ -214,8 +224,8 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga35b9120b3f2845947378c902dcb63da8"><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="group__camera.html#ga1d1ae2bdce686a3b4580c15cecf83802">CaptureMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#ga35b9120b3f2845947378c902dcb63da8">ueye_str2capturemode</a> (const std::string &amp;mode)</td></tr>
-<tr class="separator:ga35b9120b3f2845947378c902dcb63da8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacbeff3bb9c0889e859df939bb2999b0f"><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="group__camera.html#ga45f84c3223c6bdf05eb0b8dd2bb0d06b">TriggerMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gacbeff3bb9c0889e859df939bb2999b0f">ueye_str2capturemode</a> (const std::string &amp;mode)</td></tr>
+<tr class="separator:gacbeff3bb9c0889e859df939bb2999b0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafa8eeb5281c4373606f71e6876022b39"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gafa8eeb5281c4373606f71e6876022b39">ueye_str2colormode</a> (const std::string &amp;mode)</td></tr>
 <tr class="separator:gafa8eeb5281c4373606f71e6876022b39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf44c962b36bb7eb45a95771e28351f55"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gaf44c962b36bb7eb45a95771e28351f55">ueye_colormode2bpp</a> (int mode)</td></tr>
@@ -419,6 +429,10 @@ Functions</h2></td></tr>
 <tr class="separator:ga34fc5cad787a7dc51e838c0e215de982"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga11bc56d5f1cab9eb15b19c31d8d86810"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__math.html#ga24a95f1d60479280e950c8fa2cd83110">Vec2</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__vision.html#ga11bc56d5f1cab9eb15b19c31d8d86810">normalize</a> (const <a class="el" href="group__math.html#ga24a95f1d60479280e950c8fa2cd83110">Vec2</a> &amp;x)</td></tr>
 <tr class="separator:ga11bc56d5f1cab9eb15b19c31d8d86810"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab82a4983f45304e0e7ac176db5e61a22"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#ab82a4983f45304e0e7ac176db5e61a22">ueye_colormode2bpp</a> (const std::string &amp;color_mode)</td></tr>
+<tr class="separator:ab82a4983f45304e0e7ac176db5e61a22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0bf53ce79d3980bd4daf3b53475c973"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#af0bf53ce79d3980bd4daf3b53475c973">ueye_colormode2channels</a> (const std::string &amp;color_mode)</td></tr>
+<tr class="separator:af0bf53ce79d3980bd4daf3b53475c973"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0469f7ced61d32fe1814142e984e794"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#ac0469f7ced61d32fe1814142e984e794">load_matrix</a> (const <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;A, std::vector&lt; double &gt; &amp;x)</td></tr>
 <tr class="separator:ac0469f7ced61d32fe1814142e984e794"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5977ab5450f9dab4c6ff670e8803a995"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a5977ab5450f9dab4c6ff670e8803a995">test_MITDetector_constructor</a> ()</td></tr>
@@ -457,8 +471,8 @@ Functions</h2></td></tr>
 <tr class="separator:a821039f8966a3daca63278d1f5537321"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebe0ea253008f3ab4ba174929d71d2e8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#aebe0ea253008f3ab4ba174929d71d2e8">test_IDSCamera_allocBuffers_and_freeBuffers</a> ()</td></tr>
 <tr class="separator:aebe0ea253008f3ab4ba174929d71d2e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4069f78b07b35d5a69e09e4d877dd577"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a4069f78b07b35d5a69e09e4d877dd577">test_IDSCamera_setCaptureMode_and_getCaptureMode</a> ()</td></tr>
-<tr class="separator:a4069f78b07b35d5a69e09e4d877dd577"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c503cb22e3e620469c8135225138fed"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a6c503cb22e3e620469c8135225138fed">test_IDSCamera_setTriggerMode_and_getTriggerMode</a> ()</td></tr>
+<tr class="separator:a6c503cb22e3e620469c8135225138fed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afde2bd911fed9da374bdcdebc0643fe2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#afde2bd911fed9da374bdcdebc0643fe2">test_IDSCamera_setPixelClock_and_getPixelClock</a> ()</td></tr>
 <tr class="separator:afde2bd911fed9da374bdcdebc0643fe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5571e2dc460d3d8d18df442ea3aee090"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a5571e2dc460d3d8d18df442ea3aee090">test_IDSCamera_setColorMode_and_getColorMode</a> ()</td></tr>
@@ -1741,21 +1755,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4069f78b07b35d5a69e09e4d877dd577"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int gvio::test_IDSCamera_setCaptureMode_and_getCaptureMode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a5571e2dc460d3d8d18df442ea3aee090"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1822,6 +1821,21 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">int gvio::test_IDSCamera_setROI_and_getROI </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6c503cb22e3e620469c8135225138fed"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::test_IDSCamera_setTriggerMode_and_getTriggerMode </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -2784,6 +2798,38 @@ Variables</h2></td></tr>
           <td class="memname">int gvio::test_wrapTo360 </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab82a4983f45304e0e7ac176db5e61a22"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::ueye_colormode2bpp </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>color_mode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af0bf53ce79d3980bd4daf3b53475c973"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::ueye_colormode2channels </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>color_mode</em></td><td>)</td>
           <td></td>
         </tr>
       </table>

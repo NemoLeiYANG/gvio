@@ -2,13 +2,15 @@
 
 namespace gvio {
 
-enum CaptureMode ueye_str2capturemode(const std::string &mode) {
+enum TriggerMode ueye_str2capturemode(const std::string &mode) {
   if (mode == "FREE_RUN") {
-    return CaptureMode::FREE_RUN;
-  } else if (mode == "SOFTARE_TRIGGER") {
-    return CaptureMode::SOFTWARE_TRIGGER;
+    return TriggerMode::FREE_RUN;
+  } else if (mode == "SOFTWARE_TRIGGER") {
+    return TriggerMode::SOFTWARE_TRIGGER;
   }
-  return CaptureMode::INVALID;
+  LOG_ERROR("Opps! [%s] is invalid or its not implemented!", mode.c_str());
+
+  return TriggerMode::INVALID;
 }
 
 int ueye_str2colormode(const std::string &mode) {
@@ -76,7 +78,15 @@ int ueye_str2colormode(const std::string &mode) {
     return -1;
 }
 
-int ueye_colormode2bpp(int mode) {
+int ueye_colormode2bpp(const std::string &color_mode) {
+  // Convert color mode from string to int
+  auto mode = ueye_str2colormode(color_mode);
+  if (mode == -1) {
+    LOG_ERROR("Invalid color mode [%s]!", color_mode.c_str());
+    return -1;
+  }
+
+  // Bits per pixel
   switch (mode) {
     case IS_CM_SENSOR_RAW8:
     case IS_CM_MONO8: return 8;
@@ -112,7 +122,15 @@ int ueye_colormode2bpp(int mode) {
   }
 }
 
-int ueye_colormode2channels(int mode) {
+int ueye_colormode2channels(const std::string &color_mode) {
+  // Convert color mode from string to int
+  auto mode = ueye_str2colormode(color_mode);
+  if (mode == -1) {
+    LOG_ERROR("Invalid color mode [%s]!", color_mode.c_str());
+    return -1;
+  }
+
+  // Channels
   switch (mode) {
     case IS_CM_SENSOR_RAW8:
     case IS_CM_MONO8:
@@ -300,24 +318,21 @@ IDSCamera::~IDSCamera() {
   this->freeBuffers();
 
   // Close camera driver
-  int retval = is_ExitCamera(this->cam_handle);
+  int retval = is_ExitCamera(this->camera_handle);
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to exit camera!");
   }
 }
 
 int IDSCamera::configure(const std::string &config_file) {
-  int retval = -1;
-  ConfigParser parser;
+  int retval = 0;
 
-  int camera_index = 0;
-  std::string capture_mode;
-  std::string color_mode;
-  int nb_buffers = 2;
-  parser.addParam("camera_index", &camera_index);
-  parser.addParam("nb_buffers", &nb_buffers);
-  parser.addParam("capture_mode", &capture_mode);
-  parser.addParam("color_mode", &color_mode);
+  // Load config file
+  ConfigParser parser;
+  parser.addParam("camera_index", &this->camera_index);
+  parser.addParam("nb_buffers", &this->nb_buffers);
+  parser.addParam("trigger_mode", &this->trigger_mode);
+  parser.addParam("color_mode", &this->color_mode);
   parser.addParam("image_width", &this->image_width);
   parser.addParam("image_height", &this->image_height);
   parser.addParam("offset_x", &this->offset_x);
@@ -342,54 +357,43 @@ int IDSCamera::configure(const std::string &config_file) {
     LOG_ERROR("Hint: is the IDS daemon (/etc/init.d/ueyeusbdrc) is running?");
     return -1;
   }
-  LOG_INFO("Number of cameras %d", nb_cameras);
 
   // Initialize camera
-  retval = is_InitCamera(&this->cam_handle, NULL);
+  retval = is_InitCamera(&this->camera_handle, NULL);
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to initialize camera!");
     return -1;
   }
 
   // Get camera info
-  retval = is_GetCameraInfo(this->cam_handle, &this->camera_info);
+  retval = is_GetCameraInfo(this->camera_handle, &this->camera_info);
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to poll camera information!");
     return -1;
   }
 
   // Get sensor info
-  retval = is_GetSensorInfo(this->cam_handle, &this->sensor_info);
+  retval = is_GetSensorInfo(this->camera_handle, &this->sensor_info);
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to poll sensor information!");
     return -1;
   }
 
   // Set display mode
-  retval = is_SetDisplayMode(this->cam_handle, IS_SET_DM_DIB);
+  retval = is_SetDisplayMode(this->camera_handle, IS_SET_DM_DIB);
   if (retval != IS_SUCCESS) {
     LOG_ERROR("This camera does not support Device Independent Bitmap mode");
     return -1;
   }
 
-  // Set capture mode
-  this->capture_mode = ueye_str2capturemode(capture_mode);
-  if (this->capture_mode == CaptureMode::INVALID) {
-    LOG_ERROR("Invalid capture mode [%s]!", capture_mode.c_str());
-    return -1;
-  }
-  retval = this->setCaptureMode(this->capture_mode);
+  // Set trigger mode
+  retval = this->setTriggerMode(this->trigger_mode);
   if (retval != IS_SUCCESS) {
     LOG_ERROR("This camera does not support Device Independent Bitmap mode");
     return -1;
   }
 
   // Set color mode
-  this->color_mode = ueye_str2colormode(color_mode);
-  if (this->color_mode == -1) {
-    LOG_ERROR("Invalid color mode [%s]!", color_mode.c_str());
-    return -1;
-  }
   retval = this->setColorMode(this->color_mode);
   if (retval != 0) {
     LOG_ERROR("Failed to set color mode!");
@@ -428,13 +432,13 @@ int IDSCamera::configure(const std::string &config_file) {
   }
 
   // Enable frame event
-  if (is_EnableEvent(this->cam_handle, IS_SET_EVENT_FRAME) != IS_SUCCESS) {
+  if (is_EnableEvent(this->camera_handle, IS_SET_EVENT_FRAME) != IS_SUCCESS) {
     LOG_ERROR("Failed to enable frame event!");
     return -1;
   }
 
   // Start capturing
-  if (is_CaptureVideo(this->cam_handle, IS_DONT_WAIT) != IS_SUCCESS) {
+  if (is_CaptureVideo(this->camera_handle, IS_DONT_WAIT) != IS_SUCCESS) {
     LOG_ERROR("Failed to start capture!");
     return -1;
   }
@@ -444,6 +448,7 @@ int IDSCamera::configure(const std::string &config_file) {
 }
 
 int IDSCamera::allocBuffers(const int nb_buffers, const int bpp) {
+  this->nb_buffers = nb_buffers;
   this->buffers.resize(nb_buffers);
   this->buffer_id.resize(nb_buffers);
 
@@ -458,7 +463,7 @@ int IDSCamera::allocBuffers(const int nb_buffers, const int bpp) {
   int retval;
   for (int i = 0; i < nb_buffers; i++) {
     // Allocate buffer
-    retval = is_AllocImageMem(this->cam_handle,
+    retval = is_AllocImageMem(this->camera_handle,
                               img_width,
                               img_height,
                               bpp,
@@ -469,9 +474,10 @@ int IDSCamera::allocBuffers(const int nb_buffers, const int bpp) {
       return -1;
     }
 
-    // Set buffer as frame buffer
-    retval =
-        is_SetImageMem(this->cam_handle, this->buffers[i], this->buffer_id[i]);
+    // Activate buffer
+    retval = is_SetImageMem(this->camera_handle,
+                            this->buffers[i],
+                            this->buffer_id[i]);
     if (retval != IS_SUCCESS) {
       LOG_ERROR("Failed to set memory for frame buffers!");
       return -1;
@@ -483,7 +489,7 @@ int IDSCamera::allocBuffers(const int nb_buffers, const int bpp) {
 
 int IDSCamera::freeBuffers() {
   for (size_t i = 0; i < this->buffers.size(); i++) {
-    if (is_FreeImageMem(this->cam_handle,
+    if (is_FreeImageMem(this->camera_handle,
                         this->buffers[i],
                         this->buffer_id[i]) != IS_SUCCESS) {
       LOG_ERROR("Failed to free frame memory!");
@@ -491,25 +497,34 @@ int IDSCamera::freeBuffers() {
     }
   }
 
-  buffers.clear();
-  buffer_id.clear();
+  this->nb_buffers = 0;
+  this->buffers.clear();
+  this->buffer_id.clear();
 
   return 0;
 }
 
-int IDSCamera::setCaptureMode(const enum CaptureMode &capture_mode) {
+int IDSCamera::setTriggerMode(const std::string &trigger_mode) {
   int retval;
 
-  // Set capture mode
-  switch (capture_mode) {
-    case CaptureMode::FREE_RUN:
-      retval = is_SetExternalTrigger(this->cam_handle, IS_SET_TRIGGER_OFF);
+  // Convert string to trigger mode
+  auto mode = ueye_str2capturemode(trigger_mode);
+  if (mode == TriggerMode::INVALID) {
+    LOG_ERROR("Invalid trigger mode [%s]!", trigger_mode.c_str());
+    return -1;
+  }
+
+  // Set trigger mode
+  switch (mode) {
+    case TriggerMode::FREE_RUN:
+      retval = is_SetExternalTrigger(this->camera_handle, IS_SET_TRIGGER_OFF);
       break;
-    case CaptureMode::SOFTWARE_TRIGGER:
-      retval = is_SetExternalTrigger(this->cam_handle, IS_SET_TRIGGER_SOFTWARE);
+    case TriggerMode::SOFTWARE_TRIGGER:
+      retval =
+          is_SetExternalTrigger(this->camera_handle, IS_SET_TRIGGER_SOFTWARE);
       break;
     default:
-      LOG_ERROR("Not implemented!");
+      LOG_ERROR("Not implemented or [%s] is invalid!", trigger_mode.c_str());
       return -1;
       break;
   }
@@ -519,19 +534,19 @@ int IDSCamera::setCaptureMode(const enum CaptureMode &capture_mode) {
     return -1;
   }
 
-  this->capture_mode = capture_mode;
+  this->trigger_mode = trigger_mode;
   return 0;
 }
 
-int IDSCamera::getCaptureMode(enum CaptureMode &capture_mode) {
-  capture_mode = this->capture_mode;
+int IDSCamera::getTriggerMode(std::string &trigger_mode) {
+  trigger_mode = this->trigger_mode;
   return 0;
 }
 
 int IDSCamera::setPixelClock(const int clock_rate) {
   // Get number of supported pixel clock rates
   int nb_pixel_clock_rates = 0;
-  int retval = is_PixelClock(this->cam_handle,
+  int retval = is_PixelClock(this->camera_handle,
                              IS_PIXELCLOCK_CMD_GET_NUMBER,
                              (void *) &nb_pixel_clock_rates,
                              sizeof(nb_pixel_clock_rates));
@@ -540,11 +555,11 @@ int IDSCamera::setPixelClock(const int clock_rate) {
     return -1;
   }
 
-  // Get valid pixel clock rates
-  // -- No camera has more than 150 different pixel clocks.
+  // Get valid pixel clock rates, Note: no camera has more than 150 different
+  // pixel clocks.
   int pixel_clock_rates[150];
   ZeroMemory(&pixel_clock_rates, sizeof(pixel_clock_rates));
-  retval = is_PixelClock(this->cam_handle,
+  retval = is_PixelClock(this->camera_handle,
                          IS_PIXELCLOCK_CMD_GET_LIST,
                          (void *) pixel_clock_rates,
                          nb_pixel_clock_rates * sizeof(int));
@@ -562,7 +577,7 @@ int IDSCamera::setPixelClock(const int clock_rate) {
     }
   }
   if (rate_valid &&
-      is_PixelClock(this->cam_handle,
+      is_PixelClock(this->camera_handle,
                     IS_PIXELCLOCK_CMD_SET,
                     (void *) &clock_rate,
                     sizeof(clock_rate)) == IS_SUCCESS) {
@@ -574,7 +589,7 @@ int IDSCamera::setPixelClock(const int clock_rate) {
 }
 
 int IDSCamera::getPixelClock(int &clock_rate) {
-  if (is_PixelClock(this->cam_handle,
+  if (is_PixelClock(this->camera_handle,
                     IS_PIXELCLOCK_CMD_GET,
                     (void *) &clock_rate,
                     sizeof(clock_rate)) == IS_SUCCESS) {
@@ -587,17 +602,33 @@ int IDSCamera::getPixelClock(int &clock_rate) {
   return 0;
 }
 
-int IDSCamera::setColorMode(const int color_mode) {
-  const int retval = is_SetColorMode(this->cam_handle, color_mode);
-  if (retval != IS_SUCCESS) {
+int IDSCamera::setColorMode(const std::string &color_mode) {
+  // Convert color mode from string to int
+  auto mode = ueye_str2colormode(color_mode);
+  if (mode == -1) {
+    LOG_ERROR("Invalid color mode [%s]!", color_mode.c_str());
     return -1;
   }
 
-  this->color_mode = color_mode;
+  // Set color mode
+  const int retval = is_SetColorMode(this->camera_handle, mode);
+  if (retval != IS_SUCCESS) {
+
+    if (retval == IS_INVALID_MODE) {
+      LOG_ERROR("Invalid color mode [%s]", color_mode.c_str());
+    } else if (retval == IS_INVALID_COLOR_FORMAT) {
+      LOG_ERROR("Invalid color format!");
+    } else if (retval == IS_CAPTURE_RUNNING) {
+      LOG_ERROR("Capture is running, stop that first!");
+    }
+
+    return -1;
+  }
+
   return 0;
 }
 
-int IDSCamera::getColorMode(int &color_mode) {
+int IDSCamera::getColorMode(std::string &color_mode) {
   color_mode = this->color_mode;
   return 0;
 }
@@ -608,7 +639,7 @@ int IDSCamera::setFrameRate(const double frame_rate) {
   double time_max = 0.0;
   double time_interval = 0.0;
 
-  if (is_GetFrameTimeRange(this->cam_handle,
+  if (is_GetFrameTimeRange(this->camera_handle,
                            &time_min,
                            &time_max,
                            &time_interval) != IS_SUCCESS) {
@@ -627,7 +658,7 @@ int IDSCamera::setFrameRate(const double frame_rate) {
   }
 
   // Set frame rate
-  if (is_SetFrameRate(this->cam_handle, frame_rate, &this->frame_rate) !=
+  if (is_SetFrameRate(this->camera_handle, frame_rate, &this->frame_rate) !=
       IS_SUCCESS) {
     return -1;
   }
@@ -648,7 +679,7 @@ int IDSCamera::setGain(const int gain) {
 
   // Set hardware gain
   int retval = 0;
-  retval = is_SetHardwareGain(this->cam_handle,
+  retval = is_SetHardwareGain(this->camera_handle,
                               gain,
                               IS_IGNORE_PARAMETER,
                               IS_IGNORE_PARAMETER,
@@ -662,7 +693,7 @@ int IDSCamera::setGain(const int gain) {
 
 int IDSCamera::getGain(int &gain) {
   // Get hardware gain
-  gain = is_SetHardwareGain(this->cam_handle,
+  gain = is_SetHardwareGain(this->camera_handle,
                             IS_GET_MASTER_GAIN,
                             IS_IGNORE_PARAMETER,
                             IS_IGNORE_PARAMETER,
@@ -679,7 +710,7 @@ int IDSCamera::setROI(const int offset_x,
   int retval;
 
   // Get sensor info
-  retval = is_GetSensorInfo(this->cam_handle, &this->sensor_info);
+  retval = is_GetSensorInfo(this->camera_handle, &this->sensor_info);
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to poll sensor information!");
     return -1;
@@ -712,7 +743,7 @@ int IDSCamera::setROI(const int offset_x,
   aoi.s32Y = offset_y;
   aoi.s32Width = (image_width == 0) ? max_width : image_width;
   aoi.s32Height = (image_height == 0) ? max_height : image_height;
-  if (is_AOI(this->cam_handle,
+  if (is_AOI(this->camera_handle,
              IS_AOI_IMAGE_SET_AOI,
              (void *) &aoi,
              sizeof(aoi)) != IS_SUCCESS) {
@@ -729,7 +760,7 @@ int IDSCamera::getROI(int &offset_x,
   IS_RECT aoi;
 
   // Get ROI
-  if (is_AOI(this->cam_handle,
+  if (is_AOI(this->camera_handle,
              IS_AOI_IMAGE_GET_AOI,
              (void *) &aoi,
              sizeof(aoi)) != IS_SUCCESS) {
@@ -759,17 +790,17 @@ int IDSCamera::getFrame(cv::Mat &image) {
     return -1;
   }
 
-  // Wait for new frame
-  if (is_WaitEvent(this->cam_handle,
+  // Wait for new frame (timeout is 10 seconds)
+  if (is_WaitEvent(this->camera_handle,
                    IS_SET_EVENT_FRAME,
-                   (int) (2000 / this->frame_rate)) != IS_SUCCESS) {
+                   (int) (10 * 1000)) != IS_SUCCESS) {
     LOG_ERROR("Image wait timeout!");
     return -1;
   }
 
   // Obtain image data
   void *image_data;
-  if (is_GetImageMem(this->cam_handle, &image_data) != IS_SUCCESS) {
+  if (is_GetImageMem(this->camera_handle, &image_data) != IS_SUCCESS) {
     LOG_ERROR("Failed to get image memory!");
     return -1;
   }
