@@ -139,7 +139,8 @@ namespace gvio {
 /**
  * Invensense MPU6050 I2C Driver
  */
-struct MPU6050 : public IMU {
+class MPU6050 : public IMU {
+public:
   float temperature = 0.0f;
   float sample_rate = -1.0f;
   int8_t dplf_config = 0;
@@ -157,40 +158,40 @@ struct MPU6050 : public IMU {
    * Ping
    * @returns 0 for success, -1 for failure
    */
-  int ping();
+  virtual int ping() override;
 
   /**
    * Get IMU data
    * @returns 0 for success, -1 for failure
    */
-  int getData();
+  virtual int getData() override;
 
   /**
    * Set DPLF
    *
-   * DPLF_CFG    Accelerometer
-   * ----------------------------------------
-   *             Bandwidth(Hz) | Delay(ms)
-   * 0           260             0
-   * 1           184             2.0
-   * 2           94              3.0
-   * 3           44              4.9
-   * 4           21              8.5
-   * 5           10              13.8
-   * 6           5               19.0
-   * 7           RESERVED        RESERVED
+   *   DPLF_CFG    Accelerometer
+   *   ----------------------------------------
+   *               Bandwidth(Hz) | Delay(ms)
+   *   0           260             0
+   *   1           184             2.0
+   *   2           94              3.0
+   *   3           44              4.9
+   *   4           21              8.5
+   *   5           10              13.8
+   *   6           5               19.0
+   *   7           RESERVED        RESERVED
    *
-   * DPLF_CFG    Gyroscope
-   * ----------------------------------------------
-   *             Bandwidth(Hz) | Delay(ms) | Fs(kHz)
-   * 0           256             0.98        8
-   * 1           188             1.9         1
-   * 2           98              2.8         1
-   * 3           42              4.8         1
-   * 4           20              8.3         1
-   * 5           10              13.4        1
-   * 6           5               18.5        1
-   * 7           RESERVED        RESERVED    8
+   *   DPLF_CFG    Gyroscope
+   *   ----------------------------------------------
+   *               Bandwidth(Hz) | Delay(ms) | Fs(kHz)
+   *   0           256             0.98        8
+   *   1           188             1.9         1
+   *   2           98              2.8         1
+   *   3           42              4.8         1
+   *   4           20              8.3         1
+   *   5           10              13.4        1
+   *   6           5               18.5        1
+   *   7           RESERVED        RESERVED    8
    *
    * @param setting
    * @returns 0 for success, -1 for failure
@@ -257,8 +258,8 @@ struct MPU6050 : public IMU {
 };
 
 /**
-  * MPU6050 to string
-  */
+ * MPU6050 to string
+ */
 std::ostream &operator<<(std::ostream &os, const MPU6050 &imu);
 
 /** @} group imu */

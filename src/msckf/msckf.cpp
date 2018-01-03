@@ -105,12 +105,11 @@ void MSCKF::augmentState() {
   const MatX P = X * this->P() * X.transpose();
 
   // Decompose covariance into its own constituents
+  // clang-format off
   this->imu_state.P = P.block(0, 0, x_imu_size, x_imu_size);
-  this->P_cam = P.block(x_imu_size,
-                        x_imu_size,
-                        P.rows() - x_imu_size,
-                        P.cols() - x_imu_size);
+  this->P_cam = P.block(x_imu_size, x_imu_size, P.rows() - x_imu_size, P.cols() - x_imu_size);
   this->P_imu_cam = P.block(0, x_imu_size, x_imu_size, P.cols() - x_imu_size);
+  // clang-format on
 
   // Add new camera state to sliding window by using current IMU pose
   // estimate to calculate camera pose
@@ -241,13 +240,13 @@ int MSCKF::calResiduals(const FeatureTracks &tracks,
 
       // R is a bit special, it is the covariance matrix so it has to be
       // stacked diagonally
+      // clang-format off
       MatX R_copy(R.rows() + R_j.rows(), R.cols() + R_j.cols());
       R_copy.block(0, 0, R.rows(), R.cols()) = R;
-      R_copy.block(0, R.cols(), R.rows(), R_j.cols()) =
-          zeros(R.rows(), R_j.cols());
-      R_copy.block(R.rows(), 0, R_j.rows(), R.cols()) =
-          zeros(R_j.rows(), R.cols());
+      R_copy.block(0, R.cols(), R.rows(), R_j.cols()) = zeros(R.rows(), R_j.cols());
+      R_copy.block(R.rows(), 0, R_j.rows(), R.cols()) = zeros(R_j.rows(), R.cols());
       R_copy.block(R.rows(), R.cols(), R_j.rows(), R_j.cols()) = R_j;
+      // clang-format on
       R = R_copy;
     }
   }

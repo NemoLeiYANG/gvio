@@ -215,7 +215,7 @@ SBGC::SBGC() {
   this->connection_flags = 0;
 }
 
-SBGC::SBGC(std::string port) {
+SBGC::SBGC(const std::string &port) {
   this->configured = false;
 
   this->port = port;
@@ -256,7 +256,7 @@ int SBGC::disconnect() {
   }
 }
 
-int SBGC::sendFrame(SBGCFrame &cmd) {
+int SBGC::sendFrame(const SBGCFrame &cmd) {
   uint8_t start;
   int data_size_limit;
 
@@ -282,7 +282,7 @@ int SBGC::sendFrame(SBGCFrame &cmd) {
   return 0;
 }
 
-int SBGC::readFrame(uint8_t read_length, SBGCFrame &frame) {
+int SBGC::readFrame(const uint8_t read_length, SBGCFrame &frame) {
   // pre-check
   uint8_t buffer[150];
   int16_t nb_bytes = read(this->serial, buffer, read_length);
@@ -378,25 +378,26 @@ int SBGC::getBoardInfo() {
 
 int SBGC::getRealtimeData4() {
   int retval;
-  SBGCFrame frame;
-  // SBGCRealtimeData data;
 
-  // request real time data
+  // Request real time data
+  SBGCFrame frame;
   frame.buildFrame(CMD_REALTIME_DATA_4);
   retval = this->sendFrame(frame);
   if (retval == -1) {
     // std::cout << "failed to request SBGC realtime data!" << std::endl;
     return -1;
   }
-  // obtain real time data
+
+  // Obtain real time data
   retval = this->readFrame(129, frame);
   if (retval == -1) {
     // std::cout << "failed to parse SBGC frame for realtime data!" <<
     // std::endl;
     return -1;
   }
-  // parse real time data
-  // accelerometer and gyroscope
+
+  // Parse real time data
+  // Accelerometer and gyroscope
   this->data.accel(0) = S16BIT(frame.data, 1, 0);
   this->data.gyro(0) = S16BIT(frame.data, 3, 2);
   this->data.accel(1) = S16BIT(frame.data, 5, 4);
@@ -412,7 +413,7 @@ int SBGC::getRealtimeData4() {
   this->data.gyro(1) = (GYRO_UNIT) * this->data.gyro(1);
   this->data.gyro(2) = (GYRO_UNIT) * this->data.gyro(2);
 
-  // angles
+  // Angles
   this->data.camera_angles(0) = S16BIT(frame.data, 33, 32);
   this->data.camera_angles(1) = S16BIT(frame.data, 35, 34);
   this->data.camera_angles(2) = S16BIT(frame.data, 37, 36);
@@ -445,7 +446,7 @@ int SBGC::getRealtimeData4() {
   this->data.encoder_angles(1) = (DEG_PER_BIT) * this->data.encoder_angles(1);
   this->data.encoder_angles(2) = (DEG_PER_BIT) * this->data.encoder_angles(2);
 
-  // misc
+  // Misc
   this->data.cycle_time = U16BIT(frame.data, 51, 50);
   this->data.i2c_error_count = U16BIT(frame.data, 53, 52);
   this->data.system_error = U16BIT(frame.data, 15, 14);
@@ -458,24 +459,24 @@ int SBGC::getRealtimeData4() {
 int SBGC::getRealtimeData() {
   int retval;
   SBGCFrame frame;
-  // SBGCRealtimeData data;
 
-  // request real time data
+  // Request real time data
   frame.buildFrame(CMD_REALTIME_DATA_3);
   retval = this->sendFrame(frame);
   if (retval == -1) {
     std::cout << "failed to request SBGC realtime data!" << std::endl;
     return -1;
   }
-  // obtain real time data
+
+  // Obtain real time data
   retval = this->readFrame(68, frame);
   if (retval == -1) {
     std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
     return -1;
   }
 
-  // parse real time data
-  // accelerometer and gyroscope
+  // Parse real time data
+  // Accelerometer and gyroscope
   this->data.accel(0) = S16BIT(frame.data, 1, 0);
   this->data.gyro(0) = S16BIT(frame.data, 3, 2);
   this->data.accel(1) = S16BIT(frame.data, 5, 4);
@@ -491,7 +492,7 @@ int SBGC::getRealtimeData() {
   this->data.gyro(1) = (GYRO_UNIT) * this->data.gyro(1);
   this->data.gyro(2) = (GYRO_UNIT) * this->data.gyro(2);
 
-  // angles
+  // Angles
   this->data.camera_angles(0) = S16BIT(frame.data, 33, 32);
   this->data.camera_angles(1) = S16BIT(frame.data, 35, 34);
   this->data.camera_angles(2) = S16BIT(frame.data, 37, 36);
@@ -529,29 +530,30 @@ int SBGC::getRealtimeData() {
 
 int SBGC::getAnglesExt() {
   int retval;
-  SBGCFrame frame;
   // SBGCRealtimeData data;
 
-  // request real time data
+  // Request real time data
+  SBGCFrame frame;
   frame.buildFrame(CMD_GET_ANGLES_EXT);
   retval = this->sendFrame(frame);
   if (retval == -1) {
     std::cout << "failed to request SBGC realtime data!" << std::endl;
     return -1;
   }
-  // obtain real time data
+
+  // Obtain real time data
   retval = this->readFrame(54, frame);
   if (retval == -1) {
     std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
     return -1;
   }
 
-  // roll
+  // Roll
   this->data.camera_angles(0) = S16BIT(frame.data, 1, 0);
   this->data.rc_angles(0) = S16BIT(frame.data, 3, 2);
   this->data.encoder_angles(0) = S16BIT(frame.data, 8, 4);
 
-  // pitch
+  // Pitch
   this->data.camera_angles(1) = S16BIT(frame.data, 19, 18);
   this->data.rc_angles(1) = S16BIT(frame.data, 21, 20);
   this->data.encoder_angles(1) = S16BIT(frame.data, 26, 22);
@@ -577,19 +579,14 @@ int SBGC::getAnglesExt() {
   return 0;
 }
 
-int SBGC::setAngle(double roll, double pitch, double yaw) {
-  SBGCFrame frame;
-  int16_t roll_adjusted;
-  int16_t pitch_adjusted;
-  int16_t yaw_adjusted;
-  uint8_t data[13];
-
+int SBGC::setAngle(const double roll, const double pitch, const double yaw) {
   // adjust roll, pitch and yaw
-  roll_adjusted = (int16_t)(roll / DEG_PER_BIT);
-  pitch_adjusted = (int16_t)(pitch / DEG_PER_BIT);
-  yaw_adjusted = (int16_t)(yaw / DEG_PER_BIT);
+  int16_t roll_adjusted = (int16_t)(roll / DEG_PER_BIT);
+  int16_t pitch_adjusted = (int16_t)(pitch / DEG_PER_BIT);
+  int16_t yaw_adjusted = (int16_t)(yaw / DEG_PER_BIT);
 
   // control mode
+  uint8_t data[13];
   data[0] = MODE_ANGLE;
 
   // speed roll
@@ -617,63 +614,57 @@ int SBGC::setAngle(double roll, double pitch, double yaw) {
   data[12] = ((yaw_adjusted >> 8) & 0xff);
 
   // build frame and send
+  SBGCFrame frame;
   frame.buildFrame(CMD_CONTROL, data, 13);
   this->sendFrame(frame);
 
   return 0;
 }
 
-int SBGC::setSpeedAngle(double roll,
-                        double pitch,
-                        double yaw,
-                        double roll_speed,
-                        double pitch_speed,
-                        double yaw_speed) {
-  SBGCFrame frame;
-  int16_t roll_adjusted;
-  int16_t pitch_adjusted;
-  int16_t yaw_adjusted;
-  int16_t roll_speed_adjusted;
-  int16_t pitch_speed_adjusted;
-  int16_t yaw_speed_adjusted;
+int SBGC::setSpeedAngle(const double roll,
+                        const double pitch,
+                        const double yaw,
+                        const double roll_speed,
+                        const double pitch_speed,
+                        const double yaw_speed) {
+  // Adjust roll, pitch and yaw
+  int16_t roll_adjusted = (int16_t)(roll / DEG_PER_BIT);
+  int16_t pitch_adjusted = (int16_t)(pitch / DEG_PER_BIT);
+  int16_t yaw_adjusted = (int16_t)(yaw / DEG_PER_BIT);
+  int16_t roll_speed_adjusted = (int16_t)(roll_speed / DEG_SEC_PER_BIT);
+  int16_t pitch_speed_adjusted = (int16_t)(pitch_speed / DEG_SEC_PER_BIT);
+  int16_t yaw_speed_adjusted = (int16_t)(yaw_speed / DEG_SEC_PER_BIT);
+
+  // Control mode
   uint8_t data[13];
-
-  // adjust roll, pitch and yaw
-  roll_adjusted = (int16_t)(roll / DEG_PER_BIT);
-  pitch_adjusted = (int16_t)(pitch / DEG_PER_BIT);
-  yaw_adjusted = (int16_t)(yaw / DEG_PER_BIT);
-  roll_speed_adjusted = (int16_t)(roll_speed / DEG_SEC_PER_BIT);
-  pitch_speed_adjusted = (int16_t)(pitch_speed / DEG_SEC_PER_BIT);
-  yaw_speed_adjusted = (int16_t)(yaw_speed / DEG_SEC_PER_BIT);
-
-  // control mode
   data[0] = MODE_SPEED_ANGLE;
 
-  // speed roll
+  // Speed roll
   data[1] = ((roll_speed_adjusted >> 0) & 0xff);
   data[2] = ((roll_speed_adjusted >> 8) & 0xff);
 
-  // angle roll
+  // Angle roll
   data[3] = ((roll_adjusted >> 0) & 0xff);
   data[4] = ((roll_adjusted >> 8) & 0xff);
 
-  // speed pitch
+  // Speed pitch
   data[5] = ((pitch_speed_adjusted >> 0) & 0xff);
   data[6] = ((pitch_speed_adjusted >> 8) & 0xff);
 
-  // angle pitch
+  // Angle pitch
   data[7] = ((pitch_adjusted >> 0) & 0xff);
   data[8] = ((pitch_adjusted >> 8) & 0xff);
 
-  // speed yaw
+  // Speed yaw
   data[9] = ((yaw_speed_adjusted >> 0) & 0xff);
   data[10] = ((yaw_speed_adjusted >> 8) & 0xff);
 
-  // angle yaw
+  // Angle yaw
   data[11] = ((yaw_adjusted >> 0) & 0xff);
   data[12] = ((yaw_adjusted >> 8) & 0xff);
 
-  // build frame and send
+  // Build frame and send
+  SBGCFrame frame;
   frame.buildFrame(CMD_CONTROL, data, 13);
   this->sendFrame(frame);
 

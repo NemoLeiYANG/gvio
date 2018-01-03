@@ -54,7 +54,8 @@ struct AccelData {
   AccelData() {}
 };
 
-struct IMU {
+class IMU {
+public:
   GyroData gyro;
   AccelData accel;
   I2C i2c;

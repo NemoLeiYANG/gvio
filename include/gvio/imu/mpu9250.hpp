@@ -201,16 +201,8 @@ public:
 
   clock_t last_updated = 0;
   float sample_rate = -1.0f;
-  float sample_rate;
 
-  MPU9250()
-      : gyro(), accel(), mag(), i2c(),
-
-        pitch(0.0f), roll(0.0f), temperature(0.0f),
-
-        pitch_offset(0.0f), roll_offset(0.0f),
-
-        last_updated(0), sample_rate(-1.0f) {}
+  MPU9250() {}
 
   int configure();
   int ping();

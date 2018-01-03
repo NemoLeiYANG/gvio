@@ -13,7 +13,7 @@
 
 #include <iostream>
 
-#include <Eigen/Dense>
+#include "gvio/util/util.hpp"
 
 namespace gvio {
 /**
@@ -138,13 +138,13 @@ public:
 
 class SBGCRealtimeData {
 public:
-  Eigen::Vector3d accel;
-  Eigen::Vector3d gyro;
+  Vec3 accel;
+  Vec3 gyro;
 
-  Eigen::Vector3d camera_angles;
-  Eigen::Vector3d frame_angles;
-  Eigen::Vector3d rc_angles;
-  Eigen::Vector3d encoder_angles;
+  Vec3 camera_angles;
+  Vec3 frame_angles;
+  Vec3 rc_angles;
+  Vec3 encoder_angles;
 
   int cycle_time;
   int i2c_error_count;
@@ -169,11 +169,11 @@ public:
   uint8_t connection_flags;
 
   SBGC();
-  SBGC(std::string port);
+  SBGC(const std::string &port);
   int connect();
   int disconnect();
-  int sendFrame(SBGCFrame &cmd);
-  int readFrame(uint8_t read_length, SBGCFrame &frame);
+  int sendFrame(const SBGCFrame &cmd);
+  int readFrame(const uint8_t read_length, SBGCFrame &frame);
   int on();
   int off();
   int reset();
@@ -181,13 +181,13 @@ public:
   int getRealtimeData();
   int getRealtimeData4();
   int getAnglesExt();
-  int setAngle(double roll, double pitch, double yaw);
-  int setSpeedAngle(double roll,
-                    double pitch,
-                    double yaw,
-                    double roll_speed,
-                    double pitch_speed,
-                    double yaw_speed);
+  int setAngle(const double roll, const double pitch, const double yaw);
+  int setSpeedAngle(const double roll,
+                    const double pitch,
+                    const double yaw,
+                    const double roll_speed,
+                    const double pitch_speed,
+                    const double yaw_speed);
 };
 
 /** @} group feature2d */

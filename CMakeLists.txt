@@ -54,6 +54,8 @@ ADD_LIBRARY(
   src/kitti/raw/oxts.cpp
   src/kitti/raw/parse.cpp
   src/kitti/raw/raw.cpp
+  # pwm
+  src/pwm/pca9685.cpp
   # quaternion
   src/quaternion/jpl.cpp
   # utils
