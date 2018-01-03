@@ -34,6 +34,7 @@ ADD_LIBRARY(
   src/driver/i2c.cpp
   src/driver/uart.cpp
   # msckf
+  src/msckf/blackbox.cpp
   src/msckf/camera_state.cpp
   src/msckf/feature_estimator.cpp
   src/msckf/imu_state.cpp
