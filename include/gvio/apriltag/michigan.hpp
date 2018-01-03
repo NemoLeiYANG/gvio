@@ -38,8 +38,7 @@ public:
   apriltag_detector_t *detector = nullptr;
   apriltag_family_t *family = nullptr;
 
-  MichiganDetector() {
-  }
+  MichiganDetector() {}
   ~MichiganDetector() {
     // detector
     if (this->detector != nullptr) {

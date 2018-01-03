@@ -33,8 +33,7 @@ struct GyroData {
   float y = 0.0f;
   float z = 0.0f;
 
-  GyroData() {
-  }
+  GyroData() {}
 };
 
 struct AccelData {
@@ -52,8 +51,7 @@ struct AccelData {
   float y = 0.0f;
   float z = 0.0f;
 
-  AccelData() {
-  }
+  AccelData() {}
 };
 
 class IMU {
@@ -62,8 +60,7 @@ public:
   AccelData accel;
   I2C i2c;
 
-  IMU() {
-  }
+  IMU() {}
 
   /**
    * Ping

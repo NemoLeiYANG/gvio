@@ -67,8 +67,7 @@ public:
   bool enable_ns_trick = true;
   bool enable_qr_trick = true;
 
-  MSCKF() {
-  }
+  MSCKF() {}
 
   /**
    * Return covariance matrix P

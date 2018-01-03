@@ -34,8 +34,7 @@ public:
   MatX Q = zeros(12);   ///< Noise matrix
   MatX Phi = zeros(15); ///< Phi matrix
 
-  IMUState() {
-  }
+  IMUState() {}
 
   /**
    * Transition Jacobian F matrix

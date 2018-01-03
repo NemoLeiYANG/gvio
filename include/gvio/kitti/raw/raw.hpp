@@ -49,8 +49,7 @@ public:
              const std::string &seq)
       : raw_dir{strip_end(raw_dir, "/")}, date{date}, seq{seq},
         date_dir{raw_dir + "/" + date},
-        drive_dir{date_dir + "/" + date + "_drive_" + seq + "_sync"} {
-  }
+        drive_dir{date_dir + "/" + date + "_drive_" + seq + "_sync"} {}
 
   /// Load calibrations
   int loadCalibrations();

@@ -94,10 +94,8 @@ public:
   double window_padding = FLT_MAX;
   bool imshow = false;
 
-  BaseDetector() {
-  }
-  ~BaseDetector() {
-  }
+  BaseDetector() {}
+  ~BaseDetector() {}
 
   /**
    * Configure

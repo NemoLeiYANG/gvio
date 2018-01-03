@@ -2,8 +2,7 @@
 
 namespace gvio {
 
-BlackBox::BlackBox() {
-}
+BlackBox::BlackBox() {}
 
 BlackBox::~BlackBox() {
   if (this->output_file.good()) {

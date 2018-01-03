@@ -1,5 +1,6 @@
 #include "gvio/munit.h"
 #include "gvio/msckf/msckf.hpp"
+#include "gvio/msckf/blackbox.hpp"
 #include "gvio/kitti/kitti.hpp"
 #include "gvio/util/util.hpp"
 
@@ -107,6 +108,12 @@ int test_MSCKF_predictionUpdate() {
     LOG_ERROR("Failed to load KITTI raw dataset [%s]!",
               KITTI_RAW_DATASET.c_str());
     return -1;
+  }
+
+  // Prep blackbox
+  BlackBox blackbox;
+  if (blackbox.configure("/tmp/test_msckf_predictionUpdate.dat") != 0) {
+    LOG_ERROR("Failed to configure MSCKF blackbox!");
   }
 
   // Loop through data and do prediction update

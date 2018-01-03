@@ -115,8 +115,7 @@ public:
                          const Vec3 &t_Ci_CiC0,
                          const cv::KeyPoint &keypoint)
       : cam_model{cam_model}, C_CiC0{C_CiC0}, t_Ci_CiC0{t_Ci_CiC0},
-        keypoint{keypoint} {
-  }
+        keypoint{keypoint} {}
 
   /**
    * Calculate reprojection residual
@@ -143,8 +142,7 @@ public:
   CeresFeatureEstimator(const CameraModel *cam_model,
                         const FeatureTrack track,
                         const CameraStates track_cam_states)
-      : FeatureEstimator{cam_model, track, track_cam_states} {
-  }
+      : FeatureEstimator{cam_model, track, track_cam_states} {}
 
   /**
    * Add residual block

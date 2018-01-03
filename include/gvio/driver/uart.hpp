@@ -30,8 +30,7 @@ public:
 
   UART(const std::string &port, int speed)
       : connected{false}, connection{-1}, port{port}, speed{speed}, parity{0},
-        blocking{1} {
-  }
+        blocking{1} {}
 
   int connect();
   int disconnect();

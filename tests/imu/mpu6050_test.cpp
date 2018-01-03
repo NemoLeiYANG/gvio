@@ -13,9 +13,7 @@ int test_MPU6050_configure() {
   return 0;
 }
 
-void test_suite() {
-  MU_ADD_TEST(test_MPU6050_configure);
-}
+void test_suite() { MU_ADD_TEST(test_MPU6050_configure); }
 
 } // namespace gvio
 

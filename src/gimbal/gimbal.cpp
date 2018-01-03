@@ -46,13 +46,9 @@ int Gimbal::configure(const std::string &config_file) {
   return 0;
 }
 
-int Gimbal::on() {
-  return this->sbgc.on();
-}
+int Gimbal::on() { return this->sbgc.on(); }
 
-int Gimbal::off() {
-  return this->sbgc.off();
-}
+int Gimbal::off() { return this->sbgc.off(); }
 
 Vec3 Gimbal::getTargetInBF(const Pose &camera_offset, const Vec3 &target_C) {
   // camera mount offset

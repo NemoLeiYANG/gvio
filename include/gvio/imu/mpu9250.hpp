@@ -139,8 +139,7 @@ public:
   float pitch = 0.0f;
   float roll = 0.0f;
 
-  MPU9250Gyroscope() {
-  }
+  MPU9250Gyroscope() {}
 };
 
 class MPU9250Accelerometer {
@@ -162,8 +161,7 @@ public:
   float pitch = 0.0f;
   float roll = 0.0f;
 
-  MPU9250Accelerometer() {
-  }
+  MPU9250Accelerometer() {}
 };
 
 class MPU9250Magnetometer {
@@ -184,8 +182,7 @@ public:
 
   float heading = 0.0f;
 
-  MPU9250Magnetometer() {
-  }
+  MPU9250Magnetometer() {}
 };
 
 class MPU9250 {
@@ -205,8 +202,7 @@ public:
   clock_t last_updated = 0;
   float sample_rate = -1.0f;
 
-  MPU9250() {
-  }
+  MPU9250() {}
 
   int configure();
   int ping();

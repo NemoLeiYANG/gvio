@@ -20,8 +20,7 @@ class ORBTracker : public FeatureTracker {
 public:
   cv::Ptr<cv::ORB> orb = cv::ORB::create();
 
-  ORBTracker() {
-  }
+  ORBTracker() {}
 
   /**
    * Configure

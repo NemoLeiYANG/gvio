@@ -94,8 +94,7 @@ class PCA9685 {
 public:
   I2C i2c;
 
-  PCA9685() {
-  }
+  PCA9685() {}
 
   /**
    * Configure

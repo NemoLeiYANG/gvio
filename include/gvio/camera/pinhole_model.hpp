@@ -27,13 +27,11 @@ public:
   double fx = 0.0;      ///< Focal length in x-axis
   double fy = 0.0;      ///< Focal length in y-axis
 
-  PinholeModel() {
-  }
+  PinholeModel() {}
 
   PinholeModel(const int image_width, const int image_height, const MatX &K)
       : image_width{image_width}, image_height{image_height}, K{K}, cx{K(0, 2)},
-        cy{K(1, 2)}, fx{K(0, 0)}, fy{K(1, 1)} {
-  }
+        cy{K(1, 2)}, fx{K(0, 0)}, fy{K(1, 1)} {}
 
   PinholeModel(const int image_width,
                const int image_height,

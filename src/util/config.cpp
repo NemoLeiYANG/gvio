@@ -2,9 +2,7 @@
 
 namespace gvio {
 
-ConfigParser::ConfigParser() {
-  this->config_loaded = false;
-}
+ConfigParser::ConfigParser() { this->config_loaded = false; }
 
 void ConfigParser::addParam(const std::string &key,
                             bool *out,

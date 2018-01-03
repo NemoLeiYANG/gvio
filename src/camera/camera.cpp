@@ -2,9 +2,7 @@
 
 namespace gvio {
 
-Camera::~Camera() {
-  this->disconnect();
-}
+Camera::~Camera() { this->disconnect(); }
 
 int Camera::configure(const std::string &config_path) {
   ConfigParser parser;

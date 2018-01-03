@@ -39,11 +39,8 @@ public:
   Vec3 rc_angles = Vec3{0.0, 0.0, 0.0};
   Vec3 encoder_angles = Vec3{0.0, 0.0, 0.0};
 
-  Gimbal() {
-  }
-  ~Gimbal() {
-    this->off();
-  }
+  Gimbal() {}
+  ~Gimbal() { this->off(); }
 
   int configure(const std::string &config_path);
   int on();

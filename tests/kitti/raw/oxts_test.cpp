@@ -16,9 +16,7 @@ int test_OXTS_load() {
   return 0;
 }
 
-void test_suite() {
-  MU_ADD_TEST(test_OXTS_load);
-}
+void test_suite() { MU_ADD_TEST(test_OXTS_load); }
 
 } // namespace gvio
 
