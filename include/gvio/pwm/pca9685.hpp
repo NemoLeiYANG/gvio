@@ -8,7 +8,7 @@
 
 namespace gvio {
 
-/* REGISTERS */
+// REGISTERS
 #define PCA9685_MODE1 0x00
 #define PCA9685_MODE2 0x01
 #define PCA9685_SUBADD1 0x02
@@ -86,7 +86,7 @@ namespace gvio {
 #define PCA9685_PRE_SCALE 0xFE
 #define PCA9685_TEST_MODE 0xFF
 
-/* OTHER */
+// OTHER
 #define PCA9685_I2C_ADDR 0x40
 #define PCA9685_WAIT_MS 5
 
@@ -94,11 +94,44 @@ class PCA9685 {
 public:
   I2C i2c;
 
-  PCA9685();
+  PCA9685() {}
+
+	/**
+	 * Configure
+	 *
+	 * @param freq Frequency (Hz)
+	 * @returns 0 for success, -1 for failure
+	 */
   int configure(const int freq);
+
+	/**
+	 * Set PWM frequency
+	 *
+	 * @param freq Frequency (Hz)
+	 * @returns 0 for success, -1 for failure
+	 */
   void setPWMFrequency(const int freq);
+
+	/**
+	 * Set PWM on a specific channel
+	 *
+	 * @param channel
+	 * @param off
+	 * @returns 0 for success, -1 for failure
+	 */
   void setPWM(const int8_t channel, const int16_t off);
+
+	/**
+	 * Set PWM on all channels
+	 *
+	 * @param off
+	 * @returns 0 for success, -1 for failure
+	 */
   void setAllPWM(const int16_t off);
+
+  /**
+   * Reset PCA9685
+   */
   void reset();
 };
 
