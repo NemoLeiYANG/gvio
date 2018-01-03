@@ -16,6 +16,18 @@ MatX ones(const int rows, const int cols) {
 
 MatX ones(const int size) { return 1.0 * MatX::Identity(size, size); }
 
+MatX hstack(const MatX &A, const MatX &B) {
+  MatX C(A.rows(), A.cols() + B.cols());
+  C << A, B;
+  return C;
+}
+
+MatX vstack(const MatX &A, const MatX &B) {
+  MatX C(A.rows() + B.rows(), A.cols());
+  C << A, B;
+  return C;
+}
+
 Mat3 skew(const Vec3 &w) {
   Mat3 S;
   // clang-format off
@@ -49,6 +61,12 @@ MatX enforce_psd(const MatX &A) {
   }
 
   return A_psd;
+}
+
+MatX nullspace(const MatX &A) {
+  Eigen::FullPivLU<MatX> lu(A);
+  MatX A_null_space = lu.kernel();
+  return A_null_space;
 }
 
 } // namepsace gvio

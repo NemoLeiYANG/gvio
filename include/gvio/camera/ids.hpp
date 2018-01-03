@@ -119,8 +119,12 @@ void ueye_print_camera_info(const CAMINFO &info);
 /**
   * Convert raw image data to `cv::Mat`
   *
+  * @param image_data Input image data
   * @param image_width Image width
   * @param image_height Image height
+  * @param channels Image channels
+  * @param bpp Bits per pixel
+  * @param output Output image in cv::Mat
   * @returns 0 for success, -1 for failure
   */
 int raw2cvmat(void *image_data,
@@ -167,7 +171,7 @@ public:
   /**
    * Configure
    *
-   * @param Path to config file
+   * @param config_file Path to config file
    * @returns 0 for success, -1 for failure
    */
   int configure(const std::string &config_file);

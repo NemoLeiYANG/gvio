@@ -122,18 +122,30 @@ public:
    * @param pixel Pixel measurement
    * @returns Pixel measurement to image coordinates
    */
+  Vec2 pixel2image(const cv::KeyPoint &pixel);
+
+  /**
+   * @copydoc Vec2 pixel2image(const Vec2 &pixel)
+   */
   Vec2 pixel2image(const Vec2 &pixel) const;
 
   /**
-   * Convert pixel measurement to image coordinates
-   *
-   * @param pixel Pixel measurement
-   * @returns Pixel measurement to image coordinates
+   * @copydoc Vec2 pixel2image(const cv::Point2f &pixel)
    */
   Vec2 pixel2image(const cv::Point2f &pixel) const;
 
   /**
+   * @copydoc Vec2 pixel2image(const cv::KeyPoint &pixel)
+   */
+  Vec2 pixel2image(const cv::KeyPoint &pixel) const;
+
+  /**
    * Return features are observed by camera
+   *
+   * @param features Features
+   * @param rpy Rotation (roll, pitch  yaw)
+   * @param t Time (s)
+   * @param mask Features observed mask where 1 denotes observed or else 0
    */
   MatX observedFeatures(const MatX &features,
                         const Vec3 &rpy,

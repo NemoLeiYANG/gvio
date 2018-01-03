@@ -35,7 +35,8 @@ public:
    * @param features List of features
    * @returns 0 for success, -1 for failure
    */
-  int detect(const cv::Mat &image, std::vector<Feature> &features);
+  virtual int detect(const cv::Mat &image,
+                     std::vector<Feature> &features) override;
 
   /**
    * Draw tracks
@@ -68,7 +69,7 @@ public:
    * @param img_cur Current image frame
    * @returns 0 for success, -1 for failure
    */
-  int update(const cv::Mat &img_cur);
+  virtual int update(const cv::Mat &img_cur) override;
 };
 
 /** @} group feature2d */

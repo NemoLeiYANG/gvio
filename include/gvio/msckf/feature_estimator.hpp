@@ -148,6 +148,8 @@ public:
    * Add residual block
    *
    * @param kp Keypoint
+   * @param C_CiC0 Rotation matrix from frame C0 to Ci
+   * @param t_Ci_CiC0 Translation vector from frame C0 to Ci expressed in Ci
    * @param x Optimization parameters
    */
   void addResidualBlock(const cv::KeyPoint &kp,

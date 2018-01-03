@@ -106,7 +106,13 @@ public:
   int configure(const std::string &config_file);
 
   /**
-   * Illumination invariant transform
+   * Illumination invariant transform is based on:
+   *
+   * Maddern, Will, et al. "Illumination invariant imaging: Applications in
+   * robust vision-based localisation, mapping and classification for
+   * autonomous vehicles." Proceedings of the Visual Place Recognition in
+   * Changing Environments Workshop, IEEE International Conference on
+   * Robotics and Automation (ICRA), Hong Kong, China. Vol. 2. 2014.
    *
    * @param image Image to be transformed
    * @returns 0 for success, -1 for failure

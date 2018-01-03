@@ -140,6 +140,11 @@ struct FeatureTrack {
   }
 };
 
+/**
+ * Feature tracks
+ */
+using FeatureTracks = std::vector<FeatureTrack>;
+
 class FeatureTracker {
 public:
   bool show_matches = false;

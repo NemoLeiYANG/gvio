@@ -56,6 +56,10 @@ Vec2 PinholeModel::pixel2image(const cv::Point2f &pixel) {
   return this->pixel2image(Vec2{pixel.x, pixel.y});
 }
 
+Vec2 PinholeModel::pixel2image(const cv::KeyPoint &kp) {
+  return this->pixel2image(Vec2{kp.pt.x, kp.pt.y});
+}
+
 Vec2 PinholeModel::pixel2image(const Vec2 &pixel) const {
   Vec2 pt((pixel(0) - this->cx) / this->fx, (pixel(1) - this->cy) / this->fy);
   return pt;
@@ -63,6 +67,10 @@ Vec2 PinholeModel::pixel2image(const Vec2 &pixel) const {
 
 Vec2 PinholeModel::pixel2image(const cv::Point2f &pixel) const {
   return this->pixel2image(Vec2{pixel.x, pixel.y});
+}
+
+Vec2 PinholeModel::pixel2image(const cv::KeyPoint &kp) const {
+  return this->pixel2image(Vec2{kp.pt.x, kp.pt.y});
 }
 
 // TODO: Need to a more robust test for when feature is behind camera

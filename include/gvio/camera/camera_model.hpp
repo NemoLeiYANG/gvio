@@ -45,7 +45,7 @@ public:
    * @param pixel Pixel measurement
    * @returns Pixel measurement to image coordinates
    */
-  virtual Vec2 pixel2image(const Vec2 &pixel) const = 0;
+  virtual Vec2 pixel2image(const cv::Point2f &pixel) = 0;
 
   /**
    * Convert pixel measurement to image coordinates
@@ -53,12 +53,22 @@ public:
    * @param pixel Pixel measurement
    * @returns Pixel measurement to image coordinates
    */
-  virtual Vec2 pixel2image(const cv::Point2f &pixel) = 0;
+  virtual Vec2 pixel2image(const cv::KeyPoint &pixel) = 0;
+
+  /**
+   * @copydoc Vec2 pixel2image(const Vec2 &pixel)
+   */
+  virtual Vec2 pixel2image(const Vec2 &pixel) const = 0;
 
   /**
    * @copydoc Vec2 pixel2image(const cv::Point2f &pixel)
    */
   virtual Vec2 pixel2image(const cv::Point2f &pixel) const = 0;
+
+  /**
+   * @copydoc Vec2 pixel2image(const cv::KeyPoint &pixel)
+   */
+  virtual Vec2 pixel2image(const cv::KeyPoint &pixel) const = 0;
 
   /**
    * Return features are observed by camera
