@@ -2,19 +2,29 @@
 
 namespace gvio {
 
-MatX zeros(const int rows, const int cols) { return MatX::Zero(rows, cols); }
+MatX zeros(const int rows, const int cols) {
+  return MatX::Zero(rows, cols);
+}
 
-MatX zeros(const int size) { return MatX::Zero(size, size); }
+MatX zeros(const int size) {
+  return MatX::Zero(size, size);
+}
 
-MatX I(const int rows, const int cols) { return MatX::Identity(rows, cols); }
+MatX I(const int rows, const int cols) {
+  return MatX::Identity(rows, cols);
+}
 
-MatX I(const int size) { return MatX::Identity(size, size); }
+MatX I(const int size) {
+  return MatX::Identity(size, size);
+}
 
 MatX ones(const int rows, const int cols) {
   return 1.0 * MatX::Identity(rows, cols);
 }
 
-MatX ones(const int size) { return 1.0 * MatX::Identity(size, size); }
+MatX ones(const int size) {
+  return 1.0 * MatX::Identity(size, size);
+}
 
 MatX hstack(const MatX &A, const MatX &B) {
   MatX C(A.rows(), A.cols() + B.cols());

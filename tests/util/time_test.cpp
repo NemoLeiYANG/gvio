@@ -18,7 +18,9 @@ int test_ticAndToc() {
   return 0;
 }
 
-void test_suite() { MU_ADD_TEST(test_ticAndToc); }
+void test_suite() {
+  MU_ADD_TEST(test_ticAndToc);
+}
 
 } // namespace gvio
 

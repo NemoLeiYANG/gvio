@@ -31,7 +31,9 @@ int test_linreg() {
   return 0;
 }
 
-void test_suite() { MU_ADD_TEST(test_linreg); }
+void test_suite() {
+  MU_ADD_TEST(test_linreg);
+}
 
 } // namespace gvio
 

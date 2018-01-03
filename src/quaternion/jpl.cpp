@@ -13,7 +13,9 @@ Vec4 quatnormalize(const Vec4 &q) {
   return Vec4{q(0) / norm, q(1) / norm, q(2) / norm, q(3) / norm};
 }
 
-Vec4 quatconj(const Vec4 &q) { return Vec4{-q(0), -q(1), -q(2), q(3)}; }
+Vec4 quatconj(const Vec4 &q) {
+  return Vec4{-q(0), -q(1), -q(2), q(3)};
+}
 
 Vec4 quatmul(const Vec4 &p, const Vec4 &q) {
   return Vec4{q(3) * p(0) + q(2) * p(1) - q(1) * p(2) + q(0) * p(3),

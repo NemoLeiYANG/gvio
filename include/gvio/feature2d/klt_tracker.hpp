@@ -18,7 +18,8 @@ namespace gvio {
  */
 class KLTTracker : public FeatureTracker {
 public:
-  KLTTracker() {}
+  KLTTracker() {
+  }
 
   /**
    * Configure

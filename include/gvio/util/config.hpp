@@ -75,7 +75,8 @@ public:
   void *data = nullptr; //!< pointer to variable to store the parameter value
   bool optional = false;
 
-  ConfigParam() {}
+  ConfigParam() {
+  }
 
   ConfigParam(ConfigDataType type, std::string key, void *out, bool optional)
       : type{type}, key{key}, data{out}, optional{optional} {};

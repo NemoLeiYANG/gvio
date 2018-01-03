@@ -47,7 +47,9 @@ void mat2array(const MatX &A, double *out) {
   }
 }
 
-int randi(int ub, int lb) { return rand() % lb + ub; }
+int randi(int ub, int lb) {
+  return rand() % lb + ub;
+}
 
 double randf(const double ub, const double lb) {
   const double f = (double) rand() / RAND_MAX;
@@ -91,9 +93,13 @@ double median(const std::vector<double> &v) {
   }
 }
 
-double deg2rad(const double d) { return d * (M_PI / 180); }
+double deg2rad(const double d) {
+  return d * (M_PI / 180);
+}
 
-double rad2deg(const double r) { return r * (180 / M_PI); }
+double rad2deg(const double r) {
+  return r * (180 / M_PI);
+}
 
 void load_matrix(const std::vector<double> &x,
                  const int rows,
@@ -134,9 +140,13 @@ double wrapTo360(const double euler_angle) {
   }
 }
 
-double wrapToPi(const double r) { return deg2rad(wrapTo180(rad2deg(r))); }
+double wrapToPi(const double r) {
+  return deg2rad(wrapTo180(rad2deg(r)));
+}
 
-double wrapTo2Pi(const double r) { return deg2rad(wrapTo360(rad2deg(r))); }
+double wrapTo2Pi(const double r) {
+  return deg2rad(wrapTo360(rad2deg(r)));
+}
 
 double cross_track_error(const Vec2 &p1, const Vec2 &p2, const Vec2 &pos) {
   const double x0 = pos(0);

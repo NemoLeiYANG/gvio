@@ -16,7 +16,9 @@ int test_Calib_load() {
   return 0;
 }
 
-void test_suite() { MU_ADD_TEST(test_Calib_load); }
+void test_suite() {
+  MU_ADD_TEST(test_Calib_load);
+}
 
 } // namespace gvio
 

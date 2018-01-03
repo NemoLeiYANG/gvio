@@ -36,24 +36,34 @@ struct Feature {
   cv::KeyPoint kp;
   cv::Mat desc;
 
-  Feature() {}
-  Feature(const Vec2 &pt) : kp{cv::Point2f(pt(0), pt(1)), 1.0f} {}
-  Feature(const cv::Point2f &pt) : kp{pt, 1.0f} {}
-  Feature(const cv::KeyPoint &kp) : kp{kp} {}
-  Feature(const cv::KeyPoint &kp, const cv::Mat &desc) : kp{kp}, desc{desc} {}
-  Feature(const Feature &f) : track_id{f.track_id}, kp{f.kp}, desc{f.desc} {}
+  Feature() {
+  }
+  Feature(const Vec2 &pt) : kp{cv::Point2f(pt(0), pt(1)), 1.0f} {
+  }
+  Feature(const cv::Point2f &pt) : kp{pt, 1.0f} {
+  }
+  Feature(const cv::KeyPoint &kp) : kp{kp} {
+  }
+  Feature(const cv::KeyPoint &kp, const cv::Mat &desc) : kp{kp}, desc{desc} {
+  }
+  Feature(const Feature &f) : track_id{f.track_id}, kp{f.kp}, desc{f.desc} {
+  }
 
   /**
    * Set feature track ID
    *
    * @param track_id Track ID
    */
-  void setTrackID(const TrackID &track_id) { this->track_id = track_id; }
+  void setTrackID(const TrackID &track_id) {
+    this->track_id = track_id;
+  }
 
   /**
    * Return feature as cv::KeyPoint
    */
-  cv::KeyPoint &getKeyPoint() { return this->kp; }
+  cv::KeyPoint &getKeyPoint() {
+    return this->kp;
+  }
 
   /**
    * Feature to string
@@ -87,14 +97,16 @@ struct FeatureTrack {
   FrameID frame_end = -1;
   std::vector<Feature> track;
 
-  FeatureTrack() {}
+  FeatureTrack() {
+  }
 
   FeatureTrack(const TrackID &track_id,
                const FrameID &frame_id,
                const Feature &f1,
                const Feature &f2)
       : track_id{track_id}, frame_start{frame_id - 1}, frame_end{frame_id},
-        track{f1, f2} {}
+        track{f1, f2} {
+  }
 
   /**
    * Update feature track
@@ -112,21 +124,27 @@ struct FeatureTrack {
    *
    * @returns Last feature
    */
-  Feature &last() { return this->track.back(); }
+  Feature &last() {
+    return this->track.back();
+  }
 
   /**
    * Return feature track length
    *
    * @returns Size of feature track
    */
-  size_t trackedLength() { return this->track.size(); }
+  size_t trackedLength() {
+    return this->track.size();
+  }
 
   /**
    * Return feature track length
    *
    * @returns Size of feature track
    */
-  size_t trackedLength() const { return this->track.size(); }
+  size_t trackedLength() const {
+    return this->track.size();
+  }
 
   /**
    * FeatureTrack to string
@@ -168,7 +186,8 @@ public:
   std::vector<Feature> fea_ref;
   std::vector<Feature> unmatched;
 
-  FeatureTracker() {}
+  FeatureTracker() {
+  }
 
   /**
    * Add feature track

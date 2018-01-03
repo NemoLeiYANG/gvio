@@ -48,7 +48,8 @@ public:
   bool snapshot = false;
   bool showfps = false;
 
-  CameraConfig() {}
+  CameraConfig() {
+  }
 
   /**
    * Load camera config

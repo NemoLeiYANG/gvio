@@ -165,7 +165,8 @@ public:
   std::vector<char *> buffers;
   std::vector<int> buffer_id;
 
-  IDSCamera() {}
+  IDSCamera() {
+  }
   ~IDSCamera();
 
   /**

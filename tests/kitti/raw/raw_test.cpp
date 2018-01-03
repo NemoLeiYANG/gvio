@@ -9,7 +9,9 @@ int test_RAW_load() {
   return 0;
 }
 
-void test_suite() { MU_ADD_TEST(test_RAW_load); }
+void test_suite() {
+  MU_ADD_TEST(test_RAW_load);
+}
 
 } // namespace gvio
 

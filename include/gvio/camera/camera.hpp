@@ -31,7 +31,8 @@ public:
 
   cv::VideoCapture *capture = nullptr;
 
-  Camera() {}
+  Camera() {
+  }
   virtual ~Camera();
 
   /**

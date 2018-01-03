@@ -18,7 +18,8 @@ namespace gvio {
  */
 class CameraModel {
 public:
-  CameraModel() {}
+  CameraModel() {
+  }
 
   /**
    * Project 3D point to image plane

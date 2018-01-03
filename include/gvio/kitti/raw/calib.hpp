@@ -32,7 +32,8 @@ struct CalibCamToCam {
   std::array<Mat3, 4> R_rect;
   std::array<Mat34, 4> P_rect;
 
-  CalibCamToCam() {}
+  CalibCamToCam() {
+  }
 
   /**
    * Load calibration
@@ -50,7 +51,8 @@ struct CalibIMUToVelo {
   Mat3 R;
   Vec3 t;
 
-  CalibIMUToVelo() {}
+  CalibIMUToVelo() {
+  }
 
   /**
    * Load calibration
@@ -70,7 +72,8 @@ struct CalibVeloToCam {
   Vec2 df;
   Vec2 dc;
 
-  CalibVeloToCam() {}
+  CalibVeloToCam() {
+  }
 
   /**
    * Load calibration

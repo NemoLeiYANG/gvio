@@ -38,7 +38,8 @@ class MITDetector : public BaseDetector {
 public:
   AprilTags::TagDetector *detector = nullptr;
 
-  MITDetector() {}
+  MITDetector() {
+  }
 
   /**
    * Configure

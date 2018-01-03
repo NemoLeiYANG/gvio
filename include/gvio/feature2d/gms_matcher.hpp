@@ -175,7 +175,8 @@ public:
     bf_matcher = cv::BFMatcher::create(cv::NORM_HAMMING);
 #endif
   }
-  ~GMSMatcher() {}
+  ~GMSMatcher() {
+  }
 
   /**
    * Normalize Key Points to Range(0 - 1)

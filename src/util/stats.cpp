@@ -2,7 +2,9 @@
 
 namespace gvio {
 
-inline static double sqr(double x) { return x * x; }
+inline static double sqr(double x) {
+  return x * x;
+}
 
 int linreg(std::vector<Vec2> pts, double *m, double *c, double *r) {
   // linear regression of form: y = mx + c

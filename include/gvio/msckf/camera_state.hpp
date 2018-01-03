@@ -25,10 +25,13 @@ public:
   Vec3 p_G = zeros(3, 1);    ///< Position of camera in Global frame
   Vec4 q_CG = zeros(4, 1);   ///< Orientation of camera in Global frame
 
-  CameraState() {}
-  CameraState(const Vec3 &p_G, const Vec4 &q_CG) : p_G{p_G}, q_CG{q_CG} {}
+  CameraState() {
+  }
+  CameraState(const Vec3 &p_G, const Vec4 &q_CG) : p_G{p_G}, q_CG{q_CG} {
+  }
   CameraState(const FrameID frame_id, const Vec3 &p_G, const Vec4 &q_CG)
-      : frame_id{frame_id}, p_G{p_G}, q_CG{q_CG} {}
+      : frame_id{frame_id}, p_G{p_G}, q_CG{q_CG} {
+  }
 
   /**
    * Correct camera state

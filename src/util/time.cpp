@@ -2,7 +2,9 @@
 
 namespace gvio {
 
-void tic(struct timespec *tic) { clock_gettime(CLOCK_MONOTONIC, tic); }
+void tic(struct timespec *tic) {
+  clock_gettime(CLOCK_MONOTONIC, tic);
+}
 
 float toc(struct timespec *tic) {
   struct timespec toc;
@@ -15,7 +17,9 @@ float toc(struct timespec *tic) {
   return time_elasped;
 }
 
-float mtoc(struct timespec *tic) { return toc(tic) * 1000.0; }
+float mtoc(struct timespec *tic) {
+  return toc(tic) * 1000.0;
+}
 
 double time_now() {
   struct timeval t;

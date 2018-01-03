@@ -26,7 +26,9 @@ MatX MSCKF::P() {
   return P;
 }
 
-int MSCKF::N() { return (int) this->cam_states.size(); }
+int MSCKF::N() {
+  return (int) this->cam_states.size();
+}
 
 void MSCKF::H(const FeatureTrack &track,
               const CameraStates &track_cam_states,

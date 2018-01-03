@@ -37,7 +37,8 @@ struct OXTS {
   std::vector<double> pos_accuracy;
   std::vector<double> vel_accuracy;
 
-  OXTS() {}
+  OXTS() {
+  }
 
   /**
    * Parse OXTS

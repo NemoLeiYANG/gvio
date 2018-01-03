@@ -146,7 +146,8 @@ public:
   int8_t dplf_config = 0;
   clock_t last_updated = 0;
 
-  MPU6050() {}
+  MPU6050() {
+  }
 
   /**
    * Configure
