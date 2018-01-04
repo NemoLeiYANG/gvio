@@ -59,20 +59,16 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   const Vec3 a_hat = a_m;
   const Vec3 w_hat = w_m;
 
-  UNUSED(a_hat);
-  UNUSED(w_hat);
-  UNUSED(dt);
-
   // Propagate IMU states
   // clang-format off
   // -- Orientation
   this->q_IG = this->q_IG + 0.5 * Omega(w_hat) * q_IG * dt;
   this->q_IG = quatnormalize(q_IG);
+
   // -- Gyro bias
   this->b_g = this->b_g + zeros(3, 1);
   // -- Velocity
-  // this->v_G = v_G + (dot(C(q_IG).T, a_hat) - 2 * dot(skew(w_G), v_G) - dot(skewsq(w_G), p_G)) * dt
-  this->v_G = this->v_G + (C(this->q_IG).transpose() * a_hat) - 2 * skew(this->w_G) * this->v_G - skewsq(this->w_G) * this->p_G + this->g_G * dt;
+  this->v_G = this->v_G + (C(this->q_IG).transpose() * a_hat - 2 * skew(this->w_G) * this->v_G - skewsq(this->w_G) * this->p_G + this->g_G) * dt;
   // -- Accel bias
   this->b_a = this->b_a + zeros(3, 1);
   // -- Position

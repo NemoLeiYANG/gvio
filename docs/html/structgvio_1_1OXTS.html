@@ -92,6 +92,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a633e3327a757ecf254974682a8f138ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98842d2fc43ebe6db8be517e51154cd7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1OXTS.html#a98842d2fc43ebe6db8be517e51154cd7">rpy</a></td></tr>
 <tr class="separator:a98842d2fc43ebe6db8be517e51154cd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a0e1861bea4fd2a45714824c036c7cd"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1OXTS.html#a5a0e1861bea4fd2a45714824c036c7cd">p_G</a></td></tr>
+<tr class="separator:a5a0e1861bea4fd2a45714824c036c7cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a18696b8726f3b76dc5e51f69daf7b459"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1OXTS.html#a18696b8726f3b76dc5e51f69daf7b459">v_G</a></td></tr>
 <tr class="separator:a18696b8726f3b76dc5e51f69daf7b459"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfa7d51e3968d5ce87cc262101da7b10"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1OXTS.html#acfa7d51e3968d5ce87cc262101da7b10">v_B</a></td></tr>
@@ -113,6 +115,8 @@ Public Attributes</h2></td></tr>
 Public Methods</h2></td></tr>
 <tr class="memitem:ad439d43c4d9663effb005f8a931b8ecb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1OXTS.html#ad439d43c4d9663effb005f8a931b8ecb">OXTS</a> ()</td></tr>
 <tr class="separator:ad439d43c4d9663effb005f8a931b8ecb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf5a618381e226ea952a2147a37241fe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1OXTS.html#abf5a618381e226ea952a2147a37241fe">parseSingleOXTSFile</a> (const std::string &amp;file_path, <a class="el" href="structgvio_1_1OXTSEntry.html">OXTSEntry</a> &amp;entry)</td></tr>
+<tr class="separator:abf5a618381e226ea952a2147a37241fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68407107e13cf1557594cbaaf251fd01"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1OXTS.html#a68407107e13cf1557594cbaaf251fd01">parseOXTS</a> (const std::string &amp;oxts_dir)</td></tr>
 <tr class="separator:a68407107e13cf1557594cbaaf251fd01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5be542413c8adbf34270b6cd977cf3a0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1OXTS.html#a5be542413c8adbf34270b6cd977cf3a0">parseSingleTimeStamp</a> (const std::string &amp;line, double *s)</td></tr>
@@ -164,6 +168,40 @@ Public Methods</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">oxts_dir</td><td>Path to <a class="el" href="structgvio_1_1OXTS.html">OXTS</a> data </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="abf5a618381e226ea952a2147a37241fe"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::OXTS::parseSingleOXTSFile </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>file_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structgvio_1_1OXTSEntry.html">OXTSEntry</a> &amp;&#160;</td>
+          <td class="paramname"><em>entry</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Parse a single <a class="el" href="structgvio_1_1OXTS.html">OXTS</a> file</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">file_path</td><td>File path to a single <a class="el" href="structgvio_1_1OXTS.html">OXTS</a> data </td></tr>
   </table>
   </dd>
 </dl>

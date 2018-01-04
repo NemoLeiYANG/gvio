@@ -99,8 +99,12 @@
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a63a73b8f0a43247ea7267d82c0642d00"><td class="memItemLeft" align="right" valign="top">std::ofstream&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#a63a73b8f0a43247ea7267d82c0642d00">output_file</a></td></tr>
-<tr class="separator:a63a73b8f0a43247ea7267d82c0642d00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c8daa66216a0a603c0aa4582ffdbc57"><td class="memItemLeft" align="right" valign="top">std::ofstream&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#a1c8daa66216a0a603c0aa4582ffdbc57">est_file</a></td></tr>
+<tr class="separator:a1c8daa66216a0a603c0aa4582ffdbc57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9f17aa3106d6ee02ed831e7c8fd4c65"><td class="memItemLeft" align="right" valign="top">std::ofstream&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#ad9f17aa3106d6ee02ed831e7c8fd4c65">mea_file</a></td></tr>
+<tr class="separator:ad9f17aa3106d6ee02ed831e7c8fd4c65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acac9cf83dd819a187478b5eb3dfb0af2"><td class="memItemLeft" align="right" valign="top">std::ofstream&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#acac9cf83dd819a187478b5eb3dfb0af2">gnd_file</a></td></tr>
+<tr class="separator:acac9cf83dd819a187478b5eb3dfb0af2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Methods</h2></td></tr>
@@ -108,13 +112,13 @@ Public Methods</h2></td></tr>
 <tr class="separator:ab0aa162990cc93d573548dd2d2671e66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac073aa3a179df0f2df4abd8135fda54b"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#ac073aa3a179df0f2df4abd8135fda54b">~BlackBox</a> ()</td></tr>
 <tr class="separator:ac073aa3a179df0f2df4abd8135fda54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78a6dd13865d0d1382c552ca3e2fde16"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#a78a6dd13865d0d1382c552ca3e2fde16">configure</a> (const std::string &amp;output_path)</td></tr>
-<tr class="separator:a78a6dd13865d0d1382c552ca3e2fde16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbbebd0726ff9a33f680941ebba9be59"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#abbbebd0726ff9a33f680941ebba9be59">record</a> (const <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> &amp;msckf)</td></tr>
-<tr class="separator:abbbebd0726ff9a33f680941ebba9be59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a018b4cf1333c8203d6bc26db54be24c9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#a018b4cf1333c8203d6bc26db54be24c9">configure</a> (const std::string &amp;output_path, const std::string &amp;base_name)</td></tr>
+<tr class="separator:a018b4cf1333c8203d6bc26db54be24c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44bf8d7bd243af52404cba5991959e46"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#a44bf8d7bd243af52404cba5991959e46">record</a> (const double time, const <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> &amp;msckf, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;measurement_a_B, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;measurement_w_B, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_p_G, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_v_G, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_rpy_G)</td></tr>
+<tr class="separator:a44bf8d7bd243af52404cba5991959e46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Method Descriptions</h2>
-<a class="anchor" id="a78a6dd13865d0d1382c552ca3e2fde16"></a>
+<a class="anchor" id="a018b4cf1333c8203d6bc26db54be24c9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -122,24 +126,74 @@ Public Methods</h2></td></tr>
           <td class="memname">int gvio::BlackBox::configure </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>output_path</em></td><td>)</td>
+          <td class="paramname"><em>output_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>base_name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="abbbebd0726ff9a33f680941ebba9be59"></a>
+<a class="anchor" id="a44bf8d7bd243af52404cba5991959e46"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">int gvio::BlackBox::record </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> &amp;&#160;</td>
-          <td class="paramname"><em>msckf</em></td><td>)</td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> &amp;&#160;</td>
+          <td class="paramname"><em>msckf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>measurement_a_B</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>measurement_w_B</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>ground_truth_p_G</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>ground_truth_v_G</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>ground_truth_rpy_G</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

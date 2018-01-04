@@ -2,6 +2,59 @@
 
 namespace gvio {
 
+int OXTS::parseSingleOXTSFile(const std::string &file_path, OXTSEntry &entry) {
+  // Load file
+  std::ifstream oxt_file(file_path.c_str());
+  if (oxt_file.good() == false) {
+    return -1;
+  }
+
+  // Load the data
+  std::string line;
+  std::getline(oxt_file, line);
+  const std::vector<double> array = parseArray(line);
+
+  // Store
+  const double lat = array[0];
+  const double lon = array[1];
+  const double alt = array[2];
+  const double roll = array[3];
+  const double pitch = array[4];
+  const double yaw = array[5];
+  const double vn = array[6];
+  const double ve = array[7];
+  const double vf = array[8];
+  const double vl = array[9];
+  const double vu = array[10];
+  const double ax = array[11];
+  const double ay = array[12];
+  const double az = array[13];
+  const double af = array[14];
+  const double al = array[15];
+  const double au = array[16];
+  const double wx = array[17];
+  const double wy = array[18];
+  const double wz = array[19];
+  const double wf = array[20];
+  const double wl = array[21];
+  const double wu = array[22];
+  const double pos_acc = array[23];
+  const double vel_acc = array[24];
+
+  entry.gps = Vec3{lat, lon, alt};
+  entry.rpy = Vec3{roll, pitch, yaw};
+  entry.v_G = Vec3{ve, vn, vu};
+  entry.v_B = Vec3{vf, vl, vu};
+  entry.a_G = Vec3{ax, ay, az};
+  entry.a_B = Vec3{af, al, au};
+  entry.w_G = Vec3{wx, wy, wz};
+  entry.w_B = Vec3{wf, wl, wu};
+  entry.pos_accuracy = pos_acc;
+  entry.vel_accuracy = vel_acc;
+
+  return 0;
+}
+
 int OXTS::parseOXTS(const std::string &oxts_dir) {
   // Get list of oxts files
   const std::string oxts_data_dir = strip(oxts_dir) + "/data";
@@ -9,56 +62,61 @@ int OXTS::parseOXTS(const std::string &oxts_dir) {
   if (list_dir(oxts_data_dir, oxts_files) != 0) {
     return -1;
   }
+  std::sort(oxts_files.begin(), oxts_files.end());
+
+  // Get first GPS point
+  OXTSEntry first_entry;
+  const std::string file_path = oxts_data_dir + "/" + oxts_files[0];
+  if (this->parseSingleOXTSFile(file_path, first_entry) != 0) {
+    return -1;
+  }
+
+  // Store initial conditions
+  const Vec3 gps_ref = first_entry.gps;
+  gps.emplace_back(first_entry.gps);
+  rpy.emplace_back(first_entry.rpy);
+  p_G.emplace_back(0, 0, 0);
+  v_G.emplace_back(first_entry.v_G);
+  v_B.emplace_back(first_entry.v_B);
+  a_G.emplace_back(first_entry.a_G);
+  a_B.emplace_back(first_entry.a_B);
+  w_G.emplace_back(first_entry.w_G);
+  w_B.emplace_back(first_entry.w_B);
+  pos_accuracy.push_back(first_entry.pos_accuracy);
+  vel_accuracy.push_back(first_entry.vel_accuracy);
 
   // Parse oxts files
-  std::sort(oxts_files.begin(), oxts_files.end());
-  for (std::string file_name : oxts_files) {
-    // Load oxts file
-    const std::string file_path = oxts_data_dir + "/" + file_name;
-    std::ifstream oxt_file(file_path.c_str());
+  for (size_t i = 1; i < oxts_files.size(); i++) {
+    // Parse single oxts file
+    OXTSEntry entry;
+    const std::string file_path = oxts_data_dir + "/" + oxts_files[i];
+    if (this->parseSingleOXTSFile(file_path, entry) != 0) {
+      return -1;
+    }
 
-    // Load the data
-    std::string line;
-    std::getline(oxt_file, line);
-    const std::vector<double> array = parseArray(line);
+    // Calculate local position
+    double dist_N = 0.0;
+    double dist_E = 0.0;
+    double alt = entry.gps(2) - gps_ref(2);
+    latlon_diff(gps_ref(0),
+                gps_ref(1),
+                entry.gps(0),
+                entry.gps(1),
+                &dist_N,
+                &dist_E);
 
-    // Store
-    const double lat = array[0];
-    const double lon = array[1];
-    const double alt = array[2];
-    const double roll = array[3];
-    const double pitch = array[4];
-    const double yaw = array[5];
-    const double vn = array[6];
-    const double ve = array[7];
-    const double vf = array[8];
-    const double vl = array[9];
-    const double vu = array[10];
-    const double ax = array[11];
-    const double ay = array[12];
-    const double az = array[13];
-    const double af = array[14];
-    const double al = array[15];
-    const double au = array[16];
-    const double wx = array[17];
-    const double wy = array[18];
-    const double wz = array[19];
-    const double wf = array[20];
-    const double wl = array[21];
-    const double wu = array[22];
-    const double pos_acc = array[23];
-    const double vel_acc = array[24];
-
-    gps.emplace_back(lat, lon, alt);
-    rpy.emplace_back(roll, pitch, yaw);
-    v_G.emplace_back(vn, ve, vu);
-    v_B.emplace_back(vf, vl, vu);
-    a_G.emplace_back(ax, ay, az);
-    a_B.emplace_back(af, al, au);
-    w_G.emplace_back(wx, wy, wz);
-    w_B.emplace_back(wf, wl, wu);
-    pos_accuracy.push_back(pos_acc);
-    vel_accuracy.push_back(vel_acc);
+    // Store data
+    gps.emplace_back(entry.gps);
+    rpy.emplace_back(entry.rpy);
+    p_G.emplace_back(dist_E, dist_N, alt);
+    v_G.emplace_back(entry.v_G);
+    v_B.emplace_back(entry.v_B);
+    a_G.emplace_back(entry.a_G);
+    a_B.emplace_back(entry.a_B);
+    w_G.emplace_back(entry.w_G);
+    w_B.emplace_back(entry.w_B);
+    pos_accuracy.push_back(entry.pos_accuracy);
+    vel_accuracy.push_back(entry.vel_accuracy);
   }
 
   return 0;

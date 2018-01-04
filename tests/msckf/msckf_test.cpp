@@ -112,14 +112,27 @@ int test_MSCKF_predictionUpdate() {
 
   // Prep blackbox
   BlackBox blackbox;
-  if (blackbox.configure("/tmp/test_msckf_predictionUpdate.dat") != 0) {
+  if (blackbox.configure("/tmp", "test_msckf_predictionUpdate") != 0) {
     LOG_ERROR("Failed to configure MSCKF blackbox!");
   }
 
-  // Loop through data and do prediction update
+  // Setup MSCKF
   MSCKF msckf;
+  msckf.imu_state.q_IG = euler2quat(raw_dataset.oxts.rpy[0]);
+  msckf.imu_state.v_G = raw_dataset.oxts.v_G[0];
+  msckf.imu_state.p_G = Vec3{0.0, 0.0, 0.0};
 
-  for (int i = 1; i < 10; i++) {
+  // Record initial conditions
+  blackbox.record(raw_dataset.oxts.timestamps[0],
+                  msckf,
+                  raw_dataset.oxts.a_B[0],
+                  raw_dataset.oxts.w_B[0],
+                  raw_dataset.oxts.p_G[0],
+                  raw_dataset.oxts.v_G[0],
+                  raw_dataset.oxts.rpy[0]);
+
+  // Loop through data and do prediction update
+  for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
     const Vec3 a_B = raw_dataset.oxts.a_B[i];
     const Vec3 w_B = raw_dataset.oxts.w_B[i];
     const double t_prev = raw_dataset.oxts.timestamps[i - 1];
@@ -127,12 +140,21 @@ int test_MSCKF_predictionUpdate() {
     const double dt = t_now - t_prev;
 
     msckf.predictionUpdate(a_B, w_B, dt);
+    blackbox.record(raw_dataset.oxts.timestamps[i],
+                    msckf,
+                    a_B,
+                    w_B,
+                    raw_dataset.oxts.p_G[i],
+                    raw_dataset.oxts.v_G[i],
+                    raw_dataset.oxts.rpy[i]);
 
     // const std::string img_path = raw_dataset.cam0[i];
     // const cv::Mat image = cv::imread(img_path);
     // cv::imshow("Image", image);
     // cv::waitKey(0);
   }
+
+  // system("python3 scripts/plot_msckf_blackbox.py");
 
   return 0;
 }

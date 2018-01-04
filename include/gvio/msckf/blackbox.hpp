@@ -15,13 +15,21 @@ namespace gvio {
  */
 class BlackBox {
 public:
-  std::ofstream output_file;
+  std::ofstream est_file;
+  std::ofstream mea_file;
+  std::ofstream gnd_file;
 
   BlackBox();
   virtual ~BlackBox();
 
-  int configure(const std::string &output_path);
-  int record(const MSCKF &msckf);
+  int configure(const std::string &output_path, const std::string &base_name);
+  int record(const double time,
+             const MSCKF &msckf,
+             const Vec3 &measurement_a_B,
+             const Vec3 &measurement_w_B,
+             const Vec3 &ground_truth_p_G,
+             const Vec3 &ground_truth_v_G,
+             const Vec3 &ground_truth_rpy_G);
 };
 
 } // namespace gvio

@@ -20,6 +20,22 @@ namespace gvio {
  */
 
 /**
+ * OXTS entry
+ */
+struct OXTSEntry {
+  Vec3 gps = zeros(3, 1);
+  Vec3 rpy = zeros(3, 1);
+  Vec3 v_G = zeros(3, 1);
+  Vec3 v_B = zeros(3, 1);
+  Vec3 a_G = zeros(3, 1);
+  Vec3 a_B = zeros(3, 1);
+  Vec3 w_G = zeros(3, 1);
+  Vec3 w_B = zeros(3, 1);
+  double pos_accuracy = 0.0;
+  double vel_accuracy = 0.0;
+};
+
+/**
  * OXTS
  */
 struct OXTS {
@@ -28,6 +44,7 @@ struct OXTS {
   std::vector<double> timestamps;
   std::vector<Vec3> gps;
   std::vector<Vec3> rpy;
+  std::vector<Vec3> p_G;
   std::vector<Vec3> v_G;
   std::vector<Vec3> v_B;
   std::vector<Vec3> a_G;
@@ -39,6 +56,13 @@ struct OXTS {
 
   OXTS() {}
 
+  /**
+   * Parse a single OXTS file
+   *
+   * @param file_path File path to a single OXTS data
+   * @returns 0 for success, -1 for failure
+   */
+  int parseSingleOXTSFile(const std::string &file_path, OXTSEntry &entry);
   /**
    * Parse OXTS
    *

@@ -21,14 +21,14 @@ class IMUState {
 public:
   static const int size = 15; ///< Size of state vector
 
-  Vec4 q_IG = zeros(4, 1); ///< JPL Quaternion of IMU in Global frame
-  Vec3 b_g = zeros(3, 1);  ///< Bias of gyroscope
-  Vec3 v_G = zeros(3, 1);  ///< Velocity of IMU in Global frame
-  Vec3 b_a = zeros(3, 1);  ///< Bias of accelerometer
-  Vec3 p_G = zeros(3, 1);  ///< Position of IMU in Global frame
+  Vec4 q_IG = Vec4{0.0, 0.0, 0.0, 1.0}; ///< JPL Quaternion in Global frame
+  Vec3 b_g = zeros(3, 1);               ///< Bias of gyroscope
+  Vec3 v_G = zeros(3, 1);               ///< Velocity in Global frame
+  Vec3 b_a = zeros(3, 1);               ///< Bias of accelerometer
+  Vec3 p_G = zeros(3, 1);               ///< Position in Global frame
 
-  Vec3 w_G = zeros(3, 1); ///< Earth's angular velocity
-  Vec3 g_G = zeros(3, 1); ///< Gravitational acceleration
+  Vec3 w_G = zeros(3, 1);           ///< Earth's angular velocity
+  Vec3 g_G = Vec3{0.0, 0.0, -9.81}; ///< Gravitational acceleration
 
   MatX P = zeros(15);   ///< Covariance matrix
   MatX Q = zeros(12);   ///< Noise matrix
