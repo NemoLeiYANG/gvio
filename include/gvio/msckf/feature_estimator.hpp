@@ -5,10 +5,12 @@
 #ifndef GVIO_MSCKF_FEATURE_ESTIMATOR_HPP
 #define GVIO_MSCKF_FEATURE_ESTIMATOR_HPP
 
-#include "gvio/util/util.hpp"
+#include <cmath>
+#include <cfloat>
 
 #include <ceres/ceres.h>
 
+#include "gvio/util/util.hpp"
 #include "gvio/quaternion/jpl.hpp"
 #include "gvio/msckf/msckf.hpp"
 #include "gvio/ceres/jpl_quaternion_parameterization.hpp"

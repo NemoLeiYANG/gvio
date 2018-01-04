@@ -61,8 +61,8 @@ void MSCKF::H(const FeatureTrack &track,
 
     // dh / dg
     MatX dhdg = zeros(2, 3);
-    dhdg.block(0, 0, 1, 3) = Vec3{1.0 / Z, 0.0, -X / pow(Z, 2)};
-    dhdg.block(1, 0, 1, 3) = Vec3{0.0, 1.0 / Z, -Y / pow(Z, 2)};
+    dhdg.block(0, 0, 1, 3) = Vec3{1.0 / Z, 0.0, -X / pow(Z, 2)}.transpose();
+    dhdg.block(1, 0, 1, 3) = Vec3{0.0, 1.0 / Z, -Y / pow(Z, 2)}.transpose();
 
     // Row start index
     const int rs = 2 * i;
@@ -81,6 +81,36 @@ void MSCKF::H(const FeatureTrack &track,
     // Update pose_idx
     pose_idx++;
   }
+}
+
+void MSCKF::R(const double n_u,
+              const double n_v,
+              const int nb_residuals,
+              MatX &R) {
+  Vec2 noise{n_u, n_v};
+  R = zeros(nb_residuals, nb_residuals);
+  for (int i = 0; i < nb_residuals; i += 2) {
+    R(i, i) = n_u;
+    R(i + 1, i + 1) = n_v;
+  }
+}
+
+int MSCKF::initialize() {
+  this->augmentState();
+  this->state = MSCKFState::INITIALIZED;
+
+  return 0;
+}
+
+int MSCKF::initialize(const Vec4 &q_IG, const Vec3 &v_G, const Vec3 &p_G) {
+  this->imu_state.q_IG = q_IG;
+  this->imu_state.v_G = v_G;
+  this->imu_state.p_G = p_G;
+
+  this->augmentState();
+  this->state = MSCKFState::INITIALIZED;
+
+  return 0;
 }
 
 void MSCKF::augmentState() {
@@ -198,9 +228,7 @@ int MSCKF::calTrackResiduals(const FeatureTrack &track,
 
   // Form the covariance matrix of different feature observations
   const int nb_residuals = r_j.rows();
-  const Vec2 sigma_img{this->n_u, this->n_v};
-  sigma_img.replicate(1, nb_residuals / 2.0);
-  R_j = sigma_img.diagonal();
+  this->R(this->n_u, this->n_v, nb_residuals, R_j);
 
   // Perform Null Space Trick?
   if (this->enable_ns_trick) {

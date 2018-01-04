@@ -20,10 +20,10 @@ namespace gvio {
  */
 class CameraState {
 public:
-  static const int size = 6; ///< Size of state vector
-  FrameID frame_id = -1;     ///< Camera frame id
-  Vec3 p_G = zeros(3, 1);    ///< Position of camera in Global frame
-  Vec4 q_CG = zeros(4, 1);   ///< Orientation of camera in Global frame
+  static const int size = 6;            ///< Size of state vector
+  FrameID frame_id = -1;                ///< Camera frame id
+  Vec3 p_G = zeros(3, 1);               ///< Position in Global frame
+  Vec4 q_CG = Vec4{0.0, 0.0, 0.0, 1.0}; ///< Orientation in Global frame
 
   CameraState() {}
   CameraState(const Vec3 &p_G, const Vec4 &q_CG) : p_G{p_G}, q_CG{q_CG} {}

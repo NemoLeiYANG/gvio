@@ -24,6 +24,12 @@ namespace gvio {
  * @{
  */
 
+enum class MSCKFState {
+  IDLE,
+  CONFIGURED,
+  INITIALIZED,
+};
+
 /**
  * Multi-State Constraint Kalman Filter
  *
@@ -39,11 +45,11 @@ namespace gvio {
  */
 class MSCKF {
 public:
+  MSCKFState state = MSCKFState::IDLE;
+
   // Covariance matrices
   MatX P_cam = zeros(CameraState::size, CameraState::size);
   MatX P_imu_cam = zeros(IMUState::size, CameraState::size);
-  // MatX P_cam;
-  // MatX P_imu_cam;
 
   // IMU
   IMUState imu_state;
@@ -54,7 +60,7 @@ public:
   FrameID counter_frame_id = 0;
   // -- Extrinsics
   Vec3 ext_p_IC = zeros(3, 1);
-  Vec4 ext_q_CI = zeros(4, 1);
+  Vec4 ext_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
   // -- Noise
   double n_u = 0.0;
   double n_v = 0.0;
@@ -93,6 +99,34 @@ public:
          const Vec3 &p_G_f,
          MatX &H_f_j,
          MatX &H_x_j);
+
+  /**
+   * Return measurement covariance matrix R
+   *
+   * @param n_u Noise in x-axis
+   * @param n_v Noise in y-axis
+   * @param nb_residuals Number of residuals
+   * @param R Measurement covariance matrix R
+   */
+  void R(const double n_u, const double n_v, const int nb_residuals, MatX &R);
+
+  /**
+   * Initialize
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int initialize();
+
+  /**
+   * Initialize
+   *
+   * @param q_IG Initial quaternion
+   * @param v_G Initial velocity
+   * @param p_G Initial position
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int initialize(const Vec4 &q_IG, const Vec3 &v_G, const Vec3 &p_G);
 
   /**
    * Augment state vector with new camera state

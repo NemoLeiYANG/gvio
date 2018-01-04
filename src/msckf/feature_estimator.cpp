@@ -288,9 +288,9 @@ int CeresFeatureEstimator::setupProblem() {
   this->x[1] = p_C0_f(1) / p_C0_f(2); // Beta
   this->x[2] = 1.0 / p_C0_f(2);       // Rho
 
-  this->x[0] += 0.1;
-  this->x[1] += 0.1;
-  this->x[2] += 10;
+  // this->x[0] += 0.1;
+  // this->x[1] += 0.1;
+  // this->x[2] += 10;
 
   // Add residual blocks
   const int N = this->track_cam_states.size();
@@ -324,7 +324,7 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   this->options.parameter_tolerance = 1e-10;
   this->options.num_threads = 1;
   this->options.num_linear_solver_threads = 1;
-  this->options.minimizer_progress_to_stdout = true;
+  this->options.minimizer_progress_to_stdout = false;
 
   // Setup problem
   if (this->setupProblem() != 0) {
@@ -333,7 +333,6 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
 
   // Solve
   ceres::Solve(this->options, &this->problem, &this->summary);
-  std::cout << summary.FullReport() << std::endl;
 
   // Transform feature position from camera to global frame
   const Vec3 X{this->x[0], this->x[1], 1.0};
@@ -341,7 +340,10 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
   const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
   p_G_f = z * (C_C0G.transpose() * X) + p_G_C0;
-  std::cout << "p_G_f: " << p_G_f.transpose() << std::endl;
+
+  if (std::isnan(p_G_f(0)) || std::isnan(p_G_f(1)) || std::isnan(p_G_f(2))) {
+    return -2;
+  }
 
   return 0;
 }
