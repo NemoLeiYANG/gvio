@@ -2,7 +2,7 @@
 
 namespace gvio {
 
-int KLTTracker::detect(const cv::Mat &image, std::vector<Feature> &features) {
+int KLTTracker::detect(const cv::Mat &image, Features &features) {
   // Convert image to gray scale
   cv::Mat gray_image;
   cv::cvtColor(image, gray_image, CV_BGR2GRAY);
@@ -23,27 +23,7 @@ int KLTTracker::detect(const cv::Mat &image, std::vector<Feature> &features) {
   return 0;
 }
 
-cv::Mat KLTTracker::drawTracks(const cv::Mat &img_cur,
-                               const std::vector<cv::Point2f> p0,
-                               const std::vector<cv::Point2f> p1,
-                               const std::vector<uchar> &status) {
-  // Draw tracks
-  for (size_t i = 0; i < status.size(); i++) {
-    // Check if point was lost
-    if (status[i] == 0) {
-      continue;
-    }
-
-    // Draw circle and line
-    cv::circle(img_cur, p0[i], 1, cv::Scalar(0, 255, 0), -1);
-    cv::circle(img_cur, p1[i], 1, cv::Scalar(0, 255, 0), -1);
-    cv::line(img_cur, p0[i], p1[i], cv::Scalar(0, 255, 0));
-  }
-
-  return img_cur;
-}
-
-int KLTTracker::track(const std::vector<Feature> &features) {
+int KLTTracker::track(const Features &features) {
   // Convert list of features to list of cv::Point2f
   std::vector<cv::Point2f> p0;
   for (auto f : features) {
@@ -70,30 +50,25 @@ int KLTTracker::track(const std::vector<Feature> &features) {
 
   // Show matches
   if (this->show_matches) {
-    cv::Mat matches_img = this->drawTracks(this->img_cur, p0, p1, status);
+    cv::Mat matches_img = draw_tracks(this->img_cur, p0, p1, status);
     cv::imshow("Matches", matches_img);
   }
 
   // Update or remove feature track
+  Features keeping;
   int index = 0;
-  std::vector<Feature> keeping;
-  std::map<Feature, bool, CompareFeatureByKeyPoint> tracking;
 
   for (auto s : status) {
     auto f0 = features[index];
 
     if (s == 1) {
       auto f1 = Feature(p1[index]);
-
       if (f0.track_id == -1) {
         this->addTrack(f0, f1);
       } else {
         this->updateTrack(f0.track_id, f1);
       }
-
-      this->fea_ref.push_back(f1);
       keeping.push_back(f1);
-      tracking.insert({f1, true});
 
     } else {
       this->removeTrack(f0.track_id, true);

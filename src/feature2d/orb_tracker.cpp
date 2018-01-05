@@ -2,7 +2,7 @@
 
 namespace gvio {
 
-int ORBTracker::detect(const cv::Mat &image, std::vector<Feature> &features) {
+int ORBTracker::detect(const cv::Mat &image, Features &features) {
   // Feature descriptor extraction
   std::vector<cv::KeyPoint> keypoints;
   cv::Mat mask;
@@ -10,11 +10,10 @@ int ORBTracker::detect(const cv::Mat &image, std::vector<Feature> &features) {
   this->orb->detectAndCompute(image, mask, keypoints, descriptors);
 
   // Update counters
-  this->counter_frame_id++;
+  this->counter_frame_id += 1;
 
   // Create features
-  // for (int i = 0; i < descriptors.rows; i++) {
-  for (int i = 0; i < 200; i++) {
+  for (int i = 0; i < descriptors.rows; i++) {
     features.emplace_back(keypoints[i], descriptors.row(i));
   }
 

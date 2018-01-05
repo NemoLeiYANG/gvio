@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>gvio: tests/feature2d/orb_tracker_test.cpp File Reference</title>
+<title>gvio: include/gvio/feature2d/draw.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -41,7 +41,7 @@
   </div>
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_59425e443f801f1f2fd8bbe4959a3ccf.html">tests</a></li><li class="navelem"><a class="el" href="dir_a3c34fddf7d28bded67047294c9ed67e.html">feature2d</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_86b931fcf5335d7eb841943cf101b746.html">gvio</a></li><li class="navelem"><a class="el" href="dir_58f612d33a2c698d414c951a1a14d096.html">feature2d</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -49,9 +49,11 @@
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">orb_tracker_test.cpp File Reference</div>  </div>
+<div class="title">draw.hpp File Reference<div class="ingroups"><a class="el" href="group__feature2d.html">feature2d</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p><a href="draw_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
@@ -60,32 +62,13 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa3e32a8e34dd8231b14e5566baee9f37"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#aa3e32a8e34dd8231b14e5566baee9f37">gvio::test_ORBTracker_update</a> ()</td></tr>
-<tr class="separator:aa3e32a8e34dd8231b14e5566baee9f37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afed1b34daaa0a584c9c1f0f51526065c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#afed1b34daaa0a584c9c1f0f51526065c">gvio::test_ORBTracker_getLostTracks</a> ()</td></tr>
-<tr class="separator:afed1b34daaa0a584c9c1f0f51526065c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37de1744d780056a6694cd515663684d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegvio.html#a37de1744d780056a6694cd515663684d">gvio::test_suite</a> ()</td></tr>
-<tr class="separator:a37de1744d780056a6694cd515663684d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1b7d55d7cc63a61fd617dfece1f7789"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orb__tracker__test_8cpp.html#ac1b7d55d7cc63a61fd617dfece1f7789">MU_RUN_TESTS</a> (<a class="el" href="namespacegvio.html#a37de1744d780056a6694cd515663684d">gvio::test_suite</a>)</td></tr>
-<tr class="separator:ac1b7d55d7cc63a61fd617dfece1f7789"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3bfdcb7a92d7b76bb1c8fa525b81bcb9"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#ga3bfdcb7a92d7b76bb1c8fa525b81bcb9">gvio::draw_tracks</a> (const cv::Mat &amp;img_cur, const std::vector&lt; cv::Point2f &gt; p0, const std::vector&lt; cv::Point2f &gt; p1, const std::vector&lt; uchar &gt; &amp;status)</td></tr>
+<tr class="separator:ga3bfdcb7a92d7b76bb1c8fa525b81bcb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae8630a7343a4b66636f077f1322a1ac1"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#gae8630a7343a4b66636f077f1322a1ac1">gvio::draw_matches</a> (const cv::Mat &amp;img0, const cv::Mat &amp;img1, const std::vector&lt; cv::KeyPoint &gt; k0, const std::vector&lt; cv::KeyPoint &gt; k1, const std::vector&lt; cv::DMatch &gt; &amp;matches)</td></tr>
+<tr class="separator:gae8630a7343a4b66636f077f1322a1ac1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaecb1f487319b593e023df1b0bb0dabfc"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#gaecb1f487319b593e023df1b0bb0dabfc">gvio::draw_features</a> (const cv::Mat &amp;image, const Features features)</td></tr>
+<tr class="separator:gaecb1f487319b593e023df1b0bb0dabfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ac1b7d55d7cc63a61fd617dfece1f7789"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">MU_RUN_TESTS </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacegvio.html#a37de1744d780056a6694cd515663684d">gvio::test_suite</a>&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

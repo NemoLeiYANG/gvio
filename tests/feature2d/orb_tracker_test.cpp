@@ -4,10 +4,13 @@
 
 namespace gvio {
 
-int test_ORBDetector_update() {
+static const std::string KITTI_RAW_DATASET = "/data/kitti/raw";
+
+int test_ORBTracker_update() {
   ORBTracker tracker;
 
-  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  // Load dataset
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
   if (raw_dataset.load() != 0) {
     return -1;
   }
@@ -37,7 +40,39 @@ int test_ORBDetector_update() {
   return 0;
 }
 
-void test_suite() { MU_ADD_TEST(test_ORBDetector_update); }
+int test_ORBTracker_getLostTracks() {
+  // Load raw dataset
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
+  if (raw_dataset.load() != 0) {
+    LOG_ERROR("Failed to load KITTI raw dataset [%s]!",
+              KITTI_RAW_DATASET.c_str());
+    return -1;
+  }
+
+  // Track features
+  ORBTracker tracker;
+  tracker.initialize(cv::imread(raw_dataset.cam0[0]));
+  tracker.update(cv::imread(raw_dataset.cam0[1]));
+  tracker.update(cv::imread(raw_dataset.cam0[2]));
+  std::cout << tracker.lost.size() << std::endl;
+
+  // Get lost tracks
+  FeatureTracks tracks;
+  tracker.getLostTracks(tracks);
+
+  // Assert
+  MU_CHECK(tracks.size() > 0);
+  for (auto track : tracks) {
+    MU_CHECK(tracker.buffer.find(track.track_id) == tracker.buffer.end());
+  }
+
+  return 0;
+}
+
+void test_suite() {
+  MU_ADD_TEST(test_ORBTracker_update);
+  MU_ADD_TEST(test_ORBTracker_getLostTracks);
+}
 
 } // namespace gvio
 

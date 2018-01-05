@@ -1,11 +1,10 @@
 #include "gvio/munit.h"
-#include "gvio/kitti/kitti.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 
-#define TEST_IMAGE_TOP "test_data/apriltag/top.png"
-#define TEST_IMAGE_BOTTOM "test_data/apriltag/bottom.png"
-
 namespace gvio {
+
+static const std::string TEST_IMAGE_TOP = "test_data/apriltag/top.png";
+static const std::string TEST_IMAGE_BOTTOM = "test_data/apriltag/bottom.png";
 
 int test_Feature_constructor() {
   cv::KeyPoint kp;
@@ -157,21 +156,25 @@ int test_FeatureTracker_removeTrack() {
   Feature f1;
   Feature f2;
 
-  // Test remove from buffer
+  // Test remove from buffer as lost
   tracker.addTrack(f1, f2);
   tracker.removeTrack(0);
 
   MU_CHECK_EQ(0, (int) tracker.tracking.size());
-  MU_CHECK_EQ(0, (int) tracker.lost.size());
-  MU_CHECK_EQ(0, (int) tracker.buffer.size());
-
-  // Test remove as lost
-  tracker.addTrack(f1, f2);
-  tracker.removeTrack(1, true);
-
-  MU_CHECK_EQ(0, (int) tracker.tracking.size());
   MU_CHECK_EQ(1, (int) tracker.lost.size());
   MU_CHECK_EQ(1, (int) tracker.buffer.size());
+
+  // Clear lost and buffer for next test
+  tracker.lost.clear();
+  tracker.buffer.clear();
+
+  // Test remove as not lost
+  tracker.addTrack(f1, f2);
+  tracker.removeTrack(1, false);
+
+  MU_CHECK_EQ(0, (int) tracker.tracking.size());
+  MU_CHECK_EQ(0, (int) tracker.lost.size());
+  MU_CHECK_EQ(0, (int) tracker.buffer.size());
 
   return 0;
 }

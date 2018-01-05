@@ -35,22 +35,7 @@ public:
    * @param features List of features
    * @returns 0 for success, -1 for failure
    */
-  virtual int detect(const cv::Mat &image,
-                     std::vector<Feature> &features) override;
-
-  /**
-   * Draw tracks
-   *
-   * @param img_cur Current image frame
-   * @param p0 Previous corners
-   * @param p1 Current corners
-   * @param status Corners status
-   * @returns Image with feature matches between previous and current frame
-   */
-  cv::Mat drawTracks(const cv::Mat &img_cur,
-                     const std::vector<cv::Point2f> p0,
-                     const std::vector<cv::Point2f> p1,
-                     const std::vector<uchar> &status);
+  virtual int detect(const cv::Mat &image, Features &features) override;
 
   /**
    * Track features
@@ -61,7 +46,7 @@ public:
    * @param features List of features in current frame
    * @returns 0 for success, -1 for failure
    */
-  int track(const std::vector<Feature> &features);
+  int track(const Features &features);
 
   /**
    * Update feature tracker

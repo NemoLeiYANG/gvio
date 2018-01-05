@@ -1,8 +1,9 @@
 #include "gvio/munit.h"
+#include "gvio/util/util.hpp"
+#include "gvio/kitti/kitti.hpp"
 #include "gvio/msckf/msckf.hpp"
 #include "gvio/msckf/blackbox.hpp"
-#include "gvio/kitti/kitti.hpp"
-#include "gvio/util/util.hpp"
+#include "gvio/feature2d/klt_tracker.hpp"
 
 namespace gvio {
 
@@ -212,7 +213,7 @@ int test_MSCKF_predictionUpdate() {
     // cv::waitKey(0);
   }
 
-  // system("python3 scripts/plot_msckf_blackbox.py");
+  // system("python3 scripts/plot_msckf.py");
 
   return 0;
 }
@@ -373,20 +374,104 @@ int test_MSCKF_correctCameraStates() {
   return 0;
 }
 
+int test_MSCKF_measurementUpdate() {
+  // Load raw dataset
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
+  if (raw_dataset.load() != 0) {
+    LOG_ERROR("Failed to load KITTI raw dataset [%s]!",
+              KITTI_RAW_DATASET.c_str());
+    return -1;
+  }
+
+  // Setup blackbox
+  BlackBox blackbox;
+  if (blackbox.configure("/tmp", "test_msckf_predictionUpdate") != 0) {
+    LOG_ERROR("Failed to configure MSCKF blackbox!");
+  }
+
+  // Setup camera model
+  const int image_width = 640;
+  const int image_height = 640;
+  const double fov = 60.0;
+  const double fx = PinholeModel::focalLengthX(image_width, fov);
+  const double fy = PinholeModel::focalLengthY(image_height, fov);
+  const double cx = image_width / 2.0;
+  const double cy = image_height / 2.0;
+  PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
+
+  // Setup feature tracker
+  KLTTracker tracker;
+  tracker.initialize(cv::imread(raw_dataset.cam0[0]));
+
+  // Setup MSCKF
+  MSCKF msckf;
+  msckf.enable_ns_trick = false;
+  msckf.enable_qr_trick = false;
+  msckf.camera_model = &pinhole_model;
+  msckf.initialize(euler2quat(raw_dataset.oxts.rpy[0]),
+                   raw_dataset.oxts.v_G[0],
+                   Vec3{0.0, 0.0, 0.0});
+
+  // Record initial conditions
+  blackbox.record(raw_dataset.oxts.timestamps[0],
+                  msckf,
+                  raw_dataset.oxts.a_B[0],
+                  raw_dataset.oxts.w_B[0],
+                  raw_dataset.oxts.p_G[0],
+                  raw_dataset.oxts.v_G[0],
+                  raw_dataset.oxts.rpy[0]);
+
+  // Loop through data and do prediction update
+  // for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
+  for (int i = 1; i < 50; i++) {
+    // Feature tracker
+    const std::string img_path = raw_dataset.cam0[i];
+    const cv::Mat img = cv::imread(img_path);
+    FeatureTracks tracks;
+    tracker.update(img);
+    tracker.getLostTracks(tracks);
+
+    // MSCKF
+    const Vec3 a_B = raw_dataset.oxts.a_B[i];
+    const Vec3 w_B = raw_dataset.oxts.w_B[i];
+    const double t_prev = raw_dataset.oxts.timestamps[i - 1];
+    const double t_now = raw_dataset.oxts.timestamps[i];
+    const double dt = t_now - t_prev;
+
+    msckf.predictionUpdate(a_B, w_B, dt);
+    msckf.measurementUpdate(tracks);
+
+    // Record
+    blackbox.record(raw_dataset.oxts.timestamps[i],
+                    msckf,
+                    a_B,
+                    w_B,
+                    raw_dataset.oxts.p_G[i],
+                    raw_dataset.oxts.v_G[i],
+                    raw_dataset.oxts.rpy[i]);
+
+    printf("frame: %d, nb_tracks: %ld\n", i, tracks.size());
+  }
+
+  system("python3 scripts/plot_msckf.py");
+
+  return 0;
+}
+
 void test_suite() {
-  MU_ADD_TEST(test_MSCKF_constructor);
-  MU_ADD_TEST(test_MSCKF_P);
-  MU_ADD_TEST(test_MSCKF_N);
-  MU_ADD_TEST(test_MSCKF_H);
-  MU_ADD_TEST(test_MSCKF_R);
-  MU_ADD_TEST(test_MSCKF_augmentState);
-  MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
-  MU_ADD_TEST(test_MSCKF_predictionUpdate);
-  MU_ADD_TEST(test_MSCKF_calTrackResiduals);
-  MU_ADD_TEST(test_MSCKF_calResiduals);
-  MU_ADD_TEST(test_MSCKF_correctIMUState);
-  MU_ADD_TEST(test_MSCKF_correctCameraStates);
-  // MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  // MU_ADD_TEST(test_MSCKF_constructor);
+  // MU_ADD_TEST(test_MSCKF_P);
+  // MU_ADD_TEST(test_MSCKF_N);
+  // MU_ADD_TEST(test_MSCKF_H);
+  // MU_ADD_TEST(test_MSCKF_R);
+  // MU_ADD_TEST(test_MSCKF_augmentState);
+  // MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
+  // MU_ADD_TEST(test_MSCKF_predictionUpdate);
+  // MU_ADD_TEST(test_MSCKF_calTrackResiduals);
+  // MU_ADD_TEST(test_MSCKF_calResiduals);
+  // MU_ADD_TEST(test_MSCKF_correctIMUState);
+  // MU_ADD_TEST(test_MSCKF_correctCameraStates);
+  MU_ADD_TEST(test_MSCKF_measurementUpdate);
 }
 
 } // namespace gvio

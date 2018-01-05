@@ -63,8 +63,6 @@ Files</h2></td></tr>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1Feature.html">gvio::Feature</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1CompareFeatureByKeyPoint.html">gvio::CompareFeatureByKeyPoint</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgvio_1_1FeatureTrack.html">gvio::FeatureTrack</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html">gvio::FeatureTracker</a></td></tr>
@@ -87,11 +85,19 @@ Typedefs</h2></td></tr>
 <tr class="separator:ga2e8f0fd10f78539dbce8456b99c662a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafe4f0efb14d5061ed16c24bb0c6ee6c2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">gvio::FrameID</a> = long int</td></tr>
 <tr class="separator:gafe4f0efb14d5061ed16c24bb0c6ee6c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab14d9865446b4d588bea72e2a9de22a1"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">gvio::Features</a> = std::vector&lt; Feature &gt;</td></tr>
+<tr class="separator:gab14d9865446b4d588bea72e2a9de22a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7c4d310e4ecdce4f1c81d6b1ad5c13c0"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#ga7c4d310e4ecdce4f1c81d6b1ad5c13c0">gvio::FeatureTracks</a> = std::vector&lt; FeatureTrack &gt;</td></tr>
 <tr class="separator:ga7c4d310e4ecdce4f1c81d6b1ad5c13c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga3bfdcb7a92d7b76bb1c8fa525b81bcb9"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#ga3bfdcb7a92d7b76bb1c8fa525b81bcb9">gvio::draw_tracks</a> (const cv::Mat &amp;img_cur, const std::vector&lt; cv::Point2f &gt; p0, const std::vector&lt; cv::Point2f &gt; p1, const std::vector&lt; uchar &gt; &amp;status)</td></tr>
+<tr class="separator:ga3bfdcb7a92d7b76bb1c8fa525b81bcb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae8630a7343a4b66636f077f1322a1ac1"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#gae8630a7343a4b66636f077f1322a1ac1">gvio::draw_matches</a> (const cv::Mat &amp;img0, const cv::Mat &amp;img1, const std::vector&lt; cv::KeyPoint &gt; k0, const std::vector&lt; cv::KeyPoint &gt; k1, const std::vector&lt; cv::DMatch &gt; &amp;matches)</td></tr>
+<tr class="separator:gae8630a7343a4b66636f077f1322a1ac1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaecb1f487319b593e023df1b0bb0dabfc"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#gaecb1f487319b593e023df1b0bb0dabfc">gvio::draw_features</a> (const cv::Mat &amp;image, const Features features)</td></tr>
+<tr class="separator:gaecb1f487319b593e023df1b0bb0dabfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3db75956895fe89f7e8f954fc0880002"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature2d.html#ga3db75956895fe89f7e8f954fc0880002">gvio::draw_inliers</a> (const cv::Mat &amp;src1, const cv::Mat &amp;src2, const std::vector&lt; cv::KeyPoint &gt; &amp;kpt1, const std::vector&lt; cv::KeyPoint &gt; &amp;kpt2, const std::vector&lt; cv::DMatch &gt; &amp;inlier, int type=1)</td></tr>
 <tr class="separator:ga3db75956895fe89f7e8f954fc0880002"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -117,6 +123,19 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
+<a class="anchor" id="gab14d9865446b4d588bea72e2a9de22a1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">gvio::Features</a> = typedef std::vector&lt;Feature&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Features </p>
+
+</div>
+</div>
 <a class="anchor" id="ga7c4d310e4ecdce4f1c81d6b1ad5c13c0"></a>
 <div class="memitem">
 <div class="memproto">
@@ -155,6 +174,41 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="gaecb1f487319b593e023df1b0bb0dabfc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cv::Mat gvio::draw_features </td>
+          <td>(</td>
+          <td class="paramtype">const cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>image</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a>&#160;</td>
+          <td class="paramname"><em>features</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Draw features</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">image</td><td>Image frame </td></tr>
+    <tr><td class="paramname">features</td><td>List of features </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Features image </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ga3db75956895fe89f7e8f954fc0880002"></a>
 <div class="memitem">
 <div class="memproto">
@@ -210,6 +264,111 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="gae8630a7343a4b66636f077f1322a1ac1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cv::Mat gvio::draw_matches </td>
+          <td>(</td>
+          <td class="paramtype">const cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>img0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>img1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; cv::KeyPoint &gt;&#160;</td>
+          <td class="paramname"><em>k0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; cv::KeyPoint &gt;&#160;</td>
+          <td class="paramname"><em>k1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; cv::DMatch &gt; &amp;&#160;</td>
+          <td class="paramname"><em>matches</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Draw matches</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">img0</td><td>Previous image frame </td></tr>
+    <tr><td class="paramname">img1</td><td>Current image frame </td></tr>
+    <tr><td class="paramname">k0</td><td>Previous keypoints </td></tr>
+    <tr><td class="paramname">k1</td><td>Current keypoints </td></tr>
+    <tr><td class="paramname">matches</td><td><a class="el" href="structgvio_1_1Feature.html">Feature</a> matches </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Image with feature matches between previous and current frame </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga3bfdcb7a92d7b76bb1c8fa525b81bcb9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cv::Mat gvio::draw_tracks </td>
+          <td>(</td>
+          <td class="paramtype">const cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>img_cur</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; cv::Point2f &gt;&#160;</td>
+          <td class="paramname"><em>p0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; cv::Point2f &gt;&#160;</td>
+          <td class="paramname"><em>p1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; uchar &gt; &amp;&#160;</td>
+          <td class="paramname"><em>status</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Draw tracks</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">img_cur</td><td>Current image frame </td></tr>
+    <tr><td class="paramname">p0</td><td>Previous corners </td></tr>
+    <tr><td class="paramname">p1</td><td>Current corners </td></tr>
+    <tr><td class="paramname">status</td><td>Corners status </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Image with feature matches between previous and current frame </dd></dl>
 
 </div>
 </div>

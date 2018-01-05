@@ -8,14 +8,14 @@ int test_IMUState_constructor() {
 
   MU_CHECK_EQ(15, imu_state.size);
 
-  MU_CHECK(zeros(4, 1).isApprox(imu_state.q_IG));
+  MU_CHECK(Vec4(0.0, 0.0, 0.0, 1.0).isApprox(imu_state.q_IG));
   MU_CHECK(zeros(3, 1).isApprox(imu_state.b_g));
   MU_CHECK(zeros(3, 1).isApprox(imu_state.v_G));
   MU_CHECK(zeros(3, 1).isApprox(imu_state.b_a));
   MU_CHECK(zeros(3, 1).isApprox(imu_state.p_G));
 
   MU_CHECK(zeros(3, 1).isApprox(imu_state.w_G));
-  MU_CHECK(zeros(3, 1).isApprox(imu_state.g_G));
+  MU_CHECK(Vec3(0.0, 0.0, -9.81).isApprox(imu_state.g_G));
 
   // MU_CHECK(zeros(1, 1).isApprox(imu_state.P));
   // MU_CHECK(zeros(1, 1).isApprox(imu_state.Q));

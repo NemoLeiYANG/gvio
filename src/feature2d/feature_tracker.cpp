@@ -60,7 +60,7 @@ int FeatureTracker::updateTrack(const TrackID &track_id, Feature &f) {
 }
 
 void FeatureTracker::getKeyPointsAndDescriptors(
-    const std::vector<Feature> &features,
+    const Features &features,
     std::vector<cv::KeyPoint> &keypoints,
     cv::Mat &descriptors) {
   descriptors = cv::Mat(features.size(), features[0].desc.cols, CV_8UC1);
@@ -72,14 +72,26 @@ void FeatureTracker::getKeyPointsAndDescriptors(
 
 void FeatureTracker::getFeatures(const std::vector<cv::KeyPoint> &keypoints,
                                  const cv::Mat &descriptors,
-                                 std::vector<Feature> &features) {
+                                 Features &features) {
   for (size_t i = 0; i < keypoints.size(); i++) {
     features.emplace_back(keypoints[i], descriptors.row(i));
   }
 }
 
-int FeatureTracker::detect(const cv::Mat &image,
-                           std::vector<Feature> &features) {
+void FeatureTracker::getLostTracks(std::vector<FeatureTrack> &tracks) {
+  tracks.clear();
+  auto lost_ids = this->lost;
+
+  for (size_t i = 0; i < lost_ids.size(); i++) {
+    TrackID track_id = lost_ids[i];
+    tracks.emplace_back(this->buffer[track_id]);
+    this->buffer.erase(this->buffer.find(track_id));
+  }
+
+  this->lost.clear();
+}
+
+int FeatureTracker::detect(const cv::Mat &image, Features &features) {
   UNUSED(image);
   UNUSED(features);
   LOG_ERROR("You're suppose to override FeatureTracker::detect()!");
@@ -89,51 +101,10 @@ int FeatureTracker::detect(const cv::Mat &image,
   return 0;
 }
 
-cv::Mat FeatureTracker::drawMatches(const cv::Mat &img0,
-                                    const cv::Mat &img1,
-                                    const std::vector<cv::KeyPoint> k0,
-                                    const std::vector<cv::KeyPoint> k1,
-                                    const std::vector<cv::DMatch> &matches) {
-  cv::Mat match_img;
-
-  // Stack current and previous image vertically
-  cv::vconcat(img0, img1, match_img);
-
-  // Draw matches
-  for (size_t i = 0; i < matches.size(); i++) {
-    const int k0_idx = matches[i].queryIdx;
-    const int k1_idx = matches[i].trainIdx;
-    cv::KeyPoint p0 = k0[k0_idx];
-    cv::KeyPoint p1 = k1[k1_idx];
-
-    // Point 1
-    p1.pt.y += img0.rows;
-
-    // Draw circle and line
-    cv::circle(match_img, p0.pt, 2, cv::Scalar(0, 255, 0), -1);
-    cv::circle(match_img, p1.pt, 2, cv::Scalar(0, 255, 0), -1);
-    cv::line(match_img, p0.pt, p1.pt, cv::Scalar(0, 255, 0));
-  }
-
-  return match_img;
-}
-
-cv::Mat FeatureTracker::drawFeatures(const cv::Mat &image,
-                                     const std::vector<Feature> features) {
-  cv::Mat fea_img;
-
-  image.copyTo(fea_img);
-  for (auto f : features) {
-    cv::circle(fea_img, f.kp.pt, 2, cv::Scalar(0, 255, 0), -1);
-  }
-
-  return fea_img;
-}
-
-int FeatureTracker::match(const std::vector<Feature> &f1,
+int FeatureTracker::match(const Features &f1,
                           std::vector<cv::DMatch> &matches) {
   // Stack previously unmatched features with tracked features
-  std::vector<Feature> f0;
+  Features f0;
   f0.reserve(this->fea_ref.size() + this->unmatched.size());
   f0.insert(f0.end(), this->fea_ref.begin(), this->fea_ref.end());
   f0.insert(f0.end(), this->unmatched.begin(), this->unmatched.end());
@@ -155,7 +126,7 @@ int FeatureTracker::match(const std::vector<Feature> &f1,
   // Show matches
   if (this->show_matches) {
     const cv::Mat matches_img =
-        this->drawMatches(this->img_ref, this->img_cur, k0, k1, matches);
+        draw_matches(this->img_ref, this->img_cur, k0, k1, matches);
     cv::imshow("Matches", matches_img);
   }
 
@@ -241,7 +212,7 @@ int FeatureTracker::update(const cv::Mat &img_cur) {
   }
 
   // Detect
-  std::vector<Feature> features;
+  Features features;
   if (this->detect(img_cur, features) != 0) {
     return -1;
   }
@@ -256,6 +227,66 @@ int FeatureTracker::update(const cv::Mat &img_cur) {
   img_cur.copyTo(this->img_ref);
 
   return 0;
+}
+
+cv::Mat draw_tracks(const cv::Mat &img_cur,
+                    const std::vector<cv::Point2f> p0,
+                    const std::vector<cv::Point2f> p1,
+                    const std::vector<uchar> &status) {
+  // Draw tracks
+  for (size_t i = 0; i < status.size(); i++) {
+    // Check if point was lost
+    if (status[i] == 0) {
+      continue;
+    }
+
+    // Draw circle and line
+    cv::circle(img_cur, p0[i], 1, cv::Scalar(0, 255, 0), -1);
+    cv::circle(img_cur, p1[i], 1, cv::Scalar(0, 255, 0), -1);
+    cv::line(img_cur, p0[i], p1[i], cv::Scalar(0, 255, 0));
+  }
+
+  return img_cur;
+}
+
+cv::Mat draw_matches(const cv::Mat &img0,
+                     const cv::Mat &img1,
+                     const std::vector<cv::KeyPoint> k0,
+                     const std::vector<cv::KeyPoint> k1,
+                     const std::vector<cv::DMatch> &matches) {
+  cv::Mat match_img;
+
+  // Stack current and previous image vertically
+  cv::vconcat(img0, img1, match_img);
+
+  // Draw matches
+  for (size_t i = 0; i < matches.size(); i++) {
+    const int k0_idx = matches[i].queryIdx;
+    const int k1_idx = matches[i].trainIdx;
+    cv::KeyPoint p0 = k0[k0_idx];
+    cv::KeyPoint p1 = k1[k1_idx];
+
+    // Point 1
+    p1.pt.y += img0.rows;
+
+    // Draw circle and line
+    cv::circle(match_img, p0.pt, 2, cv::Scalar(0, 255, 0), -1);
+    cv::circle(match_img, p1.pt, 2, cv::Scalar(0, 255, 0), -1);
+    cv::line(match_img, p0.pt, p1.pt, cv::Scalar(0, 255, 0));
+  }
+
+  return match_img;
+}
+
+cv::Mat draw_features(const cv::Mat &image, const Features features) {
+  cv::Mat fea_img;
+
+  image.copyTo(fea_img);
+  for (auto f : features) {
+    cv::circle(fea_img, f.kp.pt, 2, cv::Scalar(0, 255, 0), -1);
+  }
+
+  return fea_img;
 }
 
 } // namespace gvio

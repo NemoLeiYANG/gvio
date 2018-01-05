@@ -16,7 +16,7 @@ int test_KLTTracker_detect() {
 
   std::vector<Feature> features;
   tracker.detect(img0, features);
-  img0 = tracker.drawFeatures(img0, features);
+  img0 = draw_features(img0, features);
 
   MU_CHECK(features.size() > 0);
 
@@ -84,7 +84,7 @@ int test_KLTTracker_demo() {
 void test_suite() {
   MU_ADD_TEST(test_KLTTracker_detect);
   MU_ADD_TEST(test_KLTTracker_track);
-  // MU_ADD_TEST(test_KLTTracker_demo);
+  MU_ADD_TEST(test_KLTTracker_demo);
 }
 
 } // namespace gvio

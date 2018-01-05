@@ -67,16 +67,9 @@ struct Feature {
 };
 
 /**
- * Compare feature by keypoint
+ * Features
  */
-struct CompareFeatureByKeyPoint {
-  bool operator()(const Feature &a, const Feature &b) const {
-    const double dx = b.kp.pt.x - a.kp.pt.x;
-    const double dy = b.kp.pt.y - a.kp.pt.y;
-    const double dist = sqrtf(dx * dx + dy * dy);
-    return dist;
-  }
-};
+using Features = std::vector<Feature>;
 
 /**
  * Feature track
@@ -85,7 +78,7 @@ struct FeatureTrack {
   TrackID track_id = -1;
   FrameID frame_start = -1;
   FrameID frame_end = -1;
-  std::vector<Feature> track;
+  Features track;
 
   FeatureTrack() {}
 
@@ -165,8 +158,8 @@ public:
   // Image, feature, unmatched features book keeping
   cv::Mat img_cur;
   cv::Mat img_ref;
-  std::vector<Feature> fea_ref;
-  std::vector<Feature> unmatched;
+  Features fea_ref;
+  Features unmatched;
 
   FeatureTracker() {}
 
@@ -186,7 +179,7 @@ public:
    * @param lost Mark feature track as lost
    * @returns 0 for success, -1 for failure
    */
-  int removeTrack(const TrackID &track_id, const bool lost = false);
+  int removeTrack(const TrackID &track_id, const bool lost = true);
 
   /**
    * Update feature track
@@ -204,20 +197,27 @@ public:
    * @param keypoints Keypoints
    * @param descriptors Descriptors
    */
-  void getKeyPointsAndDescriptors(const std::vector<Feature> &features,
+  void getKeyPointsAndDescriptors(const Features &features,
                                   std::vector<cv::KeyPoint> &keypoints,
                                   cv::Mat &descriptors);
 
   /**
-    * Convert keypoints and descriptors to list of features
-    *
+   * Convert keypoints and descriptors to list of features
+   *
    * @param features List of features
    * @param keypoints Keypoints
    * @param descriptors Descriptors
-    */
+   */
   void getFeatures(const std::vector<cv::KeyPoint> &keypoints,
                    const cv::Mat &descriptors,
-                   std::vector<Feature> &features);
+                   Features &features);
+
+  /**
+   * Get lost feature tracks
+   *
+   * @param tracks Lost feature tracks
+   */
+  void getLostTracks(std::vector<FeatureTrack> &tracks);
 
   /**
    * Detect features
@@ -226,33 +226,7 @@ public:
    * @param features List of features
    * @returns 0 for success, -1 for failure
    */
-  virtual int detect(const cv::Mat &image, std::vector<Feature> &features);
-
-  /**
-   * Draw matches
-   *
-   * @param img0 Previous image frame
-   * @param img1 Current image frame
-   * @param k0 Previous keypoints
-   * @param k1 Current keypoints
-   * @param matches Feature matches
-   * @returns Image with feature matches between previous and current frame
-   */
-  cv::Mat drawMatches(const cv::Mat &img0,
-                      const cv::Mat &img1,
-                      const std::vector<cv::KeyPoint> k0,
-                      const std::vector<cv::KeyPoint> k1,
-                      const std::vector<cv::DMatch> &matches);
-
-  /**
-   * Draw features
-   *
-   * @param image Image frame
-   * @param features List of features
-   * @returns Features image
-   */
-  cv::Mat drawFeatures(const cv::Mat &image,
-                       const std::vector<Feature> features);
+  virtual int detect(const cv::Mat &image, Features &features);
 
   /**
    * Match features to feature tracks
@@ -264,8 +238,7 @@ public:
    * @param matches List of matches
    * @returns 0 for success, -1 for failure
    */
-  virtual int match(const std::vector<Feature> &f1,
-                    std::vector<cv::DMatch> &matches);
+  virtual int match(const Features &f1, std::vector<cv::DMatch> &matches);
 
   /**
    * Purge old feature tracks
@@ -329,6 +302,45 @@ public:
     return os;
   }
 };
+
+/**
+  * Draw tracks
+  *
+  * @param img_cur Current image frame
+  * @param p0 Previous corners
+  * @param p1 Current corners
+  * @param status Corners status
+  * @returns Image with feature matches between previous and current frame
+  */
+cv::Mat draw_tracks(const cv::Mat &img_cur,
+                    const std::vector<cv::Point2f> p0,
+                    const std::vector<cv::Point2f> p1,
+                    const std::vector<uchar> &status);
+
+/**
+  * Draw matches
+  *
+  * @param img0 Previous image frame
+  * @param img1 Current image frame
+  * @param k0 Previous keypoints
+  * @param k1 Current keypoints
+  * @param matches Feature matches
+  * @returns Image with feature matches between previous and current frame
+  */
+cv::Mat draw_matches(const cv::Mat &img0,
+                     const cv::Mat &img1,
+                     const std::vector<cv::KeyPoint> k0,
+                     const std::vector<cv::KeyPoint> k1,
+                     const std::vector<cv::DMatch> &matches);
+
+/**
+  * Draw features
+  *
+  * @param image Image frame
+  * @param features List of features
+  * @returns Features image
+  */
+cv::Mat draw_features(const cv::Mat &image, const Features features);
 
 /** @} group feature2d */
 } // namespace gvio
