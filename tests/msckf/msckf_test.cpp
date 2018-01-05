@@ -317,6 +317,62 @@ int test_MSCKF_calResiduals() {
   return 0;
 }
 
+int test_MSCKF_correctIMUState() {
+  // Setup MSCKF
+  MSCKF msckf;
+  msckf.initialize();
+
+  // Form correction vector
+  const Vec3 dtheta_IG{0.0, 0.0, 0.0};
+  const Vec3 db_g{1.0, 1.0, 1.0};
+  const Vec3 dv_G{2.0, 2.0, 2.0};
+  const Vec3 db_a{3.0, 3.0, 3.0};
+  const Vec3 dp_G{4.0, 4.0, 4.0};
+
+  VecX dx;
+  dx.resize(15, 1);
+  dx << dtheta_IG, db_g, dv_G, db_a, dp_G;
+
+  // Correct IMU state
+  msckf.correctIMUState(dx);
+
+  // Assert
+  MU_CHECK(msckf.imu_state.b_g.isApprox(db_g));
+  MU_CHECK(msckf.imu_state.v_G.isApprox(dv_G));
+  MU_CHECK(msckf.imu_state.b_a.isApprox(db_a));
+  MU_CHECK(msckf.imu_state.p_G.isApprox(dp_G));
+
+  return 0;
+}
+
+int test_MSCKF_correctCameraStates() {
+  // Setup MSCKF
+  MSCKF msckf;
+  msckf.initialize();
+
+  // Form correction vector
+  const Vec3 dtheta_IG{0.0, 0.0, 0.0};
+  const Vec3 db_g{0.0, 0.0, 0.0};
+  const Vec3 dv_G{0.0, 0.0, 0.0};
+  const Vec3 db_a{0.0, 0.0, 0.0};
+  const Vec3 dp_G_I{0.0, 0.0, 0.0};
+
+  const Vec3 dtheta_CG{0.0, 0.0, 0.0};
+  const Vec3 dp_G_C{1.0, 2.0, 3.0};
+
+  VecX dx;
+  dx.resize(21, 1);
+  dx << dtheta_IG, db_g, dv_G, db_a, dp_G_I, dtheta_CG, dp_G_C;
+
+  // Correct camera states
+  msckf.correctCameraStates(dx);
+
+  // Assert
+  MU_CHECK(msckf.cam_states[0].p_G.isApprox(dp_G_C));
+
+  return 0;
+}
+
 void test_suite() {
   MU_ADD_TEST(test_MSCKF_constructor);
   MU_ADD_TEST(test_MSCKF_P);
@@ -328,8 +384,8 @@ void test_suite() {
   MU_ADD_TEST(test_MSCKF_predictionUpdate);
   MU_ADD_TEST(test_MSCKF_calTrackResiduals);
   MU_ADD_TEST(test_MSCKF_calResiduals);
-  // TODO: MU_ADD_TEST(test_MSCKF_correctIMUState);
-  // TODO: MU_ADD_TEST(test_MSCKF_correctCameraStates);
+  MU_ADD_TEST(test_MSCKF_correctIMUState);
+  MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate);
 }
 
