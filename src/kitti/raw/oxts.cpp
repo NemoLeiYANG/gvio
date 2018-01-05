@@ -2,7 +2,7 @@
 
 namespace gvio {
 
-int OXTS::parseSingleOXTSFile(const std::string &file_path, OXTSEntry &entry) {
+int OXTSEntry::load(const std::string &file_path) {
   // Load file
   std::ifstream oxt_file(file_path.c_str());
   if (oxt_file.good() == false) {
@@ -41,21 +41,21 @@ int OXTS::parseSingleOXTSFile(const std::string &file_path, OXTSEntry &entry) {
   const double pos_acc = array[23];
   const double vel_acc = array[24];
 
-  entry.gps = Vec3{lat, lon, alt};
-  entry.rpy = Vec3{roll, pitch, yaw};
-  entry.v_G = Vec3{ve, vn, vu};
-  entry.v_B = Vec3{vf, vl, vu};
-  entry.a_G = Vec3{ax, ay, az};
-  entry.a_B = Vec3{af, al, au};
-  entry.w_G = Vec3{wx, wy, wz};
-  entry.w_B = Vec3{wf, wl, wu};
-  entry.pos_accuracy = pos_acc;
-  entry.vel_accuracy = vel_acc;
+  this->gps = Vec3{lat, lon, alt};
+  this->rpy = Vec3{roll, pitch, yaw};
+  this->v_G = Vec3{ve, vn, vu};
+  this->v_B = Vec3{vf, vl, vu};
+  this->a_G = Vec3{ax, ay, az};
+  this->a_B = Vec3{af, al, au};
+  this->w_G = Vec3{wx, wy, wz};
+  this->w_B = Vec3{wf, wl, wu};
+  this->pos_accuracy = pos_acc;
+  this->vel_accuracy = vel_acc;
 
   return 0;
 }
 
-int OXTS::parseOXTS(const std::string &oxts_dir) {
+int OXTS::loadOXTS(const std::string &oxts_dir) {
   // Get list of oxts files
   const std::string oxts_data_dir = strip(oxts_dir) + "/data";
   std::vector<std::string> oxts_files;
@@ -67,7 +67,7 @@ int OXTS::parseOXTS(const std::string &oxts_dir) {
   // Get first GPS point
   OXTSEntry first_entry;
   const std::string file_path = oxts_data_dir + "/" + oxts_files[0];
-  if (this->parseSingleOXTSFile(file_path, first_entry) != 0) {
+  if (first_entry.load(file_path) != 0) {
     return -1;
   }
 
@@ -90,7 +90,7 @@ int OXTS::parseOXTS(const std::string &oxts_dir) {
     // Parse single oxts file
     OXTSEntry entry;
     const std::string file_path = oxts_data_dir + "/" + oxts_files[i];
-    if (this->parseSingleOXTSFile(file_path, entry) != 0) {
+    if (entry.load(file_path) != 0) {
       return -1;
     }
 
@@ -151,7 +151,7 @@ int OXTS::parseSingleTimeStamp(const std::string &line, double *s) {
   return 0;
 }
 
-int OXTS::parseTimeStamps(const std::string &oxts_dir) {
+int OXTS::loadTimeStamps(const std::string &oxts_dir) {
   // Setup parse
   const std::string file_path = strip(oxts_dir) + "/timestamps.txt";
   std::string line;
@@ -174,10 +174,10 @@ int OXTS::parseTimeStamps(const std::string &oxts_dir) {
 }
 
 int OXTS::load(const std::string &oxts_dir) {
-  if (this->parseOXTS(oxts_dir) != 0) {
+  if (this->loadOXTS(oxts_dir) != 0) {
     return -1;
   }
-  if (this->parseTimeStamps(oxts_dir) != 0) {
+  if (this->loadTimeStamps(oxts_dir) != 0) {
     return -1;
   }
 

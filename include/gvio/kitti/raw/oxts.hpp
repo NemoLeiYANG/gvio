@@ -33,14 +33,20 @@ struct OXTSEntry {
   Vec3 w_B = zeros(3, 1);
   double pos_accuracy = 0.0;
   double vel_accuracy = 0.0;
+
+  /**
+   * Load OXTS entry
+   *
+   * @param file_path File path to a single OXTS data
+   * @returns 0 for success, -1 for failure
+   */
+  int load(const std::string &file_path);
 };
 
 /**
  * OXTS
  */
 struct OXTS {
-  bool ok = false;
-
   std::vector<double> timestamps;
   std::vector<Vec3> gps;
   std::vector<Vec3> rpy;
@@ -57,19 +63,12 @@ struct OXTS {
   OXTS() {}
 
   /**
-   * Parse a single OXTS file
-   *
-   * @param file_path File path to a single OXTS data
-   * @returns 0 for success, -1 for failure
-   */
-  int parseSingleOXTSFile(const std::string &file_path, OXTSEntry &entry);
-  /**
-   * Parse OXTS
+   * load OXTS
    *
    * @param oxts_dir Path to OXTS data
    * @returns 0 for success, -1 for failure
    */
-  int parseOXTS(const std::string &oxts_dir);
+  int loadOXTS(const std::string &oxts_dir);
 
   /**
    * Parse a single timestamp to seconds since epoch (Unix time)
@@ -81,12 +80,12 @@ struct OXTS {
   int parseSingleTimeStamp(const std::string &line, double *s);
 
   /**
-   * Parse timestamps
+   * Load timestamps
    *
    * @param oxts_dir Path to OXTS data
    * @returns 0 for success, -1 for failure
    */
-  int parseTimeStamps(const std::string &oxts_dir);
+  int loadTimeStamps(const std::string &oxts_dir);
 
   /**
    * Load OXTS
