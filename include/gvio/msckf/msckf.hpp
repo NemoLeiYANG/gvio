@@ -185,7 +185,7 @@ public:
   int calResiduals(const FeatureTracks &tracks,
                    MatX &T_H,
                    VecX &r_n,
-                   VecX &R_n);
+                   MatX &R_n);
 
   /**
    * Correct IMU state

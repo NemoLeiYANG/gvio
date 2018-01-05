@@ -84,6 +84,15 @@ MatX hstack(const MatX &A, const MatX &B);
 MatX vstack(const MatX &A, const MatX &B);
 
 /**
+ * Diagonally stack matrices A and B
+ *
+ * @param A Matrix A
+ * @param B Matrix B
+ * @returns Stacked matrix
+ */
+MatX dstack(const MatX &A, const MatX &B);
+
+/**
  * Skew symmetric-matrix
  *
  * @param w Input vector

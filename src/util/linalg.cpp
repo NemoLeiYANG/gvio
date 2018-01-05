@@ -28,6 +28,13 @@ MatX vstack(const MatX &A, const MatX &B) {
   return C;
 }
 
+MatX dstack(const MatX &A, const MatX &B) {
+  MatX C = zeros(A.rows() + B.rows(), A.cols() + B.cols());
+  C.block(0, 0, A.rows(), A.cols()) = A;
+  C.block(A.rows(), A.cols(), B.rows(), B.cols()) = B;
+  return C;
+}
+
 Mat3 skew(const Vec3 &w) {
   Mat3 S;
   // clang-format off

@@ -11,10 +11,10 @@ static const std::string KITTI_RAW_DATASET = "/data/kitti/raw";
 int test_MSCKF_constructor() {
   MSCKF msckf;
 
-  // MU_CHECK_EQ(CameraState::size, msckf.P_cam.rows());
-  // MU_CHECK_EQ(CameraState::size, msckf.P_cam.cols());
-  // MU_CHECK_EQ(IMUState::size, msckf.P_imu_cam.rows());
-  // MU_CHECK_EQ(CameraState::size, msckf.P_imu_cam.cols());
+  MU_CHECK_EQ(CameraState::size, msckf.P_cam.rows());
+  MU_CHECK_EQ(CameraState::size, msckf.P_cam.cols());
+  MU_CHECK_EQ(IMUState::size, msckf.P_imu_cam.rows());
+  MU_CHECK_EQ(CameraState::size, msckf.P_imu_cam.cols());
 
   MU_CHECK_EQ(0, msckf.counter_frame_id);
   MU_CHECK(zeros(3, 1).isApprox(msckf.ext_p_IC));
@@ -29,11 +29,44 @@ int test_MSCKF_constructor() {
 }
 
 int test_MSCKF_P() {
+  // Setup
   MSCKF msckf;
+
+  msckf.augmentState();
+  msckf.augmentState();
+  msckf.augmentState();
+
+  msckf.imu_state.P.fill(1.0);
+  msckf.P_cam.fill(2.0);
+  msckf.P_imu_cam.fill(3.0);
+
+  // Test
   const MatX P = msckf.P();
 
-  MU_CHECK_EQ(15, P.rows());
-  MU_CHECK_EQ(15, P.cols());
+  // Assert
+  const int imu_sz = IMUState::size;
+  const int cam_sz = CameraState::size * msckf.N();
+
+  MatX P_imu_expected = zeros(imu_sz);
+  P_imu_expected.fill(1.0);
+
+  MatX P_cam_expected = zeros(cam_sz);
+  P_cam_expected.fill(2.0);
+
+  MatX P_imu_cam_expected = zeros(imu_sz, cam_sz);
+  P_imu_cam_expected.fill(3.0);
+
+  MU_CHECK_EQ(cam_sz, msckf.P_cam.rows());
+  MU_CHECK_EQ(cam_sz, msckf.P_cam.cols());
+  MU_CHECK(P.block(0, 0, imu_sz, imu_sz).isApprox(P_imu_expected));
+
+  MU_CHECK_EQ(imu_sz, msckf.P_imu_cam.rows());
+  MU_CHECK_EQ(cam_sz, msckf.P_imu_cam.cols());
+  MU_CHECK(P.block(0, imu_sz, imu_sz, cam_sz).isApprox(P_imu_cam_expected));
+
+  MU_CHECK_EQ(imu_sz + cam_sz, P.cols());
+  MU_CHECK_EQ(imu_sz + cam_sz, P.rows());
+  MU_CHECK(P.block(imu_sz, imu_sz, cam_sz, cam_sz).isApprox(P_cam_expected));
 
   return 0;
 }
@@ -41,6 +74,10 @@ int test_MSCKF_P() {
 int test_MSCKF_N() {
   MSCKF msckf;
   MU_CHECK_EQ(0, msckf.N());
+
+  msckf.augmentState();
+  MU_CHECK_EQ(1, msckf.N());
+
   return 0;
 }
 
@@ -231,6 +268,55 @@ int test_MSCKF_calTrackResiduals() {
   return 0;
 }
 
+int test_MSCKF_calResiduals() {
+  // Camera model
+  const int image_width = 640;
+  const int image_height = 640;
+  const double fov = 60.0;
+  const double fx = PinholeModel::focalLengthX(image_width, fov);
+  const double fy = PinholeModel::focalLengthY(image_height, fov);
+  const double cx = image_width / 2.0;
+  const double cy = image_height / 2.0;
+  PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
+
+  // Setup MSCKF
+  MSCKF msckf;
+  // -- Modify default settings for test
+  msckf.min_track_length = 2;
+  msckf.camera_model = &pinhole_model;
+  // -- Add first camera state
+  msckf.initialize();
+  // -- Add second camera state
+  msckf.imu_state.p_G = Vec3{0.0, 1.0, 0.0};
+  msckf.augmentState();
+
+  // Prepare features and feature track
+  // -- Create 2 features
+  const Vec3 p_G_f{0.0, 0.0, 10.0};
+  const Vec3 pt0 = pinhole_model.project(p_G_f,
+                                         C(msckf.cam_states[0].q_CG),
+                                         msckf.cam_states[0].p_G);
+  const Vec3 pt1 = pinhole_model.project(p_G_f,
+                                         C(msckf.cam_states[1].q_CG),
+                                         msckf.cam_states[1].p_G);
+  Feature f0{Vec2{pt0(0), pt0(1)}};
+  Feature f1{Vec2{pt1(0), pt1(1)}};
+  // -- Create a feature track based on two features
+  FeatureTrack track{0, 1, f0, f1};
+  FeatureTracks tracks{track};
+
+  // Calculate residuals
+  MatX T_H;
+  VecX r_n;
+  MatX R_n;
+  int retval = msckf.calResiduals(tracks, T_H, r_n, R_n);
+
+  // Assert
+  MU_CHECK_EQ(0, retval);
+
+  return 0;
+}
+
 void test_suite() {
   MU_ADD_TEST(test_MSCKF_constructor);
   MU_ADD_TEST(test_MSCKF_P);
@@ -241,7 +327,7 @@ void test_suite() {
   MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
   MU_ADD_TEST(test_MSCKF_predictionUpdate);
   MU_ADD_TEST(test_MSCKF_calTrackResiduals);
-  // TODO: MU_ADD_TEST(test_MSCKF_calResiduals);
+  MU_ADD_TEST(test_MSCKF_calResiduals);
   // TODO: MU_ADD_TEST(test_MSCKF_correctIMUState);
   // TODO: MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate);

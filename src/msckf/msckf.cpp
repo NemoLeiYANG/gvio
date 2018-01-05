@@ -17,7 +17,7 @@ MatX MSCKF::P() {
   const int P_size = x_imu_size + x_cam_size;
 
   // Form P
-  P.resize(P_size, P_size);
+  P = zeros(P_size, P_size);
   P.block(0, 0, x_imu_size, x_imu_size) = this->imu_state.P;
   P.block(0, x_imu_size, x_imu_size, x_cam_size) = this->P_imu_cam;
   P.block(x_imu_size, 0, x_cam_size, x_imu_size) = this->P_imu_cam.transpose();
@@ -253,63 +253,63 @@ int MSCKF::calTrackResiduals(const FeatureTrack &track,
 int MSCKF::calResiduals(const FeatureTracks &tracks,
                         MatX &T_H,
                         VecX &r_n,
-                        VecX &R_n) {
+                        MatX &R_n) {
   // Residualize feature tracks
-  MatX H;
-  Vec3 r;
-  MatX R;
+  MatX H_o;
+  VecX r_o;
+  MatX R_o;
+  bool stack_residuals = false;
+
   for (auto track : tracks) {
     MatX H_j;
     VecX r_j;
     MatX R_j;
-    if (this->calTrackResiduals(track, H_j, r_j, R_j) == 0) {
-      H = vstack(H, H_j);
-      r = vstack(r, r_j);
 
-      // R is a bit special, it is the covariance matrix so it has to be
-      // stacked diagonally
-      // clang-format off
-      MatX R_copy(R.rows() + R_j.rows(), R.cols() + R_j.cols());
-      R_copy.block(0, 0, R.rows(), R.cols()) = R;
-      R_copy.block(0, R.cols(), R.rows(), R_j.cols()) = zeros(R.rows(), R_j.cols());
-      R_copy.block(R.rows(), 0, R_j.rows(), R.cols()) = zeros(R_j.rows(), R.cols());
-      R_copy.block(R.rows(), R.cols(), R_j.rows(), R_j.cols()) = R_j;
-      // clang-format on
-      R = R_copy;
+    if (this->calTrackResiduals(track, H_j, r_j, R_j) == 0) {
+      // Stack measurement jacobian matrix and residual vector
+      if (stack_residuals) {
+        H_o = vstack(H_o, H_j);
+        r_o = vstack(r_o, r_j);
+        R_o = dstack(R_o, R_j);
+      } else {
+        H_o = H_j;
+        r_o = r_j;
+        R_o = R_j;
+        stack_residuals = true;
+      }
     }
   }
 
   // No residuals, do not continue
-  if (H.rows() == 0 && r.rows() == 0 and R.rows() == 0) {
+  if (stack_residuals == false) {
     return -1;
   }
 
   // Perform QR decomposition?
   if (this->enable_qr_trick) {
-    // Perform QR decomposition to reduce computation in actual EKF
-    // update, since R for 10 features seen in 10 camera poses each
-    // would yield a R of dimension 170 [Section E: EKF Updates,
-    // Mourikis2007]
-    const Eigen::HouseholderQR<MatX> qr(H);
-    const MatX R = qr.matrixQR().triangularView<Eigen::Upper>();
-    const MatX Q = qr.householderQ();
+    // Perform QR decomposition to reduce computation in EKF update, since R
+    // for 10 features seen in 10 camera poses each would yield a R of
+    // dimension 170 [Section E: EKF Updates, Mourikis2007]
+    const Eigen::HouseholderQR<MatX> QR(H_o);
+    const MatX R = QR.matrixQR().triangularView<Eigen::Upper>();
+    const MatX Q = QR.householderQ();
     // -- Find non-zero rows
-    MatX T_H;
-    MatX Q_1;
-    for (int i = 0; i < R.rows(); i++) {
+    MatX T_H = R.row(0);
+    MatX Q_1 = Q.col(0);
+    for (int i = 1; i < R.rows(); i++) {
       if ((R.row(i).array() != 0.0).any()) {
         T_H = vstack(T_H, R.row(i));
         Q_1 = hstack(Q_1, Q.col(i));
       }
     }
     // -- Calculate residual
-    r_n = Q_1.transpose() * r;
-    R_n = Q_1.transpose() * R * Q_1;
+    r_n = Q_1.transpose() * r_o;
+    R_n = Q_1.transpose() * R_o * Q_1;
 
   } else {
-    T_H = H;
-    r_n = r;
-    R_n = R;
+    T_H = H_o;
+    r_n = r_o;
+    R_n = R_o;
   }
 
   return 0;
@@ -346,15 +346,16 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
   // Calculate residuals
   MatX T_H;
   VecX r_n;
-  VecX R_n;
+  MatX R_n;
   if (this->calResiduals(tracks, T_H, r_n, R_n) != 0) {
     return -2;
   }
 
   // Calculate Kalman gain
+  // clang-format off
   const MatX P = this->P();
-  const MatX K =
-      P * T_H.transpose() * (T_H * P).inverse() * T_H.transpose() + R_n;
+  const MatX K = P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
+  // clang-format on
 
   // Correct states
   const VecX dx = K * r_n;
