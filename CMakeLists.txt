@@ -40,6 +40,7 @@ ADD_LIBRARY(
   src/msckf/imu_state.cpp
   src/msckf/msckf.cpp
   # feature
+  src/feature2d/draw.cpp
   src/feature2d/feature_container.cpp
   src/feature2d/feature_tracker.cpp
   src/feature2d/gms_matcher.cpp
@@ -94,6 +95,9 @@ SET(UNITTESTS
   camera-camera_config_test
   camera-ids_test
   camera-pinhole_model_test
+  feature2d-feature_container_test
+  feature2d-feature_test
+  feature2d-feature_track_test
   feature2d-feature_tracker_test
   feature2d-gms_matcher_test
   feature2d-klt_tracker_test

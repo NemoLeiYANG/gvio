@@ -429,7 +429,7 @@ int test_MSCKF_measurementUpdate() {
     const cv::Mat img = cv::imread(img_path);
     FeatureTracks tracks;
     tracker.update(img);
-    tracker.getLostTracks(tracks);
+    tracker.removeLostTracks(tracks);
 
     // MSCKF
     const Vec3 a_B = raw_dataset.oxts.a_B[i];

@@ -54,16 +54,17 @@ int test_ORBTracker_getLostTracks() {
   tracker.initialize(cv::imread(raw_dataset.cam0[0]));
   tracker.update(cv::imread(raw_dataset.cam0[1]));
   tracker.update(cv::imread(raw_dataset.cam0[2]));
-  std::cout << tracker.lost.size() << std::endl;
+  std::cout << tracker.features.lost.size() << std::endl;
 
   // Get lost tracks
   FeatureTracks tracks;
-  tracker.getLostTracks(tracks);
+  // tracker.getLostTracks(tracks);
 
   // Assert
   MU_CHECK(tracks.size() > 0);
   for (auto track : tracks) {
-    MU_CHECK(tracker.buffer.find(track.track_id) == tracker.buffer.end());
+    MU_CHECK_EQ(tracker.features.buffer.find(track.track_id),
+                tracker.features.buffer.end());
   }
 
   return 0;
