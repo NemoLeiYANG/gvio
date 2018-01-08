@@ -16,8 +16,24 @@ namespace gvio {
 /**
  * KLT based feature tracker
  */
-class KLTTracker : public FeatureTracker {
+class KLTTracker {
 public:
+  bool show_matches = false;
+
+  // Frame and track ounters
+  FrameID counter_frame_id = -1;
+  TrackID counter_track_id = -1;
+
+  // Feature track book keeping
+  std::vector<TrackID> tracking;
+  std::vector<TrackID> lost;
+  std::map<TrackID, FeatureTrack> buffer;
+
+  // Image, feature, unmatched features book keeping
+  cv::Mat img_cur;
+  cv::Mat img_ref;
+  Features fea_ref;
+
   KLTTracker() {}
 
   /**
@@ -29,13 +45,63 @@ public:
   int configure(const std::string &config_file);
 
   /**
+   * Add feature track
+   *
+   * @param f1 First feature
+   * @param f2 Second feature
+   * @returns 0 for success, -1 for failure
+   */
+  int addTrack(Feature &f1, Feature &f2);
+
+  /**
+   * Remove feature track
+   *
+   * @param track_id Track ID
+   * @param lost Mark feature track as lost
+   * @returns 0 for success, -1 for failure
+   */
+  int removeTrack(const TrackID &track_id, const bool lost = true);
+
+  /**
+   * Update feature track
+   *
+   * @param track_id Track ID
+   * @param f Feature
+   * @returns 0 for success, -1 for failure
+   */
+  int updateTrack(const TrackID &track_id, Feature &f);
+
+  /**
+   * Get lost feature tracks
+   *
+   * @param tracks Lost feature tracks
+   */
+  void getLostTracks(std::vector<FeatureTrack> &tracks);
+
+  /**
+   * Purge old feature tracks
+   *
+   * @param n N-number of feature tracks to purge (starting with oldest)
+   * @returns 0 for success, -1 for failure
+   */
+  std::vector<FeatureTrack> purge(const size_t n);
+
+  /**
+   * Initialize feature tracker
+   *
+   * @param img_cur Current image frame
+   * @returns 0 for success, -1 for failure
+   */
+  int initialize(const cv::Mat &img_cur);
+
+  /**
    * Detect features
    *
    * @param image Input image
    * @param features List of features
    * @returns 0 for success, -1 for failure
    */
-  virtual int detect(const cv::Mat &image, Features &features) override;
+  int detect(const cv::Mat &image, Features &features);
 
   /**
    * Track features
@@ -54,7 +120,7 @@ public:
    * @param img_cur Current image frame
    * @returns 0 for success, -1 for failure
    */
-  virtual int update(const cv::Mat &img_cur) override;
+  int update(const cv::Mat &img_cur);
 };
 
 /** @} group feature2d */

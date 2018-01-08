@@ -40,6 +40,7 @@ ADD_LIBRARY(
   src/msckf/imu_state.cpp
   src/msckf/msckf.cpp
   # feature
+  src/feature2d/feature_container.cpp
   src/feature2d/feature_tracker.cpp
   src/feature2d/gms_matcher.cpp
   src/feature2d/orb_tracker.cpp

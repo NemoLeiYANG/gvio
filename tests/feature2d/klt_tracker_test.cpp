@@ -57,6 +57,30 @@ int test_KLTTracker_track() {
   return 0;
 }
 
+int test_KLTTracker_update() {
+  // Setup test data
+  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  if (raw_dataset.load() != 0) {
+    return -1;
+  }
+
+  KLTTracker tracker;
+  tracker.update(cv::imread(raw_dataset.cam0[0]));
+  tracker.update(cv::imread(raw_dataset.cam0[1]));
+  tracker.update(cv::imread(raw_dataset.cam0[2]));
+  tracker.update(cv::imread(raw_dataset.cam0[3]));
+
+  FeatureTracks tracks;
+  tracker.getLostTracks(tracks);
+  for (auto track : tracks) {
+    MU_CHECK_EQ(0, track.frame_start);
+    MU_CHECK_EQ(track.frame_start + track.frame_end + 1,
+                (int) track.trackedLength());
+  }
+
+  return 0;
+}
+
 int test_KLTTracker_demo() {
   KLTTracker tracker;
 
@@ -84,7 +108,8 @@ int test_KLTTracker_demo() {
 void test_suite() {
   MU_ADD_TEST(test_KLTTracker_detect);
   MU_ADD_TEST(test_KLTTracker_track);
-  MU_ADD_TEST(test_KLTTracker_demo);
+  MU_ADD_TEST(test_KLTTracker_update);
+  // MU_ADD_TEST(test_KLTTracker_demo);
 }
 
 } // namespace gvio

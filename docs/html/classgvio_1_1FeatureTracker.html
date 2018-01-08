@@ -62,8 +62,7 @@ Inheritance diagram for gvio::FeatureTracker:</div>
  <div class="center">
   <img src="classgvio_1_1FeatureTracker.png" usemap="#gvio::FeatureTracker_map" alt=""/>
   <map id="gvio::FeatureTracker_map" name="gvio::FeatureTracker_map">
-<area href="classgvio_1_1KLTTracker.html" alt="gvio::KLTTracker" shape="rect" coords="0,56,130,80"/>
-<area href="classgvio_1_1ORBTracker.html" alt="gvio::ORBTracker" shape="rect" coords="140,56,270,80"/>
+<area href="classgvio_1_1ORBTracker.html" alt="gvio::ORBTracker" shape="rect" coords="0,56,130,80"/>
 </map>
  </div></div>
 <h2 class="groupheader">Constructors and Destructors</h2>
@@ -128,19 +127,19 @@ Public Methods</h2></td></tr>
 <tr class="separator:a479b6c95feff97d44b99c060e639d362"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acda12e0b791d266ef7956b148df00709"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#acda12e0b791d266ef7956b148df00709">updateTrack</a> (const <a class="el" href="group__feature2d.html#ga2e8f0fd10f78539dbce8456b99c662a4">TrackID</a> &amp;track_id, <a class="el" href="structgvio_1_1Feature.html">Feature</a> &amp;f)</td></tr>
 <tr class="separator:acda12e0b791d266ef7956b148df00709"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e4b314adab1ca7653247e402b7ce427"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#a1e4b314adab1ca7653247e402b7ce427">getLostTracks</a> (std::vector&lt; <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &gt; &amp;tracks)</td></tr>
+<tr class="separator:a1e4b314adab1ca7653247e402b7ce427"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0214f3ff45b301b1f9a7c9fd62b9c129"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#a0214f3ff45b301b1f9a7c9fd62b9c129">purge</a> (const size_t n)</td></tr>
+<tr class="separator:a0214f3ff45b301b1f9a7c9fd62b9c129"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0656bfabccb3cbfdbe8c28aaebd84e29"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#a0656bfabccb3cbfdbe8c28aaebd84e29">getKeyPointsAndDescriptors</a> (const <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;features, std::vector&lt; cv::KeyPoint &gt; &amp;keypoints, cv::Mat &amp;descriptors)</td></tr>
 <tr class="separator:a0656bfabccb3cbfdbe8c28aaebd84e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad61cbc592acf78e629ab242212d7cbc3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#ad61cbc592acf78e629ab242212d7cbc3">getFeatures</a> (const std::vector&lt; cv::KeyPoint &gt; &amp;keypoints, const cv::Mat &amp;descriptors, <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;features)</td></tr>
 <tr class="separator:ad61cbc592acf78e629ab242212d7cbc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e4b314adab1ca7653247e402b7ce427"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#a1e4b314adab1ca7653247e402b7ce427">getLostTracks</a> (std::vector&lt; <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &gt; &amp;tracks)</td></tr>
-<tr class="separator:a1e4b314adab1ca7653247e402b7ce427"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abde37715eedef6e63b664f77004b3c31"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#abde37715eedef6e63b664f77004b3c31">detect</a> (const cv::Mat &amp;image, <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;features)</td></tr>
 <tr class="separator:abde37715eedef6e63b664f77004b3c31"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90eb6c676a6bd1ece6b6dd86e4522318"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#a90eb6c676a6bd1ece6b6dd86e4522318">match</a> (const <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;f1, std::vector&lt; cv::DMatch &gt; &amp;matches)</td></tr>
 <tr class="separator:a90eb6c676a6bd1ece6b6dd86e4522318"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0214f3ff45b301b1f9a7c9fd62b9c129"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#a0214f3ff45b301b1f9a7c9fd62b9c129">purge</a> (const size_t n)</td></tr>
-<tr class="separator:a0214f3ff45b301b1f9a7c9fd62b9c129"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af36f22fd944e61850e1a7b265c5303eb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#af36f22fd944e61850e1a7b265c5303eb">initialize</a> (const cv::Mat &amp;<a class="el" href="classgvio_1_1FeatureTracker.html#a33ece341df946e1a763d56dce6d05f28">img_cur</a>)</td></tr>
+<tr class="memitem:af36f22fd944e61850e1a7b265c5303eb"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#af36f22fd944e61850e1a7b265c5303eb">initialize</a> (const cv::Mat &amp;<a class="el" href="classgvio_1_1FeatureTracker.html#a33ece341df946e1a763d56dce6d05f28">img_cur</a>)</td></tr>
 <tr class="separator:af36f22fd944e61850e1a7b265c5303eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af929c1de33e242d15bdcf70d976520ef"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1FeatureTracker.html#af929c1de33e242d15bdcf70d976520ef">update</a> (const cv::Mat &amp;<a class="el" href="classgvio_1_1FeatureTracker.html#a33ece341df946e1a763d56dce6d05f28">img_cur</a>)</td></tr>
 <tr class="separator:af929c1de33e242d15bdcf70d976520ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -263,7 +262,7 @@ Friends</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classgvio_1_1ORBTracker.html#afcef14d999f5ea4198f79202f6131e62">gvio::ORBTracker</a>, and <a class="el" href="classgvio_1_1KLTTracker.html#a5eb79ce86dd1ef10c61bc6f0e8aae537">gvio::KLTTracker</a>.</p>
+<p>Reimplemented in <a class="el" href="classgvio_1_1ORBTracker.html#afcef14d999f5ea4198f79202f6131e62">gvio::ORBTracker</a>.</p>
 
 </div>
 </div>
@@ -375,6 +374,9 @@ Friends</h2></td></tr>
 <a class="anchor" id="af36f22fd944e61850e1a7b265c5303eb"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int gvio::FeatureTracker::initialize </td>
@@ -384,6 +386,11 @@ Friends</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Initialize feature tracker</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -529,8 +536,6 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classgvio_1_1KLTTracker.html#a5bd5bf4274599fc2b901f9066a86fd94">gvio::KLTTracker</a>.</p>
 
 </div>
 </div>

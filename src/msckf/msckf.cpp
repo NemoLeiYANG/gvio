@@ -193,15 +193,6 @@ int MSCKF::calTrackResiduals(const FeatureTrack &track,
 
   // Estimate j-th feature position in global frame
   CameraStates track_cam_states = this->getTrackCameraStates(track);
-  // std::cout << track << std::endl;
-  // for (size_t i = 0; i < track_cam_states.size(); i++) {
-  //   std::cout << "camera q_CG: " << track_cam_states[i].q_CG.transpose()
-  //             << std::endl;
-  //   std::cout << "camera p_G: " << track_cam_states[i].p_G.transpose()
-  //             << std::endl;
-  // }
-  // exit(1);
-
   CeresFeatureEstimator feature_estimator(this->camera_model,
                                           track,
                                           track_cam_states);

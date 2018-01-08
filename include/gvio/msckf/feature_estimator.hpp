@@ -29,8 +29,8 @@ namespace gvio {
 class FeatureEstimator {
 public:
   const CameraModel *cam_model;
-  const FeatureTrack track;
-  const CameraStates track_cam_states;
+  FeatureTrack track;
+  CameraStates track_cam_states;
 
   bool debug_mode = false;
   int max_iter = 30;
@@ -142,8 +142,8 @@ public:
   double x[3] = {0.0, 0.0, 0.0};
 
   CeresFeatureEstimator(const CameraModel *cam_model,
-                        const FeatureTrack track,
-                        const CameraStates track_cam_states)
+                        const FeatureTrack &track,
+                        const CameraStates &track_cam_states)
       : FeatureEstimator{cam_model, track, track_cam_states} {}
 
   /**

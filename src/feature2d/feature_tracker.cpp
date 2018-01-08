@@ -59,6 +59,42 @@ int FeatureTracker::updateTrack(const TrackID &track_id, Feature &f) {
   return 0;
 }
 
+void FeatureTracker::getLostTracks(std::vector<FeatureTrack> &tracks) {
+  tracks.clear();
+  auto lost_ids = this->lost;
+
+  for (size_t i = 0; i < lost_ids.size(); i++) {
+    TrackID track_id = lost_ids[i];
+    tracks.emplace_back(this->buffer[track_id]);
+    this->buffer.erase(this->buffer.find(track_id));
+  }
+
+  this->lost.clear();
+}
+
+std::vector<FeatureTrack> FeatureTracker::purge(const size_t n) {
+  std::vector<FeatureTrack> tracks;
+
+  /**
+   * Note: Map is ordered (source: https://stackoverflow.com/q/7648756/154688)
+   */
+  size_t counter = 0;
+  for (auto kv : this->buffer) {
+    auto track_id = kv.first;
+    auto track = kv.second;
+
+    tracks.push_back(track);
+    this->buffer.erase(track_id);
+
+    counter++;
+    if (counter == n) {
+      break;
+    }
+  }
+
+  return tracks;
+}
+
 void FeatureTracker::getKeyPointsAndDescriptors(
     const Features &features,
     std::vector<cv::KeyPoint> &keypoints,
@@ -76,19 +112,6 @@ void FeatureTracker::getFeatures(const std::vector<cv::KeyPoint> &keypoints,
   for (size_t i = 0; i < keypoints.size(); i++) {
     features.emplace_back(keypoints[i], descriptors.row(i));
   }
-}
-
-void FeatureTracker::getLostTracks(std::vector<FeatureTrack> &tracks) {
-  tracks.clear();
-  auto lost_ids = this->lost;
-
-  for (size_t i = 0; i < lost_ids.size(); i++) {
-    TrackID track_id = lost_ids[i];
-    tracks.emplace_back(this->buffer[track_id]);
-    this->buffer.erase(this->buffer.find(track_id));
-  }
-
-  this->lost.clear();
 }
 
 int FeatureTracker::detect(const cv::Mat &image, Features &features) {
@@ -169,29 +192,6 @@ int FeatureTracker::match(const Features &f1,
   }
 
   return 0;
-}
-
-std::vector<FeatureTrack> FeatureTracker::purge(const size_t n) {
-  std::vector<FeatureTrack> tracks;
-
-  /**
-   * Note: Map is ordered (source: https://stackoverflow.com/q/7648756/154688)
-   */
-  size_t counter = 0;
-  for (auto kv : this->buffer) {
-    auto track_id = kv.first;
-    auto track = kv.second;
-
-    tracks.push_back(track);
-    this->buffer.erase(track_id);
-
-    counter++;
-    if (counter == n) {
-      break;
-    }
-  }
-
-  return tracks;
 }
 
 int FeatureTracker::initialize(const cv::Mat &img_cur) {

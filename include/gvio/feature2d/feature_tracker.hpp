@@ -5,17 +5,13 @@
 #ifndef GVIO_FEATURE2D_FEATURE_TRACKER_HPP
 #define GVIO_FEATURE2D_FEATURE_TRACKER_HPP
 
-#include <stdio.h>
 #include <vector>
 #include <map>
 #include <algorithm>
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
 #include "gvio/util/util.hpp"
+#include "gvio/feature2d/feature.hpp"
+#include "gvio/feature2d/feature_track.hpp"
 #include "gvio/feature2d/gms_matcher.hpp"
 
 namespace gvio {
@@ -23,120 +19,6 @@ namespace gvio {
  * @addtogroup feature2d
  * @{
  */
-
-// Track and frame ID typedefs
-using TrackID = long int;
-using FrameID = long int;
-
-/**
- * Feature
- */
-struct Feature {
-  TrackID track_id = -1;
-  cv::KeyPoint kp;
-  cv::Mat desc;
-
-  Feature() {}
-  Feature(const Vec2 &pt) : kp{cv::Point2f(pt(0), pt(1)), 1.0f} {}
-  Feature(const cv::Point2f &pt) : kp{pt, 1.0f} {}
-  Feature(const cv::KeyPoint &kp) : kp{kp} {}
-  Feature(const cv::KeyPoint &kp, const cv::Mat &desc) : kp{kp}, desc{desc} {}
-  Feature(const Feature &f) : track_id{f.track_id}, kp{f.kp}, desc{f.desc} {}
-
-  /**
-   * Set feature track ID
-   *
-   * @param track_id Track ID
-   */
-  void setTrackID(const TrackID &track_id) { this->track_id = track_id; }
-
-  /**
-   * Return feature as cv::KeyPoint
-   */
-  cv::KeyPoint &getKeyPoint() { return this->kp; }
-
-  /**
-   * Feature to string
-   */
-  friend std::ostream &operator<<(std::ostream &os, const Feature &f) {
-    os << "track_id: " << f.track_id << std::endl;
-    os << "kp: (" << f.kp.pt.x << ", " << f.kp.pt.y << ")" << std::endl;
-    os << "desc: " << f.desc.size() << std::endl;
-    return os;
-  }
-};
-
-/**
- * Features
- */
-using Features = std::vector<Feature>;
-
-/**
- * Feature track
- */
-struct FeatureTrack {
-  TrackID track_id = -1;
-  FrameID frame_start = -1;
-  FrameID frame_end = -1;
-  Features track;
-
-  FeatureTrack() {}
-
-  FeatureTrack(const TrackID &track_id,
-               const FrameID &frame_id,
-               const Feature &f1,
-               const Feature &f2)
-      : track_id{track_id}, frame_start{frame_id - 1}, frame_end{frame_id},
-        track{f1, f2} {}
-
-  /**
-   * Update feature track
-   *
-   * @param frame_id Frame ID
-   * @param data Feature
-   */
-  void update(const FrameID &frame_id, const Feature &data) {
-    this->frame_end = frame_id;
-    this->track.push_back(data);
-  }
-
-  /**
-   * Return last feature seen
-   *
-   * @returns Last feature
-   */
-  Feature &last() { return this->track.back(); }
-
-  /**
-   * Return feature track length
-   *
-   * @returns Size of feature track
-   */
-  size_t trackedLength() { return this->track.size(); }
-
-  /**
-   * Return feature track length
-   *
-   * @returns Size of feature track
-   */
-  size_t trackedLength() const { return this->track.size(); }
-
-  /**
-   * FeatureTrack to string
-   */
-  friend std::ostream &operator<<(std::ostream &os, const FeatureTrack &track) {
-    os << "track_id: " << track.track_id << std::endl;
-    os << "frame_start: " << track.frame_start << std::endl;
-    os << "frame_end: " << track.frame_end << std::endl;
-    os << "length: " << track.track.size() << std::endl;
-    return os;
-  }
-};
-
-/**
- * Feature tracks
- */
-using FeatureTracks = std::vector<FeatureTrack>;
 
 class FeatureTracker {
 public:
@@ -191,6 +73,21 @@ public:
   int updateTrack(const TrackID &track_id, Feature &f);
 
   /**
+   * Get lost feature tracks
+   *
+   * @param tracks Lost feature tracks
+   */
+  void getLostTracks(std::vector<FeatureTrack> &tracks);
+
+  /**
+   * Purge old feature tracks
+   *
+   * @param n N-number of feature tracks to purge (starting with oldest)
+   * @returns 0 for success, -1 for failure
+   */
+  std::vector<FeatureTrack> purge(const size_t n);
+
+  /**
    * Convert list of features to keypoints and descriptors
    *
    * @param features List of features
@@ -211,13 +108,6 @@ public:
   void getFeatures(const std::vector<cv::KeyPoint> &keypoints,
                    const cv::Mat &descriptors,
                    Features &features);
-
-  /**
-   * Get lost feature tracks
-   *
-   * @param tracks Lost feature tracks
-   */
-  void getLostTracks(std::vector<FeatureTrack> &tracks);
 
   /**
    * Detect features
@@ -241,20 +131,12 @@ public:
   virtual int match(const Features &f1, std::vector<cv::DMatch> &matches);
 
   /**
-   * Purge old feature tracks
-   *
-   * @param n N-number of feature tracks to purge (starting with oldest)
-   * @returns 0 for success, -1 for failure
-   */
-  std::vector<FeatureTrack> purge(const size_t n);
-
-  /**
    * Initialize feature tracker
    *
    * @param img_cur Current image frame
    * @returns 0 for success, -1 for failure
    */
-  int initialize(const cv::Mat &img_cur);
+  virtual int initialize(const cv::Mat &img_cur);
 
   /**
    * Update feature tracker
