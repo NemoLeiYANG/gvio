@@ -60,9 +60,11 @@ void MSCKF::H(const FeatureTrack &track,
     const double Z = p_C_f(2);
 
     // dh / dg
+    // clang-format off
     MatX dhdg = zeros(2, 3);
-    dhdg.block(0, 0, 1, 3) = Vec3{1.0 / Z, 0.0, -X / pow(Z, 2)}.transpose();
-    dhdg.block(1, 0, 1, 3) = Vec3{0.0, 1.0 / Z, -Y / pow(Z, 2)}.transpose();
+    dhdg << 1.0 / Z, 0.0, -X / pow(Z, 2),
+            0.0, 1.0 / Z, -Y / pow(Z, 2);
+    // clang-format on
 
     // Row start index
     const int rs = 2 * i;

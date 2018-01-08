@@ -42,14 +42,11 @@ int test_ones() {
 
   MU_CHECK_EQ(A.rows(), 2);
   MU_CHECK_EQ(A.cols(), 2);
+  std::cout << A << std::endl;
 
   for (int i = 0; i < A.rows(); i++) {
     for (int j = 0; j < A.cols(); j++) {
-      if (i != j) {
-        MU_CHECK_FLOAT(0.0, A(i, j));
-      } else {
-        MU_CHECK_FLOAT(1.0, A(i, j));
-      }
+      MU_CHECK_FLOAT(1.0, A(i, j));
     }
   }
 

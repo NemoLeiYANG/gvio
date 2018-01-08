@@ -84,6 +84,40 @@ int test_MSCKF_N() {
 
 int test_MSCKF_H() {
   MSCKF msckf;
+
+  // Setup feature track
+  const TrackID track_id = 0;
+  const FrameID frame_id = 3;
+  const auto data0 = Feature(Vec2{0.0, 0.0});
+  const auto data1 = Feature(Vec2{0.0, 0.0});
+  const auto track = FeatureTrack(track_id, frame_id, data0, data1);
+
+  // Setup track cam states
+  msckf.ext_p_IC = Vec3{0.0, 0.0, 0.0};
+  msckf.ext_q_CI = Vec4{0.5, -0.5, 0.5, -0.5};
+  msckf.augmentState();
+  msckf.augmentState();
+  msckf.augmentState();
+  msckf.augmentState();
+  CameraStates track_cam_states = msckf.getTrackCameraStates(track);
+
+  // Test
+  const Vec3 p_G_f{1.0, 2.0, 3.0};
+  MatX H_f_j;
+  MatX H_x_j;
+  msckf.H(track, track_cam_states, p_G_f, H_f_j, H_x_j);
+
+  // Assert
+  MU_CHECK_EQ(H_f_j.rows(), 4);
+  MU_CHECK_EQ(H_f_j.cols(), 3);
+  MU_CHECK_EQ(H_x_j.rows(), 4);
+  MU_CHECK_EQ(H_x_j.cols(), 39);
+
+  // mat2csv("/tmp/H_f_j.dat", H_f_j);
+  // mat2csv("/tmp/H_x_j.dat", H_x_j);
+  // system("python3 scripts/plot_matrix.py /tmp/H_f_j.dat");
+  // system("python3 scripts/plot_matrix.py /tmp/H_x_j.dat");
+
   return 0;
 }
 
@@ -462,7 +496,7 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_constructor);
   // MU_ADD_TEST(test_MSCKF_P);
   // MU_ADD_TEST(test_MSCKF_N);
-  // MU_ADD_TEST(test_MSCKF_H);
+  MU_ADD_TEST(test_MSCKF_H);
   // MU_ADD_TEST(test_MSCKF_R);
   // MU_ADD_TEST(test_MSCKF_augmentState);
   // MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
@@ -471,7 +505,7 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_calResiduals);
   // MU_ADD_TEST(test_MSCKF_correctIMUState);
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
-  MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  // MU_ADD_TEST(test_MSCKF_measurementUpdate);
 }
 
 } // namespace gvio
