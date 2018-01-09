@@ -29,6 +29,7 @@ ADD_LIBRARY(
   src/camera/camera.cpp
   src/camera/camera_config.cpp
   src/camera/ids.cpp
+  src/camera/distortion.cpp
   src/camera/pinhole_model.cpp
   # driver
   src/driver/i2c.cpp
@@ -115,6 +116,7 @@ SET(UNITTESTS
   util-data_test
   util-file_test
   util-gps_test
+  util-linalg_test
   util-math_test
   util-stats_test
   util-time_test

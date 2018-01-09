@@ -142,8 +142,8 @@ Public Methods</h2></td></tr>
 <tr class="separator:a10558220361a7759f1eb1d5cc62ea8fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5667aede2465b7692fac9952b77ac248"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MSCKF.html#a5667aede2465b7692fac9952b77ac248">predictionUpdate</a> (const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;a_m, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;w_m, const double dt)</td></tr>
 <tr class="separator:a5667aede2465b7692fac9952b77ac248"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac92cb20b099711856449a12bd5f5d5a4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MSCKF.html#ac92cb20b099711856449a12bd5f5d5a4">calTrackResiduals</a> (const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &amp;track, <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;H_j, <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;r_j, <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;R_j)</td></tr>
-<tr class="separator:ac92cb20b099711856449a12bd5f5d5a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae60fa00966a99e513f93532f90b8ad57"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MSCKF.html#ae60fa00966a99e513f93532f90b8ad57">residualizeTrack</a> (const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &amp;track, <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;H_j, <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;r_j, <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;R_j)</td></tr>
+<tr class="separator:ae60fa00966a99e513f93532f90b8ad57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb4cac31a0bf619686e9165637533fcb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MSCKF.html#acb4cac31a0bf619686e9165637533fcb">calResiduals</a> (const <a class="el" href="group__feature2d.html#ga7c4d310e4ecdce4f1c81d6b1ad5c13c0">FeatureTracks</a> &amp;tracks, <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;T_H, <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;r_n, <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;R_n)</td></tr>
 <tr class="separator:acb4cac31a0bf619686e9165637533fcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a682135e4d184c4ac14e8677f20a51d86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1MSCKF.html#a682135e4d184c4ac14e8677f20a51d86">correctIMUState</a> (const <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;dx)</td></tr>
@@ -213,59 +213,6 @@ Public Methods</h2></td></tr>
     <tr><td class="paramname">T_H</td><td></td></tr>
     <tr><td class="paramname">r_n</td><td>Residuals vector </td></tr>
     <tr><td class="paramname">R_n</td><td>Measurement covariance matrix</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd><ul>
-<li>-1: Track length &lt; Min track length</li>
-<li>-2: Failed to estimate feature position </li>
-</ul>
-</dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ac92cb20b099711856449a12bd5f5d5a4"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int gvio::MSCKF::calTrackResiduals </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &amp;&#160;</td>
-          <td class="paramname"><em>track</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;&#160;</td>
-          <td class="paramname"><em>H_j</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;&#160;</td>
-          <td class="paramname"><em>r_j</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;&#160;</td>
-          <td class="paramname"><em>R_j</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Calculate track residuals</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">track</td><td><a class="el" href="structgvio_1_1Feature.html">Feature</a> track </td></tr>
-    <tr><td class="paramname">H_j</td><td>Measurement jacobian matrix </td></tr>
-    <tr><td class="paramname">r_j</td><td>Residuals vector </td></tr>
-    <tr><td class="paramname">R_j</td><td>Measurement covariance matrix</td></tr>
   </table>
   </dd>
 </dl>
@@ -602,6 +549,59 @@ Public Methods</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="ae60fa00966a99e513f93532f90b8ad57"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::MSCKF::residualizeTrack </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &amp;&#160;</td>
+          <td class="paramname"><em>track</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;&#160;</td>
+          <td class="paramname"><em>H_j</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;&#160;</td>
+          <td class="paramname"><em>r_j</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;&#160;</td>
+          <td class="paramname"><em>R_j</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Residualize track</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">track</td><td><a class="el" href="structgvio_1_1Feature.html">Feature</a> track </td></tr>
+    <tr><td class="paramname">H_j</td><td>Measurement jacobian matrix </td></tr>
+    <tr><td class="paramname">r_j</td><td>Residuals vector </td></tr>
+    <tr><td class="paramname">R_j</td><td>Measurement covariance matrix</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><ul>
+<li>-1: Track length &lt; Min track length</li>
+<li>-2: Failed to estimate feature position </li>
+</ul>
+</dd></dl>
 
 </div>
 </div>

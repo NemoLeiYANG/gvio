@@ -252,10 +252,10 @@ int test_MSCKF_predictionUpdate() {
   return 0;
 }
 
-int test_MSCKF_calTrackResiduals() {
+int test_MSCKF_residualizeTrack() {
   // Camera model
   const int image_width = 640;
-  const int image_height = 640;
+  const int image_height = 480;
   const double fov = 60.0;
   const double fx = PinholeModel::focalLengthX(image_width, fov);
   const double fy = PinholeModel::focalLengthY(image_height, fov);
@@ -265,13 +265,14 @@ int test_MSCKF_calTrackResiduals() {
 
   // Setup MSCKF
   MSCKF msckf;
+  // msckf.enable_ns_trick = false;
   // -- Modify default settings for test
   msckf.min_track_length = 2;
   msckf.camera_model = &pinhole_model;
   // -- Add first camera state
   msckf.initialize();
   // -- Add second camera state
-  msckf.imu_state.p_G = Vec3{0.0, 1.0, 0.0};
+  msckf.imu_state.p_G = Vec3{1.0, 1.0, 0.0};
   msckf.augmentState();
 
   // Prepare features and feature track
@@ -292,13 +293,28 @@ int test_MSCKF_calTrackResiduals() {
   MatX H_j;
   VecX r_j;
   MatX R_j;
-  int retval = msckf.calTrackResiduals(track, H_j, r_j, R_j);
+  int retval = msckf.residualizeTrack(track, H_j, r_j, R_j);
 
   // Assert
+  MU_CHECK_EQ(0, retval);
+  MU_CHECK_EQ(1, H_j.rows());
+  MU_CHECK_EQ(27, H_j.cols());
+  MU_CHECK_EQ(1, r_j.rows());
+  MU_CHECK_EQ(1, r_j.cols());
+  MU_CHECK_EQ(1, R_j.rows());
+  MU_CHECK_EQ(1, R_j.cols());
+
   MU_CHECK_EQ(0, retval);
   for (int i = 0; i < r_j.rows(); i++) {
     MU_CHECK_NEAR(r_j(i), 0.0, 1e-5);
   }
+
+  // mat2csv("/tmp/H_j.dat", H_j);
+  // mat2csv("/tmp/r_j.dat", r_j);
+  // mat2csv("/tmp/R_j.dat", R_j);
+  // system("python3 scripts/plot_matrix.py /tmp/H_j.dat");
+  // system("python3 scripts/plot_matrix.py /tmp/r_j.dat");
+  // system("python3 scripts/plot_matrix.py /tmp/R_j.dat");
 
   return 0;
 }
@@ -496,12 +512,12 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_constructor);
   // MU_ADD_TEST(test_MSCKF_P);
   // MU_ADD_TEST(test_MSCKF_N);
-  MU_ADD_TEST(test_MSCKF_H);
+  // MU_ADD_TEST(test_MSCKF_H);
   // MU_ADD_TEST(test_MSCKF_R);
   // MU_ADD_TEST(test_MSCKF_augmentState);
   // MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
   // MU_ADD_TEST(test_MSCKF_predictionUpdate);
-  // MU_ADD_TEST(test_MSCKF_calTrackResiduals);
+  MU_ADD_TEST(test_MSCKF_residualizeTrack);
   // MU_ADD_TEST(test_MSCKF_calResiduals);
   // MU_ADD_TEST(test_MSCKF_correctIMUState);
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);

@@ -11,10 +11,12 @@ MatX I(const int rows, const int cols) { return MatX::Identity(rows, cols); }
 MatX I(const int size) { return MatX::Identity(size, size); }
 
 MatX ones(const int rows, const int cols) {
-  return 1.0 * MatX::Identity(rows, cols);
+  MatX A{rows, cols};
+  A.fill(1.0);
+  return A;
 }
 
-MatX ones(const int size) { return 1.0 * MatX::Identity(size, size); }
+MatX ones(const int size) { return ones(size, size); }
 
 MatX hstack(const MatX &A, const MatX &B) {
   MatX C(A.rows(), A.cols() + B.cols());

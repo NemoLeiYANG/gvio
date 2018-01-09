@@ -154,7 +154,7 @@ public:
   void predictionUpdate(const Vec3 &a_m, const Vec3 &w_m, const double dt);
 
   /**
-   * Calculate track residuals
+   * Residualize track
    *
    * @param track Feature track
    * @param H_j Measurement jacobian matrix
@@ -165,10 +165,10 @@ public:
    *  - -1: Track length < Min track length
    *  - -2: Failed to estimate feature position
    */
-  int calTrackResiduals(const FeatureTrack &track,
-                        MatX &H_j,
-                        VecX &r_j,
-                        MatX &R_j);
+  int residualizeTrack(const FeatureTrack &track,
+                       MatX &H_j,
+                       VecX &r_j,
+                       MatX &R_j);
 
   /**
    * Calculate residuals

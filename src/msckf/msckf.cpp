@@ -184,10 +184,10 @@ void MSCKF::predictionUpdate(const Vec3 &a_m,
   this->P_imu_cam = this->imu_state.Phi * this->P_imu_cam;
 }
 
-int MSCKF::calTrackResiduals(const FeatureTrack &track,
-                             MatX &H_j,
-                             VecX &r_j,
-                             MatX &R_j) {
+int MSCKF::residualizeTrack(const FeatureTrack &track,
+                            MatX &H_j,
+                            VecX &r_j,
+                            MatX &R_j) {
   // Pre-check
   if (track.trackedLength() < this->min_track_length) {
     return -1;
@@ -238,7 +238,9 @@ int MSCKF::calTrackResiduals(const FeatureTrack &track,
     // away state errors by removing the measurement jacobian w.r.t.
     // feature position via null space projection [Section D:
     // Measurement Model, Mourikis2007]
-    const MatX A_j{nullspace(H_f_j.transpose())};
+    //
+    // Note: Left nullspace == kernel of transpose
+    const MatX A_j{H_f_j.transpose().fullPivLu().kernel()};
     H_j = A_j.transpose() * H_x_j;
     r_j = A_j.transpose() * r_j;
     R_j = A_j.transpose() * R_j * A_j;
@@ -267,7 +269,7 @@ int MSCKF::calResiduals(const FeatureTracks &tracks,
     VecX r_j;
     MatX R_j;
 
-    if (this->calTrackResiduals(track, H_j, r_j, R_j) == 0) {
+    if (this->residualizeTrack(track, H_j, r_j, R_j) == 0) {
       // Stack measurement jacobian matrix and residual vector
       if (stack_residuals) {
         H_o = vstack(H_o, H_j);
