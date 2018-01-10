@@ -106,7 +106,7 @@ void IMUState::correct(const VecX &dx) {
   }
   dq_IG = quatnormalize(dq_IG);
 
-  // Correct IMU state
+  // // Correct IMU state
   this->q_IG = quatlcomp(dq_IG) * this->q_IG;
   this->b_g = this->b_g + db_g;
   this->v_G = this->v_G + dv_G;

@@ -8,6 +8,11 @@
 #include <vector>
 #include <algorithm>
 
+#include <Eigen/SVD>
+#include <Eigen/QR>
+#include <Eigen/SparseCore>
+#include <Eigen/SPQRSupport>
+
 #include "gvio/util/util.hpp"
 #include "gvio/quaternion/jpl.hpp"
 #include "gvio/camera/camera_model.hpp"
@@ -62,14 +67,14 @@ public:
   Vec3 ext_p_IC = zeros(3, 1);
   Vec4 ext_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
   // -- Noise
-  double n_u = 0.0;
-  double n_v = 0.0;
+  double n_u = 1.0;
+  double n_v = 1.0;
   // -- Model
   CameraModel *camera_model;
 
   // Settings
-  size_t max_nb_tracks = 1000;
-  size_t min_track_length = 10;
+  size_t max_nb_tracks = 30;
+  size_t min_track_length = 15;
   bool enable_ns_trick = true;
   bool enable_qr_trick = true;
 

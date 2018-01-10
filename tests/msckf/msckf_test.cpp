@@ -69,6 +69,9 @@ int test_MSCKF_P() {
   MU_CHECK_EQ(imu_sz + cam_sz, P.rows());
   MU_CHECK(P.block(imu_sz, imu_sz, cam_sz, cam_sz).isApprox(P_cam_expected));
 
+  mat2csv("/tmp/P.dat", P);
+  system("python3 scripts/plot_matrix.py /tmp/P.dat");
+
   return 0;
 }
 
@@ -322,7 +325,7 @@ int test_MSCKF_residualizeTrack() {
 int test_MSCKF_calResiduals() {
   // Camera model
   const int image_width = 640;
-  const int image_height = 640;
+  const int image_height = 480;
   const double fov = 60.0;
   const double fx = PinholeModel::focalLengthX(image_width, fov);
   const double fy = PinholeModel::focalLengthY(image_height, fov);
@@ -338,29 +341,47 @@ int test_MSCKF_calResiduals() {
   // -- Add first camera state
   msckf.initialize();
   // -- Add second camera state
-  msckf.imu_state.p_G = Vec3{0.0, 1.0, 0.0};
+  msckf.imu_state.p_G = Vec3{1.0, 1.0, 0.0};
   msckf.augmentState();
+  // // -- Add third camera state
+  // msckf.imu_state.p_G = Vec3{2.0, 2.0, 0.0};
+  // msckf.augmentState();
 
   // Prepare features and feature track
-  // -- Create 2 features
-  const Vec3 p_G_f{0.0, 0.0, 10.0};
-  const Vec3 pt0 = pinhole_model.project(p_G_f,
+  // -- Create a feature track1
+  const Vec3 p_G_f0{0.0, 0.0, 10.0};
+  const Vec3 pt0 = pinhole_model.project(p_G_f0,
                                          C(msckf.cam_states[0].q_CG),
                                          msckf.cam_states[0].p_G);
-  const Vec3 pt1 = pinhole_model.project(p_G_f,
+  const Vec3 pt1 = pinhole_model.project(p_G_f0,
                                          C(msckf.cam_states[1].q_CG),
                                          msckf.cam_states[1].p_G);
   Feature f0{Vec2{pt0(0), pt0(1)}};
   Feature f1{Vec2{pt1(0), pt1(1)}};
-  // -- Create a feature track based on two features
-  FeatureTrack track{0, 1, f0, f1};
-  FeatureTracks tracks{track};
+  FeatureTrack track1{0, 1, f0, f1};
+  // -- Create a feature track2
+  const Vec3 p_G_f1{1.0, 1.0, 10.0};
+  const Vec3 pt2 = pinhole_model.project(p_G_f1,
+                                         C(msckf.cam_states[0].q_CG),
+                                         msckf.cam_states[0].p_G);
+  const Vec3 pt3 = pinhole_model.project(p_G_f1,
+                                         C(msckf.cam_states[1].q_CG),
+                                         msckf.cam_states[1].p_G);
+  Feature f2{Vec2{pt2(0), pt2(1)}};
+  Feature f3{Vec2{pt3(0), pt3(1)}};
+  FeatureTrack track2{1, 1, f2, f3};
+  // // -- Create feature tracks
+  FeatureTracks tracks{track1, track2};
+  // FeatureTracks tracks{track1};
 
   // Calculate residuals
   MatX T_H;
   VecX r_n;
   MatX R_n;
   int retval = msckf.calResiduals(tracks, T_H, r_n, R_n);
+  print_shape("T_H", T_H);
+  print_shape("r_n", r_n);
+  print_shape("R_n", R_n);
 
   // Assert
   MU_CHECK_EQ(0, retval);
@@ -451,12 +472,15 @@ int test_MSCKF_measurementUpdate() {
 
   // Setup feature tracker
   KLTTracker tracker;
-  tracker.initialize(cv::imread(raw_dataset.cam0[0]));
+  const cv::Mat img0 = cv::imread(raw_dataset.cam0[0]);
+  tracker.initialize(img0);
+  printf("image size: %dx%d\n", img0.cols, img0.rows);
 
   // Setup MSCKF
   MSCKF msckf;
-  msckf.enable_ns_trick = false;
+  msckf.enable_ns_trick = true;
   msckf.enable_qr_trick = false;
+  msckf.ext_q_CI = Vec4{0.5, -0.5, 0.5, -0.5};
   msckf.camera_model = &pinhole_model;
   msckf.initialize(euler2quat(raw_dataset.oxts.rpy[0]),
                    raw_dataset.oxts.v_G[0],
@@ -472,8 +496,9 @@ int test_MSCKF_measurementUpdate() {
                   raw_dataset.oxts.rpy[0]);
 
   // Loop through data and do prediction update
-  // for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
-  for (int i = 1; i < 50; i++) {
+  struct timespec start = tic();
+  // for (int i = 1; i < 30; i++) {
+  for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
     // Feature tracker
     const std::string img_path = raw_dataset.cam0[i];
     const cv::Mat img = cv::imread(img_path);
@@ -502,8 +527,13 @@ int test_MSCKF_measurementUpdate() {
 
     printf("frame: %d, nb_tracks: %ld\n", i, tracks.size());
   }
+  printf("-- total elasped: %fs --\n", toc(&start));
 
+  // save_camera_states(msckf.cam_states, "/tmp/camera_states.dat");
   system("python3 scripts/plot_msckf.py");
+  // system("python3 scripts/plot_camera_states.py /tmp/camera_states.dat");
+  // system("python3 scripts/plot_camera_states.py /tmp/track_cam_states.dat");
+  // system("python3 scripts/plot_feature_track.py /tmp/track.dat");
 
   return 0;
 }
@@ -517,11 +547,11 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_augmentState);
   // MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
   // MU_ADD_TEST(test_MSCKF_predictionUpdate);
-  MU_ADD_TEST(test_MSCKF_residualizeTrack);
+  // MU_ADD_TEST(test_MSCKF_residualizeTrack);
   // MU_ADD_TEST(test_MSCKF_calResiduals);
   // MU_ADD_TEST(test_MSCKF_correctIMUState);
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
-  // MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  MU_ADD_TEST(test_MSCKF_measurementUpdate);
 }
 
 } // namespace gvio

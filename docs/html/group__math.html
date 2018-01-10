@@ -75,10 +75,10 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaacd94b5a27ee067e752f9a09e0bc0a7a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#gaacd94b5a27ee067e752f9a09e0bc0a7a">gvio::print_shape</a> (const MatX &amp;A)</td></tr>
-<tr class="separator:gaacd94b5a27ee067e752f9a09e0bc0a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8b0b62604d417a6d4bb009095c4ea845"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga8b0b62604d417a6d4bb009095c4ea845">gvio::print_shape</a> (const VecX &amp;v)</td></tr>
-<tr class="separator:ga8b0b62604d417a6d4bb009095c4ea845"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9d7c3fc1e914e1485d5059b3ea1b602f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga9d7c3fc1e914e1485d5059b3ea1b602f">gvio::print_shape</a> (const std::string &amp;name, const MatX &amp;A)</td></tr>
+<tr class="separator:ga9d7c3fc1e914e1485d5059b3ea1b602f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaccc3fe03e06c7be11ade39ae0c3bd67b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#gaccc3fe03e06c7be11ade39ae0c3bd67b">gvio::print_shape</a> (const std::string &amp;name, const VecX &amp;v)</td></tr>
+<tr class="separator:gaccc3fe03e06c7be11ade39ae0c3bd67b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad2aa0e79d97feb59052c5f90dc06ca76"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#gad2aa0e79d97feb59052c5f90dc06ca76">gvio::vec2array</a> (const VecX &amp;v)</td></tr>
 <tr class="separator:gad2aa0e79d97feb59052c5f90dc06ca76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga584b18f5428697e054f4e1019632d990"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__math.html#ga584b18f5428697e054f4e1019632d990">gvio::mat2array</a> (const MatX &amp;m)</td></tr>
@@ -665,37 +665,71 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="gaacd94b5a27ee067e752f9a09e0bc0a7a"></a>
+<a class="anchor" id="ga9d7c3fc1e914e1485d5059b3ea1b602f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void gvio::print_shape </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;&#160;</td>
-          <td class="paramname"><em>A</em></td><td>)</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga6c5bfa63c179fd85b92d8b1e845e6698">MatX</a> &amp;&#160;</td>
+          <td class="paramname"><em>A</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Print shape of a matrix </p>
+<p>Print shape of a matrix</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name of matrix </td></tr>
+    <tr><td class="paramname">A</td><td>Matrix </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="ga8b0b62604d417a6d4bb009095c4ea845"></a>
+<a class="anchor" id="gaccc3fe03e06c7be11ade39ae0c3bd67b"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void gvio::print_shape </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;&#160;</td>
-          <td class="paramname"><em>v</em></td><td>)</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#gab068d9028a0bcb92be09eecf95adc262">VecX</a> &amp;&#160;</td>
+          <td class="paramname"><em>v</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Print shape of a vector </p>
+<p>Print shape of a vector</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name of vector </td></tr>
+    <tr><td class="paramname">v</td><td>Vector </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

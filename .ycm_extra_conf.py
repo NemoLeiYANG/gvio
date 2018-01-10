@@ -38,6 +38,8 @@ flags = [
     '-I',
     '/usr/include/eigen3',
     '-I',
+    '/usr/include/suitesparse',
+    '-I',
     './ClangCompleter',
     '-isystem',
     './tests/gmock/gtest',

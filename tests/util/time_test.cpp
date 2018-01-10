@@ -6,9 +6,7 @@
 namespace gvio {
 
 int test_ticAndToc() {
-  struct timespec start;
-
-  tic(&start);
+  struct timespec start = tic();
   usleep(10 * 1000);
   MU_CHECK(toc(&start) < 0.011);
   MU_CHECK(toc(&start) > 0.009);

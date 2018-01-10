@@ -48,6 +48,15 @@ public:
  */
 using CameraStates = std::vector<CameraState>;
 
+/**
+ * Camera states to CSV file
+ *
+ * @param states Camera states
+ * @param output_path Output path
+ */
+int save_camera_states(const CameraStates &states,
+                       const std::string &output_path);
+
 /** @} group msckf */
 } // namespace gvio
 #endif // GVIO_MSCKF_CAMERA_STATE_HPP

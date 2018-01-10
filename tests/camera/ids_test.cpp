@@ -215,8 +215,7 @@ int test_IDSCamera_getFrame() {
   IDSCamera camera;
   camera.configure(TEST_CONFIG);
 
-  struct timespec start;
-  tic(&start);
+  struct timespec start = tic();
   // int index = 0;
 
   while (true) {
@@ -231,7 +230,7 @@ int test_IDSCamera_getFrame() {
     }
 
     printf("fps: %fs\n", 1.0 / toc(&start));
-    tic(&start);
+    start = tic();
     // index = 0;
   }
 

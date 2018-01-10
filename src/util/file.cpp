@@ -43,6 +43,17 @@ std::string strip_end(const std::string &s, const std::string &target) {
   return s.substr(0, last + 1);
 }
 
+int create_dir(const std::string &path) {
+  const std::string command = "mkdir -p " + path;
+  const int retval = system(command.c_str());
+  if (retval == -1) {
+    printf("Error creating directory!n");
+    return -1;
+  }
+
+  return 0;
+}
+
 int remove_dir(const std::string &path) {
   DIR *dir = opendir(path.c_str());
   struct dirent *next_file;

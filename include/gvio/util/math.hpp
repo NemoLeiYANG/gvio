@@ -38,13 +38,19 @@ typedef Eigen::Quaterniond Quaternion;
 
 /**
  * Print shape of a matrix
+ *
+ * @param name Name of matrix
+ * @param A Matrix
  */
-void print_shape(const MatX &A);
+void print_shape(const std::string &name, const MatX &A);
 
 /**
  * Print shape of a vector
+ *
+ * @param name Name of vector
+ * @param v Vector
  */
-void print_shape(const VecX &v);
+void print_shape(const std::string &name, const VecX &v);
 
 /**
  * Vector to array

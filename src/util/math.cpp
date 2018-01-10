@@ -2,12 +2,12 @@
 
 namespace gvio {
 
-void print_shape(const MatX &A) {
-  std::cout << A.rows() << "x" << A.cols() << std::endl;
+void print_shape(const std::string &name, const MatX &A) {
+  std::cout << name << ": " << A.rows() << "x" << A.cols() << std::endl;
 }
 
-void print_shape(const VecX &v) {
-  std::cout << v.rows() << "x" << v.cols() << std::endl;
+void print_shape(const std::string &name, const VecX &v) {
+  std::cout << name << ": " << v.rows() << "x" << v.cols() << std::endl;
 }
 
 double *vec2array(const VecX &v) {

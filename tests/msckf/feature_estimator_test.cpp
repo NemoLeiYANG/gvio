@@ -167,8 +167,7 @@ int test_FeatureEstimator_estimate() {
   FeatureEstimator estimator(&cam_model, track, track_cam_states);
   estimator.debug_mode = true;
 
-  struct timespec start;
-  tic(&start);
+  struct timespec start = tic();
   int retval = estimator.estimate(p_G_f);
   printf("elasped: %fs\n", toc(&start));
 
@@ -295,9 +294,8 @@ int test_CeresFeatureEstimator_estimate() {
   // Setup CeresFeatureEstimator
   CeresFeatureEstimator estimator{&cam_model, track, track_cam_states};
 
-  struct timespec start;
-  tic(&start);
   Vec3 p_G_f;
+  struct timespec start = tic();
   estimator.estimate(p_G_f);
   printf("elasped: %fs\n", toc(&start));
 

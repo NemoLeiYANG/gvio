@@ -22,17 +22,17 @@ public:
   static const int size = 15; ///< Size of state vector
 
   Vec4 q_IG = Vec4{0.0, 0.0, 0.0, 1.0}; ///< JPL Quaternion in Global frame
-  Vec3 b_g = zeros(3, 1);               ///< Bias of gyroscope
+  Vec3 b_g = 0.001 * ones(3, 1);        ///< Bias of gyroscope
   Vec3 v_G = zeros(3, 1);               ///< Velocity in Global frame
-  Vec3 b_a = zeros(3, 1);               ///< Bias of accelerometer
+  Vec3 b_a = 0.01 * ones(3, 1);         ///< Bias of accelerometer
   Vec3 p_G = zeros(3, 1);               ///< Position in Global frame
 
   Vec3 w_G = zeros(3, 1);           ///< Earth's angular velocity
   Vec3 g_G = Vec3{0.0, 0.0, -9.81}; ///< Gravitational acceleration
 
-  MatX P = zeros(15);   ///< Covariance matrix
-  MatX Q = zeros(12);   ///< Noise matrix
-  MatX Phi = zeros(15); ///< Phi matrix
+  MatX P = 1e-6 * I(15);     ///< Covariance matrix
+  MatX Q = 1e-2 * zeros(12); ///< Noise matrix
+  MatX Phi = zeros(15);      ///< Phi matrix
 
   IMUState() {}
 

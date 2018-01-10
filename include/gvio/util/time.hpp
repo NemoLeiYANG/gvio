@@ -15,7 +15,7 @@ namespace gvio {
  * @{
  */
 
-void tic(struct timespec *tic);
+struct timespec tic();
 float toc(struct timespec *tic);
 float mtoc(struct timespec *tic);
 

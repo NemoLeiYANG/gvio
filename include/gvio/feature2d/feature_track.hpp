@@ -94,6 +94,24 @@ struct FeatureTrack {
  */
 using FeatureTracks = std::vector<FeatureTrack>;
 
+/**
+ * Feature track to CSV file
+ *
+ * @param track Feature track
+ * @param output_path Output path
+ */
+int save_feature_track(const FeatureTrack &track,
+                       const std::string &output_path);
+
+/**
+ * Feature tracks to CSV file
+ *
+ * @param tracks Feature track
+ * @param output_path Output path
+ */
+int save_feature_tracks(const FeatureTracks &tracks,
+                        const std::string &output_path);
+
 /** @} group feature2d */
 } // namespace gvio
 #endif // GVIO_FEATURE2D_FEATURE_TRACK_HPP

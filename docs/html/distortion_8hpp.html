@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>gvio: include/gvio/util/time.hpp File Reference</title>
+<title>gvio: include/gvio/camera/distortion.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -41,7 +41,7 @@
   </div>
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_86b931fcf5335d7eb841943cf101b746.html">gvio</a></li><li class="navelem"><a class="el" href="dir_bbdaef33f4d0cc40797be0a3f4627a75.html">util</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_86b931fcf5335d7eb841943cf101b746.html">gvio</a></li><li class="navelem"><a class="el" href="dir_59e28c815c0a0a51a35a5badb03507d4.html">camera</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -49,11 +49,11 @@
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">time.hpp File Reference</div>  </div>
+<div class="title">distortion.hpp File Reference<div class="ingroups"><a class="el" href="group__camera.html">camera</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><a href="time_8hpp_source.html">Go to the source code of this file.</a></p>
+<p><a href="distortion_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
@@ -62,14 +62,10 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga8dafc4b0c179ad476cc09d635741b5e6"><td class="memItemLeft" align="right" valign="top">struct timespec&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#ga8dafc4b0c179ad476cc09d635741b5e6">gvio::tic</a> ()</td></tr>
-<tr class="separator:ga8dafc4b0c179ad476cc09d635741b5e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga56b8460961e38b5a92f72b198e340e30"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#ga56b8460961e38b5a92f72b198e340e30">gvio::toc</a> (struct timespec *tic)</td></tr>
-<tr class="separator:ga56b8460961e38b5a92f72b198e340e30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab3020fd79893f85ee563d81980dbd715"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#gab3020fd79893f85ee563d81980dbd715">gvio::mtoc</a> (struct timespec *tic)</td></tr>
-<tr class="separator:gab3020fd79893f85ee563d81980dbd715"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gacf9d64bd59dbe6842de39bf19a9acd72"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#gacf9d64bd59dbe6842de39bf19a9acd72">gvio::time_now</a> ()</td></tr>
-<tr class="separator:gacf9d64bd59dbe6842de39bf19a9acd72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf29b4b662880f1c368ad9b47b52fbbc4"><td class="memItemLeft" align="right" valign="top">MatX&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gaf29b4b662880f1c368ad9b47b52fbbc4">gvio::radtan_distort</a> (const double k1, const double k2, const double k3, const double p1, const double p2, const MatX points)</td></tr>
+<tr class="separator:gaf29b4b662880f1c368ad9b47b52fbbc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae2f675313cb573e7a12451379b8282c9"><td class="memItemLeft" align="right" valign="top">MatX&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__camera.html#gae2f675313cb573e7a12451379b8282c9">gvio::equi_distort</a> (const double k1, const double k2, const double k3, const double k4, const MatX points)</td></tr>
+<tr class="separator:gae2f675313cb573e7a12451379b8282c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->

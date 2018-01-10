@@ -185,16 +185,20 @@ void MSCKF::predictionUpdate(const Vec3 &a_m,
 }
 
 int MSCKF::residualizeTrack(const FeatureTrack &track,
-                            MatX &H_j,
-                            VecX &r_j,
-                            MatX &R_j) {
+                            MatX &H_o_j,
+                            VecX &r_o_j,
+                            MatX &R_o_j) {
   // Pre-check
   if (track.trackedLength() < this->min_track_length) {
     return -1;
   }
 
   // Estimate j-th feature position in global frame
-  CameraStates track_cam_states = this->getTrackCameraStates(track);
+  const CameraStates track_cam_states = this->getTrackCameraStates(track);
+
+  // save_camera_states(track_cam_states, "/tmp/track_cam_states.dat");
+  // save_feature_track(track, "/tmp/track.dat");
+
   CeresFeatureEstimator feature_estimator(this->camera_model,
                                           track,
                                           track_cam_states);
@@ -204,9 +208,9 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
   }
 
   // Calculate residuals
-  r_j = zeros(2 * this->N(), 1);
+  VecX r_j = zeros(2 * track_cam_states.size(), 1);
 
-  for (int i = 0; i < this->N(); i++) {
+  for (size_t i = 0; i < track_cam_states.size(); i++) {
     // Transform feature from global frame to i-th camera frame
     const Mat3 C_CG = C(track_cam_states[i].q_CG);
     const Vec3 p_C_f = C_CG * (p_G_f - track_cam_states[i].p_G);
@@ -230,6 +234,7 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
 
   // Form the covariance matrix of different feature observations
   const int nb_residuals = r_j.rows();
+  MatX R_j;
   this->R(this->n_u, this->n_v, nb_residuals, R_j);
 
   // Perform Null Space Trick?
@@ -241,14 +246,14 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     //
     // Note: Left nullspace == kernel of transpose
     const MatX A_j{H_f_j.transpose().fullPivLu().kernel()};
-    H_j = A_j.transpose() * H_x_j;
-    r_j = A_j.transpose() * r_j;
-    R_j = A_j.transpose() * R_j * A_j;
+    H_o_j = A_j.transpose() * H_x_j;
+    r_o_j = A_j.transpose() * r_j;
+    R_o_j = A_j.transpose() * R_j * A_j;
 
   } else {
-    H_j = H_x_j;
-    r_j = r_j;
-    R_j = R_j;
+    H_o_j = H_x_j;
+    r_o_j = r_j;
+    R_o_j = R_j;
   }
 
   return 0;
@@ -284,38 +289,68 @@ int MSCKF::calResiduals(const FeatureTracks &tracks,
     }
   }
 
+  save_feature_tracks(tracks, "/tmp/feature_tracks");
+
   // No residuals, do not continue
   if (stack_residuals == false) {
-    LOG_ERROR("No residuals!");
     return -1;
   }
+  T_H = H_o;
+  r_n = r_o;
+  R_n = R_o;
 
   // Perform QR decomposition?
+  struct timespec start = tic();
   if (this->enable_qr_trick) {
     // Perform QR decomposition to reduce computation in EKF update, since R
     // for 10 features seen in 10 camera poses each would yield a R of
     // dimension 170 [Section E: EKF Updates, Mourikis2007]
-    const Eigen::HouseholderQR<MatX> QR(H_o);
-    const MatX R = QR.matrixQR().triangularView<Eigen::Upper>();
+    Eigen::HouseholderQR<MatX> QR(H_o);
+    QR.compute(H_o);
+    const MatX R = QR.matrixQR().template triangularView<Eigen::Upper>();
     const MatX Q = QR.householderQ();
     // -- Find non-zero rows
-    MatX T_H = R.row(0);
-    MatX Q_1 = Q.col(0);
-    for (int i = 1; i < R.rows(); i++) {
-      if ((R.row(i).array() != 0.0).any()) {
-        T_H = vstack(T_H, R.row(i));
-        Q_1 = hstack(Q_1, Q.col(i));
-      }
-    }
+    T_H = R;
+    MatX Q_1 = Q;
     // -- Calculate residual
     r_n = Q_1.transpose() * r_o;
     R_n = Q_1.transpose() * R_o * Q_1;
+    T_H = H_o;
+    r_n = r_o;
+    R_n = R_o;
 
   } else {
     T_H = H_o;
     r_n = r_o;
     R_n = R_o;
   }
+  printf("-- QR elasped: %fs --\n", toc(&start));
+
+  // struct timespec start = tic();
+  // if (H_o.rows() > H_o.cols()) {
+  //   // Convert H to a sparse matrix.
+  //   Eigen::SparseMatrix<double> H_sparse = H_o.sparseView();
+  //
+  //   // Perform QR decompostion on H_sparse.
+  //   Eigen::SPQR<Eigen::SparseMatrix<double>> spqr_helper;
+  //   spqr_helper.setSPQROrdering(SPQR_ORDERING_NATURAL);
+  //   spqr_helper.compute(H_sparse);
+  //
+  //   MatX H_temp;
+  //   VecX r_temp;
+  //   (spqr_helper.matrixQ().transpose() * H_o).evalTo(H_temp);
+  //   (spqr_helper.matrixQ().transpose() * r_o).evalTo(r_temp);
+  //
+  //   T_H = H_temp.topRows(IMUState::size + this->N() * CameraState::size);
+  //   r_n = r_temp.head(IMUState::size + this->N() * CameraState::size);
+  //   R_n = R_o;
+  //
+  // } else {
+  //   T_H = H_o;
+  //   r_n = r_o;
+  //   R_n = R_o;
+  // }
+  // printf("-- QR elasped: %fs --\n", toc(&start));
 
   return 0;
 }
@@ -345,7 +380,7 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
 
   // Limit number of tracks
   if (tracks.size() > this->max_nb_tracks) {
-    tracks.erase(tracks.begin(), tracks.begin() + 100);
+    tracks.erase(tracks.begin() + this->max_nb_tracks, tracks.end());
   }
 
   // Calculate residuals
@@ -358,8 +393,8 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
 
   // Calculate Kalman gain
   // clang-format off
-  const MatX P = this->P();
-  const MatX K = P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
+  MatX P = this->P();
+  MatX K = P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
   // clang-format on
 
   // Correct states

@@ -46,6 +46,12 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
   // Calculate initial estimate of 3D position
   FeatureEstimator::triangulate(pt1, pt2, C_C0C1, t_C1_C0C1, p_C0_f);
 
+  // std::cout << "p_G_C0: " << p_G_C0.transpose() << std::endl;
+  // std::cout << "p_G_C1: " << p_G_C1.transpose() << std::endl;
+  // std::cout << "t_C1_C0C1: " << t_C1_C0C1.transpose() << std::endl;
+  // std::cout << "p_C0_f: " << p_C0_f.transpose() << std::endl;
+  // exit(0);
+
   return 0;
 }
 
@@ -287,10 +293,6 @@ int CeresFeatureEstimator::setupProblem() {
   this->x[0] = p_C0_f(0) / p_C0_f(2); // Alpha
   this->x[1] = p_C0_f(1) / p_C0_f(2); // Beta
   this->x[2] = 1.0 / p_C0_f(2);       // Rho
-
-  // this->x[0] += 0.1;
-  // this->x[1] += 0.1;
-  // this->x[2] += 10;
 
   // Add residual blocks
   const int N = this->track_cam_states.size();

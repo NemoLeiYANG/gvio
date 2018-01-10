@@ -58,6 +58,14 @@ std::string strip(const std::string &s, const std::string &target = " ");
 std::string strip_end(const std::string &s, const std::string &target = " ");
 
 /**
+ * Create directory
+ *
+ * @param path Path to directory
+ * @returns 0 for success, -1 for failure
+ */
+int create_dir(const std::string &path);
+
+/**
  * Remove directory
  *
  * @param path Path to directory

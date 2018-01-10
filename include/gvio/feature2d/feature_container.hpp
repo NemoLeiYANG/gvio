@@ -25,6 +25,7 @@ struct FeatureContainer {
   /**
    * Add feature track
    *
+   * @param frame_id Frame ID
    * @param f1 First feature
    * @param f2 Second feature
    * @returns 0 for success, -1 for failure
@@ -50,6 +51,7 @@ struct FeatureContainer {
   /**
    * Update feature track
    *
+   * @param frame_id Frame ID
    * @param track_id Track ID
    * @param f Feature
    * @returns 0 for success, -1 for failure
