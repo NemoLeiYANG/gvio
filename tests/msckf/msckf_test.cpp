@@ -20,8 +20,8 @@ int test_MSCKF_constructor() {
   MU_CHECK_EQ(0, msckf.counter_frame_id);
   MU_CHECK(zeros(3, 1).isApprox(msckf.ext_p_IC));
   MU_CHECK(Vec4(0.0, 0.0, 0.0, 1.0).isApprox(msckf.ext_q_CI));
-  MU_CHECK_FLOAT(0.0, msckf.n_u);
-  MU_CHECK_FLOAT(0.0, msckf.n_v);
+  MU_CHECK(msckf.n_u > 0.0);
+  MU_CHECK(msckf.n_v > 0.0);
 
   MU_CHECK(msckf.enable_ns_trick);
   MU_CHECK(msckf.enable_qr_trick);
@@ -271,7 +271,6 @@ int test_MSCKF_residualizeTrack() {
   // msckf.enable_ns_trick = false;
   // -- Modify default settings for test
   msckf.min_track_length = 2;
-  msckf.camera_model = &pinhole_model;
   // -- Add first camera state
   msckf.initialize();
   // -- Add second camera state
@@ -281,12 +280,14 @@ int test_MSCKF_residualizeTrack() {
   // Prepare features and feature track
   // -- Create 2 features
   const Vec3 p_G_f{0.0, 0.0, 10.0};
-  const Vec2 pt0 = pinhole_model.project(p_G_f,
-                                         C(msckf.cam_states[0].q_CG),
-                                         msckf.cam_states[0].p_G);
-  const Vec2 pt1 = pinhole_model.project(p_G_f,
-                                         C(msckf.cam_states[1].q_CG),
-                                         msckf.cam_states[1].p_G);
+  Vec2 pt0 = pinhole_model.project(p_G_f,
+                                   C(msckf.cam_states[0].q_CG),
+                                   msckf.cam_states[0].p_G);
+  Vec2 pt1 = pinhole_model.project(p_G_f,
+                                   C(msckf.cam_states[1].q_CG),
+                                   msckf.cam_states[1].p_G);
+  pt0 = pinhole_model.pixel2image(pt0);
+  pt1 = pinhole_model.pixel2image(pt1);
   Feature f0{pt0};
   Feature f1{pt1};
   // -- Create a feature track based on two features
@@ -337,7 +338,6 @@ int test_MSCKF_calResiduals() {
   MSCKF msckf;
   // -- Modify default settings for test
   msckf.min_track_length = 2;
-  msckf.camera_model = &pinhole_model;
   // -- Add first camera state
   msckf.initialize();
   // -- Add second camera state
@@ -350,23 +350,27 @@ int test_MSCKF_calResiduals() {
   // Prepare features and feature track
   // -- Create a feature track1
   const Vec3 p_G_f0{0.0, 0.0, 10.0};
-  const Vec2 pt0 = pinhole_model.project(p_G_f0,
-                                         C(msckf.cam_states[0].q_CG),
-                                         msckf.cam_states[0].p_G);
-  const Vec2 pt1 = pinhole_model.project(p_G_f0,
-                                         C(msckf.cam_states[1].q_CG),
-                                         msckf.cam_states[1].p_G);
+  Vec2 pt0 = pinhole_model.project(p_G_f0,
+                                   C(msckf.cam_states[0].q_CG),
+                                   msckf.cam_states[0].p_G);
+  Vec2 pt1 = pinhole_model.project(p_G_f0,
+                                   C(msckf.cam_states[1].q_CG),
+                                   msckf.cam_states[1].p_G);
+  pt0 = pinhole_model.pixel2image(pt0);
+  pt1 = pinhole_model.pixel2image(pt1);
   Feature f0{pt0};
   Feature f1{pt1};
   FeatureTrack track1{0, 1, f0, f1};
   // -- Create a feature track2
   const Vec3 p_G_f1{1.0, 1.0, 10.0};
-  const Vec2 pt2 = pinhole_model.project(p_G_f1,
-                                         C(msckf.cam_states[0].q_CG),
-                                         msckf.cam_states[0].p_G);
-  const Vec2 pt3 = pinhole_model.project(p_G_f1,
-                                         C(msckf.cam_states[1].q_CG),
-                                         msckf.cam_states[1].p_G);
+  Vec2 pt2 = pinhole_model.project(p_G_f1,
+                                   C(msckf.cam_states[0].q_CG),
+                                   msckf.cam_states[0].p_G);
+  Vec2 pt3 = pinhole_model.project(p_G_f1,
+                                   C(msckf.cam_states[1].q_CG),
+                                   msckf.cam_states[1].p_G);
+  pt2 = pinhole_model.pixel2image(pt0);
+  pt3 = pinhole_model.pixel2image(pt1);
   Feature f2{pt2};
   Feature f3{pt3};
   FeatureTrack track2{1, 1, f2, f3};
@@ -409,9 +413,7 @@ int test_MSCKF_correctIMUState() {
   msckf.correctIMUState(dx);
 
   // Assert
-  MU_CHECK(msckf.imu_state.b_g.isApprox(db_g));
   MU_CHECK(msckf.imu_state.v_G.isApprox(dv_G));
-  MU_CHECK(msckf.imu_state.b_a.isApprox(db_a));
   MU_CHECK(msckf.imu_state.p_G.isApprox(dp_G));
 
   return 0;
@@ -460,10 +462,8 @@ int test_MSCKF_measurementUpdate() {
     LOG_ERROR("Failed to configure MSCKF blackbox!");
   }
 
-  // Setup feature tracker
-  KLTTracker tracker;
+  // Load first image
   const cv::Mat img0 = cv::imread(raw_dataset.cam0[0]);
-  tracker.initialize(img0);
 
   // Setup camera model
   const int image_width = img0.cols;
@@ -474,12 +474,16 @@ int test_MSCKF_measurementUpdate() {
   const double cy = raw_dataset.calib_cam_to_cam.K[0](1, 2);
   PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
 
+  // Setup feature tracker
+  KLTTracker tracker;
+  tracker.camera_model = &pinhole_model;
+  tracker.initialize(img0);
+
   // Setup MSCKF
   MSCKF msckf;
   msckf.enable_ns_trick = true;
   msckf.enable_qr_trick = true;
   msckf.ext_q_CI = Vec4{0.5, -0.5, 0.5, -0.5};
-  msckf.camera_model = &pinhole_model;
   msckf.initialize(euler2quat(raw_dataset.oxts.rpy[0]),
                    raw_dataset.oxts.v_G[0],
                    Vec3{0.0, 0.0, 0.0});
@@ -538,18 +542,18 @@ int test_MSCKF_measurementUpdate() {
 }
 
 void test_suite() {
-  // MU_ADD_TEST(test_MSCKF_constructor);
-  // MU_ADD_TEST(test_MSCKF_P);
-  // MU_ADD_TEST(test_MSCKF_N);
-  // MU_ADD_TEST(test_MSCKF_H);
-  // MU_ADD_TEST(test_MSCKF_R);
-  // MU_ADD_TEST(test_MSCKF_augmentState);
-  // MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
-  // MU_ADD_TEST(test_MSCKF_predictionUpdate);
-  // MU_ADD_TEST(test_MSCKF_residualizeTrack);
-  // MU_ADD_TEST(test_MSCKF_calResiduals);
-  // MU_ADD_TEST(test_MSCKF_correctIMUState);
-  // MU_ADD_TEST(test_MSCKF_correctCameraStates);
+  MU_ADD_TEST(test_MSCKF_constructor);
+  MU_ADD_TEST(test_MSCKF_P);
+  MU_ADD_TEST(test_MSCKF_N);
+  MU_ADD_TEST(test_MSCKF_H);
+  MU_ADD_TEST(test_MSCKF_R);
+  MU_ADD_TEST(test_MSCKF_augmentState);
+  MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
+  MU_ADD_TEST(test_MSCKF_predictionUpdate);
+  MU_ADD_TEST(test_MSCKF_residualizeTrack);
+  MU_ADD_TEST(test_MSCKF_calResiduals);
+  MU_ADD_TEST(test_MSCKF_correctIMUState);
+  MU_ADD_TEST(test_MSCKF_correctCameraStates);
   MU_ADD_TEST(test_MSCKF_measurementUpdate);
 }
 

@@ -182,7 +182,6 @@ int test_FeatureEstimator_estimate() {
 int test_CeresReprojectionError_constructor() {
   // Setup test
   const struct test_config config;
-  PinholeModel cam_model;
   CameraStates track_cam_states;
   FeatureTrack track;
   setup_test(config, track_cam_states, track);
@@ -200,10 +199,9 @@ int test_CeresReprojectionError_constructor() {
   const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
 
   // Ceres reprojection error
-  CeresReprojectionError error{&cam_model,
-                               C_CiC0,
+  CeresReprojectionError error{C_CiC0,
                                t_Ci_CiC0,
-                               track.track[camera_index].kp};
+                               track.track[camera_index].getKeyPoint()};
 
   return 0;
 }
@@ -211,7 +209,6 @@ int test_CeresReprojectionError_constructor() {
 int test_CeresReprojectionError_evaluate() {
   // Setup test
   const struct test_config config;
-  PinholeModel cam_model;
   CameraStates track_cam_states;
   FeatureTrack track;
   setup_test(config, track_cam_states, track);
@@ -231,10 +228,9 @@ int test_CeresReprojectionError_evaluate() {
 
     // Calculate reprojection error for first measurement
     double r[2] = {1.0, 1.0};
-    CeresReprojectionError error{&cam_model,
-                                 C_CiC0,
+    CeresReprojectionError error{C_CiC0,
                                  t_Ci_CiC0,
-                                 track.track[i].kp};
+                                 track.track[i].getKeyPoint()};
 
     // Create inverse depth params (these are to be optimized)
     const double alpha = config.landmark(0) / config.landmark(2);
@@ -259,13 +255,12 @@ int test_CeresReprojectionError_evaluate() {
 int test_CeresFeatureEstimator_constructor() {
   // Setup test
   const struct test_config config;
-  PinholeModel cam_model;
   CameraStates track_cam_states;
   FeatureTrack track;
   setup_test(config, track_cam_states, track);
 
   // Setup CeresFeatureEstimator
-  CeresFeatureEstimator estimator{&cam_model, track, track_cam_states};
+  CeresFeatureEstimator estimator{track, track_cam_states};
 
   return 0;
 }
@@ -273,13 +268,12 @@ int test_CeresFeatureEstimator_constructor() {
 int test_CeresFeatureEstimator_setupProblem() {
   // Setup test
   const struct test_config config;
-  PinholeModel cam_model;
   CameraStates track_cam_states;
   FeatureTrack track;
   setup_test(config, track_cam_states, track);
 
   // Setup CeresFeatureEstimator
-  CeresFeatureEstimator estimator{&cam_model, track, track_cam_states};
+  CeresFeatureEstimator estimator{track, track_cam_states};
   estimator.setupProblem();
 
   return 0;
@@ -288,13 +282,12 @@ int test_CeresFeatureEstimator_setupProblem() {
 int test_CeresFeatureEstimator_estimate() {
   // Setup test
   const struct test_config config;
-  PinholeModel cam_model;
   CameraStates track_cam_states;
   FeatureTrack track;
   setup_test(config, track_cam_states, track);
 
   // Setup CeresFeatureEstimator
-  CeresFeatureEstimator estimator{&cam_model, track, track_cam_states};
+  CeresFeatureEstimator estimator{track, track_cam_states};
 
   Vec3 p_G_f;
   struct timespec start = tic();
@@ -314,14 +307,14 @@ void test_suite() {
   MU_ADD_TEST(test_FeatureEstimator_reprojectionError);
   MU_ADD_TEST(test_FeatureEstimator_estimate);
 
-  // // CeresReprojectionError
-  // MU_ADD_TEST(test_CeresReprojectionError_constructor);
-  // MU_ADD_TEST(test_CeresReprojectionError_evaluate);
-  //
-  // // CeresFeatureEstimator
-  // MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
-  // MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
-  // MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
+  // CeresReprojectionError
+  MU_ADD_TEST(test_CeresReprojectionError_constructor);
+  MU_ADD_TEST(test_CeresReprojectionError_evaluate);
+
+  // CeresFeatureEstimator
+  MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
+  MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
+  MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
 }
 
 } // namespace gvio

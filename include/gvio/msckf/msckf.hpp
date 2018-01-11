@@ -69,8 +69,6 @@ public:
   // -- Noise
   double n_u = 0.1;
   double n_v = 0.1;
-  // -- Model
-  CameraModel *camera_model;
 
   // Settings
   int max_nb_tracks = 30;

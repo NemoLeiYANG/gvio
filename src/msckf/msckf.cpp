@@ -216,9 +216,7 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
   const CameraStates track_cam_states = this->getTrackCameraStates(track);
 
   // struct timespec start = tic();
-  CeresFeatureEstimator feature_estimator(this->camera_model,
-                                          track,
-                                          track_cam_states);
+  CeresFeatureEstimator feature_estimator(track, track_cam_states);
   Vec3 p_G_f;
   if (feature_estimator.estimate(p_G_f) != 0) {
     return -2;
@@ -237,7 +235,7 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     const Vec2 z_hat{cu, cv};
 
     // Transform idealized measurement
-    const Vec2 z{this->camera_model->pixel2image(track.track[i].kp)};
+    const Vec2 z{track.track[i].getKeyPoint()};
 
     // Calculate reprojection error and add it to the residual vector
     const int rs = 2 * i;

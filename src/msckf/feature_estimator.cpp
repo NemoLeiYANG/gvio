@@ -203,7 +203,7 @@ bool CeresReprojectionError::Evaluate(double const *const *x,
 
   // Calculate reprojection error
   // -- Convert measurment to image coordinates
-  const Vec2 z = this->cam_model->pixel2image(this->keypoint.pt);
+  const Vec2 z{this->keypoint};
   // -- Convert feature location to normalized coordinates
   const Vec2 z_hat{h(0) / h(2), h(1) / h(2)};
 
@@ -263,12 +263,12 @@ bool CeresReprojectionError::Evaluate(double const *const *x,
   return true;
 }
 
-void CeresFeatureEstimator::addResidualBlock(const cv::KeyPoint &kp,
+void CeresFeatureEstimator::addResidualBlock(const Vec2 &kp,
                                              const Mat3 &C_CiC0,
                                              const Vec3 &t_Ci_CiC0,
                                              double *x) {
   // Build residual
-  auto cost_func = new CeresReprojectionError(cam_model, C_CiC0, t_Ci_CiC0, kp);
+  auto cost_func = new CeresReprojectionError(C_CiC0, t_Ci_CiC0, kp);
 
   // Add residual block to problem
   this->problem.AddResidualBlock(cost_func, // Cost function
@@ -304,7 +304,10 @@ int CeresFeatureEstimator::setupProblem() {
     const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
 
     // Add residual block
-    this->addResidualBlock(this->track.track[i].kp, C_CiC0, t_Ci_CiC0, this->x);
+    this->addResidualBlock(this->track.track[i].getKeyPoint(),
+                           C_CiC0,
+                           t_Ci_CiC0,
+                           this->x);
   }
 
   return 0;

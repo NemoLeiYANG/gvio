@@ -94,27 +94,17 @@ public:
  */
 struct CeresReprojectionError : public ceres::SizedCostFunction<2, 3> {
 public:
-  const CameraModel *cam_model;
-
-  // Camera intrinsics
-  double fx = 0.0;
-  double fy = 0.0;
-  double cx = 0.0;
-  double cy = 0.0;
-
   // Camera extrinsics
   Mat3 C_CiC0;
   Vec3 t_Ci_CiC0;
 
   // Measurement
-  cv::KeyPoint keypoint;
+  Vec2 keypoint;
 
-  CeresReprojectionError(const CameraModel *cam_model,
-                         const Mat3 &C_CiC0,
+  CeresReprojectionError(const Mat3 &C_CiC0,
                          const Vec3 &t_Ci_CiC0,
-                         const cv::KeyPoint &keypoint)
-      : cam_model{cam_model}, C_CiC0{C_CiC0}, t_Ci_CiC0{t_Ci_CiC0},
-        keypoint{keypoint} {}
+                         const Vec2 &keypoint)
+      : C_CiC0{C_CiC0}, t_Ci_CiC0{t_Ci_CiC0}, keypoint{keypoint} {}
 
   /**
    * Calculate reprojection residual
@@ -133,17 +123,14 @@ public:
  */
 class CeresFeatureEstimator : public FeatureEstimator {
 public:
-  const CameraModel *cam_model;
-
   ceres::Problem problem;
   ceres::Solver::Options options;
   ceres::Solver::Summary summary;
   double x[3] = {0.0, 0.0, 0.0};
 
-  CeresFeatureEstimator(const CameraModel *cam_model,
-                        const FeatureTrack &track,
+  CeresFeatureEstimator(const FeatureTrack &track,
                         const CameraStates &track_cam_states)
-      : FeatureEstimator{track, track_cam_states}, cam_model{cam_model} {}
+      : FeatureEstimator{track, track_cam_states} {}
 
   /**
    * Add residual block
@@ -153,7 +140,7 @@ public:
    * @param t_Ci_CiC0 Translation vector from frame C0 to Ci expressed in Ci
    * @param x Optimization parameters
    */
-  void addResidualBlock(const cv::KeyPoint &kp,
+  void addResidualBlock(const Vec2 &kp,
                         const Mat3 &C_CiC0,
                         const Vec3 &t_Ci_CiC0,
                         double *x);
