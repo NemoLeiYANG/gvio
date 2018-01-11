@@ -124,7 +124,7 @@ int test_PinholeModel_project() {
   Mat3 R = euler321ToRot(Vec3{0.0, 0.0, 0.0});
   Vec3 t{0.0, 0.0, 0.0};
   Vec3 X{0.0, 0.0, 10.0};
-  Vec3 x = cam_model.project(X, R, t);
+  Vec2 x = cam_model.project(X, R, t);
 
   MU_CHECK_FLOAT(320.0, x(0));
   MU_CHECK_FLOAT(320.0, x(1));

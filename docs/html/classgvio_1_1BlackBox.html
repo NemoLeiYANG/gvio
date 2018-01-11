@@ -105,6 +105,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ad9f17aa3106d6ee02ed831e7c8fd4c65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acac9cf83dd819a187478b5eb3dfb0af2"><td class="memItemLeft" align="right" valign="top">std::ofstream&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#acac9cf83dd819a187478b5eb3dfb0af2">gnd_file</a></td></tr>
 <tr class="separator:acac9cf83dd819a187478b5eb3dfb0af2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ea4c6e14dfe5f3ce633d82ce41a0d34"><td class="memItemLeft" align="right" valign="top">std::ofstream&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#a6ea4c6e14dfe5f3ce633d82ce41a0d34">win_file</a></td></tr>
+<tr class="separator:a6ea4c6e14dfe5f3ce633d82ce41a0d34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Methods</h2></td></tr>
@@ -114,8 +116,16 @@ Public Methods</h2></td></tr>
 <tr class="separator:ac073aa3a179df0f2df4abd8135fda54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a018b4cf1333c8203d6bc26db54be24c9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#a018b4cf1333c8203d6bc26db54be24c9">configure</a> (const std::string &amp;output_path, const std::string &amp;base_name)</td></tr>
 <tr class="separator:a018b4cf1333c8203d6bc26db54be24c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44bf8d7bd243af52404cba5991959e46"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#a44bf8d7bd243af52404cba5991959e46">record</a> (const double time, const <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> &amp;msckf, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;measurement_a_B, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;measurement_w_B, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_p_G, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_v_G, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_rpy_G)</td></tr>
-<tr class="separator:a44bf8d7bd243af52404cba5991959e46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bec4c833d4f4165d06138ee135d7707"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#a7bec4c833d4f4165d06138ee135d7707">recordEstimate</a> (const double time, const <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> &amp;msckf)</td></tr>
+<tr class="separator:a7bec4c833d4f4165d06138ee135d7707"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adaa9220b6518b1a89a5d82ea94c91d60"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#adaa9220b6518b1a89a5d82ea94c91d60">recordMeasurement</a> (const double time, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;measurement_a_B, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;measurement_w_B)</td></tr>
+<tr class="separator:adaa9220b6518b1a89a5d82ea94c91d60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaae93e06b3e6d1925f62ac85da338492"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#aaae93e06b3e6d1925f62ac85da338492">recordGroundTruth</a> (const double time, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_p_G, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_v_G, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_rpy_G)</td></tr>
+<tr class="separator:aaae93e06b3e6d1925f62ac85da338492"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af865db1b940307b73971a664b1707983"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#af865db1b940307b73971a664b1707983">recordCameraStates</a> (const <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> &amp;msckf)</td></tr>
+<tr class="separator:af865db1b940307b73971a664b1707983"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab02d9580c34a5a2dad4f0eb301d2bf43"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1BlackBox.html#ab02d9580c34a5a2dad4f0eb301d2bf43">recordTimeStep</a> (const double time, const <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> &amp;msckf, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;measurement_a_B, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;measurement_w_B, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_p_G, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_v_G, const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;ground_truth_rpy_G)</td></tr>
+<tr class="separator:ab02d9580c34a5a2dad4f0eb301d2bf43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Method Descriptions</h2>
 <a class="anchor" id="a018b4cf1333c8203d6bc26db54be24c9"></a>
@@ -141,15 +151,174 @@ Public Methods</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Configure</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">output_path</td><td>Output path </td></tr>
+    <tr><td class="paramname">base_name</td><td>Output file basename</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a44bf8d7bd243af52404cba5991959e46"></a>
+<a class="anchor" id="af865db1b940307b73971a664b1707983"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gvio::BlackBox::record </td>
+          <td class="memname">int gvio::BlackBox::recordCameraStates </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> &amp;&#160;</td>
+          <td class="paramname"><em>msckf</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Record <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> camera states</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msckf</td><td><a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a7bec4c833d4f4165d06138ee135d7707"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::BlackBox::recordEstimate </td>
+          <td>(</td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> &amp;&#160;</td>
+          <td class="paramname"><em>msckf</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Record ground truth</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time</td><td>Relative time in seconds (where 0 is start) </td></tr>
+    <tr><td class="paramname">msckf</td><td><a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aaae93e06b3e6d1925f62ac85da338492"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::BlackBox::recordGroundTruth </td>
+          <td>(</td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>ground_truth_p_G</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>ground_truth_v_G</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>ground_truth_rpy_G</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Record ground truth</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time</td><td>Relative time in seconds (where 0 is start) </td></tr>
+    <tr><td class="paramname">ground_truth_p_G</td><td>Ground Truth position in global frame </td></tr>
+    <tr><td class="paramname">ground_truth_v_G</td><td>Ground Truth velocity in global frame </td></tr>
+    <tr><td class="paramname">ground_truth_rpy_G</td><td>Ground Truth roll, pitch, and yaw in global frame</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="adaa9220b6518b1a89a5d82ea94c91d60"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::BlackBox::recordMeasurement </td>
+          <td>(</td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>measurement_a_B</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>measurement_w_B</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Record measurement</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time</td><td>Relative time in seconds (where 0 is start) </td></tr>
+    <tr><td class="paramname">measurement_a_B</td><td>Accelerometer measurement </td></tr>
+    <tr><td class="paramname">measurement_w_B</td><td>Gyroscope measurement</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ab02d9580c34a5a2dad4f0eb301d2bf43"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::BlackBox::recordTimeStep </td>
           <td>(</td>
           <td class="paramtype">const double&#160;</td>
           <td class="paramname"><em>time</em>, </td>
@@ -197,6 +366,20 @@ Public Methods</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Record time step</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time</td><td>Relative time in seconds (where 0 is start) </td></tr>
+    <tr><td class="paramname">msckf</td><td><a class="el" href="classgvio_1_1MSCKF.html">MSCKF</a> </td></tr>
+    <tr><td class="paramname">measurement_a_B</td><td>Accelerometer measurement </td></tr>
+    <tr><td class="paramname">measurement_w_B</td><td>Gyroscope measurement </td></tr>
+    <tr><td class="paramname">ground_truth_p_G</td><td>Ground Truth position in global frame </td></tr>
+    <tr><td class="paramname">ground_truth_v_G</td><td>Ground Truth velocity in global frame </td></tr>
+    <tr><td class="paramname">ground_truth_rpy_G</td><td>Ground Truth roll, pitch, and yaw in global frame</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
 
 </div>
 </div>

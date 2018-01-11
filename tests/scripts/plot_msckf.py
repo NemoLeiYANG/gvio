@@ -3,6 +3,11 @@ import matplotlib.pylab as plt
 
 
 def parse_data(data_path):
+    # Check number of lines
+    nb_lines = sum(1 for lline in open(data_path))
+    if nb_lines < 2:
+        raise RuntimeError("No data in [" + data_path + "]?")
+
     # Load csv as numpy matrix
     data_file = open(data_path, "r")
     header = open(data_path, "r").readline()
@@ -20,11 +25,12 @@ def parse_data(data_path):
     return data_dict
 
 
-def plot_position(est_data, gnd_data):
+def plot_position(est_data, win_data, gnd_data):
     plt.figure()
 
     plt.plot(gnd_data["x"], gnd_data["y"], label="Ground truth")
     plt.plot(est_data["x"], est_data["y"], label="Estimated")
+    plt.plot(win_data["x"], win_data["y"], label="Camera states")
 
     plt.title("Position")
     plt.xlabel("East (m)")
@@ -83,8 +89,9 @@ if __name__ == "__main__":
     est_data = parse_data("/tmp/test_msckf_predictionUpdate_est.dat")
     mea_data = parse_data("/tmp/test_msckf_predictionUpdate_mea.dat")
     gnd_data = parse_data("/tmp/test_msckf_predictionUpdate_gnd.dat")
+    win_data = parse_data("/tmp/test_msckf_predictionUpdate_win.dat")
 
-    plot_position(est_data, gnd_data)
-    plot_attitude(est_data, gnd_data)
+    plot_position(est_data, win_data, gnd_data)
+    # plot_attitude(est_data, gnd_data)
     # plot_measurements(mea_data)
     plt.show()

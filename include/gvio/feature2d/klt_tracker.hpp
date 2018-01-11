@@ -7,6 +7,7 @@
 
 #include "gvio/feature2d/feature_tracker.hpp"
 #include "gvio/feature2d/feature_container.hpp"
+#include "gvio/camera/camera_model.hpp"
 
 namespace gvio {
 /**
@@ -19,14 +20,28 @@ namespace gvio {
  */
 class KLTTracker {
 public:
-  bool show_matches = false;
-
   FrameID counter_frame_id = -1;
   cv::Mat img_cur;
   cv::Mat img_ref;
   FeatureContainer features;
 
+  int nb_max_corners = 1000;
+  double quality_level = 0.01;
+  double min_distance = 10.0;
+  bool show_matches = false;
+
+  const CameraModel *camera_model = nullptr;
+
   KLTTracker() {}
+
+  KLTTracker(const CameraModel *camera_model) : camera_model{camera_model} {}
+
+  KLTTracker(const int nb_max_corners,
+             const double quality_level,
+             const double min_distance,
+             const CameraModel *camera_model)
+      : nb_max_corners{nb_max_corners}, quality_level{quality_level},
+        min_distance{min_distance}, camera_model{camera_model} {}
 
   /**
    * Configure
@@ -37,11 +52,11 @@ public:
   int configure(const std::string &config_file);
 
   /**
-   * Remove lost feature tracks
+   * Get lost feature tracks
    *
    * @param tracks Lost feature tracks
    */
-  void removeLostTracks(std::vector<FeatureTrack> &tracks);
+  std::vector<FeatureTrack> getLostTracks();
 
   /**
    * Initialize feature tracker

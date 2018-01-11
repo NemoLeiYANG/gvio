@@ -29,7 +29,7 @@ public:
    *
    * @returns 3D point in image plane (homogenous)
    */
-  virtual Vec3 project(const Vec3 &X, const Mat3 &R, const Vec3 &t) = 0;
+  virtual Vec2 project(const Vec3 &X, const Mat3 &R, const Vec3 &t) = 0;
 
   /**
    * Convert pixel measurement to image coordinates

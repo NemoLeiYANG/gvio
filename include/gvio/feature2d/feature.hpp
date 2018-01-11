@@ -48,9 +48,14 @@ struct Feature {
   void setTrackID(const TrackID &track_id) { this->track_id = track_id; }
 
   /**
-   * Return feature as cv::KeyPoint
+   * Return feature as Vec2
    */
-  cv::KeyPoint &getKeyPoint() { return this->kp; }
+  Vec2 getKeyPoint() { return Vec2{this->kp.pt.x, this->kp.pt.y}; }
+
+  /**
+   * Return feature as Vec2
+   */
+  Vec2 getKeyPoint() const { return Vec2{this->kp.pt.x, this->kp.pt.y}; }
 
   /**
    * Feature to string

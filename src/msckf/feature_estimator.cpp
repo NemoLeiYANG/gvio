@@ -46,12 +46,6 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
   // Calculate initial estimate of 3D position
   FeatureEstimator::triangulate(pt1, pt2, C_C0C1, t_C1_C0C1, p_C0_f);
 
-  // std::cout << "p_G_C0: " << p_G_C0.transpose() << std::endl;
-  // std::cout << "p_G_C1: " << p_G_C1.transpose() << std::endl;
-  // std::cout << "t_C1_C0C1: " << t_C1_C0C1.transpose() << std::endl;
-  // std::cout << "p_C0_f: " << p_C0_f.transpose() << std::endl;
-  // exit(0);
-
   return 0;
 }
 
@@ -129,7 +123,7 @@ VecX FeatureEstimator::reprojectionError(const VecX &x) {
 
     // Calculate reprojection error
     // -- Convert measurment to image coordinates
-    const Vec2 z = this->cam_model->pixel2image(track.track[i].kp.pt);
+    const Vec2 z = this->cam_model->pixel2image(track.track[i].getKeyPoint());
     // -- Convert feature location to normalized coordinates
     const Vec2 z_hat{h(0) / h(2), h(1) / h(2)};
     // -- Reprojcetion error

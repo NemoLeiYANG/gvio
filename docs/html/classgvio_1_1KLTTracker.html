@@ -81,11 +81,79 @@
 
 </div>
 </div>
+<a class="anchor" id="aff0ba1154896af58c74fc15d994eaa69"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">gvio::KLTTracker::KLTTracker </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *&#160;</td>
+          <td class="paramname"><em>camera_model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a57bd840823c64cf1f566d67a8055ad63"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">gvio::KLTTracker::KLTTracker </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>nb_max_corners</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>quality_level</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>min_distance</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *&#160;</td>
+          <td class="paramname"><em>camera_model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a9a1bc305ec7e7ebfd168d533fb720290"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a9a1bc305ec7e7ebfd168d533fb720290">show_matches</a> = false</td></tr>
-<tr class="separator:a9a1bc305ec7e7ebfd168d533fb720290"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5274169391c75239d9bc0cb0dc2541d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#af5274169391c75239d9bc0cb0dc2541d">counter_frame_id</a> = -1</td></tr>
 <tr class="separator:af5274169391c75239d9bc0cb0dc2541d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20d3e1ca03a16f244ca175a12098d2da"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a20d3e1ca03a16f244ca175a12098d2da">img_cur</a></td></tr>
@@ -94,15 +162,29 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a10a5827748c37ea8fa5b095871b4d11b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a485c4827d1b5942dfa8dfe356d79ec7c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgvio_1_1FeatureContainer.html">FeatureContainer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a485c4827d1b5942dfa8dfe356d79ec7c">features</a></td></tr>
 <tr class="separator:a485c4827d1b5942dfa8dfe356d79ec7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47901d37d8bd4ef2cbd0bf3269454c69"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a47901d37d8bd4ef2cbd0bf3269454c69">nb_max_corners</a> = 1000</td></tr>
+<tr class="separator:a47901d37d8bd4ef2cbd0bf3269454c69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae031567df45b973924e8bfe9dc7e93bb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#ae031567df45b973924e8bfe9dc7e93bb">quality_level</a> = 0.01</td></tr>
+<tr class="separator:ae031567df45b973924e8bfe9dc7e93bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a333db8d70d134c1f4e030e2a70e71a02"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a333db8d70d134c1f4e030e2a70e71a02">min_distance</a> = 10.0</td></tr>
+<tr class="separator:a333db8d70d134c1f4e030e2a70e71a02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a1bc305ec7e7ebfd168d533fb720290"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a9a1bc305ec7e7ebfd168d533fb720290">show_matches</a> = false</td></tr>
+<tr class="separator:a9a1bc305ec7e7ebfd168d533fb720290"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab17c2cfd1e071f38edf0c599ba0f1f43"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#ab17c2cfd1e071f38edf0c599ba0f1f43">camera_model</a> = nullptr</td></tr>
+<tr class="separator:ab17c2cfd1e071f38edf0c599ba0f1f43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Methods</h2></td></tr>
 <tr class="memitem:aac5fffc0de32985663bbb0161f8c3089"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#aac5fffc0de32985663bbb0161f8c3089">KLTTracker</a> ()</td></tr>
 <tr class="separator:aac5fffc0de32985663bbb0161f8c3089"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff0ba1154896af58c74fc15d994eaa69"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#aff0ba1154896af58c74fc15d994eaa69">KLTTracker</a> (const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *<a class="el" href="classgvio_1_1KLTTracker.html#ab17c2cfd1e071f38edf0c599ba0f1f43">camera_model</a>)</td></tr>
+<tr class="separator:aff0ba1154896af58c74fc15d994eaa69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57bd840823c64cf1f566d67a8055ad63"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a57bd840823c64cf1f566d67a8055ad63">KLTTracker</a> (const int <a class="el" href="classgvio_1_1KLTTracker.html#a47901d37d8bd4ef2cbd0bf3269454c69">nb_max_corners</a>, const double <a class="el" href="classgvio_1_1KLTTracker.html#ae031567df45b973924e8bfe9dc7e93bb">quality_level</a>, const double <a class="el" href="classgvio_1_1KLTTracker.html#a333db8d70d134c1f4e030e2a70e71a02">min_distance</a>, const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *<a class="el" href="classgvio_1_1KLTTracker.html#ab17c2cfd1e071f38edf0c599ba0f1f43">camera_model</a>)</td></tr>
+<tr class="separator:a57bd840823c64cf1f566d67a8055ad63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a499ea3789d4acd4bc0c9f6ae31043b41"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a499ea3789d4acd4bc0c9f6ae31043b41">configure</a> (const std::string &amp;config_file)</td></tr>
 <tr class="separator:a499ea3789d4acd4bc0c9f6ae31043b41"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8803e30ccbe2a0dfc6e22908606c0d8b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a8803e30ccbe2a0dfc6e22908606c0d8b">removeLostTracks</a> (std::vector&lt; <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &gt; &amp;tracks)</td></tr>
-<tr class="separator:a8803e30ccbe2a0dfc6e22908606c0d8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab728e5784420f764ea5258f055abe5c9"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#ab728e5784420f764ea5258f055abe5c9">getLostTracks</a> ()</td></tr>
+<tr class="separator:ab728e5784420f764ea5258f055abe5c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3db0c36235af5e9182ffa93bb56c993c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a3db0c36235af5e9182ffa93bb56c993c">initialize</a> (const cv::Mat &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a20d3e1ca03a16f244ca175a12098d2da">img_cur</a>)</td></tr>
 <tr class="separator:a3db0c36235af5e9182ffa93bb56c993c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58bcf4609100b45b54c04ca7fcabc2b7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a58bcf4609100b45b54c04ca7fcabc2b7">detect</a> (const cv::Mat &amp;image, <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a485c4827d1b5942dfa8dfe356d79ec7c">features</a>)</td></tr>
@@ -172,6 +254,28 @@ Public Methods</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ab728e5784420f764ea5258f055abe5c9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &gt; gvio::KLTTracker::getLostTracks </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get lost feature tracks</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tracks</td><td>Lost feature tracks </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a3db0c36235af5e9182ffa93bb56c993c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -193,29 +297,6 @@ Public Methods</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a8803e30ccbe2a0dfc6e22908606c0d8b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void gvio::KLTTracker::removeLostTracks </td>
-          <td>(</td>
-          <td class="paramtype">std::vector&lt; <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>tracks</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Remove lost feature tracks</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">tracks</td><td>Lost feature tracks </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>

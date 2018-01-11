@@ -2,6 +2,31 @@
 
 namespace gvio {
 
+int PinholeModel::configure(const std::string &config_file) {
+  // Load config file
+  ConfigParser parser;
+  parser.addParam("image_width", &this->image_width);
+  parser.addParam("image_height", &this->image_height);
+  parser.addParam("fx", &this->fx);
+  parser.addParam("fy", &this->fy);
+  parser.addParam("cx", &this->cx);
+  parser.addParam("cy", &this->cy);
+  if (parser.load(config_file) != 0) {
+    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
+    return -1;
+  }
+
+  // Form the intrinsics matrix
+  this->K = Mat3::Zero();
+  K(0, 0) = fx;
+  K(1, 1) = fy;
+  K(0, 2) = cx;
+  K(1, 2) = cy;
+  K(2, 2) = 1.0;
+
+  return 0;
+}
+
 double PinholeModel::focalLengthX(const int image_width, const double fov) {
   double fx = ((image_width / 2.0) / tan(deg2rad(fov) / 2.0));
   return fx;
@@ -31,7 +56,7 @@ Mat34 PinholeModel::P(const Mat3 &R, const Vec3 &t) {
   return P;
 }
 
-Vec3 PinholeModel::project(const Vec3 &X, const Mat3 &R, const Vec3 &t) {
+Vec2 PinholeModel::project(const Vec3 &X, const Mat3 &R, const Vec3 &t) {
   // Convert 3D features to homogenous coordinates
   const Vec4 X_homo = homogeneous(X);
 
@@ -44,7 +69,7 @@ Vec3 PinholeModel::project(const Vec3 &X, const Mat3 &R, const Vec3 &t) {
   x(1) = x(1) / x(2);
   x(2) = x(2) / x(2);
 
-  return x;
+  return x.block(0, 0, 2, 1);
 }
 
 Vec2 PinholeModel::pixel2image(const Vec2 &pixel) {

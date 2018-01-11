@@ -67,18 +67,26 @@ public:
   Vec3 ext_p_IC = zeros(3, 1);
   Vec4 ext_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
   // -- Noise
-  double n_u = 1.0;
-  double n_v = 1.0;
+  double n_u = 0.1;
+  double n_v = 0.1;
   // -- Model
   CameraModel *camera_model;
 
   // Settings
-  size_t max_nb_tracks = 30;
-  size_t min_track_length = 15;
+  int max_nb_tracks = 30;
+  int min_track_length = 15;
   bool enable_ns_trick = true;
   bool enable_qr_trick = true;
 
   MSCKF() {}
+
+  /**
+   * Configure
+   *
+   * @param config_file Path to configuration file
+   * @returns 0 for success, -1 for failure
+   */
+  int configure(const std::string &config_file);
 
   /**
    * Return covariance matrix P

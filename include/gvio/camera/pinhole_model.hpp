@@ -50,6 +50,14 @@ public:
   }
 
   /**
+   * Configure
+   *
+   * @param config_file Path to configuration file
+   * @returns 0 for success, -1 for failure
+   */
+  int configure(const std::string &config_file);
+
+  /**
    * Focal length in x-axis
    *
    * @param image_width Image width in pixels
@@ -98,7 +106,7 @@ public:
    *
    * @returns 3D point in image plane (homogenous)
    */
-  Vec3 project(const Vec3 &X, const Mat3 &R, const Vec3 &t);
+  Vec2 project(const Vec3 &X, const Mat3 &R, const Vec3 &t) override;
 
   /**
    * Convert pixel measurement to image coordinates
@@ -106,7 +114,7 @@ public:
    * @param pixel Pixel measurement
    * @returns Pixel measurement to image coordinates
    */
-  Vec2 pixel2image(const Vec2 &pixel);
+  Vec2 pixel2image(const Vec2 &pixel) override;
 
   /**
    * Convert pixel measurement to image coordinates
@@ -114,7 +122,7 @@ public:
    * @param pixel Pixel measurement
    * @returns Pixel measurement to image coordinates
    */
-  Vec2 pixel2image(const cv::Point2f &pixel);
+  Vec2 pixel2image(const cv::Point2f &pixel) override;
 
   /**
    * Convert pixel measurement to image coordinates
@@ -122,22 +130,22 @@ public:
    * @param pixel Pixel measurement
    * @returns Pixel measurement to image coordinates
    */
-  Vec2 pixel2image(const cv::KeyPoint &pixel);
+  Vec2 pixel2image(const cv::KeyPoint &pixel) override;
 
   /**
    * @copydoc Vec2 pixel2image(const Vec2 &pixel)
    */
-  Vec2 pixel2image(const Vec2 &pixel) const;
+  Vec2 pixel2image(const Vec2 &pixel) const override;
 
   /**
    * @copydoc Vec2 pixel2image(const cv::Point2f &pixel)
    */
-  Vec2 pixel2image(const cv::Point2f &pixel) const;
+  Vec2 pixel2image(const cv::Point2f &pixel) const override;
 
   /**
    * @copydoc Vec2 pixel2image(const cv::KeyPoint &pixel)
    */
-  Vec2 pixel2image(const cv::KeyPoint &pixel) const;
+  Vec2 pixel2image(const cv::KeyPoint &pixel) const override;
 
   /**
    * Return features are observed by camera
@@ -150,7 +158,7 @@ public:
   MatX observedFeatures(const MatX &features,
                         const Vec3 &rpy,
                         const Vec3 &t,
-                        std::vector<int> &mask);
+                        std::vector<int> &mask) override;
 };
 
 /** @} group camera */

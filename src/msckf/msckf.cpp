@@ -2,6 +2,25 @@
 
 namespace gvio {
 
+int MSCKF::configure(const std::string &config_file) {
+  // Load config file
+  ConfigParser parser;
+  parser.addParam("extrinsics.p_IC", &this->ext_p_IC);
+  parser.addParam("extrinsics.q_CI", &this->ext_q_CI);
+  parser.addParam("n_u", &this->n_u);
+  parser.addParam("n_v", &this->n_v);
+  parser.addParam("max_nb_tracks", &this->max_nb_tracks);
+  parser.addParam("min_track_length", &this->min_track_length);
+  parser.addParam("enable_ns_trick", &this->enable_ns_trick);
+  parser.addParam("enable_qr_trick", &this->enable_ns_trick);
+  if (parser.load(config_file) != 0) {
+    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
+    return -1;
+  }
+
+  return 0;
+}
+
 MatX MSCKF::P() {
   MatX P;
 
@@ -189,16 +208,14 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
                             VecX &r_o_j,
                             MatX &R_o_j) {
   // Pre-check
-  if (track.trackedLength() < this->min_track_length) {
+  if (track.trackedLength() < (size_t) this->min_track_length) {
     return -1;
   }
 
   // Estimate j-th feature position in global frame
   const CameraStates track_cam_states = this->getTrackCameraStates(track);
 
-  // save_camera_states(track_cam_states, "/tmp/track_cam_states.dat");
-  // save_feature_track(track, "/tmp/track.dat");
-
+  // struct timespec start = tic();
   CeresFeatureEstimator feature_estimator(this->camera_model,
                                           track,
                                           track_cam_states);
@@ -206,6 +223,7 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
   if (feature_estimator.estimate(p_G_f) != 0) {
     return -2;
   }
+  // printf("-- BA elasped: %fs --\n", toc(&start));
 
   // Calculate residuals
   VecX r_j = zeros(2 * track_cam_states.size(), 1);
@@ -289,7 +307,7 @@ int MSCKF::calResiduals(const FeatureTracks &tracks,
     }
   }
 
-  save_feature_tracks(tracks, "/tmp/feature_tracks");
+  // save_feature_tracks(tracks, "/tmp/feature_tracks");
 
   // No residuals, do not continue
   if (stack_residuals == false) {
@@ -379,7 +397,7 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
   }
 
   // Limit number of tracks
-  if (tracks.size() > this->max_nb_tracks) {
+  if (tracks.size() > (size_t) this->max_nb_tracks) {
     tracks.erase(tracks.begin() + this->max_nb_tracks, tracks.end());
   }
 

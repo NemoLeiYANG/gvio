@@ -70,8 +70,7 @@ int test_KLTTracker_update() {
   tracker.update(cv::imread(raw_dataset.cam0[2]));
   tracker.update(cv::imread(raw_dataset.cam0[3]));
 
-  FeatureTracks tracks;
-  tracker.removeLostTracks(tracks);
+  FeatureTracks tracks = tracker.getLostTracks();
   for (auto track : tracks) {
     MU_CHECK_EQ(0, track.frame_start);
     MU_CHECK_EQ(track.frame_start + track.frame_end + 1,

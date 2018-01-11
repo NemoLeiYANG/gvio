@@ -219,13 +219,13 @@ int test_MSCKF_predictionUpdate() {
                    Vec3{0.0, 0.0, 0.0});
 
   // Record initial conditions
-  blackbox.record(raw_dataset.oxts.timestamps[0],
-                  msckf,
-                  raw_dataset.oxts.a_B[0],
-                  raw_dataset.oxts.w_B[0],
-                  raw_dataset.oxts.p_G[0],
-                  raw_dataset.oxts.v_G[0],
-                  raw_dataset.oxts.rpy[0]);
+  blackbox.recordTimeStep(raw_dataset.oxts.timestamps[0],
+                          msckf,
+                          raw_dataset.oxts.a_B[0],
+                          raw_dataset.oxts.w_B[0],
+                          raw_dataset.oxts.p_G[0],
+                          raw_dataset.oxts.v_G[0],
+                          raw_dataset.oxts.rpy[0]);
 
   // Loop through data and do prediction update
   for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
@@ -236,13 +236,13 @@ int test_MSCKF_predictionUpdate() {
     const double dt = t_now - t_prev;
 
     msckf.predictionUpdate(a_B, w_B, dt);
-    blackbox.record(raw_dataset.oxts.timestamps[i],
-                    msckf,
-                    a_B,
-                    w_B,
-                    raw_dataset.oxts.p_G[i],
-                    raw_dataset.oxts.v_G[i],
-                    raw_dataset.oxts.rpy[i]);
+    blackbox.recordTimeStep(raw_dataset.oxts.timestamps[i],
+                            msckf,
+                            a_B,
+                            w_B,
+                            raw_dataset.oxts.p_G[i],
+                            raw_dataset.oxts.v_G[i],
+                            raw_dataset.oxts.rpy[i]);
 
     // const std::string img_path = raw_dataset.cam0[i];
     // const cv::Mat image = cv::imread(img_path);
@@ -281,14 +281,14 @@ int test_MSCKF_residualizeTrack() {
   // Prepare features and feature track
   // -- Create 2 features
   const Vec3 p_G_f{0.0, 0.0, 10.0};
-  const Vec3 pt0 = pinhole_model.project(p_G_f,
+  const Vec2 pt0 = pinhole_model.project(p_G_f,
                                          C(msckf.cam_states[0].q_CG),
                                          msckf.cam_states[0].p_G);
-  const Vec3 pt1 = pinhole_model.project(p_G_f,
+  const Vec2 pt1 = pinhole_model.project(p_G_f,
                                          C(msckf.cam_states[1].q_CG),
                                          msckf.cam_states[1].p_G);
-  Feature f0{Vec2{pt0(0), pt0(1)}};
-  Feature f1{Vec2{pt1(0), pt1(1)}};
+  Feature f0{pt0};
+  Feature f1{pt1};
   // -- Create a feature track based on two features
   FeatureTrack track{0, 1, f0, f1};
 
@@ -350,25 +350,25 @@ int test_MSCKF_calResiduals() {
   // Prepare features and feature track
   // -- Create a feature track1
   const Vec3 p_G_f0{0.0, 0.0, 10.0};
-  const Vec3 pt0 = pinhole_model.project(p_G_f0,
+  const Vec2 pt0 = pinhole_model.project(p_G_f0,
                                          C(msckf.cam_states[0].q_CG),
                                          msckf.cam_states[0].p_G);
-  const Vec3 pt1 = pinhole_model.project(p_G_f0,
+  const Vec2 pt1 = pinhole_model.project(p_G_f0,
                                          C(msckf.cam_states[1].q_CG),
                                          msckf.cam_states[1].p_G);
-  Feature f0{Vec2{pt0(0), pt0(1)}};
-  Feature f1{Vec2{pt1(0), pt1(1)}};
+  Feature f0{pt0};
+  Feature f1{pt1};
   FeatureTrack track1{0, 1, f0, f1};
   // -- Create a feature track2
   const Vec3 p_G_f1{1.0, 1.0, 10.0};
-  const Vec3 pt2 = pinhole_model.project(p_G_f1,
+  const Vec2 pt2 = pinhole_model.project(p_G_f1,
                                          C(msckf.cam_states[0].q_CG),
                                          msckf.cam_states[0].p_G);
-  const Vec3 pt3 = pinhole_model.project(p_G_f1,
+  const Vec2 pt3 = pinhole_model.project(p_G_f1,
                                          C(msckf.cam_states[1].q_CG),
                                          msckf.cam_states[1].p_G);
-  Feature f2{Vec2{pt2(0), pt2(1)}};
-  Feature f3{Vec2{pt3(0), pt3(1)}};
+  Feature f2{pt2};
+  Feature f3{pt3};
   FeatureTrack track2{1, 1, f2, f3};
   // // -- Create feature tracks
   FeatureTracks tracks{track1, track2};
@@ -460,26 +460,24 @@ int test_MSCKF_measurementUpdate() {
     LOG_ERROR("Failed to configure MSCKF blackbox!");
   }
 
-  // Setup camera model
-  const int image_width = 640;
-  const int image_height = 640;
-  const double fov = 60.0;
-  const double fx = PinholeModel::focalLengthX(image_width, fov);
-  const double fy = PinholeModel::focalLengthY(image_height, fov);
-  const double cx = image_width / 2.0;
-  const double cy = image_height / 2.0;
-  PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
-
   // Setup feature tracker
   KLTTracker tracker;
   const cv::Mat img0 = cv::imread(raw_dataset.cam0[0]);
   tracker.initialize(img0);
-  printf("image size: %dx%d\n", img0.cols, img0.rows);
+
+  // Setup camera model
+  const int image_width = img0.cols;
+  const int image_height = img0.rows;
+  const double fx = raw_dataset.calib_cam_to_cam.K[0](0, 0);
+  const double fy = raw_dataset.calib_cam_to_cam.K[0](1, 1);
+  const double cx = raw_dataset.calib_cam_to_cam.K[0](0, 2);
+  const double cy = raw_dataset.calib_cam_to_cam.K[0](1, 2);
+  PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
 
   // Setup MSCKF
   MSCKF msckf;
   msckf.enable_ns_trick = true;
-  msckf.enable_qr_trick = false;
+  msckf.enable_qr_trick = true;
   msckf.ext_q_CI = Vec4{0.5, -0.5, 0.5, -0.5};
   msckf.camera_model = &pinhole_model;
   msckf.initialize(euler2quat(raw_dataset.oxts.rpy[0]),
@@ -487,24 +485,23 @@ int test_MSCKF_measurementUpdate() {
                    Vec3{0.0, 0.0, 0.0});
 
   // Record initial conditions
-  blackbox.record(raw_dataset.oxts.timestamps[0],
-                  msckf,
-                  raw_dataset.oxts.a_B[0],
-                  raw_dataset.oxts.w_B[0],
-                  raw_dataset.oxts.p_G[0],
-                  raw_dataset.oxts.v_G[0],
-                  raw_dataset.oxts.rpy[0]);
+  blackbox.recordTimeStep(raw_dataset.oxts.timestamps[0],
+                          msckf,
+                          raw_dataset.oxts.a_B[0],
+                          raw_dataset.oxts.w_B[0],
+                          raw_dataset.oxts.p_G[0],
+                          raw_dataset.oxts.v_G[0],
+                          raw_dataset.oxts.rpy[0]);
 
   // Loop through data and do prediction update
   struct timespec start = tic();
-  // for (int i = 1; i < 30; i++) {
   for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
+    // for (int i = 1; i < 60; i++) {
     // Feature tracker
     const std::string img_path = raw_dataset.cam0[i];
     const cv::Mat img = cv::imread(img_path);
-    FeatureTracks tracks;
     tracker.update(img);
-    tracker.removeLostTracks(tracks);
+    FeatureTracks tracks = tracker.getLostTracks();
 
     // MSCKF
     const Vec3 a_B = raw_dataset.oxts.a_B[i];
@@ -517,17 +514,19 @@ int test_MSCKF_measurementUpdate() {
     msckf.measurementUpdate(tracks);
 
     // Record
-    blackbox.record(raw_dataset.oxts.timestamps[i],
-                    msckf,
-                    a_B,
-                    w_B,
-                    raw_dataset.oxts.p_G[i],
-                    raw_dataset.oxts.v_G[i],
-                    raw_dataset.oxts.rpy[i]);
+    blackbox.recordTimeStep(raw_dataset.oxts.timestamps[i],
+                            msckf,
+                            a_B,
+                            w_B,
+                            raw_dataset.oxts.p_G[i],
+                            raw_dataset.oxts.v_G[i],
+                            raw_dataset.oxts.rpy[i]);
 
     printf("frame: %d, nb_tracks: %ld\n", i, tracks.size());
   }
   printf("-- total elasped: %fs --\n", toc(&start));
+
+  blackbox.recordCameraStates(msckf);
 
   // save_camera_states(msckf.cam_states, "/tmp/camera_states.dat");
   system("python3 scripts/plot_msckf.py");

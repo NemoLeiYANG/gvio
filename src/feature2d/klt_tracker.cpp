@@ -2,8 +2,40 @@
 
 namespace gvio {
 
-void KLTTracker::removeLostTracks(std::vector<FeatureTrack> &tracks) {
+int KLTTracker::configure(const std::string &config_file) {
+  // Load config file
+  ConfigParser parser;
+  parser.addParam("nb_max_corners", &this->nb_max_corners);
+  parser.addParam("quality_level", &this->quality_level);
+  parser.addParam("min_distance", &this->min_distance);
+  parser.addParam("show_matches", &this->show_matches);
+  if (parser.load(config_file) != 0) {
+    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
+    return -1;
+  }
+
+  return 0;
+}
+
+std::vector<FeatureTrack> KLTTracker::getLostTracks() {
+  std::vector<FeatureTrack> tracks;
+
+  // Get lost tracks
   this->features.removeLostTracks(tracks);
+  if (this->camera_model == nullptr) {
+    return tracks;
+  }
+
+  // Transform keypoints from pixel coordinates to image coordinates
+  for (auto &track : tracks) {
+    for (auto &feature : track.track) {
+      const Vec2 pt = this->camera_model->pixel2image(feature.kp.pt);
+      feature.kp.pt.x = pt(0);
+      feature.kp.pt.y = pt(1);
+    }
+  }
+
+  return tracks;
 }
 
 int KLTTracker::initialize(const cv::Mat &img_cur) {
@@ -20,7 +52,11 @@ int KLTTracker::detect(const cv::Mat &image, Features &features) {
 
   // Feature detection
   std::vector<cv::Point2f> corners;
-  cv::goodFeaturesToTrack(gray_image, corners, 1000, 0.01, 10);
+  cv::goodFeaturesToTrack(gray_image,
+                          corners,
+                          this->nb_max_corners,
+                          this->quality_level,
+                          this->min_distance);
 
   // Create features
   features.clear();

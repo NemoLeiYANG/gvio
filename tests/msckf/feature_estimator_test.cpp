@@ -47,8 +47,8 @@ void setup_test(const struct test_config &config,
 
   // Feature track
   const Vec3 landmark{config.landmark};
-  const Vec2 kp1 = cam_model.project(landmark, C_C0G, p_G_C0).block(0, 0, 2, 1);
-  const Vec2 kp2 = cam_model.project(landmark, C_C1G, p_G_C1).block(0, 0, 2, 1);
+  const Vec2 kp1 = cam_model.project(landmark, C_C0G, p_G_C0);
+  const Vec2 kp2 = cam_model.project(landmark, C_C1G, p_G_C1);
   // -- Add to feature track
   track = FeatureTrack{0, 1, Feature{kp1}, Feature{kp2}};
 }
@@ -77,8 +77,8 @@ int test_FeatureEstimator_triangulate() {
 
   // Features
   const Vec3 landmark{0.0, 0.0, 10.0};
-  const Vec2 kp1 = cam_model.project(landmark, C_C0G, p_G_C0).block(0, 0, 2, 1);
-  const Vec2 kp2 = cam_model.project(landmark, C_C1G, p_G_C1).block(0, 0, 2, 1);
+  const Vec2 kp1 = cam_model.project(landmark, C_C0G, p_G_C0);
+  const Vec2 kp2 = cam_model.project(landmark, C_C1G, p_G_C1);
 
   // Calculate rotation and translation of first and last camera states
   // -- Obtain rotation and translation from camera 0 to camera 1
