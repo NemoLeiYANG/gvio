@@ -38,10 +38,10 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
   const Mat3 C_C0C1 = C_C0G * C_C1G.transpose();
   const Vec3 t_C1_C0C1 = C_C0G * (p_G_C1 - p_G_C0);
   // -- Convert from pixel coordinates to image coordinates
-  const cv::Point2f kp1 = this->track.track[0].kp.pt;
-  const cv::Point2f kp2 = this->track.track[1].kp.pt;
-  const Vec2 pt1 = cam_model->pixel2image(kp1);
-  const Vec2 pt2 = cam_model->pixel2image(kp2);
+  const Vec2 pt1 = this->track.track[0].getKeyPoint();
+  const Vec2 pt2 = this->track.track[1].getKeyPoint();
+  // const Vec2 pt1 = cam_model->pixel2image(kp1);
+  // const Vec2 pt2 = cam_model->pixel2image(kp2);
 
   // Calculate initial estimate of 3D position
   FeatureEstimator::triangulate(pt1, pt2, C_C0C1, t_C1_C0C1, p_C0_f);
@@ -123,7 +123,7 @@ VecX FeatureEstimator::reprojectionError(const VecX &x) {
 
     // Calculate reprojection error
     // -- Convert measurment to image coordinates
-    const Vec2 z = this->cam_model->pixel2image(track.track[i].getKeyPoint());
+    const Vec2 z = track.track[i].getKeyPoint();
     // -- Convert feature location to normalized coordinates
     const Vec2 z_hat{h(0) / h(2), h(1) / h(2)};
     // -- Reprojcetion error

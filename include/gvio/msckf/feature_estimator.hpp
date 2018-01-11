@@ -28,18 +28,15 @@ namespace gvio {
  */
 class FeatureEstimator {
 public:
-  const CameraModel *cam_model;
   FeatureTrack track;
   CameraStates track_cam_states;
 
   bool debug_mode = false;
   int max_iter = 30;
 
-  FeatureEstimator(const CameraModel *cam_model,
-                   const FeatureTrack &track,
+  FeatureEstimator(const FeatureTrack &track,
                    const CameraStates &track_cam_states)
-      : cam_model{cam_model}, track{track}, track_cam_states{track_cam_states} {
-  }
+      : track{track}, track_cam_states{track_cam_states} {}
 
   /**
    * Triangulate feature observed from camera C0 and C1 and return the
@@ -136,6 +133,8 @@ public:
  */
 class CeresFeatureEstimator : public FeatureEstimator {
 public:
+  const CameraModel *cam_model;
+
   ceres::Problem problem;
   ceres::Solver::Options options;
   ceres::Solver::Summary summary;
@@ -144,7 +143,7 @@ public:
   CeresFeatureEstimator(const CameraModel *cam_model,
                         const FeatureTrack &track,
                         const CameraStates &track_cam_states)
-      : FeatureEstimator{cam_model, track, track_cam_states} {}
+      : FeatureEstimator{track, track_cam_states}, cam_model{cam_model} {}
 
   /**
    * Add residual block
