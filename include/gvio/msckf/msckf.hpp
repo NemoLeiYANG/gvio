@@ -67,8 +67,8 @@ public:
   Vec3 ext_p_IC = zeros(3, 1);
   Vec4 ext_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
   // -- Noise
-  double n_u = 0.1;
-  double n_v = 0.1;
+  double n_u = 1.0;
+  double n_v = 1.0;
 
   // Settings
   int max_nb_tracks = 30;

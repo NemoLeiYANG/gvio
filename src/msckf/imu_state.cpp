@@ -7,7 +7,6 @@ MatX IMUState::F(const Vec3 &w_hat,
                  const Vec3 &a_hat,
                  const Vec3 &w_G) {
   MatX F = zeros(15);
-
   // -- First row --
   F.block(0, 0, 3, 3) = -skew(w_hat);
   F.block(0, 3, 3, 3) = -ones(3);
@@ -24,7 +23,6 @@ MatX IMUState::F(const Vec3 &w_hat,
 
 MatX IMUState::G(const Vec4 &q_hat) {
   MatX G = zeros(15, 12);
-
   // -- First row --
   G.block(0, 0, 3, 3) = -ones(3);
   // -- Second row --
@@ -64,7 +62,6 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   // -- Orientation
   this->q_IG = this->q_IG + 0.5 * Omega(w_hat) * q_IG * dt;
   this->q_IG = quatnormalize(q_IG);
-
   // -- Gyro bias
   this->b_g = this->b_g + zeros(3, 1);
   // -- Velocity

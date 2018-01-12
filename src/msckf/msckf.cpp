@@ -5,6 +5,10 @@ namespace gvio {
 int MSCKF::configure(const std::string &config_file) {
   // Load config file
   ConfigParser parser;
+  // parser.addParam("imu.bias_accel", &this->imu_state.b_a);
+  // parser.addParam("imu.bias_gyro", &this->imu_state.b_g);
+  // parser.addParam("imu.angular_constant", &this->imu_state.w_G);
+  // parser.addParam("imu.gravity_constant", &this->imu_state.g_G);
   parser.addParam("extrinsics.p_IC", &this->ext_p_IC);
   parser.addParam("extrinsics.q_CI", &this->ext_q_CI);
   parser.addParam("n_u", &this->n_u);
@@ -304,8 +308,6 @@ int MSCKF::calResiduals(const FeatureTracks &tracks,
       }
     }
   }
-
-  // save_feature_tracks(tracks, "/tmp/feature_tracks");
 
   // No residuals, do not continue
   if (stack_residuals == false) {

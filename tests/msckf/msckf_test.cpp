@@ -69,8 +69,8 @@ int test_MSCKF_P() {
   MU_CHECK_EQ(imu_sz + cam_sz, P.rows());
   MU_CHECK(P.block(imu_sz, imu_sz, cam_sz, cam_sz).isApprox(P_cam_expected));
 
-  mat2csv("/tmp/P.dat", P);
-  system("python3 scripts/plot_matrix.py /tmp/P.dat");
+  // mat2csv("/tmp/P.dat", P);
+  // system("python3 scripts/plot_matrix.py /tmp/P.dat");
 
   return 0;
 }
@@ -343,9 +343,6 @@ int test_MSCKF_calResiduals() {
   // -- Add second camera state
   msckf.imu_state.p_G = Vec3{1.0, 1.0, 0.0};
   msckf.augmentState();
-  // // -- Add third camera state
-  // msckf.imu_state.p_G = Vec3{2.0, 2.0, 0.0};
-  // msckf.augmentState();
 
   // Prepare features and feature track
   // -- Create a feature track1
@@ -475,8 +472,7 @@ int test_MSCKF_measurementUpdate() {
   PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
 
   // Setup feature tracker
-  KLTTracker tracker;
-  tracker.camera_model = &pinhole_model;
+  KLTTracker tracker{&pinhole_model};
   tracker.initialize(img0);
 
   // Setup MSCKF

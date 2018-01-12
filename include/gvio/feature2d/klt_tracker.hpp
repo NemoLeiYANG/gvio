@@ -8,6 +8,7 @@
 #include "gvio/feature2d/feature_tracker.hpp"
 #include "gvio/feature2d/feature_container.hpp"
 #include "gvio/camera/camera_model.hpp"
+#include "gvio/camera/pinhole_model.hpp"
 
 namespace gvio {
 /**
