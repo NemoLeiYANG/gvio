@@ -31,7 +31,8 @@ int KLTTracker::configure(const std::string &config_file) {
 
   // Load camera model
   if (camera_model == "pinhole") {
-    auto *pinhole_model = new PinholeModel{image_width, image_height, fx, fy, cx, cy};
+    auto *pinhole_model =
+        new PinholeModel{image_width, image_height, fx, fy, cx, cy};
     this->camera_model = pinhole_model;
   } else if (camera_model == "none") {
     LOG_INFO("Not loading any camera model!");
@@ -141,7 +142,7 @@ int KLTTracker::track(const Features &features) {
       }
       keeping.push_back(f1);
 
-    // Feature lost
+      // Feature lost
     } else {
       this->features.removeTrack(f0.track_id, true);
     }

@@ -495,8 +495,8 @@ int test_MSCKF_measurementUpdate() {
 
   // Loop through data and do prediction update
   struct timespec start = tic();
-  for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
-    // for (int i = 1; i < 60; i++) {
+  // for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
+  for (int i = 1; i < 100; i++) {
     // Feature tracker
     const std::string img_path = raw_dataset.cam0[i];
     const cv::Mat img = cv::imread(img_path);
