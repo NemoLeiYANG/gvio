@@ -1,11 +1,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
 PROJECT(gvio)
 
-# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -fPIC -g")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC -g")
-IF (CMAKE_COMPILER_IS_GNUCXX)
-  ADD_DEFINITIONS(-std=gnu++0x)
-ENDIF()
+# C++ COMPILER SETTINGS
+SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_BUILD_TYPE RELEASE)
+# SET(CMAKE_BUILD_TYPE DEBUG)
 
 # DEPENDENCIES
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -43,6 +43,7 @@ ADD_LIBRARY(
   src/msckf/feature_estimator.cpp
   src/msckf/imu_state.cpp
   src/msckf/msckf.cpp
+  src/msckf/profiler.cpp
   # feature
   src/feature2d/draw.cpp
   src/feature2d/feature_container.cpp
@@ -117,6 +118,7 @@ SET(UNITTESTS
   msckf-feature_estimator_test
   msckf-imu_state_test
   msckf-msckf_test
+  msckf-profiler_test
   util-config_test
   util-data_test
   util-file_test

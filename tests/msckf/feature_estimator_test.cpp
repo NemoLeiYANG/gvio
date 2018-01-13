@@ -15,6 +15,8 @@ struct test_config {
   const double cy = image_height / 2.0;
 
   const Vec3 landmark{0.0, 0.0, 10.0};
+
+  test_config() {}
 };
 
 void setup_test(const struct test_config &config,

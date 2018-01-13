@@ -19,6 +19,8 @@ namespace gvio {
  */
 class PinholeModel : public CameraModel {
 public:
+  std::string model_name = "pinhole";
+
   int image_width = 0;
   int image_height = 0;
   MatX K = zeros(3, 3); ///< Camera intrinsics
@@ -28,6 +30,7 @@ public:
   double fy = 0.0;      ///< Focal length in y-axis
 
   PinholeModel() {}
+  virtual ~PinholeModel() {}
 
   PinholeModel(const int image_width, const int image_height, const MatX &K)
       : image_width{image_width}, image_height{image_height}, K{K}, cx{K(0, 2)},

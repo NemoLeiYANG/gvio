@@ -5,6 +5,8 @@
 #ifndef GVIO_MSCKF_CAMERA_STATE_HPP
 #define GVIO_MSCKF_CAMERA_STATE_HPP
 
+#include <vector>
+
 #include "gvio/util/util.hpp"
 #include "gvio/quaternion/jpl.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
@@ -20,6 +22,8 @@ namespace gvio {
  */
 class CameraState {
 public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   static const int size = 6;            ///< Size of state vector
   FrameID frame_id = -1;                ///< Camera frame id
   Vec3 p_G = zeros(3, 1);               ///< Position in Global frame

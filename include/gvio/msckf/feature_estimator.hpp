@@ -94,6 +94,8 @@ public:
  */
 struct CeresReprojectionError : public ceres::SizedCostFunction<2, 3> {
 public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   // Camera extrinsics
   Mat3 C_CiC0;
   Vec3 t_Ci_CiC0;

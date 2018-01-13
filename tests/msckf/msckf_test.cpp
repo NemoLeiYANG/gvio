@@ -4,6 +4,7 @@
 #include "gvio/msckf/msckf.hpp"
 #include "gvio/msckf/blackbox.hpp"
 #include "gvio/feature2d/klt_tracker.hpp"
+#include "gvio/feature2d/orb_tracker.hpp"
 
 namespace gvio {
 
@@ -472,7 +473,7 @@ int test_MSCKF_measurementUpdate() {
   PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
 
   // Setup feature tracker
-  KLTTracker tracker{&pinhole_model};
+  ORBTracker tracker{&pinhole_model};
   tracker.initialize(img0);
 
   // Setup MSCKF
@@ -494,9 +495,8 @@ int test_MSCKF_measurementUpdate() {
                           raw_dataset.oxts.rpy[0]);
 
   // Loop through data and do prediction update
-  struct timespec start = tic();
-  // for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
-  for (int i = 1; i < 100; i++) {
+  struct timespec msckf_start = tic();
+  for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
     // Feature tracker
     const std::string img_path = raw_dataset.cam0[i];
     const cv::Mat img = cv::imread(img_path);
@@ -510,8 +510,11 @@ int test_MSCKF_measurementUpdate() {
     const double t_now = raw_dataset.oxts.timestamps[i];
     const double dt = t_now - t_prev;
 
+    // struct timespec frame_start = tic();
     msckf.predictionUpdate(a_B, w_B, dt);
     msckf.measurementUpdate(tracks);
+    // printf("-- frame elasped: %fs --\n", toc(&frame_start));
+    // printf("-- window size: %d --\n", (int) msckf.cam_states.size());
 
     // Record
     blackbox.recordTimeStep(raw_dataset.oxts.timestamps[i],
@@ -524,7 +527,7 @@ int test_MSCKF_measurementUpdate() {
 
     printf("frame: %d, nb_tracks: %ld\n", i, tracks.size());
   }
-  printf("-- total elasped: %fs --\n", toc(&start));
+  printf("-- total elasped: %fs --\n", toc(&msckf_start));
 
   blackbox.recordCameraStates(msckf);
 

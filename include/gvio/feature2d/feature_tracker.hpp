@@ -15,6 +15,8 @@
 #include "gvio/feature2d/feature_track.hpp"
 #include "gvio/feature2d/feature_container.hpp"
 #include "gvio/feature2d/gms_matcher.hpp"
+#include "gvio/camera/camera_model.hpp"
+#include "gvio/camera/pinhole_model.hpp"
 
 namespace gvio {
 /**
@@ -40,7 +42,25 @@ public:
   cv::Mat img_cur;
   cv::Mat img_ref;
 
+  // Camera model
+  const CameraModel *camera_model = nullptr;
+
   FeatureTracker() {}
+
+  FeatureTracker(const CameraModel *camera_model)
+      : camera_model{camera_model} {}
+
+  virtual ~FeatureTracker() {
+    // Pre-check
+    if (this->camera_model == nullptr) {
+      return;
+    }
+
+    // Delete PinholeModel
+    if (this->camera_model->model_name == "pinhole") {
+      delete (PinholeModel *) this->camera_model;
+    }
+  }
 
   /**
    * Purge old feature tracks
@@ -71,6 +91,13 @@ public:
   void getFeatures(const std::vector<cv::KeyPoint> &keypoints,
                    const cv::Mat &descriptors,
                    Features &features);
+
+  /**
+   * Get lost feature tracks
+   *
+   * @param tracks Lost feature tracks
+   */
+  std::vector<FeatureTrack> getLostTracks();
 
   /**
    * Detect features

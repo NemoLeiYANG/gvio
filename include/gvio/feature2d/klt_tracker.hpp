@@ -26,7 +26,7 @@ public:
   cv::Mat img_ref;
   FeatureContainer features;
 
-  int nb_max_corners = 1000;
+  int nb_max_corners = 500;
   double quality_level = 0.01;
   double min_distance = 10.0;
   bool show_matches = false;

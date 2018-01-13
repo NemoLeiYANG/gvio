@@ -22,6 +22,10 @@ public:
 
   ORBTracker() {}
 
+  ORBTracker(const CameraModel *camera_model) : FeatureTracker{camera_model} {}
+
+  virtual ~ORBTracker() {}
+
   /**
    * Configure
    *
@@ -37,7 +41,7 @@ public:
    * @param features List of features
    * @returns 0 for success, -1 for failure
    */
-  int detect(const cv::Mat &image, Features &features) override;
+  virtual int detect(const cv::Mat &image, Features &features) override;
 };
 
 /** @} group feature2d */

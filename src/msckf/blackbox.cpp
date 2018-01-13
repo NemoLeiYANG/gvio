@@ -5,8 +5,24 @@ namespace gvio {
 BlackBox::BlackBox() {}
 
 BlackBox::~BlackBox() {
+  // Estimation file
   if (this->est_file.good()) {
     this->est_file.close();
+  }
+
+  // Measurement file
+  if (this->mea_file.good()) {
+    this->est_file.close();
+  }
+
+  // Ground truth file
+  if (this->gnd_file.good()) {
+    this->est_file.close();
+  }
+
+  // Sliding window file
+  if (this->win_file.good()) {
+    this->win_file.close();
   }
 }
 

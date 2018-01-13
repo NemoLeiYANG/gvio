@@ -52,7 +52,12 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
     TagPose tag_pose;
     tag_pose.id = detections[i].id;
 
-    std::pair<float, float> p[4] = detections[i].p;
+    std::pair<float, float> p[4] = {
+        detections[i].p[0],
+        detections[i].p[1],
+        detections[i].p[2],
+        detections[i].p[3],
+    };
     const Vec2 p1{p[0].first, p[0].second};
     const Vec2 p2{p[1].first, p[1].second};
     const Vec2 p3{p[2].first, p[2].second};

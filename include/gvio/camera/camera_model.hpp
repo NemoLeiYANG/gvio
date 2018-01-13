@@ -18,7 +18,10 @@ namespace gvio {
  */
 class CameraModel {
 public:
+  std::string model_name;
+
   CameraModel() {}
+  virtual ~CameraModel() {}
 
   /**
    * Project 3D point to image plane

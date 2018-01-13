@@ -19,6 +19,8 @@ namespace gvio {
  */
 class IMUState {
 public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   static const int size = 15; ///< Size of state vector
 
   Vec4 q_IG = Vec4{0.0, 0.0, 0.0, 1.0}; ///< JPL Quaternion in Global frame

@@ -180,10 +180,7 @@ void MSCKF::augmentState() {
 
 CameraStates MSCKF::getTrackCameraStates(const FeatureTrack &track) {
   // Pre-check
-  if (this->N() == 0) {
-    LOG_ERROR("MSCKF not initialized yet! There are no camera states!");
-    return CameraStates();
-  }
+  assert(this->N() != 0);
 
   // Calculate camera states where feature was observed
   const FrameID fstart = track.frame_start;
@@ -195,6 +192,8 @@ CameraStates MSCKF::getTrackCameraStates(const FeatureTrack &track) {
   auto first = this->cam_states.begin() + cstart;
   auto last = this->cam_states.begin() + cend;
   CameraStates track_cam_states{first, last};
+  assert(track_cam_states.front().frame_id == track.frame_start);
+  assert(track_cam_states.back().frame_id == track.frame_end);
 
   return track_cam_states;
 }
@@ -213,6 +212,8 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
                             MatX &R_o_j) {
   // Pre-check
   if (track.trackedLength() < (size_t) this->min_track_length) {
+    return -1;
+  } else if (track.trackedLength() >= (size_t) this->max_window_size) {
     return -1;
   }
 
@@ -394,25 +395,50 @@ void MSCKF::correctCameraStates(const VecX &dx) {
   }
 }
 
+void MSCKF::pruneCameraState() {
+  // Pre-check
+  if (this->N() <= this->max_window_size) {
+    return;
+  }
+
+  // Prune camera states
+  int prune_sz = this->N() - this->max_window_size;
+  this->cam_states.erase(this->cam_states.begin(),
+                         this->cam_states.begin() + prune_sz);
+
+  // Adjust covariance matrix
+  this->P_imu_cam = this->P_imu_cam.block(0,
+                                          CameraState::size,
+                                          IMUState::size,
+                                          CameraState::size * this->N());
+  this->P_cam =
+      this->P_cam.block(CameraState::size * prune_sz,
+                        CameraState::size * prune_sz,
+                        this->P_cam.rows() - CameraState::size * prune_sz,
+                        this->P_cam.cols() - CameraState::size * prune_sz);
+}
+
 int MSCKF::measurementUpdate(FeatureTracks &tracks) {
   // Add a camera state to state vector
   this->augmentState();
 
   // Continue with EKF update?
   if (tracks.size() == 0) {
+    this->pruneCameraState();
     return -1;
   }
 
-  // Limit number of tracks
-  if (tracks.size() > (size_t) this->max_nb_tracks) {
-    tracks.erase(tracks.begin() + this->max_nb_tracks, tracks.end());
-  }
+  // // Limit number of tracks
+  // if (tracks.size() > (size_t) this->max_nb_tracks) {
+  //   tracks.erase(tracks.begin() + this->max_nb_tracks, tracks.end());
+  // }
 
   // Calculate residuals
   MatX T_H;
   VecX r_n;
   MatX R_n;
   if (this->calResiduals(tracks, T_H, r_n, R_n) != 0) {
+    this->pruneCameraState();
     return -2;
   }
 
@@ -424,7 +450,7 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
 
   // Calculate the Kalman gain.
   const MatX P = this->P();
-  const MatX S = T_H * P * T_H.transpose() + 0.1 * I(T_H.rows());
+  const MatX S = T_H * P * T_H.transpose() + 1.1 * I(T_H.rows());
   const MatX K_transpose = S.ldlt().solve(T_H * P);
   const MatX K = K_transpose.transpose();
 
@@ -449,8 +475,6 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
 
   // Update covariance matrices
   const MatX I_KH = I(K.rows(), T_H.cols()) - K * T_H;
-  // state_server.state_cov = I_KH*state_server.state_cov*I_KH.transpose() +
-  //  K*K.transpose()*Feature::observation_noise;
   const MatX P_updated = I_KH * P;
 
   // Fix covariance matrix to be symmetric
@@ -464,6 +488,9 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
                                   IMUState::size,
                                   IMUState::size,
                                   P_fixed.cols() - IMUState::size);
+
+  // Prune camera state to maintain sliding window size
+  this->pruneCameraState();
 
   return 0;
 }

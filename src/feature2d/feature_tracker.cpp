@@ -21,6 +21,27 @@ void FeatureTracker::getFeatures(const std::vector<cv::KeyPoint> &keypoints,
   }
 }
 
+std::vector<FeatureTrack> FeatureTracker::getLostTracks() {
+  // Get lost tracks
+  std::vector<FeatureTrack> tracks;
+  this->features.removeLostTracks(tracks);
+  if (this->camera_model == nullptr) {
+    return tracks;
+  }
+
+  // Transform keypoints
+  for (auto &track : tracks) {
+    for (auto &feature : track.track) {
+      // Convert pixel coordinates to image coordinates
+      const Vec2 pt = this->camera_model->pixel2image(feature.kp.pt);
+      feature.kp.pt.x = pt(0);
+      feature.kp.pt.y = pt(1);
+    }
+  }
+
+  return tracks;
+}
+
 int FeatureTracker::detect(const cv::Mat &image, Features &features) {
   UNUSED(image);
   UNUSED(features);
