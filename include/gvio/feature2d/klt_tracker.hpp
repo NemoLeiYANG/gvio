@@ -77,6 +77,16 @@ public:
   int detect(const cv::Mat &image, Features &features);
 
   /**
+   * Process feature track
+   *
+   * @param status Status if tracked or not
+   * @param fref Reference feature
+   * @param fcur Current feature
+   * @returns 0 for track removed, 1 for track added or updated
+   */
+  int processTrack(const uchar status, Feature &fref, Feature &fcur);
+
+  /**
    * Track features
    *
    * The idea is that with the current features, we want to match it against

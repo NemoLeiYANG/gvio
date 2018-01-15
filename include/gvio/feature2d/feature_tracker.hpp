@@ -32,9 +32,8 @@ public:
   cv::Size img_size;
   GMSMatcher matcher;
 
-  // Frame and track ounters
+  // Features
   FrameID counter_frame_id = -1;
-
   FeatureContainer features;
   Features unmatched;
 

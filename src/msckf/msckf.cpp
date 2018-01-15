@@ -13,6 +13,7 @@ int MSCKF::configure(const std::string &config_file) {
   parser.addParam("extrinsics.q_CI", &this->ext_q_CI);
   parser.addParam("n_u", &this->n_u);
   parser.addParam("n_v", &this->n_v);
+  parser.addParam("max_window_size", &this->max_window_size);
   parser.addParam("max_nb_tracks", &this->max_nb_tracks);
   parser.addParam("min_track_length", &this->min_track_length);
   parser.addParam("enable_ns_trick", &this->enable_ns_trick);
@@ -219,18 +220,14 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
 
   // Estimate j-th feature position in global frame
   const CameraStates track_cam_states = this->getTrackCameraStates(track);
-
-  // struct timespec start = tic();
   CeresFeatureEstimator feature_estimator(track, track_cam_states);
   Vec3 p_G_f;
   if (feature_estimator.estimate(p_G_f) != 0) {
     return -2;
   }
-  // printf("-- BA elasped: %fs --\n", toc(&start));
 
   // Calculate residuals
   VecX r_j = zeros(2 * track_cam_states.size(), 1);
-
   for (size_t i = 0; i < track_cam_states.size(); i++) {
     // Transform feature from global frame to i-th camera frame
     const Mat3 C_CG = C(track_cam_states[i].q_CG);
@@ -258,19 +255,12 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
   MatX R_j;
   this->R(this->n_u, this->n_v, nb_residuals, R_j);
 
-  // Perform Null Space Trick?
+  // Perform Null Space Trick
   if (this->enable_ns_trick) {
     // Perform null space trick to decorrelate feature position error
     // away state errors by removing the measurement jacobian w.r.t.
     // feature position via null space projection [Section D:
     // Measurement Model, Mourikis2007]
-    //
-    // Note: Left nullspace == kernel of transpose
-    // const MatX A_j{H_f_j.transpose().fullPivLu().kernel()};
-    // H_o_j = A_j.transpose() * H_x_j;
-    // r_o_j = A_j.transpose() * r_j;
-    // R_o_j = A_j.transpose() * R_j * A_j;
-
     Eigen::JacobiSVD<MatX> svd(H_f_j,
                                Eigen::ComputeFullU | Eigen::ComputeThinV);
     const MatX A_j = svd.matrixU().rightCols(H_f_j.rows() - 3);
@@ -321,38 +311,9 @@ int MSCKF::calResiduals(const FeatureTracks &tracks,
   if (stack_residuals == false) {
     return -1;
   }
-  T_H = H_o;
-  r_n = r_o;
-  R_n = R_o;
 
-  // // Perform QR decomposition?
-  // struct timespec start = tic();
-  // if (this->enable_qr_trick) {
-  //   // Perform QR decomposition to reduce computation in EKF update, since R
-  //   // for 10 features seen in 10 camera poses each would yield a R of
-  //   // dimension 170 [Section E: EKF Updates, Mourikis2007]
-  //   Eigen::HouseholderQR<MatX> QR(H_o);
-  //   QR.compute(H_o);
-  //   const MatX R = QR.matrixQR().template triangularView<Eigen::Upper>();
-  //   const MatX Q = QR.householderQ();
-  //   // -- Find non-zero rows
-  //   T_H = R;
-  //   MatX Q_1 = Q;
-  //   // -- Calculate residual
-  //   r_n = Q_1.transpose() * r_o;
-  //   R_n = Q_1.transpose() * R_o * Q_1;
-  //   T_H = H_o;
-  //   r_n = r_o;
-  //   R_n = R_o;
-  //
-  // } else {
-  //   T_H = H_o;
-  //   r_n = r_o;
-  //   R_n = R_o;
-  // }
-  // printf("-- QR elasped: %fs --\n", toc(&start));
-
-  if (H_o.rows() > H_o.cols()) {
+  // Reduce EKF measurement update computation with QR decomposition
+  if (H_o.rows() > H_o.cols() && this->enable_qr_trick) {
     struct timespec start = tic();
     // Convert H to a sparse matrix.
     Eigen::SparseMatrix<double> H_sparse = H_o.sparseView();
@@ -442,12 +403,6 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
     return -2;
   }
 
-  // Calculate Kalman gain
-  // // clang-format off
-  // MatX P = this->P();
-  // MatX K = P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
-  // // clang-format on
-
   // Calculate the Kalman gain.
   const MatX P = this->P();
   const MatX S = T_H * P * T_H.transpose() + 1.1 * I(T_H.rows());
@@ -458,20 +413,6 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
   const VecX dx = K * r_n;
   this->correctIMUState(dx);
   this->correctCameraStates(dx);
-
-  // Correct covariance matrices
-  // const MatX A = I(IMUState::size + CameraState::size * this->N()) - K * T_H;
-  // const MatX P_corrected = A * P * A.transpose() + K * R_n * K.transpose();
-  // this->imu_state.P = P_corrected.block(0, 0, IMUState::size,
-  // IMUState::size);
-  // this->P_cam = P_corrected.block(IMUState::size,
-  //                                 IMUState::size,
-  //                                 P_corrected.rows() - IMUState::size,
-  //                                 P_corrected.cols() - IMUState::size);
-  // this->P_imu_cam = P_corrected.block(0,
-  //                                     IMUState::size,
-  //                                     IMUState::size,
-  //                                     P_corrected.cols() - IMUState::size);
 
   // Update covariance matrices
   const MatX I_KH = I(K.rows(), T_H.cols()) - K * T_H;

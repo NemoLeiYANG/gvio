@@ -94,6 +94,22 @@ int KLTTracker::detect(const cv::Mat &image, Features &features) {
   return 0;
 }
 
+int KLTTracker::processTrack(const uchar status, Feature &fref, Feature &fcur) {
+  // Lost - Remove feature track
+  if (status == 0 and fref.track_id != -1) {
+    this->features.removeTrack(fref.track_id, true);
+    return 0;
+  }
+
+  // Tracked - Add or update feature track
+  if (fref.track_id == -1) {
+    this->features.addTrack(this->counter_frame_id, fref, fcur);
+  } else {
+    this->features.updateTrack(this->counter_frame_id, fref.track_id, fcur);
+  }
+  return 1;
+}
+
 int KLTTracker::track(const Features &features) {
   // Convert list of features to list of cv::Point2f
   std::vector<cv::Point2f> p0;
@@ -122,40 +138,25 @@ int KLTTracker::track(const Features &features) {
   // Show matches
   if (this->show_matches) {
     cv::Mat matches_img = draw_tracks(this->img_cur, p0, p1, status);
-    cv::imshow("Matches", matches_img);
+    cv::imshow("Matches", this->img_cur);
   }
 
   // Add, update or remove feature tracks
-  Features keeping;
-  int index = 0;
-
-  for (auto s : status) {
-    auto f0 = features[index];
-
-    // Feature tracked
-    if (s == 1) {
-      auto f1 = Feature(p1[index]);
-      if (f0.track_id == -1) {
-        this->features.addTrack(this->counter_frame_id, f0, f1);
-      } else {
-        this->features.updateTrack(this->counter_frame_id, f0.track_id, f1);
-      }
-      keeping.push_back(f1);
-
-      // Feature lost
-    } else {
-      this->features.removeTrack(f0.track_id, true);
+  Features new_fea_ref;
+  for (size_t i = 0; i < status.size(); i++) {
+    auto fref = features[i];
+    auto fcur = Feature(p1[i]);
+    if (this->processTrack(status[i], fref, fcur)) {
+      new_fea_ref.push_back(fcur);
     }
-
-    index++;
   }
-  this->features.fea_ref = keeping;
+  this->features.fea_ref = new_fea_ref;
 
   return 0;
 }
 
 int KLTTracker::update(const cv::Mat &img_cur) {
-  // Keep track of current image
+  // Copy current image
   img_cur.copyTo(this->img_cur);
 
   // Initialize feature tracker
@@ -165,7 +166,7 @@ int KLTTracker::update(const cv::Mat &img_cur) {
   }
 
   // Detect
-  if (this->features.fea_ref.size() < 200) {
+  if (this->features.fea_ref.size() < 100) {
     if (this->detect(img_cur, this->features.fea_ref) != 0) {
       return -1;
     }

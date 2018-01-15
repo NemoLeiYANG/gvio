@@ -189,6 +189,8 @@ Public Methods</h2></td></tr>
 <tr class="separator:a3db0c36235af5e9182ffa93bb56c993c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58bcf4609100b45b54c04ca7fcabc2b7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a58bcf4609100b45b54c04ca7fcabc2b7">detect</a> (const cv::Mat &amp;image, <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a485c4827d1b5942dfa8dfe356d79ec7c">features</a>)</td></tr>
 <tr class="separator:a58bcf4609100b45b54c04ca7fcabc2b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb192cb5645e96d75f6b22d3e19f39b7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#adb192cb5645e96d75f6b22d3e19f39b7">processTrack</a> (const uchar status, <a class="el" href="structgvio_1_1Feature.html">Feature</a> &amp;fref, <a class="el" href="structgvio_1_1Feature.html">Feature</a> &amp;fcur)</td></tr>
+<tr class="separator:adb192cb5645e96d75f6b22d3e19f39b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e3bba18380f356b13bafb2c10704bdf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a2e3bba18380f356b13bafb2c10704bdf">track</a> (const <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a485c4827d1b5942dfa8dfe356d79ec7c">features</a>)</td></tr>
 <tr class="separator:a2e3bba18380f356b13bafb2c10704bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28c5549426f1b954db3ebf260be1178e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a28c5549426f1b954db3ebf260be1178e">update</a> (const cv::Mat &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a20d3e1ca03a16f244ca175a12098d2da">img_cur</a>)</td></tr>
@@ -297,6 +299,48 @@ Public Methods</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="adb192cb5645e96d75f6b22d3e19f39b7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::KLTTracker::processTrack </td>
+          <td>(</td>
+          <td class="paramtype">const uchar&#160;</td>
+          <td class="paramname"><em>status</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structgvio_1_1Feature.html">Feature</a> &amp;&#160;</td>
+          <td class="paramname"><em>fref</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structgvio_1_1Feature.html">Feature</a> &amp;&#160;</td>
+          <td class="paramname"><em>fcur</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Process feature track</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">status</td><td>Status if tracked or not </td></tr>
+    <tr><td class="paramname">fref</td><td>Reference feature </td></tr>
+    <tr><td class="paramname">fcur</td><td>Current feature </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 for track removed, 1 for track added or updated </dd></dl>
 
 </div>
 </div>

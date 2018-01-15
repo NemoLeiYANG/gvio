@@ -461,11 +461,11 @@ int test_MSCKF_measurementUpdate() {
   }
 
   // Load first image
-  const cv::Mat img0 = cv::imread(raw_dataset.cam0[0]);
+  cv::Mat img_ref = cv::imread(raw_dataset.cam0[0]);
 
   // Setup camera model
-  const int image_width = img0.cols;
-  const int image_height = img0.rows;
+  const int image_width = img_ref.cols;
+  const int image_height = img_ref.rows;
   const double fx = raw_dataset.calib_cam_to_cam.K[0](0, 0);
   const double fy = raw_dataset.calib_cam_to_cam.K[0](1, 1);
   const double cx = raw_dataset.calib_cam_to_cam.K[0](0, 2);
@@ -474,7 +474,8 @@ int test_MSCKF_measurementUpdate() {
 
   // Setup feature tracker
   ORBTracker tracker{&pinhole_model};
-  tracker.initialize(img0);
+  tracker.initialize(img_ref);
+  // tracker.show_matches = true;
 
   // Setup MSCKF
   MSCKF msckf;
@@ -499,8 +500,8 @@ int test_MSCKF_measurementUpdate() {
   for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
     // Feature tracker
     const std::string img_path = raw_dataset.cam0[i];
-    const cv::Mat img = cv::imread(img_path);
-    tracker.update(img);
+    const cv::Mat img_cur = cv::imread(img_path);
+    tracker.update(img_cur);
     FeatureTracks tracks = tracker.getLostTracks();
 
     // MSCKF
