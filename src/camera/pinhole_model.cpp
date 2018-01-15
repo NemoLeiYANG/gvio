@@ -98,7 +98,6 @@ Vec2 PinholeModel::pixel2image(const cv::KeyPoint &kp) const {
   return this->pixel2image(Vec2{kp.pt.x, kp.pt.y});
 }
 
-// TODO: Need to a more robust test for when feature is behind camera
 MatX PinholeModel::observedFeatures(const MatX &features,
                                     const Vec3 &rpy,
                                     const Vec3 &t,
