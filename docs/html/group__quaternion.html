@@ -74,6 +74,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga675f67a850aa78f46a13afa89a8fbc89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3446b55099c941fc7cf7a614b0799579"><td class="memItemLeft" align="right" valign="top">Mat4&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__quaternion.html#ga3446b55099c941fc7cf7a614b0799579">gvio::quatrcomp</a> (const Vec4 &amp;q)</td></tr>
 <tr class="separator:ga3446b55099c941fc7cf7a614b0799579"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga70fd80873834883de728f4a53c01ecd9"><td class="memItemLeft" align="right" valign="top">Vec4&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__quaternion.html#ga70fd80873834883de728f4a53c01ecd9">gvio::quatsmallangle</a> (const Vec3 &amp;dtheta)</td></tr>
+<tr class="separator:ga70fd80873834883de728f4a53c01ecd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac66f4bd9626690802f1b92e56d74d6ab"><td class="memItemLeft" align="right" valign="top">Vec3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__quaternion.html#gac66f4bd9626690802f1b92e56d74d6ab">gvio::quat2euler</a> (const Vec4 &amp;q)</td></tr>
 <tr class="separator:gac66f4bd9626690802f1b92e56d74d6ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga519e7b266abd2f8ae2e5b743fa3d0e5d"><td class="memItemLeft" align="right" valign="top">Vec4&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__quaternion.html#ga519e7b266abd2f8ae2e5b743fa3d0e5d">gvio::euler2quat</a> (const Vec3 &amp;rpy)</td></tr>
@@ -412,6 +414,32 @@ Kalman filter for 3D attitude estimation." University of Minnesota, Dept. of Com
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Quaternion right-compound </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga70fd80873834883de728f4a53c01ecd9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Vec4 gvio::quatsmallangle </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__math.html#ga3a368a451927fa037003882d6052fe9e">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>dtheta</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Convert the vector part of a quaternion to a full quaternion.</p>
+<p>This function is useful to convert delta quaternion which is usually a 3x1 vector to a full quaternion. For more details, check Section 3.2 Kalman Filter Update of Equation (217) and (218) in "Indirect Kalman Filter for 3D
+Attitude Estimation" by Trawny and Roumeliotis.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dtheta</td><td>Small angle vector to form full quaternion with </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Small angle Quaternion </dd></dl>
 
 </div>
 </div>

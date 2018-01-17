@@ -43,7 +43,6 @@ ADD_LIBRARY(
   src/msckf/feature_estimator.cpp
   src/msckf/imu_state.cpp
   src/msckf/msckf.cpp
-  src/msckf/profiler.cpp
   # feature
   src/feature2d/draw.cpp
   src/feature2d/feature_container.cpp
@@ -118,7 +117,6 @@ SET(UNITTESTS
   msckf-feature_estimator_test
   msckf-imu_state_test
   msckf-msckf_test
-  msckf-profiler_test
   util-config_test
   util-data_test
   util-file_test

@@ -19,7 +19,6 @@ int test_IMUState_constructor() {
 
   // MU_CHECK(zeros(1, 1).isApprox(imu_state.P));
   // MU_CHECK(zeros(1, 1).isApprox(imu_state.Q));
-
   // MU_CHECK(zeros(1, 1).isApprox(imu_state.Phi));
 
   return 0;

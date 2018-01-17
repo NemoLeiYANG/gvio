@@ -36,6 +36,7 @@ public:
   FrameID counter_frame_id = -1;
   FeatureContainer features;
   Features unmatched;
+  Features fea_ref;
 
   // Image, feature, unmatched features book keeping
   cv::Mat img_cur;
@@ -93,8 +94,6 @@ public:
 
   /**
    * Get lost feature tracks
-   *
-   * @param tracks Lost feature tracks
    */
   std::vector<FeatureTrack> getLostTracks();
 

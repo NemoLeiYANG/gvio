@@ -20,7 +20,6 @@ struct FeatureContainer {
   std::vector<TrackID> tracking;
   std::vector<TrackID> lost;
   std::map<TrackID, FeatureTrack> buffer;
-  Features fea_ref;
 
   /**
    * Add feature track

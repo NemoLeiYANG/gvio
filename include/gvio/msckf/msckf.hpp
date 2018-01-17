@@ -73,8 +73,8 @@ public:
   double n_v = 1.0;
 
   // Settings
-  int max_window_size = 40;
-  int max_nb_tracks = 1000;
+  int max_window_size = 200;
+  int max_nb_tracks = 200;
   int min_track_length = 15;
   bool enable_ns_trick = true;
   bool enable_qr_trick = true;

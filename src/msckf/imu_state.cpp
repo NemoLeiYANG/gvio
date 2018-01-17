@@ -9,14 +9,14 @@ MatX IMUState::F(const Vec3 &w_hat,
   MatX F = zeros(15);
   // -- First row --
   F.block(0, 0, 3, 3) = -skew(w_hat);
-  F.block(0, 3, 3, 3) = -ones(3);
+  F.block(0, 3, 3, 3) = -I(3);
   // -- Third Row --
   F.block(6, 0, 3, 3) = -C(q_hat).transpose() * skew(a_hat);
   F.block(6, 6, 3, 3) = -2.0 * skew(w_G);
   F.block(6, 9, 3, 3) = -C(q_hat).transpose();
   F.block(6, 12, 3, 3) = -skewsq(w_G);
   // -- Fifth Row --
-  F.block(12, 6, 3, 3) = ones(3);
+  F.block(12, 6, 3, 3) = I(3);
 
   return F;
 }
@@ -24,13 +24,13 @@ MatX IMUState::F(const Vec3 &w_hat,
 MatX IMUState::G(const Vec4 &q_hat) {
   MatX G = zeros(15, 12);
   // -- First row --
-  G.block(0, 0, 3, 3) = -ones(3);
+  G.block(0, 0, 3, 3) = -I(3);
   // -- Second row --
-  G.block(3, 3, 3, 3) = ones(3);
+  G.block(3, 3, 3, 3) = I(3);
   // -- Third row --
   G.block(6, 6, 3, 3) = -C(q_hat).transpose();
   // -- Fourth row --
-  G.block(9, 9, 3, 3) = ones(3);
+  G.block(9, 9, 3, 3) = I(3);
 
   return G;
 }
@@ -77,34 +77,26 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   const MatX G = this->G(this->q_IG);
 
   // Update covariance
+  // clang-format off
   this->Phi = I(this->size) + F * dt;
-  this->P = Phi * P * Phi.transpose() + (G * this->Q * G.transpose()) * dt;
+  this->P = Phi * this->P * Phi.transpose() + (G * this->Q * G.transpose()) * dt;
   this->P = enforce_psd(P);
+  // clang-format on
 }
 
 void IMUState::correct(const VecX &dx) {
   // Split dx into its own components
-  const Vec3 dtheta_IG = dx.block(0, 0, 3, 1);
-  const Vec3 db_g = dx.block(3, 0, 3, 1);
-  const Vec3 dv_G = dx.block(6, 0, 3, 1);
-  const Vec3 db_a = dx.block(9, 0, 3, 1);
-  const Vec3 dp_G = dx.block(12, 0, 3, 1);
+  const Vec3 dtheta_IG = dx.segment(0, 3);
+  const Vec3 db_g = dx.segment(3, 3);
+  const Vec3 dv_G = dx.segment(6, 3);
+  const Vec3 db_a = dx.segment(9, 3);
+  const Vec3 dp_G = dx.segment(12, 3);
 
   // Time derivative of quaternion (small angle approx)
-  Vec4 dq_IG = zeros(4, 1);
-  const double norm = 0.5 * dtheta_IG.transpose() * dtheta_IG;
-  if (norm > 1.0) {
-    dq_IG.block(0, 0, 3, 1) = dtheta_IG;
-    dq_IG(3) = 1.0;
-    dq_IG = dq_IG / sqrt(1.0 + norm);
-  } else {
-    dq_IG.block(0, 0, 3, 1) = dtheta_IG;
-    dq_IG(3) = sqrt(1.0 - norm);
-  }
-  dq_IG = quatnormalize(dq_IG);
+  const Vec4 dq_IG = quatsmallangle(dtheta_IG);
 
-  // // Correct IMU state
-  this->q_IG = quatlcomp(dq_IG) * this->q_IG;
+  // Correct IMU state
+  this->q_IG = quatnormalize(quatlcomp(dq_IG) * this->q_IG);
   this->b_g = this->b_g + db_g;
   this->v_G = this->v_G + dv_G;
   this->b_a = this->b_a + db_a;

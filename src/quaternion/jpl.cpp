@@ -85,6 +85,23 @@ Mat4 quatrcomp(const Vec4 &q) {
   return A;
 }
 
+Vec4 quatsmallangle(const Vec3 &dtheta) {
+  Vec3 dq = dtheta / 2.0;
+  const double dq_square_norm = dq.squaredNorm();
+
+  Vec4 q;
+  if (dq_square_norm <= 1) {
+    q.head<3>() = dq;
+    q(3) = std::sqrt(1 - dq_square_norm);
+  } else {
+    q.head<3>() = dq;
+    q(3) = 1;
+    q = q / std::sqrt(1 + dq_square_norm);
+  }
+
+  return q;
+}
+
 Vec3 quat2euler(const Vec4 &q) {
   const double x = q(0);
   const double y = q(1);

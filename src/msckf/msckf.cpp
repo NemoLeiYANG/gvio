@@ -5,10 +5,10 @@ namespace gvio {
 int MSCKF::configure(const std::string &config_file) {
   // Load config file
   ConfigParser parser;
-  // parser.addParam("imu.bias_accel", &this->imu_state.b_a);
-  // parser.addParam("imu.bias_gyro", &this->imu_state.b_g);
-  // parser.addParam("imu.angular_constant", &this->imu_state.w_G);
-  // parser.addParam("imu.gravity_constant", &this->imu_state.g_G);
+  parser.addParam("imu.bias_accel", &this->imu_state.b_a);
+  parser.addParam("imu.bias_gyro", &this->imu_state.b_g);
+  parser.addParam("imu.angular_constant", &this->imu_state.w_G);
+  parser.addParam("imu.gravity_constant", &this->imu_state.g_G);
   parser.addParam("extrinsics.p_IC", &this->ext_p_IC);
   parser.addParam("extrinsics.q_CI", &this->ext_q_CI);
   parser.addParam("n_u", &this->n_u);
@@ -261,8 +261,8 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     // away state errors by removing the measurement jacobian w.r.t.
     // feature position via null space projection [Section D:
     // Measurement Model, Mourikis2007]
-    Eigen::JacobiSVD<MatX> svd(H_f_j,
-                               Eigen::ComputeFullU | Eigen::ComputeThinV);
+    const unsigned int settings = Eigen::ComputeFullU | Eigen::ComputeThinV;
+    Eigen::JacobiSVD<MatX> svd(H_f_j, settings);
     const MatX A_j = svd.matrixU().rightCols(H_f_j.rows() - 3);
     H_o_j = A_j.transpose() * H_x_j;
     r_o_j = A_j.transpose() * r_j;
@@ -314,7 +314,6 @@ int MSCKF::calResiduals(const FeatureTracks &tracks,
 
   // Reduce EKF measurement update computation with QR decomposition
   if (H_o.rows() > H_o.cols() && this->enable_qr_trick) {
-    struct timespec start = tic();
     // Convert H to a sparse matrix.
     Eigen::SparseMatrix<double> H_sparse = H_o.sparseView();
 
@@ -331,7 +330,6 @@ int MSCKF::calResiduals(const FeatureTracks &tracks,
     T_H = H_temp.topRows(IMUState::size + this->N() * CameraState::size);
     r_n = r_temp.head(IMUState::size + this->N() * CameraState::size);
     R_n = R_o;
-    printf("-- QR elasped: %fs --\n", toc(&start));
 
   } else {
     T_H = H_o;
@@ -369,7 +367,7 @@ void MSCKF::pruneCameraState() {
 
   // Adjust covariance matrix
   this->P_imu_cam = this->P_imu_cam.block(0,
-                                          CameraState::size,
+                                          CameraState::size * prune_sz,
                                           IMUState::size,
                                           CameraState::size * this->N());
   this->P_cam =
@@ -385,27 +383,22 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
 
   // Continue with EKF update?
   if (tracks.size() == 0) {
-    this->pruneCameraState();
+    // this->pruneCameraState();
     return -1;
   }
-
-  // // Limit number of tracks
-  // if (tracks.size() > (size_t) this->max_nb_tracks) {
-  //   tracks.erase(tracks.begin() + this->max_nb_tracks, tracks.end());
-  // }
 
   // Calculate residuals
   MatX T_H;
   VecX r_n;
   MatX R_n;
   if (this->calResiduals(tracks, T_H, r_n, R_n) != 0) {
-    this->pruneCameraState();
+    // this->pruneCameraState();
     return -2;
   }
 
   // Calculate the Kalman gain.
   const MatX P = this->P();
-  const MatX S = T_H * P * T_H.transpose() + 1.1 * I(T_H.rows());
+  const MatX S = T_H * P * T_H.transpose() + 0.1 * I(T_H.rows());
   const MatX K_transpose = S.ldlt().solve(T_H * P);
   const MatX K = K_transpose.transpose();
 
@@ -431,7 +424,7 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
                                   P_fixed.cols() - IMUState::size);
 
   // Prune camera state to maintain sliding window size
-  this->pruneCameraState();
+  // this->pruneCameraState();
 
   return 0;
 }

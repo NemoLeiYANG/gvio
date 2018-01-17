@@ -105,7 +105,7 @@
 
 </div>
 </div>
-<a class="anchor" id="a57bd840823c64cf1f566d67a8055ad63"></a>
+<a class="anchor" id="a8f127446cf77ca032e778482243ed70b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -116,7 +116,7 @@
           <td class="memname">gvio::KLTTracker::KLTTracker </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>nb_max_corners</em>, </td>
+          <td class="paramname"><em>max_corners</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -156,20 +156,24 @@
 Public Attributes</h2></td></tr>
 <tr class="memitem:af5274169391c75239d9bc0cb0dc2541d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__feature2d.html#gafe4f0efb14d5061ed16c24bb0c6ee6c2">FrameID</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#af5274169391c75239d9bc0cb0dc2541d">counter_frame_id</a> = -1</td></tr>
 <tr class="separator:af5274169391c75239d9bc0cb0dc2541d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20d3e1ca03a16f244ca175a12098d2da"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a20d3e1ca03a16f244ca175a12098d2da">img_cur</a></td></tr>
-<tr class="separator:a20d3e1ca03a16f244ca175a12098d2da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10a5827748c37ea8fa5b095871b4d11b"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a10a5827748c37ea8fa5b095871b4d11b">img_ref</a></td></tr>
-<tr class="separator:a10a5827748c37ea8fa5b095871b4d11b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a485c4827d1b5942dfa8dfe356d79ec7c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgvio_1_1FeatureContainer.html">FeatureContainer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a485c4827d1b5942dfa8dfe356d79ec7c">features</a></td></tr>
 <tr class="separator:a485c4827d1b5942dfa8dfe356d79ec7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47901d37d8bd4ef2cbd0bf3269454c69"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a47901d37d8bd4ef2cbd0bf3269454c69">nb_max_corners</a> = 500</td></tr>
-<tr class="separator:a47901d37d8bd4ef2cbd0bf3269454c69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae031567df45b973924e8bfe9dc7e93bb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#ae031567df45b973924e8bfe9dc7e93bb">quality_level</a> = 0.01</td></tr>
+<tr class="memitem:a10a5827748c37ea8fa5b095871b4d11b"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a10a5827748c37ea8fa5b095871b4d11b">img_ref</a></td></tr>
+<tr class="separator:a10a5827748c37ea8fa5b095871b4d11b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9436a5593b8b096880172badd8bd804b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a9436a5593b8b096880172badd8bd804b">fea_ref</a></td></tr>
+<tr class="separator:a9436a5593b8b096880172badd8bd804b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aadd94bfd94b84e888ec216069553046b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#aadd94bfd94b84e888ec216069553046b">max_corners</a> = 1000</td></tr>
+<tr class="separator:aadd94bfd94b84e888ec216069553046b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae031567df45b973924e8bfe9dc7e93bb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#ae031567df45b973924e8bfe9dc7e93bb">quality_level</a> = 0.001</td></tr>
 <tr class="separator:ae031567df45b973924e8bfe9dc7e93bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a333db8d70d134c1f4e030e2a70e71a02"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a333db8d70d134c1f4e030e2a70e71a02">min_distance</a> = 10.0</td></tr>
+<tr class="memitem:a333db8d70d134c1f4e030e2a70e71a02"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a333db8d70d134c1f4e030e2a70e71a02">min_distance</a> = 5.0</td></tr>
 <tr class="separator:a333db8d70d134c1f4e030e2a70e71a02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a1bc305ec7e7ebfd168d533fb720290"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a9a1bc305ec7e7ebfd168d533fb720290">show_matches</a> = false</td></tr>
 <tr class="separator:a9a1bc305ec7e7ebfd168d533fb720290"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef204b67bdc176a65d8d4bf922ae2ea3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#aef204b67bdc176a65d8d4bf922ae2ea3">image_width</a> = 0</td></tr>
+<tr class="separator:aef204b67bdc176a65d8d4bf922ae2ea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29f499d318080d7b2f0f523ff63d25b0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a29f499d318080d7b2f0f523ff63d25b0">image_height</a> = 0</td></tr>
+<tr class="separator:a29f499d318080d7b2f0f523ff63d25b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab17c2cfd1e071f38edf0c599ba0f1f43"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#ab17c2cfd1e071f38edf0c599ba0f1f43">camera_model</a> = nullptr</td></tr>
 <tr class="separator:ab17c2cfd1e071f38edf0c599ba0f1f43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -179,21 +183,23 @@ Public Methods</h2></td></tr>
 <tr class="separator:aac5fffc0de32985663bbb0161f8c3089"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff0ba1154896af58c74fc15d994eaa69"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#aff0ba1154896af58c74fc15d994eaa69">KLTTracker</a> (const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *<a class="el" href="classgvio_1_1KLTTracker.html#ab17c2cfd1e071f38edf0c599ba0f1f43">camera_model</a>)</td></tr>
 <tr class="separator:aff0ba1154896af58c74fc15d994eaa69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57bd840823c64cf1f566d67a8055ad63"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a57bd840823c64cf1f566d67a8055ad63">KLTTracker</a> (const int <a class="el" href="classgvio_1_1KLTTracker.html#a47901d37d8bd4ef2cbd0bf3269454c69">nb_max_corners</a>, const double <a class="el" href="classgvio_1_1KLTTracker.html#ae031567df45b973924e8bfe9dc7e93bb">quality_level</a>, const double <a class="el" href="classgvio_1_1KLTTracker.html#a333db8d70d134c1f4e030e2a70e71a02">min_distance</a>, const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *<a class="el" href="classgvio_1_1KLTTracker.html#ab17c2cfd1e071f38edf0c599ba0f1f43">camera_model</a>)</td></tr>
-<tr class="separator:a57bd840823c64cf1f566d67a8055ad63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f127446cf77ca032e778482243ed70b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a8f127446cf77ca032e778482243ed70b">KLTTracker</a> (const int <a class="el" href="classgvio_1_1KLTTracker.html#aadd94bfd94b84e888ec216069553046b">max_corners</a>, const double <a class="el" href="classgvio_1_1KLTTracker.html#ae031567df45b973924e8bfe9dc7e93bb">quality_level</a>, const double <a class="el" href="classgvio_1_1KLTTracker.html#a333db8d70d134c1f4e030e2a70e71a02">min_distance</a>, const <a class="el" href="classgvio_1_1CameraModel.html">CameraModel</a> *<a class="el" href="classgvio_1_1KLTTracker.html#ab17c2cfd1e071f38edf0c599ba0f1f43">camera_model</a>)</td></tr>
+<tr class="separator:a8f127446cf77ca032e778482243ed70b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a499ea3789d4acd4bc0c9f6ae31043b41"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a499ea3789d4acd4bc0c9f6ae31043b41">configure</a> (const std::string &amp;config_file)</td></tr>
 <tr class="separator:a499ea3789d4acd4bc0c9f6ae31043b41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab728e5784420f764ea5258f055abe5c9"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#ab728e5784420f764ea5258f055abe5c9">getLostTracks</a> ()</td></tr>
 <tr class="separator:ab728e5784420f764ea5258f055abe5c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3db0c36235af5e9182ffa93bb56c993c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a3db0c36235af5e9182ffa93bb56c993c">initialize</a> (const cv::Mat &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a20d3e1ca03a16f244ca175a12098d2da">img_cur</a>)</td></tr>
+<tr class="memitem:a3db0c36235af5e9182ffa93bb56c993c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a3db0c36235af5e9182ffa93bb56c993c">initialize</a> (const cv::Mat &amp;img_cur)</td></tr>
 <tr class="separator:a3db0c36235af5e9182ffa93bb56c993c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58bcf4609100b45b54c04ca7fcabc2b7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a58bcf4609100b45b54c04ca7fcabc2b7">detect</a> (const cv::Mat &amp;image, <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a485c4827d1b5942dfa8dfe356d79ec7c">features</a>)</td></tr>
 <tr class="separator:a58bcf4609100b45b54c04ca7fcabc2b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb192cb5645e96d75f6b22d3e19f39b7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#adb192cb5645e96d75f6b22d3e19f39b7">processTrack</a> (const uchar status, <a class="el" href="structgvio_1_1Feature.html">Feature</a> &amp;fref, <a class="el" href="structgvio_1_1Feature.html">Feature</a> &amp;fcur)</td></tr>
 <tr class="separator:adb192cb5645e96d75f6b22d3e19f39b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e3bba18380f356b13bafb2c10704bdf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a2e3bba18380f356b13bafb2c10704bdf">track</a> (const <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a485c4827d1b5942dfa8dfe356d79ec7c">features</a>)</td></tr>
-<tr class="separator:a2e3bba18380f356b13bafb2c10704bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28c5549426f1b954db3ebf260be1178e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a28c5549426f1b954db3ebf260be1178e">update</a> (const cv::Mat &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a20d3e1ca03a16f244ca175a12098d2da">img_cur</a>)</td></tr>
+<tr class="memitem:ace84a812e9a39371391e91b0853e8165"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#ace84a812e9a39371391e91b0853e8165">track</a> (const cv::Mat &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a10a5827748c37ea8fa5b095871b4d11b">img_ref</a>, const cv::Mat &amp;img_cur, const <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a9436a5593b8b096880172badd8bd804b">fea_ref</a>, <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;tracked)</td></tr>
+<tr class="separator:ace84a812e9a39371391e91b0853e8165"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa5ea8c54f4572a991aed44d57123bbd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#aaa5ea8c54f4572a991aed44d57123bbd">replenishFeatures</a> (const cv::Mat &amp;image, <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;<a class="el" href="classgvio_1_1KLTTracker.html#a485c4827d1b5942dfa8dfe356d79ec7c">features</a>)</td></tr>
+<tr class="separator:aaa5ea8c54f4572a991aed44d57123bbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28c5549426f1b954db3ebf260be1178e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgvio_1_1KLTTracker.html#a28c5549426f1b954db3ebf260be1178e">update</a> (const cv::Mat &amp;img_cur)</td></tr>
 <tr class="separator:a28c5549426f1b954db3ebf260be1178e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Method Descriptions</h2>
@@ -268,13 +274,7 @@ Public Methods</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get lost feature tracks</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">tracks</td><td>Lost feature tracks </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Get lost feature tracks </p>
 
 </div>
 </div>
@@ -344,16 +344,73 @@ Public Methods</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a2e3bba18380f356b13bafb2c10704bdf"></a>
+<a class="anchor" id="aaa5ea8c54f4572a991aed44d57123bbd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int gvio::KLTTracker::replenishFeatures </td>
+          <td>(</td>
+          <td class="paramtype">const cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>image</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;&#160;</td>
+          <td class="paramname"><em>features</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Replenish features</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">image</td><td>Image </td></tr>
+    <tr><td class="paramname">features</td><td>Features </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 for success, -1 for failure </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ace84a812e9a39371391e91b0853e8165"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">int gvio::KLTTracker::track </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;&#160;</td>
-          <td class="paramname"><em>features</em></td><td>)</td>
+          <td class="paramtype">const cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>img_ref</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>img_cur</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;&#160;</td>
+          <td class="paramname"><em>fea_ref</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__feature2d.html#gab14d9865446b4d588bea72e2a9de22a1">Features</a> &amp;&#160;</td>
+          <td class="paramname"><em>tracked</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -361,7 +418,10 @@ Public Methods</h2></td></tr>
 <p>The idea is that with the current features, we want to match it against the current list of <a class="el" href="structgvio_1_1FeatureTrack.html">FeatureTrack</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">features</td><td>List of features in current frame </td></tr>
+    <tr><td class="paramname">img_ref</td><td>Reference image </td></tr>
+    <tr><td class="paramname">img_cur</td><td>Current image </td></tr>
+    <tr><td class="paramname">fea_ref</td><td>Reference features </td></tr>
+    <tr><td class="paramname">tracked</td><td>Tracked features </td></tr>
   </table>
   </dd>
 </dl>

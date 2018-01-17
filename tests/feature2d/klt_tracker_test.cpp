@@ -37,9 +37,6 @@ int test_KLTTracker_track() {
   cv::Mat img0 = cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR);
   cv::Mat img1 = cv::imread(raw_dataset.cam0[1], CV_LOAD_IMAGE_COLOR);
 
-  img0.copyTo(tracker.img_ref);
-  img1.copyTo(tracker.img_cur);
-
   // Detect features in image 0
   tracker.initialize(img0);
 
@@ -49,10 +46,12 @@ int test_KLTTracker_track() {
 
   // Match features
   // tracker.show_matches = true;
-  tracker.track(f1);
+  Features tracked;
+  tracker.track(img0, img1, f1, tracked);
   cv::waitKey(0);
 
   MU_CHECK(f1.size() > 0);
+  MU_CHECK(tracked.size() > 0);
 
   return 0;
 }
@@ -76,6 +75,35 @@ int test_KLTTracker_update() {
     MU_CHECK_EQ(track.frame_start + track.frame_end + 1,
                 (int) track.trackedLength());
   }
+
+  return 0;
+}
+
+int test_KLTTracker_update2() {
+  // Setup test data
+  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  if (raw_dataset.load() != 0) {
+    return -1;
+  }
+
+  KLTTracker tracker;
+  tracker.show_matches = true;
+  for (size_t i = 0; i < raw_dataset.cam0.size(); i++) {
+    cv::Mat img = cv::imread(raw_dataset.cam0[i]);
+    tracker.update(img);
+
+    // cv::imshow("Image", img);
+    if (cv::waitKey(0) == 113) {
+      break;
+    }
+  }
+
+  // FeatureTracks tracks = tracker.getLostTracks();
+  // for (auto track : tracks) {
+  //   MU_CHECK_EQ(0, track.frame_start);
+  //   MU_CHECK_EQ(track.frame_start + track.frame_end + 1,
+  //               (int) track.trackedLength());
+  // }
 
   return 0;
 }
@@ -107,7 +135,8 @@ int test_KLTTracker_demo() {
 void test_suite() {
   MU_ADD_TEST(test_KLTTracker_detect);
   MU_ADD_TEST(test_KLTTracker_track);
-  MU_ADD_TEST(test_KLTTracker_update);
+  // MU_ADD_TEST(test_KLTTracker_update);
+  MU_ADD_TEST(test_KLTTracker_update2);
   // MU_ADD_TEST(test_KLTTracker_demo);
 }
 

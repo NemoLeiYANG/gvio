@@ -22,14 +22,17 @@ namespace gvio {
 class KLTTracker {
 public:
   FrameID counter_frame_id = -1;
-  cv::Mat img_cur;
-  cv::Mat img_ref;
   FeatureContainer features;
+  cv::Mat img_ref;
+  Features fea_ref;
 
-  int nb_max_corners = 500;
-  double quality_level = 0.01;
-  double min_distance = 10.0;
+  int max_corners = 1000;
+  double quality_level = 0.001;
+  double min_distance = 5.0;
   bool show_matches = false;
+
+  int image_width = 0;
+  int image_height = 0;
 
   const CameraModel *camera_model = nullptr;
 
@@ -37,11 +40,11 @@ public:
 
   KLTTracker(const CameraModel *camera_model) : camera_model{camera_model} {}
 
-  KLTTracker(const int nb_max_corners,
+  KLTTracker(const int max_corners,
              const double quality_level,
              const double min_distance,
              const CameraModel *camera_model)
-      : nb_max_corners{nb_max_corners}, quality_level{quality_level},
+      : max_corners{max_corners}, quality_level{quality_level},
         min_distance{min_distance}, camera_model{camera_model} {}
 
   /**
@@ -54,8 +57,6 @@ public:
 
   /**
    * Get lost feature tracks
-   *
-   * @param tracks Lost feature tracks
    */
   std::vector<FeatureTrack> getLostTracks();
 
@@ -92,10 +93,25 @@ public:
    * The idea is that with the current features, we want to match it against
    * the current list of FeatureTrack.
    *
-   * @param features List of features in current frame
+   * @param img_ref Reference image
+   * @param img_cur Current image
+   * @param fea_ref Reference features
+   * @param tracked Tracked features
    * @returns 0 for success, -1 for failure
    */
-  int track(const Features &features);
+  int track(const cv::Mat &img_ref,
+            const cv::Mat &img_cur,
+            const Features &fea_ref,
+            Features &tracked);
+
+  /**
+   * Replenish features
+   *
+   * @param image Image
+   * @param features Features
+* @returns 0 for success, -1 for failure
+   */
+  int replenishFeatures(const cv::Mat &image, Features &features);
 
   /**
    * Update feature tracker

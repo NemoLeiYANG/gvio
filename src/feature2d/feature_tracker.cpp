@@ -56,10 +56,8 @@ int FeatureTracker::match(const Features &f1,
                           std::vector<cv::DMatch> &matches) {
   // Stack previously unmatched features with tracked features
   Features f0;
-  f0.reserve(this->features.fea_ref.size() + this->unmatched.size());
-  f0.insert(f0.end(),
-            this->features.fea_ref.begin(),
-            this->features.fea_ref.end());
+  f0.reserve(this->fea_ref.size() + this->unmatched.size());
+  f0.insert(f0.end(), this->fea_ref.begin(), this->fea_ref.end());
   f0.insert(f0.end(), this->unmatched.begin(), this->unmatched.end());
 
   // Match features
@@ -86,7 +84,7 @@ int FeatureTracker::match(const Features &f1,
   // Update or add feature track
   std::map<int, bool> tracks_updated;
   std::map<int, bool> idx_updated;
-  this->features.fea_ref.clear();
+  this->fea_ref.clear();
 
   for (size_t i = 0; i < matches.size(); i++) {
     const int f0_idx = matches[i].queryIdx;
@@ -100,7 +98,7 @@ int FeatureTracker::match(const Features &f1,
       this->features.addTrack(this->counter_frame_id, fea0, fea1);
     }
 
-    this->features.fea_ref.push_back(fea1);
+    this->fea_ref.push_back(fea1);
     tracks_updated.insert({fea1.track_id, true});
     idx_updated.insert({f1_idx, true});
   }
@@ -128,7 +126,7 @@ int FeatureTracker::initialize(const cv::Mat &img_cur) {
   DEBUG("Initialize feature tracker!");
   img_cur.copyTo(this->img_ref);
   this->img_size = img_cur.size();
-  return this->detect(img_cur, this->features.fea_ref);
+  return this->detect(img_cur, this->fea_ref);
 }
 
 int FeatureTracker::update(const cv::Mat &img_cur) {
@@ -136,7 +134,7 @@ int FeatureTracker::update(const cv::Mat &img_cur) {
   img_cur.copyTo(this->img_cur);
 
   // Initialize feature tracker
-  if (this->features.fea_ref.size() == 0) {
+  if (this->fea_ref.size() == 0) {
     this->initialize(img_cur);
     return 0;
   }

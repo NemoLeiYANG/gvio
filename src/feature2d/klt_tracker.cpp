@@ -13,7 +13,7 @@ int KLTTracker::configure(const std::string &config_file) {
 
   // Load config file
   ConfigParser parser;
-  parser.addParam("nb_max_corners", &this->nb_max_corners);
+  parser.addParam("max_corners", &this->max_corners);
   parser.addParam("quality_level", &this->quality_level);
   parser.addParam("min_distance", &this->min_distance);
   parser.addParam("show_matches", &this->show_matches);
@@ -69,7 +69,9 @@ int KLTTracker::initialize(const cv::Mat &img_cur) {
   DEBUG("Initialize feature tracker!");
   img_cur.copyTo(this->img_ref);
   this->counter_frame_id++;
-  return this->detect(img_cur, this->features.fea_ref);
+  this->image_width = img_cur.cols;
+  this->image_height = img_cur.rows;
+  return this->detect(img_cur, this->fea_ref);
 }
 
 int KLTTracker::detect(const cv::Mat &image, Features &features) {
@@ -81,7 +83,7 @@ int KLTTracker::detect(const cv::Mat &image, Features &features) {
   std::vector<cv::Point2f> corners;
   cv::goodFeaturesToTrack(gray_image,
                           corners,
-                          this->nb_max_corners,
+                          this->max_corners,
                           this->quality_level,
                           this->min_distance);
 
@@ -91,12 +93,21 @@ int KLTTracker::detect(const cv::Mat &image, Features &features) {
     features.emplace_back(corner);
   }
 
+  // // std::vector<cv::KeyPoint> keypoints;
+  // // cv::FAST(gray_image, keypoints, 100, false);
+  //
+  // // Create features
+  // features.clear();
+  // for (auto kp : keypoints) {
+  //   features.emplace_back(kp);
+  // }
+
   return 0;
 }
 
 int KLTTracker::processTrack(const uchar status, Feature &fref, Feature &fcur) {
   // Lost - Remove feature track
-  if (status == 0 and fref.track_id != -1) {
+  if (status == 0 && fref.track_id != -1) {
     this->features.removeTrack(fref.track_id, true);
     return 0;
   }
@@ -110,72 +121,116 @@ int KLTTracker::processTrack(const uchar status, Feature &fref, Feature &fcur) {
   return 1;
 }
 
-int KLTTracker::track(const Features &features) {
+int KLTTracker::track(const cv::Mat &img_ref,
+                      const cv::Mat &img_cur,
+                      const Features &fea_ref,
+                      Features &tracked) {
   // Convert list of features to list of cv::Point2f
   std::vector<cv::Point2f> p0;
-  for (auto f : features) {
+  for (auto f : fea_ref) {
     p0.push_back(f.kp.pt);
   }
 
   // Convert input images to gray scale
   cv::Mat gray_img_ref, gray_img_cur;
-  cv::cvtColor(this->img_ref, gray_img_ref, CV_BGR2GRAY);
-  cv::cvtColor(this->img_cur, gray_img_cur, CV_BGR2GRAY);
+  cv::cvtColor(img_ref, gray_img_ref, CV_BGR2GRAY);
+  cv::cvtColor(img_cur, gray_img_cur, CV_BGR2GRAY);
 
-  // Track features
+  // Track features with KLT
   std::vector<cv::Point2f> p1;
-  std::vector<uchar> status;
+  std::vector<uchar> flow_mask;
   std::vector<float> err;
   cv::Size win_size(21, 21);
+  const int pyr_levels = 3;
   cv::calcOpticalFlowPyrLK(gray_img_ref, // Reference image
                            gray_img_cur, // Current image
                            p0,           // Input points
                            p1,           // Output points
-                           status,       // Tracking status
+                           flow_mask,    // Tracking status
                            err,          // Tracking error
-                           win_size);    // Window size
+                           win_size,     // Window size
+                           pyr_levels);  // Pyramid levels
+
+  // RANSAC
+  std::vector<uchar> ransac_mask;
+  cv::findFundamentalMat(p0, p1, cv::FM_RANSAC, 0, 0.9999, ransac_mask);
+
+  // Add, update or remove feature tracks
+  std::vector<uchar> final_mask;
+  for (size_t i = 0; i < flow_mask.size(); i++) {
+    auto fref = fea_ref[i];
+    auto fcur = Feature(p1[i]);
+    const uchar status = (flow_mask[i] && ransac_mask[i]) ? 1 : 0;
+
+    if (this->processTrack(status, fref, fcur)) {
+      tracked.push_back(fcur);
+    }
+
+    final_mask.push_back(status);
+  }
 
   // Show matches
   if (this->show_matches) {
-    cv::Mat matches_img = draw_tracks(this->img_cur, p0, p1, status);
-    cv::imshow("Matches", this->img_cur);
+    cv::Mat matches_img = draw_tracks(img_cur, p0, p1, final_mask);
+    cv::imshow("Matches", img_cur);
   }
 
-  // Add, update or remove feature tracks
-  Features new_fea_ref;
-  for (size_t i = 0; i < status.size(); i++) {
-    auto fref = features[i];
-    auto fcur = Feature(p1[i]);
-    if (this->processTrack(status[i], fref, fcur)) {
-      new_fea_ref.push_back(fcur);
+  return 0;
+}
+
+int KLTTracker::replenishFeatures(const cv::Mat &image, Features &features) {
+  // Pre-check
+  const int replenish_size = this->max_corners - features.size();
+  if (replenish_size <= 0) {
+    return 0;
+  }
+
+  // Build a grid denoting where existing keypoints already are
+  MatX pt_grid = zeros(this->image_height, this->image_width);
+  for (auto f : features) {
+    const int px = int(f.kp.pt.x);
+    const int py = int(f.kp.pt.y);
+    if (px >= this->image_width || px <= 0) {
+      continue;
+    } else if (py >= this->image_height || py <= 0) {
+      continue;
+    }
+    pt_grid(py, px) = 1;
+  }
+
+  // Detect new features
+  Features fea_new;
+  this->detect(image, fea_new);
+  for (auto f : fea_new) {
+    const int px = int(f.kp.pt.x);
+    const int py = int(f.kp.pt.y);
+    if (pt_grid(py, px) == 0) {
+      features.push_back(f);
     }
   }
-  this->features.fea_ref = new_fea_ref;
 
   return 0;
 }
 
 int KLTTracker::update(const cv::Mat &img_cur) {
-  // Copy current image
-  img_cur.copyTo(this->img_cur);
-
   // Initialize feature tracker
-  if (this->features.fea_ref.size() == 0) {
+  if (this->fea_ref.size() == 0) {
     this->initialize(img_cur);
     return 0;
   }
 
-  // Detect
-  if (this->features.fea_ref.size() < 100) {
-    if (this->detect(img_cur, this->features.fea_ref) != 0) {
-      return -1;
-    }
-  }
+  // Track features
   this->counter_frame_id++;
+  Features tracked;
+  int retval = this->track(this->img_ref, img_cur, this->fea_ref, tracked);
+  if (retval != 0) {
+    return -1;
+  }
+  this->fea_ref = tracked;
 
-  // Match features
-  if (this->track(this->features.fea_ref) != 0) {
-    return -2;
+  // Replenish number of features
+  if (this->replenishFeatures(img_cur, this->fea_ref) != 0) {
+    return -1;
   }
 
   // Update

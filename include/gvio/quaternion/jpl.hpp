@@ -125,6 +125,19 @@ Mat4 quatlcomp(const Vec4 &q);
 Mat4 quatrcomp(const Vec4 &q);
 
 /**
+ * Convert the vector part of a quaternion to a full quaternion.
+ *
+ * This function is useful to convert delta quaternion which is usually a 3x1
+ * vector to a full quaternion.  For more details, check Section 3.2 Kalman
+ * Filter Update of Equation (217) and (218) in "Indirect Kalman Filter for 3D
+ * Attitude Estimation" by Trawny and Roumeliotis.
+ *
+ * @param dtheta Small angle vector to form full quaternion with
+ * @returns Small angle Quaternion
+ */
+Vec4 quatsmallangle(const Vec3 &dtheta);
+
+/**
  * Quaternion to Euler-angles
  *
  * @param q Quaternion in (x, y, z, w)
