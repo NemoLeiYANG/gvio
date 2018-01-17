@@ -37,11 +37,12 @@ cd tests
 # ./kitti-raw-oxts_test
 # ./kitti-raw-parse_test
 # ./kitti-raw-raw_test
-./msckf-camera_state_test
-./msckf-imu_state_test
+# ./msckf-camera_state_test
+# ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-# ./msckf-msckf_test
+./msckf-msckf_test
 # ./msckf-profiler_test
+# ./sim-twowheel_test
 # ./util-config_test
 # ./util-data_test
 # ./util-file_test

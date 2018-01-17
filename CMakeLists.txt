@@ -66,6 +66,8 @@ ADD_LIBRARY(
   src/pwm/pca9685.cpp
   # quaternion
   src/quaternion/jpl.cpp
+  # sim
+  src/sim/twowheel.cpp
   # utils
   src/util/config.cpp
   src/util/data.cpp
@@ -117,6 +119,7 @@ SET(UNITTESTS
   msckf-feature_estimator_test
   msckf-imu_state_test
   msckf-msckf_test
+  sim-twowheel_test
   util-config_test
   util-data_test
   util-file_test

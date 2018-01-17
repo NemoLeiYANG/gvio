@@ -68,14 +68,11 @@ public:
   // -- Extrinsics
   Vec3 ext_p_IC = zeros(3, 1);
   Vec4 ext_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
-  // -- Noise
-  double n_u = 1.0;
-  double n_v = 1.0;
 
   // Settings
   int max_window_size = 200;
   int max_nb_tracks = 200;
-  int min_track_length = 15;
+  int min_track_length = 8;
   bool enable_ns_trick = true;
   bool enable_qr_trick = true;
 
@@ -113,16 +110,6 @@ public:
          const Vec3 &p_G_f,
          MatX &H_f_j,
          MatX &H_x_j);
-
-  /**
-   * Return measurement covariance matrix R
-   *
-   * @param n_u Noise in x-axis
-   * @param n_v Noise in y-axis
-   * @param nb_residuals Number of residuals
-   * @param R Measurement covariance matrix R
-   */
-  void R(const double n_u, const double n_v, const int nb_residuals, MatX &R);
 
   /**
    * Initialize
@@ -173,16 +160,12 @@ public:
    * @param track Feature track
    * @param H_j Measurement jacobian matrix
    * @param r_j Residuals vector
-   * @param R_j Measurement covariance matrix
    *
    * @returns
    *  - -1: Track length < Min track length
    *  - -2: Failed to estimate feature position
    */
-  int residualizeTrack(const FeatureTrack &track,
-                       MatX &H_j,
-                       VecX &r_j,
-                       MatX &R_j);
+  int residualizeTrack(const FeatureTrack &track, MatX &H_j, VecX &r_j);
 
   /**
    * Calculate residuals
@@ -190,16 +173,12 @@ public:
    * @param tracks Feature tracks
    * @param T_H
    * @param r_n Residuals vector
-   * @param R_n Measurement covariance matrix
    *
    * @returns
    *  - -1: Track length < Min track length
    *  - -2: Failed to estimate feature position
    */
-  int calResiduals(const FeatureTracks &tracks,
-                   MatX &T_H,
-                   VecX &r_n,
-                   MatX &R_n);
+  int calResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n);
 
   /**
    * Correct IMU state

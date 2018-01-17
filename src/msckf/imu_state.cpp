@@ -57,24 +57,19 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   const Vec3 a_hat = a_m;
   const Vec3 w_hat = w_m;
 
-  // Propagate IMU states
-  // clang-format off
-  // -- Orientation
-  this->q_IG = this->q_IG + 0.5 * Omega(w_hat) * q_IG * dt;
-  this->q_IG = quatnormalize(q_IG);
-  // -- Gyro bias
-  this->b_g = this->b_g + zeros(3, 1);
-  // -- Velocity
-  this->v_G = this->v_G + (C(this->q_IG).transpose() * a_hat - 2 * skew(this->w_G) * this->v_G - skewsq(this->w_G) * this->p_G + this->g_G) * dt;
-  // -- Accel bias
-  this->b_a = this->b_a + zeros(3, 1);
-  // -- Position
-  this->p_G = this->p_G + v_G * dt;
-  // clang-format on
-
   // Build the jacobians F and G
   const MatX F = this->F(w_hat, this->q_IG, a_hat, w_G);
   const MatX G = this->G(this->q_IG);
+
+  // Propagate IMU states
+  // clang-format off
+  // -- Orientation
+  this->q_IG += 0.5 * Omega(w_hat) * q_IG * dt;
+  // -- Velocity
+  this->v_G += (C(this->q_IG).transpose() * a_hat - 2 * skew(this->w_G) * this->v_G - skewsq(this->w_G) * this->p_G + this->g_G) * dt;
+  // -- Position
+  this->p_G += v_G * dt;
+  // clang-format on
 
   // Update covariance
   // clang-format off

@@ -32,7 +32,7 @@ public:
   Vec3 w_G = zeros(3, 1);           ///< Earth's angular velocity
   Vec3 g_G = Vec3{0.0, 0.0, -9.81}; ///< Gravitational acceleration
 
-  MatX P = 1e-6 * I(15); ///< Covariance matrix
+  MatX P = 1e-5 * I(15); ///< Covariance matrix
   MatX Q = 1e-2 * I(12); ///< Noise matrix
   MatX Phi = zeros(15);  ///< Phi matrix
 

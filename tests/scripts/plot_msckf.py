@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 import matplotlib.pylab as plt
 
@@ -88,10 +90,11 @@ def plot_measurements(mea_data):
 
 
 if __name__ == "__main__":
-    est_data = parse_data("/tmp/test_msckf_predictionUpdate_est.dat")
-    mea_data = parse_data("/tmp/test_msckf_predictionUpdate_mea.dat")
-    gnd_data = parse_data("/tmp/test_msckf_predictionUpdate_gnd.dat")
-    win_data = parse_data("/tmp/test_msckf_predictionUpdate_win.dat")
+    base_path = sys.argv[1]
+    est_data = parse_data(base_path + "_est.dat")
+    mea_data = parse_data(base_path + "_mea.dat")
+    gnd_data = parse_data(base_path + "_gnd.dat")
+    win_data = parse_data(base_path + "_win.dat")
 
     plot_position(est_data, win_data, gnd_data)
     plot_attitude(est_data, gnd_data)

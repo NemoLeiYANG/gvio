@@ -11,8 +11,6 @@ int MSCKF::configure(const std::string &config_file) {
   parser.addParam("imu.gravity_constant", &this->imu_state.g_G);
   parser.addParam("extrinsics.p_IC", &this->ext_p_IC);
   parser.addParam("extrinsics.q_CI", &this->ext_q_CI);
-  parser.addParam("n_u", &this->n_u);
-  parser.addParam("n_v", &this->n_v);
   parser.addParam("max_window_size", &this->max_window_size);
   parser.addParam("max_nb_tracks", &this->max_nb_tracks);
   parser.addParam("min_track_length", &this->min_track_length);
@@ -109,18 +107,6 @@ void MSCKF::H(const FeatureTrack &track,
   }
 }
 
-void MSCKF::R(const double n_u,
-              const double n_v,
-              const int nb_residuals,
-              MatX &R) {
-  Vec2 noise{n_u, n_v};
-  R = zeros(nb_residuals, nb_residuals);
-  for (int i = 0; i < nb_residuals; i += 2) {
-    R(i, i) = n_u;
-    R(i + 1, i + 1) = n_v;
-  }
-}
-
 int MSCKF::initialize() {
   this->augmentState();
   this->state = MSCKFState::INITIALIZED;
@@ -209,8 +195,7 @@ void MSCKF::predictionUpdate(const Vec3 &a_m,
 
 int MSCKF::residualizeTrack(const FeatureTrack &track,
                             MatX &H_o_j,
-                            VecX &r_o_j,
-                            MatX &R_o_j) {
+                            VecX &r_o_j) {
   // Pre-check
   if (track.trackedLength() < (size_t) this->min_track_length) {
     return -1;
@@ -250,11 +235,6 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
   MatX H_x_j;
   this->H(track, track_cam_states, p_G_f, H_f_j, H_x_j);
 
-  // Form the covariance matrix of different feature observations
-  const int nb_residuals = r_j.rows();
-  MatX R_j;
-  this->R(this->n_u, this->n_v, nb_residuals, R_j);
-
   // Perform Null Space Trick
   if (this->enable_ns_trick) {
     // Perform null space trick to decorrelate feature position error
@@ -266,21 +246,16 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     const MatX A_j = svd.matrixU().rightCols(H_f_j.rows() - 3);
     H_o_j = A_j.transpose() * H_x_j;
     r_o_j = A_j.transpose() * r_j;
-    R_o_j = A_j.transpose() * R_j * A_j;
 
   } else {
     H_o_j = H_x_j;
     r_o_j = r_j;
-    R_o_j = R_j;
   }
 
   return 0;
 }
 
-int MSCKF::calResiduals(const FeatureTracks &tracks,
-                        MatX &T_H,
-                        VecX &r_n,
-                        MatX &R_n) {
+int MSCKF::calResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
   // Residualize feature tracks
   MatX H_o;
   VecX r_o;
@@ -292,7 +267,7 @@ int MSCKF::calResiduals(const FeatureTracks &tracks,
     VecX r_j;
     MatX R_j;
 
-    if (this->residualizeTrack(track, H_j, r_j, R_j) == 0) {
+    if (this->residualizeTrack(track, H_j, r_j) == 0) {
       // Stack measurement jacobian matrix and residual vector
       if (stack_residuals) {
         H_o = vstack(H_o, H_j);
@@ -329,12 +304,10 @@ int MSCKF::calResiduals(const FeatureTracks &tracks,
 
     T_H = H_temp.topRows(IMUState::size + this->N() * CameraState::size);
     r_n = r_temp.head(IMUState::size + this->N() * CameraState::size);
-    R_n = R_o;
 
   } else {
     T_H = H_o;
     r_n = r_o;
-    R_n = R_o;
   }
 
   return 0;
@@ -390,17 +363,18 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
   // Calculate residuals
   MatX T_H;
   VecX r_n;
-  MatX R_n;
-  if (this->calResiduals(tracks, T_H, r_n, R_n) != 0) {
+  if (this->calResiduals(tracks, T_H, r_n) != 0) {
     // this->pruneCameraState();
     return -2;
   }
 
   // Calculate the Kalman gain.
   const MatX P = this->P();
-  const MatX S = T_H * P * T_H.transpose() + 0.1 * I(T_H.rows());
-  const MatX K_transpose = S.ldlt().solve(T_H * P);
-  const MatX K = K_transpose.transpose();
+  const MatX R_n = 1.0 * I(T_H.rows());
+  const MatX S = T_H * P * T_H.transpose() + 1.0 * I(T_H.rows());
+  const MatX K = S.ldlt().solve(T_H * P).transpose();
+  // const MatX K =
+  //     P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
 
   // Correct states
   const VecX dx = K * r_n;
@@ -409,19 +383,19 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
 
   // Update covariance matrices
   const MatX I_KH = I(K.rows(), T_H.cols()) - K * T_H;
-  const MatX P_updated = I_KH * P;
+  const MatX P_new = (I_KH * P + (I_KH * P).transpose()) / 2.0;
+  // const MatX P_new = I_KH * P * I_KH.transpose() + K * R_n * K.transpose();
 
-  // Fix covariance matrix to be symmetric
-  const MatX P_fixed = (P_updated + P_updated.transpose()) / 2.0;
-  this->imu_state.P = P_fixed.block(0, 0, IMUState::size, IMUState::size);
-  this->P_cam = P_fixed.block(IMUState::size,
-                              IMUState::size,
-                              P_fixed.rows() - IMUState::size,
-                              P_fixed.cols() - IMUState::size);
-  this->P_imu_cam = P_fixed.block(0,
-                                  IMUState::size,
-                                  IMUState::size,
-                                  P_fixed.cols() - IMUState::size);
+  // Update covariance matrix
+  this->imu_state.P = P_new.block(0, 0, IMUState::size, IMUState::size);
+  this->P_cam = P_new.block(IMUState::size,
+                            IMUState::size,
+                            P_new.rows() - IMUState::size,
+                            P_new.cols() - IMUState::size);
+  this->P_imu_cam = P_new.block(0,
+                                IMUState::size,
+                                IMUState::size,
+                                P_new.cols() - IMUState::size);
 
   // Prune camera state to maintain sliding window size
   // this->pruneCameraState();
