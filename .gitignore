@@ -16,9 +16,6 @@ obj
 tags
 build
 
-# scripts and folders
-run.sh
-
 # matlab
 *.mat
 octave-workspace
