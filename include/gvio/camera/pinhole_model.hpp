@@ -21,8 +21,6 @@ class PinholeModel : public CameraModel {
 public:
   std::string model_name = "pinhole";
 
-  int image_width = 0;
-  int image_height = 0;
   MatX K = zeros(3, 3); ///< Camera intrinsics
   double cx = 0.0;      ///< Principle center in x-axis
   double cy = 0.0;      ///< Principle center in y-axis
@@ -33,8 +31,8 @@ public:
   virtual ~PinholeModel() {}
 
   PinholeModel(const int image_width, const int image_height, const MatX &K)
-      : image_width{image_width}, image_height{image_height}, K{K}, cx{K(0, 2)},
-        cy{K(1, 2)}, fx{K(0, 0)}, fy{K(1, 1)} {}
+      : CameraModel{image_width, image_height}, K{K}, cx{K(0, 2)}, cy{K(1, 2)},
+        fx{K(0, 0)}, fy{K(1, 1)} {}
 
   PinholeModel(const int image_width,
                const int image_height,
@@ -42,8 +40,7 @@ public:
                const double fy,
                const double cx,
                const double cy)
-      : image_width{image_width}, image_height{image_height}, cx{cx}, cy{cy},
-        fx{fx}, fy{fy} {
+      : CameraModel{image_width, image_height}, cx{cx}, cy{cy}, fx{fx}, fy{fy} {
     this->K = Mat3::Zero();
     K(0, 0) = fx;
     K(1, 1) = fy;
@@ -112,6 +109,17 @@ public:
   Vec2 project(const Vec3 &X, const Mat3 &R, const Vec3 &t) override;
 
   /**
+   * Project 3D point to image plane
+   *
+   * @param X 3D point in homogeneous coordinates
+   * @param R Rotation matrix
+   * @param t translation vector
+   *
+   * @returns 3D point in image plane (homogenous)
+   */
+  Vec3 project(const Vec4 &X, const Mat3 &R, const Vec3 &t) override;
+
+  /**
    * Convert pixel measurement to image coordinates
    *
    * @param pixel Pixel measurement
@@ -149,19 +157,6 @@ public:
    * @copydoc Vec2 pixel2image(const cv::KeyPoint &pixel)
    */
   Vec2 pixel2image(const cv::KeyPoint &pixel) const override;
-
-  /**
-   * Return features are observed by camera
-   *
-   * @param features Features
-   * @param rpy Rotation (roll, pitch  yaw)
-   * @param t Time (s)
-   * @param mask Features observed mask where 1 denotes observed or else 0
-   */
-  MatX observedFeatures(const MatX &features,
-                        const Vec3 &rpy,
-                        const Vec3 &t,
-                        std::vector<int> &mask) override;
 };
 
 /** @} group camera */

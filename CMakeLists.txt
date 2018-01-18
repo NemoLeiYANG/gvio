@@ -69,7 +69,8 @@ ADD_LIBRARY(
   # sim
   src/sim/carrot_controller.cpp
   src/sim/twowheel.cpp
-  src/sim/world.cpp
+  src/sim/virtual_camera.cpp
+  src/sim/sim_world.cpp
   # utils
   src/util/config.cpp
   src/util/data.cpp
@@ -123,7 +124,8 @@ SET(UNITTESTS
   msckf-msckf_test
   sim-carrot_controller_test
   sim-twowheel_test
-  sim-world_test
+  sim-virtual_camera_test
+  sim-sim_world_test
   util-config_test
   util-data_test
   util-file_test

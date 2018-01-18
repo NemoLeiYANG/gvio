@@ -1,5 +1,5 @@
 #include "gvio/munit.hpp"
-#include "gvio/sim/world.hpp"
+#include "gvio/sim/sim_world.hpp"
 
 namespace gvio {
 
@@ -65,8 +65,8 @@ int test_SimWorld_create3DFeaturePerimeter() {
     MU_CHECK(feature(2) <= origin(2) + dimensions(2) / 2.0);
   }
 
-  mat2csv("/tmp/features.dat", features);
-  PYTHON_SCRIPT("scripts/plot_world.py /tmp/features.dat");
+  // mat2csv("/tmp/features.dat", features);
+  // PYTHON_SCRIPT("scripts/plot_world.py /tmp/features.dat");
 
   return 0;
 }

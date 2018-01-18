@@ -143,31 +143,6 @@ int test_PinholeModel_pixel2image() {
   return 0;
 }
 
-int test_PinholeModel_observedFeatures() {
-  struct test_config config;
-  PinholeModel cam_model = setup_pinhole_model();
-
-  MatX features;
-  features.resize(3, 1);
-  features << 0.0, 0.0, 10.0;
-
-  Vec3 rpy{0.0, 0.0, 0.0};
-  Vec3 t{0.0, 0.0, 0.0};
-
-  MatX observed;
-  std::vector<int> mask;
-  observed = cam_model.observedFeatures(features, rpy, t, mask);
-
-  MU_CHECK_EQ(1, mask.size());
-  MU_CHECK_EQ(0, mask[0]);
-  MU_CHECK_EQ(2, observed.rows());
-  MU_CHECK_EQ(1, observed.cols());
-  MU_CHECK_EQ(320.0, observed(0, 0));
-  MU_CHECK_EQ(320.0, observed(1, 0));
-
-  return 0;
-}
-
 void test_suite() {
   MU_ADD_TEST(test_PinholeModel_constructor);
   MU_ADD_TEST(test_PinholeModel_constructor2);
@@ -176,7 +151,6 @@ void test_suite() {
   MU_ADD_TEST(test_PinholeModel_P);
   MU_ADD_TEST(test_PinholeModel_project);
   MU_ADD_TEST(test_PinholeModel_pixel2image);
-  MU_ADD_TEST(test_PinholeModel_observedFeatures);
 }
 
 } // namespace gvio

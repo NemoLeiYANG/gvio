@@ -72,6 +72,13 @@ Vec2 PinholeModel::project(const Vec3 &X, const Mat3 &R, const Vec3 &t) {
   return x.block(0, 0, 2, 1);
 }
 
+Vec3 PinholeModel::project(const Vec4 &X, const Mat3 &R, const Vec3 &t) {
+  // Project 3D point to image plane
+  const Mat34 P = this->P(R, t);
+  Vec3 x = P * X;
+  return x;
+}
+
 Vec2 PinholeModel::pixel2image(const Vec2 &pixel) {
   Vec2 pt((pixel(0) - this->cx) / this->fx, (pixel(1) - this->cy) / this->fy);
   return pt;
@@ -96,55 +103,6 @@ Vec2 PinholeModel::pixel2image(const cv::Point2f &pixel) const {
 
 Vec2 PinholeModel::pixel2image(const cv::KeyPoint &kp) const {
   return this->pixel2image(Vec2{kp.pt.x, kp.pt.y});
-}
-
-MatX PinholeModel::observedFeatures(const MatX &features,
-                                    const Vec3 &rpy,
-                                    const Vec3 &t,
-                                    std::vector<int> &mask) {
-  // Rotation matrix
-  Mat3 R = euler123ToRot(rpy);
-
-  // projection matrix
-  Mat34 P = this->P(R, t);
-
-  // Check which features are observable from camera
-  std::vector<Vec2> observed;
-  for (int i = 0; i < features.cols(); i++) {
-    // Project 3D world point to 2D image plane
-    const Vec3 point = features.col(i);
-    Vec3 img_pt = P * homogeneous(point);
-
-    // Check to see if feature is valid and infront of camera
-    if (img_pt(2) < 1.0) {
-      continue; // skip this feature! It is not infront of camera
-    }
-
-    // Normalize pixels
-    img_pt(0) = img_pt(0) / img_pt(2);
-    img_pt(1) = img_pt(1) / img_pt(2);
-    img_pt(2) = img_pt(2) / img_pt(2);
-
-    // Check to see if feature observed is within image plane
-    const bool x_ok = (img_pt(0) < this->image_width) && (img_pt(0) > 0.0);
-    const bool y_ok = (img_pt(1) < this->image_height) && (img_pt(1) > 0.0);
-    if (x_ok && y_ok) {
-      observed.emplace_back(img_pt(0), img_pt(1));
-      mask.push_back(i);
-    }
-  }
-
-  // Convert vector of Vec3 to MatX
-  MatX result;
-  result.resize(2, observed.size());
-
-  int index = 0;
-  for (auto v : observed) {
-    result.block(0, index, 2, 1) = v;
-    index++;
-  }
-
-  return result;
 }
 
 } // namespace gvio

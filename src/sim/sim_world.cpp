@@ -1,4 +1,4 @@
-#include "gvio/sim/world.hpp"
+#include "gvio/sim/sim_world.hpp"
 
 namespace gvio {
 

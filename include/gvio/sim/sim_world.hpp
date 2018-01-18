@@ -2,8 +2,8 @@
  * @file
  * @defgroup sim sim
  */
-#ifndef GVIO_SIM_WORLD_HPP
-#define GVIO_SIM_WORLD_HPP
+#ifndef GVIO_SIM_SIM_WORLD_HPP
+#define GVIO_SIM_SIM_WORLD_HPP
 
 #include "gvio/util/util.hpp"
 #include "gvio/sim/twowheel.hpp"
@@ -44,4 +44,4 @@ public:
 
 /** @} group sim */
 } // namespace gvio
-#endif // GVIO_SIM_WORLD_HPP
+#endif // GVIO_SIM_SIM_WORLD_HPP
