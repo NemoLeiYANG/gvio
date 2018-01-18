@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/util/vision.hpp"
 #include "gvio/camera/camera_config.hpp"
 

@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/apriltag/mit.hpp"
 #include "gvio/camera/camera.hpp"
 

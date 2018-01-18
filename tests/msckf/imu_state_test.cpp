@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/msckf/imu_state.hpp"
 
 namespace gvio {

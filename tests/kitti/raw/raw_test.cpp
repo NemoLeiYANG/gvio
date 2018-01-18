@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/kitti/raw/raw.hpp"
 
 namespace gvio {

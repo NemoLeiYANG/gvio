@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/kitti/raw/oxts.hpp"
 
 #ifndef TEST_KITTI_DATA

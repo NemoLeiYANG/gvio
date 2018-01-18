@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/camera/ids.hpp"
 
 #define TEST_CONFIG_PATH "test_configs/camera/webcam"

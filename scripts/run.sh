@@ -42,8 +42,8 @@ cd tests
 # ./msckf-feature_estimator_test
 # ./msckf-msckf_test
 # ./msckf-profiler_test
-./sim-carrot_controller_test
-# ./sim-twowheel_test
+# ./sim-carrot_controller_test
+./sim-twowheel_test
 # ./util-config_test
 # ./util-data_test
 # ./util-file_test
@@ -56,3 +56,4 @@ cd tests
 # python3 scripts/plot_msckf.py
 # python3 scripts/plot_feature_track.py /tmp/track.dat 1242 375
 # python3 scripts/plot_feature_tracks.py /tmp/feature_tracks 1242 375
+# python3 scripts/plot_twowheel.py /tmp/twowheel.dat

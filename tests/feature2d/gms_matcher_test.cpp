@@ -1,6 +1,6 @@
 #include <sys/time.h>
 
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/feature2d/gms_matcher.hpp"
 
 namespace gvio {

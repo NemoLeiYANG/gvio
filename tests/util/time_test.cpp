@@ -1,6 +1,6 @@
 #include <unistd.h>
 
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/util/time.hpp"
 
 namespace gvio {

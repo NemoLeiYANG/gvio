@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/kitti/kitti.hpp"
 #include "gvio/feature2d/orb_tracker.hpp"
 

@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/camera/pinhole_model.hpp"
 
 namespace gvio {

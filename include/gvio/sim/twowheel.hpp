@@ -14,6 +14,18 @@ namespace gvio {
  */
 
 /**
+ * Calculate target angular velocity given a desired circle
+ * trajectory of radius r and velocity v
+ *
+ * @param r Desired circle radius
+ * @param v Desired trajectory velocity
+ * @param w Target angular velocity to complete a circle of radius r and
+ *          velocity v
+ * @param time Target time taken to complete circle trajectory
+ **/
+void circle_trajectory(const double r, const double v, double *w, double *time);
+
+/**
  * Two wheel robot
  */
 class TwoWheelRobot {

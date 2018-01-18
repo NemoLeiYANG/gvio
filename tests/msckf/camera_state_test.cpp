@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/msckf/camera_state.hpp"
 
 namespace gvio {

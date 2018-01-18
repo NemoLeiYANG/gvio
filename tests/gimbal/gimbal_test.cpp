@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/gimbal/gimbal.hpp"
 
 #define TEST_CONFIG "test_configs/gimbal/config.yaml"

@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/sim/carrot_controller.hpp"
 
 namespace gvio {

@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 
 namespace gvio {

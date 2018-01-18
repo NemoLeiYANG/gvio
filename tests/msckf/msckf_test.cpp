@@ -1,4 +1,4 @@
-#include "gvio/munit.h"
+#include "gvio/munit.hpp"
 #include "gvio/util/util.hpp"
 #include "gvio/kitti/kitti.hpp"
 #include "gvio/msckf/msckf.hpp"
@@ -11,13 +11,6 @@
 namespace gvio {
 
 static const std::string KITTI_RAW_DATASET = "/data/kitti/raw";
-
-#define PYTHON_SCRIPT(A)                                                       \
-  int retval = system("python3 " A);                                           \
-  if (retval != 0) {                                                           \
-    LOG_ERROR("Python script [%s] failed !", A);                               \
-    return -1;                                                                 \
-  }
 
 int test_MSCKF_constructor() {
   MSCKF msckf;
