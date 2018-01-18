@@ -43,7 +43,8 @@ cd tests
 # ./msckf-msckf_test
 # ./msckf-profiler_test
 # ./sim-carrot_controller_test
-./sim-twowheel_test
+# ./sim-twowheel_test
+./sim-world_test
 # ./util-config_test
 # ./util-data_test
 # ./util-file_test

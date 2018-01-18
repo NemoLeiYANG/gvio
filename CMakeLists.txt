@@ -4,8 +4,8 @@ PROJECT(gvio)
 # C++ COMPILER SETTINGS
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
-SET(CMAKE_BUILD_TYPE RELEASE)
-# SET(CMAKE_BUILD_TYPE DEBUG)
+# SET(CMAKE_BUILD_TYPE RELEASE)
+SET(CMAKE_BUILD_TYPE DEBUG)
 
 # DEPENDENCIES
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -69,6 +69,7 @@ ADD_LIBRARY(
   # sim
   src/sim/carrot_controller.cpp
   src/sim/twowheel.cpp
+  src/sim/world.cpp
   # utils
   src/util/config.cpp
   src/util/data.cpp
@@ -122,6 +123,7 @@ SET(UNITTESTS
   msckf-msckf_test
   sim-carrot_controller_test
   sim-twowheel_test
+  sim-world_test
   util-config_test
   util-data_test
   util-file_test

@@ -14,13 +14,12 @@ namespace gvio {
  */
 
 /**
- * Calculate target angular velocity given a desired circle
- * trajectory of radius r and velocity v
+ * Calculate target angular velocity and time taken to traverse a desired
+ * circle * trajectory of radius r and velocity v
  *
  * @param r Desired circle radius
  * @param v Desired trajectory velocity
- * @param w Target angular velocity to complete a circle of radius r and
- *          velocity v
+ * @param w Target angular velocity
  * @param time Target time taken to complete circle trajectory
  **/
 void circle_trajectory(const double r, const double v, double *w, double *time);
@@ -48,7 +47,15 @@ public:
    * @param dt Time difference (s)
    */
   void update(const double ax_B, const double wz_B, const double dt);
+
+  /**
+   * Update
+   *
+   * @param dt Time difference (s)
+   */
+  void update(const double dt);
 };
 
+/** @} group sim */
 } // namespace gvio
 #endif // GVIO_SIM_TWOWHEEL_HPP

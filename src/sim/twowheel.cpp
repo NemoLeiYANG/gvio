@@ -21,7 +21,18 @@ void TwoWheelRobot::update(const double ax_B,
   this->p_G(0) += v_B(0) * cos(this->rpy_G(2)) * dt;
   this->p_G(1) += v_B(0) * sin(this->rpy_G(2)) * dt;
   this->p_G(2) += v_B(2) * dt;
-  this->rpy_G(2) += wz_B * dt;
+  this->rpy_G += w_B * dt;
+}
+
+void TwoWheelRobot::update(const double dt) {
+  this->w_B = this->w_B;
+  this->a_B = this->a_B;
+  this->v_B += this->a_B * dt;
+
+  this->p_G(0) += v_B(0) * cos(this->rpy_G(2)) * dt;
+  this->p_G(1) += v_B(0) * sin(this->rpy_G(2)) * dt;
+  this->p_G(2) += v_B(2) * dt;
+  this->rpy_G += w_B * dt;
 }
 
 } // namespace gvio

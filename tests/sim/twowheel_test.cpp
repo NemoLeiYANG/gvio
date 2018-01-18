@@ -31,6 +31,7 @@ int test_TwoWheel_update() {
   TwoWheelRobot robot;
   double t_end = 0.0;
   const double dt = 0.1;
+
   double wz_B = 0.0;
   double ax_B = 0.0;
   circle_trajectory(10.0, 1.0, &wz_B, &t_end);
@@ -47,11 +48,6 @@ int test_TwoWheel_update() {
 
   // Simulate robot motion
   for (double t = 0.0; t < t_end; t += dt) {
-    // Control
-    if (robot.v_B(0) > 1.0) {
-      ax_B = 0.0;
-    }
-
     // Update
     robot.update(ax_B, wz_B, dt);
 
