@@ -40,8 +40,9 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-./msckf-msckf_test
+# ./msckf-msckf_test
 # ./msckf-profiler_test
+./sim-carrot_controller_test
 # ./sim-twowheel_test
 # ./util-config_test
 # ./util-data_test
