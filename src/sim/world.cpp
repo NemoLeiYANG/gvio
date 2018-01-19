@@ -1,4 +1,4 @@
-#include "gvio/sim/sim_world.hpp"
+#include "gvio/sim/world.hpp"
 
 namespace gvio {
 
@@ -6,6 +6,11 @@ int SimWorld::configure(const double dt) {
   // Time settings
   this->t = 0.0;
   this->dt = dt;
+
+  // Features
+  this->features3d = this->create3DFeaturePerimeter(this->origin,
+                                                    this->dimensions,
+                                                    this->nb_features);
 
   // Robot settings
   double circle_radius = 10.0;
@@ -16,7 +21,99 @@ int SimWorld::configure(const double dt) {
   this->robot.v_B(0) = vx_B;
   this->robot.a_B = zeros(3, 1);
 
+  // Camera settings
+  const int image_width = 640;
+  const int image_height = 640;
+  const double fov = 60.0;
+  const double fx = PinholeModel::focalLengthX(image_width, fov);
+  const double fy = PinholeModel::focalLengthY(image_height, fov);
+  const double cx = image_width / 2.0;
+  const double cy = image_height / 2.0;
+  this->camera = VirtualCamera(image_width, image_height, fx, fy, cx, cy);
+
+  // Setup output file
+  // std::ofstream output_file("/tmp/twowheel.dat");
+  // if (output_file.good() == false) {
+  //   LOG_ERROR("Failed to open file for output!");
+  //   return -1;
+  // }
+  //
+  // const std::string header = "t,x,y,z,roll,pitch,yaw";
+  // output_file << header << std::endl;
+  //
+  // Record initial robot state
+  // output_file << 0.0 << ",";
+  // output_file << robot.p_G(0) << ",";
+  // output_file << robot.p_G(1) << ",";
+  // output_file << robot.p_G(2) << ",";
+  // output_file << robot.rpy_G(0) << ",";
+  // output_file << robot.rpy_G(1) << ",";
+  // output_file << robot.rpy_G(2) << std::endl;
+  //
+  // // Record robot state
+  // output_file << t << ",";
+  // output_file << robot.p_G(0) << ",";
+  // output_file << robot.p_G(1) << ",";
+  // output_file << robot.p_G(2) << ",";
+  // output_file << robot.rpy_G(0) << ",";
+  // output_file << robot.rpy_G(1) << ",";
+  // output_file << robot.rpy_G(2) << std::endl;
+
   return 0;
+}
+
+void SimWorld::detectFeatures() {
+  // Check what features are observed
+  std::vector<int> feature_ids;
+  MatX keypoints = camera.observedFeatures(this->features3d,
+                                           this->robot.rpy_G,
+                                           this->robot.p_G,
+                                           feature_ids);
+
+  // Get features lost
+  std::vector<int> tracks_lost;
+  std::set_difference(this->features_tracking.begin(),
+                      this->features_tracking.end(),
+                      feature_ids.begin(),
+                      feature_ids.end(),
+                      std::inserter(tracks_lost, tracks_lost.begin()));
+
+  // Add or updated features observed
+  for (size_t i = 0; i < feature_ids.size(); i++) {
+    const size_t feature_id = feature_ids[i];
+    const Vec2 kp = keypoints.row(i).transpose();
+    const Feature f{kp};
+
+    if (this->tracks_tracking.count(feature_id)) {
+      // Update feature track
+      this->tracks_tracking[feature_id].update(this->time_index, f);
+
+    } else {
+      // Add feature track
+      FeatureTrack track;
+      track.frame_start = this->time_index;
+      track.frame_end = this->time_index;
+      track.track.push_back(f);
+      this->tracks_tracking[feature_id] = track;
+    }
+  }
+  this->features_tracking = feature_ids;
+
+  // Remove lost features
+  for (auto feature_id : tracks_lost) {
+    this->tracks_lost.push_back(this->tracks_tracking[feature_id]);
+    this->tracks_tracking.erase(this->tracks_tracking.find(feature_id));
+  }
+}
+
+FeatureTracks SimWorld::removeLostTracks() {
+  FeatureTracks lost_tracks;
+  for (auto track : this->tracks_lost) {
+    lost_tracks.push_back(track);
+  }
+
+  this->tracks_lost.clear();
+  return lost_tracks;
 }
 
 MatX SimWorld::create3DFeatures(const struct feature_bounds &bounds,
@@ -107,8 +204,12 @@ MatX SimWorld::create3DFeaturePerimeter(const Vec3 &origin,
 
 int SimWorld::step() {
   // Update robot
-  robot.update(this->dt);
+  this->robot.update(this->dt);
   this->t += this->dt;
+  this->time_index++;
+
+  // Update camera
+  this->detectFeatures();
 
   return 0;
 }

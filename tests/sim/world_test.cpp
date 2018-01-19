@@ -1,5 +1,5 @@
 #include "gvio/munit.hpp"
-#include "gvio/sim/sim_world.hpp"
+#include "gvio/sim/world.hpp"
 
 namespace gvio {
 
@@ -71,12 +71,65 @@ int test_SimWorld_create3DFeaturePerimeter() {
   return 0;
 }
 
+int test_SimWorld_detectFeatures() {
+  SimWorld world;
+
+  world.configure(0.1);
+  world.detectFeatures();
+  for (int i = 0; i < 100; i++) {
+    world.step();
+  }
+  world.detectFeatures();
+
+  MU_CHECK(world.features_tracking.size() > 0);
+  MU_CHECK(world.tracks_tracking.size() > 0);
+  MU_CHECK(world.tracks_lost.size() > 0);
+
+  return 0;
+}
+
+int test_SimWorld_removeLostTracks() {
+  SimWorld world;
+
+  world.configure(0.1);
+  world.detectFeatures();
+  for (int i = 0; i < 10; i++) {
+    std::cout << "frame: " << i << std::endl;
+    world.step();
+  }
+  FeatureTracks tracks = world.removeLostTracks();
+
+  MU_CHECK(tracks.size() > 0);
+  MU_CHECK_EQ(0, world.tracks_lost.size());
+
+  return 0;
+}
+
+int test_SimWorld_step() {
+  SimWorld world;
+
+  world.configure(0.1);
+  for (int i = 0; i < 10; i++) {
+    std::cout << "frame: " << i << std::endl;
+    world.step();
+  }
+  FeatureTracks tracks = world.removeLostTracks();
+
+  MU_CHECK(tracks.size() > 0);
+  MU_CHECK_EQ(0, world.tracks_lost.size());
+
+  return 0;
+}
+
 void test_suite() {
   MU_ADD_TEST(test_SimWorld_constructor);
   MU_ADD_TEST(test_SimWorld_constructor);
   MU_ADD_TEST(test_SimWorld_configure);
   MU_ADD_TEST(test_SimWorld_create3DFeatures);
   MU_ADD_TEST(test_SimWorld_create3DFeaturePerimeter);
+  MU_ADD_TEST(test_SimWorld_detectFeatures);
+  MU_ADD_TEST(test_SimWorld_removeLostTracks);
+  MU_ADD_TEST(test_SimWorld_step);
 }
 
 } // namespace gvio

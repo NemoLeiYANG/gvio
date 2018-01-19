@@ -1,4 +1,4 @@
-#include "gvio/sim/virtual_camera.hpp"
+#include "gvio/sim/camera.hpp"
 
 namespace gvio {
 
@@ -24,7 +24,7 @@ MatX VirtualCamera::observedFeatures(const MatX &features,
     const Vec3 t_C = rotx(-M_PI / 2.0) * rotz(-M_PI / 2.0) * t_G;
 
     // Project 3D world point to 2D image plane
-    Vec3 img_pt = this->camera_model->project(homogeneous(pt_C), R, t_C);
+    Vec3 img_pt = this->camera_model.project(homogeneous(pt_C), R, t_C);
 
     // Check to see if feature is valid and infront of camera
     if (img_pt(2) < 1.0) {
@@ -37,8 +37,8 @@ MatX VirtualCamera::observedFeatures(const MatX &features,
     img_pt(2) = img_pt(2) / img_pt(2);
 
     // Check to see if feature observed is within image plane
-    const int image_width = this->camera_model->image_width;
-    const int image_height = this->camera_model->image_height;
+    const int image_width = this->camera_model.image_width;
+    const int image_height = this->camera_model.image_height;
     const bool x_ok = (img_pt(0) < image_width) && (img_pt(0) > 0.0);
     const bool y_ok = (img_pt(1) < image_height) && (img_pt(1) > 0.0);
     if (x_ok && y_ok) {

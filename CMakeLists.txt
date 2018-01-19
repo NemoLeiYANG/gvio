@@ -67,10 +67,10 @@ ADD_LIBRARY(
   # quaternion
   src/quaternion/jpl.cpp
   # sim
+  src/sim/camera.cpp
   src/sim/carrot_controller.cpp
   src/sim/twowheel.cpp
-  src/sim/virtual_camera.cpp
-  src/sim/sim_world.cpp
+  src/sim/world.cpp
   # utils
   src/util/config.cpp
   src/util/data.cpp
@@ -122,10 +122,10 @@ SET(UNITTESTS
   msckf-feature_estimator_test
   msckf-imu_state_test
   msckf-msckf_test
+  sim-camera_test
   sim-carrot_controller_test
   sim-twowheel_test
-  sim-virtual_camera_test
-  sim-sim_world_test
+  sim-world_test
   util-config_test
   util-data_test
   util-file_test

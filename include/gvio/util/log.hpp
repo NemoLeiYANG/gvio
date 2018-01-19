@@ -24,10 +24,10 @@ namespace gvio {
 
 #define LOG_INFO(M, ...) fprintf(stdout, "[INFO] " M "\n", ##__VA_ARGS__)
 
-#ifdef DEBUG_MODE
-#define DEBUG(M, ...) fprintf(stdout, "[DEBUG] " M "\n", ##__VA_ARGS__)
-#else
+#ifdef NDEBUG
 #define DEBUG(M, ...)
+#else
+#define DEBUG(M, ...) fprintf(stdout, "[DEBUG] " M "\n", ##__VA_ARGS__)
 #endif
 
 /** @} group log */

@@ -1,6 +1,6 @@
 #include "gvio/munit.hpp"
 #include "gvio/camera/pinhole_model.hpp"
-#include "gvio/sim/virtual_camera.hpp"
+#include "gvio/sim/camera.hpp"
 
 namespace gvio {
 
@@ -15,28 +15,19 @@ struct test_config {
   const double cy = image_height / 2.0;
 };
 
-PinholeModel setup_pinhole_model() {
-  struct test_config config;
-
-  PinholeModel cam_model(config.image_width,
-                         config.image_height,
-                         config.fx,
-                         config.fy,
-                         config.cx,
-                         config.cy);
-  return cam_model;
-}
-
 int test_VirtualCamera_constructor() {
   VirtualCamera camera;
-  MU_CHECK_EQ(nullptr, camera.camera_model);
   return 0;
 }
 
 int test_VirtualCamera_observedFeatures() {
   struct test_config config;
-  PinholeModel camera_model = setup_pinhole_model();
-  VirtualCamera cam_model(&camera_model);
+  VirtualCamera cam_model(config.image_width,
+                          config.image_height,
+                          config.fx,
+                          config.fy,
+                          config.cx,
+                          config.cy);
 
   MatX features;
   features.resize(1, 3);

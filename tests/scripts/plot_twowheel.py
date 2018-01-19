@@ -31,6 +31,5 @@ def parse_data(data_path):
 if __name__ == "__main__":
     data_path = sys.argv[1]
     data = parse_data(data_path)
-
     plt.plot(data["x"], data["y"])
     plt.show()

@@ -2,11 +2,11 @@
  * @file
  * @ingroup sim
  */
-#ifndef GVIO_SIM_VIRTUAL_CAMERA_HPP
-#define GVIO_SIM_VIRTUAL_CAMERA_HPP
+#ifndef GVIO_SIM_CAMERA_HPP
+#define GVIO_SIM_CAMERA_HPP
 
 #include "gvio/util/util.hpp"
-#include "gvio/camera/camera_model.hpp"
+#include "gvio/camera/pinhole_model.hpp"
 
 namespace gvio {
 /**
@@ -19,19 +19,17 @@ namespace gvio {
  */
 class VirtualCamera {
 public:
-  CameraModel *camera_model = nullptr;
+  PinholeModel camera_model;
 
   VirtualCamera() {}
-  VirtualCamera(CameraModel *camera_model) : camera_model{camera_model} {}
+  VirtualCamera(const int image_width,
+                const int image_height,
+                const double fx,
+                const double fy,
+                const double cx,
+                const double cy)
+      : camera_model{image_width, image_height, fx, fy, cx, cy} {}
   virtual ~VirtualCamera() {}
-
-  /**
-   * Configure
-   *
-   * @param config_file Path to configuration file
-   * @returns 0 for success, -1 for failure
-   */
-  int configure(const std::string &config_file);
 
   /**
    * Return features are observed by camera
@@ -55,4 +53,4 @@ public:
 
 /** @} group camera */
 } // namespace gvio
-#endif // GVIO_SIM_VIRTUAL_CAMERA_HPP
+#endif // GVIO_SIM_SIM_CAMERA_HPP
