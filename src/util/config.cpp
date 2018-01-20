@@ -118,7 +118,9 @@ void ConfigParser::addParam(const std::string &key,
   this->params.emplace_back(CVMAT, key, out, optional);
 }
 
-int ConfigParser::getYamlNode(const std::string &key, YAML::Node &node) {
+int ConfigParser::getYamlNode(const std::string &key,
+                              const bool optional,
+                              YAML::Node &node) {
   std::string element;
   std::istringstream iss(key);
   std::vector<YAML::Node> traversal;
@@ -142,19 +144,7 @@ int ConfigParser::getYamlNode(const std::string &key, YAML::Node &node) {
   // tree/graph, to avoid this problem we store the visited YAML::Node into
   // a std::vector and return the last visited YAML::Node
 
-  return 0;
-}
-
-int ConfigParser::checkKey(const std::string &key, const bool optional) {
-  YAML::Node node;
-
-  // Pre-check
-  if (this->config_loaded == false) {
-    return -1;
-  }
-
   // check key
-  this->getYamlNode(key, node);
   if (!node && optional == false) {
     LOG_ERROR("Opps [%s] missing in yaml file [%s]!",
               key.c_str(),
@@ -169,7 +159,8 @@ int ConfigParser::checkKey(const std::string &key, const bool optional) {
 
 int ConfigParser::checkVector(const std::string &key,
                               const enum ConfigDataType type,
-                              const bool optional) {
+                              const bool optional,
+                              YAML::Node &node) {
   int retval;
   int vector_size;
 
@@ -179,7 +170,7 @@ int ConfigParser::checkVector(const std::string &key,
   }
 
   // check key
-  retval = this->checkKey(key, optional);
+  retval = this->getYamlNode(key, optional, node);
   if (retval != 0) {
     return retval;
   }
@@ -192,18 +183,20 @@ int ConfigParser::checkVector(const std::string &key,
   }
 
   // check number of values
-  if (this->root[key].size() != static_cast<size_t>(vector_size)) {
+  if (node.size() != static_cast<size_t>(vector_size)) {
     LOG_ERROR("Vector [%s] should have %d values but config has %d!",
               key.c_str(),
               vector_size,
-              static_cast<int>(this->root[key].size()));
+              static_cast<int>(node.size()));
     return -4;
   }
 
   return 0;
 }
 
-int ConfigParser::checkMatrix(const std::string &key, const bool optional) {
+int ConfigParser::checkMatrix(const std::string &key,
+                              const bool optional,
+                              YAML::Node &node) {
   int retval;
   const std::string targets[3] = {"rows", "cols", "data"};
 
@@ -213,7 +206,7 @@ int ConfigParser::checkMatrix(const std::string &key, const bool optional) {
   }
 
   // check key
-  retval = this->checkKey(key, optional);
+  retval = this->getYamlNode(key, optional, node);
   if (retval != 0) {
     return retval;
   }
@@ -236,13 +229,12 @@ int ConfigParser::loadPrimitive(ConfigParam &param) {
   YAML::Node node;
 
   // Pre-check
-  retval = this->checkKey(param.key, param.optional);
+  retval = this->getYamlNode(param.key, param.optional, node);
   if (retval != 0) {
     return retval;
   }
 
   // parse
-  this->getYamlNode(param.key, node);
   switch (param.type) {
     case BOOL: *static_cast<bool *>(param.data) = node.as<bool>(); break;
     case INT: *static_cast<int *>(param.data) = node.as<int>(); break;
@@ -267,13 +259,12 @@ int ConfigParser::loadArray(ConfigParam &param) {
   }
 
   // check parameters
-  retval = this->checkKey(param.key, param.optional);
+  retval = this->getYamlNode(param.key, param.optional, node);
   if (retval != 0) {
     return retval;
   }
 
   // parse
-  this->getYamlNode(param.key, node);
   switch (param.type) {
     case BOOL_ARRAY:
       for (auto n : node) {
@@ -318,13 +309,12 @@ int ConfigParser::loadVector(ConfigParam &param) {
   }
 
   // check parameter
-  retval = this->checkVector(param.key, param.type, param.optional);
+  retval = this->checkVector(param.key, param.type, param.optional, node);
   if (retval != 0) {
     return retval;
   }
 
   // parse
-  this->getYamlNode(param.key, node);
   switch (param.type) {
     case VEC2:
       *static_cast<Vec2 *>(param.data) << node[0].as<double>(),
@@ -332,6 +322,7 @@ int ConfigParser::loadVector(ConfigParam &param) {
       break;
 
     case VEC3:
+      std::cout << node[0].as<std::string>() << std::endl;
       *static_cast<Vec3 *>(param.data) << node[0].as<double>(),
           node[1].as<double>(), node[2].as<double>();
       break;
@@ -368,13 +359,12 @@ int ConfigParser::loadMatrix(ConfigParam &param) {
   }
 
   // check parameter
-  retval = this->checkMatrix(param.key, param.optional);
+  retval = this->checkMatrix(param.key, param.optional, node);
   if (retval != 0) {
     return retval;
   }
 
   // parse
-  this->getYamlNode(param.key, node);
   index = 0;
   rows = node["rows"].as<int>();
   cols = node["cols"].as<int>();

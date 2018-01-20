@@ -158,21 +158,10 @@ public:
    * Get yaml node given yaml `key`. The result is assigned to `node` if
    * `key` matches anything in the config file, else `node` is set to `NULL`.
    */
-  int getYamlNode(const std::string &key, YAML::Node &node);
-
-  /**
-   * @return a status code meaning
-   *
-   * - `0`: On success
-   * - `-1`: Config file is not loaded
-   * - `-2`: `key` not found in yaml file, parameter is not optional
-   * - `-3`: `key` not found in yaml file, parameter is optional
-   * - `-4`: Invalid vector (wrong size)
-   * - `-5`: Invalid matrix (missing yaml key 'rows', 'cols' or 'data' for
-   * matrix)
-   */
-  /** @return see `getYamlNode` */
-  int checkKey(const std::string &key, bool optional);
+  // int getYamlNode(const std::string &key, YAML::Node &node);
+  int getYamlNode(const std::string &key,
+                  const bool optional,
+                  YAML::Node &node);
 
   /**
    * @return see `checkKey`
@@ -181,10 +170,11 @@ public:
    */
   int checkVector(const std::string &key,
                   enum ConfigDataType type,
-                  bool optional);
+                  bool optional,
+                  YAML::Node &node);
 
   /** @return see `checkKey` */
-  int checkMatrix(const std::string &key, bool optional);
+  int checkMatrix(const std::string &key, bool optional, YAML::Node &node);
 
   /**
    * Load yaml param primitive, array, vector or matrix.

@@ -2,7 +2,7 @@
 #include "gvio/util/data.hpp"
 #include "gvio/util/config.hpp"
 
-#define TEST_CONFIG "test_data/utils/config.yaml"
+#define TEST_CONFIG "test_configs/config/config.yaml"
 
 namespace gvio {
 
@@ -83,16 +83,25 @@ int test_ConfigParser_addParam() {
 }
 
 int test_ConfigParser_getYamlNode() {
-  YAML::Node node1, node2;
+  YAML::Node node1, node2, node3;
   ConfigParser parser;
 
+  parser.params.clear();
   parser.load(TEST_CONFIG);
 
-  parser.getYamlNode("level3.a.b.c", node1);
+  parser.getYamlNode("level3.a.b.c", false, node1);
   MU_CHECK_EQ(3, node1.as<int>());
 
-  parser.getYamlNode("float", node2);
-  MU_CHECK_FLOAT(2.2, node2.as<float>());
+  parser.getYamlNode("level3.a.b.d", false, node2);
+  if (node2.IsSequence()) {
+    std::cout << node2.size() << std::endl;
+    std::cout << node2[0].as<double>() << std::endl;
+    std::cout << node2[1].as<double>() << std::endl;
+    std::cout << node2[2].as<double>() << std::endl;
+  }
+
+  parser.getYamlNode("float", false, node3);
+  MU_CHECK_FLOAT(2.2, node3.as<float>());
 
   return 0;
 }
@@ -438,6 +447,7 @@ int test_ConfigParser_load() {
   std::cout << "matrix4: \n" << mat4 << std::endl;
   std::cout << "matrix: \n" << matx << std::endl;
   std::cout << "cvmatrix: \n" << cvmat << std::endl;
+
   std::cout << std::endl;
 
   return 0;
