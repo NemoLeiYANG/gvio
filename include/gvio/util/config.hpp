@@ -27,6 +27,18 @@ namespace gvio {
  * @{
  */
 
+enum ConfigStatus {
+  SUCCESS = 0,
+  CONFIG_NOT_FOUND = -1,
+  CONFIG_NOT_LOADED = 1,
+  PARSER_NOT_CONFIGURED = 2,
+  KEY_NOT_FOUND = 3,
+  OPTIONAL_KEY_NOT_FOUND = 4,
+  INVALID_VECTOR = 5,
+  INVALID_MATRIX = 6,
+  INVALID_TYPE = 7
+};
+
 /**
  * An enum used by `ConfigParam` to denote the yaml value type.
  *
@@ -110,7 +122,7 @@ public:
  */
 class ConfigParser {
 public:
-  bool config_loaded;
+  bool config_loaded = false;
 
   std::string file_path;
   YAML::Node root;
@@ -157,8 +169,12 @@ public:
   /**
    * Get yaml node given yaml `key`. The result is assigned to `node` if
    * `key` matches anything in the config file, else `node` is set to `NULL`.
+   *
+   * @param key YAML Key
+   * @param optional Optional
+   * @param node YAML node
+   * @returns
    */
-  // int getYamlNode(const std::string &key, YAML::Node &node);
   int getYamlNode(const std::string &key,
                   const bool optional,
                   YAML::Node &node);

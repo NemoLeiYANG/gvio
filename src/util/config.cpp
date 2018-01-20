@@ -121,14 +121,10 @@ void ConfigParser::addParam(const std::string &key,
 int ConfigParser::getYamlNode(const std::string &key,
                               const bool optional,
                               YAML::Node &node) {
+  ASSERT(this->config_loaded == true, "Config file is not loaded!");
   std::string element;
   std::istringstream iss(key);
   std::vector<YAML::Node> traversal;
-
-  // Pre-check
-  if (this->config_loaded == false) {
-    return -1;
-  }
 
   // recurse down config key
   traversal.push_back(this->root);
@@ -149,37 +145,32 @@ int ConfigParser::getYamlNode(const std::string &key,
     LOG_ERROR("Opps [%s] missing in yaml file [%s]!",
               key.c_str(),
               this->file_path.c_str());
-    return -2;
+    return KEY_NOT_FOUND;
   } else if (!node && optional == true) {
-    return -3;
+    return OPTIONAL_KEY_NOT_FOUND;
   }
 
-  return 0;
+  return SUCCESS;
 }
 
 int ConfigParser::checkVector(const std::string &key,
                               const enum ConfigDataType type,
                               const bool optional,
                               YAML::Node &node) {
-  int retval;
-  int vector_size;
-
-  // Pre-check
-  if (this->config_loaded == false) {
-    return -1;
-  }
+  ASSERT(this->config_loaded == true, "Config file is not loaded!");
 
   // check key
-  retval = this->getYamlNode(key, optional, node);
-  if (retval != 0) {
+  int retval = this->getYamlNode(key, optional, node);
+  if (retval != SUCCESS) {
     return retval;
   }
 
+  int vector_size;
   switch (type) {
     case VEC2: vector_size = 2; break;
     case VEC3: vector_size = 3; break;
     case VEC4: vector_size = 4; break;
-    default: return 0;
+    default: return SUCCESS;
   }
 
   // check number of values
@@ -188,7 +179,7 @@ int ConfigParser::checkVector(const std::string &key,
               key.c_str(),
               vector_size,
               static_cast<int>(node.size()));
-    return -4;
+    return INVALID_VECTOR;
   }
 
   return 0;
@@ -197,40 +188,35 @@ int ConfigParser::checkVector(const std::string &key,
 int ConfigParser::checkMatrix(const std::string &key,
                               const bool optional,
                               YAML::Node &node) {
-  int retval;
-  const std::string targets[3] = {"rows", "cols", "data"};
-
-  // Pre-check
-  if (this->config_loaded == false) {
-    return -1;
-  }
+  ASSERT(this->config_loaded == true, "Config file is not loaded!");
 
   // check key
-  retval = this->getYamlNode(key, optional, node);
-  if (retval != 0) {
+  int retval = this->getYamlNode(key, optional, node);
+  if (retval != SUCCESS) {
     return retval;
   }
 
   // check fields
+  const std::string targets[3] = {"rows", "cols", "data"};
   for (int i = 0; i < 3; i++) {
-    if (!this->root[key][targets[i]]) {
+    if (!node[targets[i]]) {
       LOG_ERROR("Key [%s] is missing for matrix [%s]!",
                 targets[i].c_str(),
                 key.c_str());
-      return -5;
+      return INVALID_MATRIX;
     }
   }
 
-  return 0;
+  return SUCCESS;
 }
 
 int ConfigParser::loadPrimitive(ConfigParam &param) {
-  int retval;
-  YAML::Node node;
+  ASSERT(this->config_loaded == true, "Config file is not loaded!");
 
   // Pre-check
-  retval = this->getYamlNode(param.key, param.optional, node);
-  if (retval != 0) {
+  YAML::Node node;
+  int retval = this->getYamlNode(param.key, param.optional, node);
+  if (retval != SUCCESS) {
     return retval;
   }
 
@@ -243,24 +229,19 @@ int ConfigParser::loadPrimitive(ConfigParam &param) {
     case STRING:
       *static_cast<std::string *>(param.data) = node.as<std::string>();
       break;
-    default: return -6;
+    default: return INVALID_TYPE;
   }
 
-  return 0;
+  return SUCCESS;
 }
 
 int ConfigParser::loadArray(ConfigParam &param) {
-  int retval;
-  YAML::Node node;
-
-  // Pre-check
-  if (this->config_loaded == false) {
-    return -1;
-  }
+  ASSERT(this->config_loaded == true, "Config file is not loaded!");
 
   // check parameters
-  retval = this->getYamlNode(param.key, param.optional, node);
-  if (retval != 0) {
+  YAML::Node node;
+  int retval = this->getYamlNode(param.key, param.optional, node);
+  if (retval != SUCCESS) {
     return retval;
   }
 
@@ -293,24 +274,19 @@ int ConfigParser::loadArray(ConfigParam &param) {
             ->push_back(n.as<std::string>());
       }
       break;
-    default: return -6;
+    default: return INVALID_TYPE;
   }
 
   return 0;
 }
 
 int ConfigParser::loadVector(ConfigParam &param) {
-  int retval;
-  YAML::Node node;
-
-  // Pre-check
-  if (this->config_loaded == false) {
-    return -1;
-  }
+  ASSERT(this->config_loaded == true, "Config file is not loaded!");
 
   // check parameter
-  retval = this->checkVector(param.key, param.type, param.optional, node);
-  if (retval != 0) {
+  YAML::Node node;
+  int retval = this->checkVector(param.key, param.type, param.optional, node);
+  if (retval != SUCCESS) {
     return retval;
   }
 
@@ -322,7 +298,6 @@ int ConfigParser::loadVector(ConfigParam &param) {
       break;
 
     case VEC3:
-      std::cout << node[0].as<std::string>() << std::endl;
       *static_cast<Vec3 *>(param.data) << node[0].as<double>(),
           node[1].as<double>(), node[2].as<double>();
       break;
@@ -340,34 +315,26 @@ int ConfigParser::loadVector(ConfigParam &param) {
       }
     } break;
 
-    default: return -6;
+    default: return INVALID_TYPE;
   }
 
-  return 0;
+  return SUCCESS;
 }
 
 int ConfigParser::loadMatrix(ConfigParam &param) {
-  int retval;
-  int index;
-  int rows;
-  int cols;
-  YAML::Node node;
-
-  // Pre-check
-  if (this->config_loaded == false) {
-    return -1;
-  }
+  ASSERT(this->config_loaded == true, "Config file is not loaded!");
 
   // check parameter
-  retval = this->checkMatrix(param.key, param.optional, node);
-  if (retval != 0) {
+  YAML::Node node;
+  int retval = this->checkMatrix(param.key, param.optional, node);
+  if (retval != SUCCESS) {
     return retval;
   }
 
   // parse
-  index = 0;
-  rows = node["rows"].as<int>();
-  cols = node["cols"].as<int>();
+  int index = 0;
+  int rows = node["rows"].as<int>();
+  int cols = node["cols"].as<int>();
 
   switch (param.type) {
     case MAT2: {
@@ -425,19 +392,17 @@ int ConfigParser::loadMatrix(ConfigParam &param) {
         }
       }
     } break;
-    default: return -6;
+    default: return INVALID_TYPE;
   }
 
-  return 0;
+  return SUCCESS;
 }
 
 int ConfigParser::load(const std::string &config_file) {
-  int retval;
-
   // Pre-check
   if (file_exists(config_file) == false) {
     LOG_ERROR("File not found: %s", config_file.c_str());
-    return 1;
+    return CONFIG_NOT_FOUND;
   }
 
   // load and parse file
@@ -445,6 +410,7 @@ int ConfigParser::load(const std::string &config_file) {
   this->root = YAML::LoadFile(config_file);
   this->config_loaded = true;
 
+  int retval;
   for (size_t i = 0; i < this->params.size(); i++) {
     switch (this->params[i].type) {
       // PRIMITIVE
@@ -476,15 +442,15 @@ int ConfigParser::load(const std::string &config_file) {
       case MAT4:
       case MATX:
       case CVMAT: retval = this->loadMatrix(this->params[i]); break;
-      default: return -6;
+      default: return INVALID_TYPE;
     }
 
-    if (retval == -1 || retval == -2) {
+    if (retval != SUCCESS && retval != OPTIONAL_KEY_NOT_FOUND) {
       return retval;
     }
   }
 
-  return 0;
+  return SUCCESS;
 }
 
 } // namespace gvio

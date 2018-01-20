@@ -244,6 +244,7 @@ int test_ConfigParser_loadVector() {
   param.key = "vector2";
   param.data = &vec2;
   parser.loadVector(param);
+  std::cout << vec2.transpose() << std::endl;
 
   MU_CHECK_FLOAT(1.1, vec2(0));
   MU_CHECK_FLOAT(2.2, vec2(1));
@@ -254,6 +255,7 @@ int test_ConfigParser_loadVector() {
   param.key = "vector3";
   param.data = &vec3;
   parser.loadVector(param);
+  std::cout << vec3.transpose() << std::endl;
 
   MU_CHECK_FLOAT(1.1, vec3(0));
   MU_CHECK_FLOAT(2.2, vec3(1));
@@ -265,6 +267,7 @@ int test_ConfigParser_loadVector() {
   param.key = "vector4";
   param.data = &vec4;
   parser.loadVector(param);
+  std::cout << vec4.transpose() << std::endl;
 
   MU_CHECK_FLOAT(1.1, vec4(0));
   MU_CHECK_FLOAT(2.2, vec4(1));
@@ -277,6 +280,7 @@ int test_ConfigParser_loadVector() {
   param.key = "vector";
   param.data = &vecx;
   parser.loadVector(param);
+  std::cout << vecx.transpose() << std::endl;
 
   for (int i = 0; i < 9; i++) {
     MU_CHECK_FLOAT((i + 1) * 1.1, vecx(i));
@@ -305,6 +309,7 @@ int test_ConfigParser_loadMatrix() {
   param.key = "matrix2";
   param.data = &mat2;
   parser.loadMatrix(param);
+  std::cout << mat2 << std::endl;
 
   MU_CHECK_FLOAT(1.1, mat2(0, 0));
   MU_CHECK_FLOAT(2.2, mat2(0, 1));
@@ -317,6 +322,7 @@ int test_ConfigParser_loadMatrix() {
   param.key = "matrix3";
   param.data = &mat3;
   parser.loadMatrix(param);
+  std::cout << mat3 << std::endl;
 
   index = 0;
   for (int i = 0; i < 3; i++) {
@@ -332,6 +338,7 @@ int test_ConfigParser_loadMatrix() {
   param.key = "matrix4";
   param.data = &mat4;
   parser.loadMatrix(param);
+  std::cout << mat4 << std::endl;
 
   index = 0;
   for (int i = 0; i < 4; i++) {
@@ -347,6 +354,7 @@ int test_ConfigParser_loadMatrix() {
   param.key = "matrix";
   param.data = &matx;
   parser.loadMatrix(param);
+  std::cout << matx << std::endl;
 
   index = 0;
   for (int i = 0; i < 3; i++) {
@@ -362,6 +370,7 @@ int test_ConfigParser_loadMatrix() {
   param.key = "matrix";
   param.data = &cvmat;
   parser.loadMatrix(param);
+  std::cout << cvmat << std::endl;
 
   index = 0;
   for (int i = 0; i < 3; i++) {
@@ -423,6 +432,7 @@ int test_ConfigParser_load() {
   parser.addParam("matrix4", &mat4);
   parser.addParam("matrix", &matx);
   parser.addParam("matrix", &cvmat);
+  parser.addParam("non_existant_key", &cvmat, true);
 
   retval = parser.load(TEST_CONFIG);
   if (retval != 0) {
