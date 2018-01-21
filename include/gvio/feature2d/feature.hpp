@@ -33,12 +33,15 @@ struct Feature {
   cv::KeyPoint kp;
   cv::Mat desc;
 
+  Vec3 ground_truth = Vec3::Zero();
+
   Feature() {}
   Feature(const Vec2 &pt) : kp{cv::Point2f(pt(0), pt(1)), 1.0f} {}
+  Feature(const Vec2 &pt, const Vec3 &ground_truth)
+      : kp{cv::Point2f(pt(0), pt(1)), 1.0f}, ground_truth{ground_truth} {}
   Feature(const cv::Point2f &pt) : kp{pt, 1.0f} {}
   Feature(const cv::KeyPoint &kp) : kp{kp} {}
   Feature(const cv::KeyPoint &kp, const cv::Mat &desc) : kp{kp}, desc{desc} {}
-  Feature(const Feature &f) : track_id{f.track_id}, kp{f.kp}, desc{f.desc} {}
 
   /**
    * Set feature track ID

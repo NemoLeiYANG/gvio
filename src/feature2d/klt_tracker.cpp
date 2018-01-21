@@ -66,7 +66,6 @@ std::vector<FeatureTrack> KLTTracker::getLostTracks() {
 }
 
 int KLTTracker::initialize(const cv::Mat &img_cur) {
-  DEBUG("Initialize feature tracker!");
   img_cur.copyTo(this->img_ref);
   this->counter_frame_id++;
   this->image_width = img_cur.cols;

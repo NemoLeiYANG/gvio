@@ -15,6 +15,30 @@ namespace gvio {
  */
 
 /**
+ * IMU State Config
+ */
+struct IMUStateConfig {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  // Initial Estimate Covariances
+  Vec3 q_init_var = zeros(3, 1);
+  Vec3 bg_init_var = zeros(3, 1);
+  Vec3 v_init_var = zeros(3, 1);
+  Vec3 ba_init_var = zeros(3, 1);
+  Vec3 p_init_var = zeros(3, 1);
+
+  // Process Noises
+  Vec3 w_var = zeros(3, 1);
+  Vec3 dbg_var = zeros(3, 1);
+  Vec3 a_var = zeros(3, 1);
+  Vec3 dba_var = zeros(3, 1);
+
+  // Constants
+  Vec3 w_G = zeros(3, 1);
+  Vec3 g_G = zeros(3, 1);
+};
+
+/**
  * IMU State
  */
 class IMUState {
@@ -24,9 +48,9 @@ public:
   static const int size = 15; ///< Size of state vector
 
   Vec4 q_IG = Vec4{0.0, 0.0, 0.0, 1.0}; ///< JPL Quaternion in Global frame
-  Vec3 b_g = 0.001 * ones(3, 1);        ///< Bias of gyroscope
+  Vec3 b_g = zeros(3, 1);               ///< Bias of gyroscope
   Vec3 v_G = zeros(3, 1);               ///< Velocity in Global frame
-  Vec3 b_a = 0.01 * ones(3, 1);         ///< Bias of accelerometer
+  Vec3 b_a = zeros(3, 1);               ///< Bias of accelerometer
   Vec3 p_G = zeros(3, 1);               ///< Position in Global frame
 
   Vec3 w_G = zeros(3, 1);           ///< Earth's angular velocity
@@ -36,7 +60,8 @@ public:
   MatX Q = 1e-2 * I(12); ///< Noise matrix
   MatX Phi = zeros(15);  ///< Phi matrix
 
-  IMUState() {}
+  IMUState();
+  IMUState(const IMUStateConfig &config);
 
   /**
    * Transition Jacobian F matrix

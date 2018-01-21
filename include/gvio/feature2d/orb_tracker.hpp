@@ -21,9 +21,7 @@ public:
   cv::Ptr<cv::ORB> orb = cv::ORB::create();
 
   ORBTracker() {}
-
   ORBTracker(const CameraModel *camera_model) : FeatureTracker{camera_model} {}
-
   virtual ~ORBTracker() {}
 
   /**

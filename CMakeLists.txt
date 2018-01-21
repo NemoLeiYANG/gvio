@@ -4,8 +4,8 @@ PROJECT(gvio)
 # C++ COMPILER SETTINGS
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
-# SET(CMAKE_BUILD_TYPE RELEASE)
-SET(CMAKE_BUILD_TYPE DEBUG)
+SET(CMAKE_BUILD_TYPE RELEASE)
+# SET(CMAKE_BUILD_TYPE DEBUG)
 
 # DEPENDENCIES
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -70,6 +70,7 @@ ADD_LIBRARY(
   src/sim/camera.cpp
   src/sim/carrot_controller.cpp
   src/sim/twowheel.cpp
+  src/sim/pid.cpp
   src/sim/world.cpp
   # utils
   src/util/config.cpp

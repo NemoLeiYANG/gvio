@@ -36,13 +36,13 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
   const Vec3 p_G_C1 = this->track_cam_states[1].p_G;
   // -- Calculate rotation and translation from camera 0 to camera 1
   const Mat3 C_C0C1 = C_C0G * C_C1G.transpose();
-  const Vec3 t_C1_C0C1 = C_C0G * (p_G_C1 - p_G_C0);
+  const Vec3 t_C0_C0C1 = C_C0G * (p_G_C1 - p_G_C0);
   // -- Convert from pixel coordinates to image coordinates
   const Vec2 pt1 = this->track.track[0].getKeyPoint();
   const Vec2 pt2 = this->track.track[1].getKeyPoint();
 
   // Calculate initial estimate of 3D position
-  FeatureEstimator::triangulate(pt1, pt2, C_C0C1, t_C1_C0C1, p_C0_f);
+  FeatureEstimator::triangulate(pt1, pt2, C_C0C1, t_C0_C0C1, p_C0_f);
 
   return 0;
 }
@@ -327,6 +327,10 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   if (this->setupProblem() != 0) {
     return -1;
   }
+
+  // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
+  //   p_G_f = this->track.track[0].ground_truth;
+  // }
 
   // Solve
   ceres::Solve(this->options, &this->problem, &this->summary);

@@ -5,12 +5,16 @@
 #include "gvio/msckf/blackbox.hpp"
 #include "gvio/feature2d/klt_tracker.hpp"
 #include "gvio/feature2d/orb_tracker.hpp"
+#include "gvio/sim/world.hpp"
 
 #include <opencv2/core/eigen.hpp>
 
 namespace gvio {
 
+// clang-format off
 static const std::string KITTI_RAW_DATASET = "/data/kitti/raw";
+static const std::string MSCKF_CONFIG = "test_configs/msckf/msckf_kitti_raw.yaml";
+// clang-format on
 
 int test_MSCKF_constructor() {
   MSCKF msckf;
@@ -26,6 +30,30 @@ int test_MSCKF_constructor() {
 
   MU_CHECK(msckf.enable_ns_trick);
   MU_CHECK(msckf.enable_qr_trick);
+
+  return 0;
+}
+
+int test_MSCKF_configure() {
+  MSCKF msckf;
+
+  int retval = msckf.configure(MSCKF_CONFIG);
+
+  std::cout << msckf.imu_state.Q << std::endl;
+  std::cout << msckf.imu_state.P << std::endl;
+
+  MU_CHECK_EQ(0, retval);
+  // MU_CHECK_EQ(CameraState::size, msckf.P_cam.rows());
+  // MU_CHECK_EQ(CameraState::size, msckf.P_cam.cols());
+  // MU_CHECK_EQ(IMUState::size, msckf.P_imu_cam.rows());
+  // MU_CHECK_EQ(CameraState::size, msckf.P_imu_cam.cols());
+  //
+  // MU_CHECK_EQ(0, msckf.counter_frame_id);
+  // MU_CHECK(zeros(3, 1).isApprox(msckf.ext_p_IC));
+  // MU_CHECK(Vec4(0.0, 0.0, 0.0, 1.0).isApprox(msckf.ext_q_CI));
+  //
+  // MU_CHECK(msckf.enable_ns_trick);
+  // MU_CHECK(msckf.enable_qr_trick);
 
   return 0;
 }
@@ -100,8 +128,11 @@ int test_MSCKF_H() {
   msckf.ext_p_IC = Vec3{0.0, 0.0, 0.0};
   msckf.ext_q_CI = Vec4{0.5, -0.5, 0.5, -0.5};
   msckf.augmentState();
+  msckf.imu_state.p_G = Vec3{0.1, 0.0, 0.0};
   msckf.augmentState();
+  msckf.imu_state.p_G = Vec3{0.2, 0.0, 0.0};
   msckf.augmentState();
+  msckf.imu_state.p_G = Vec3{0.3, 0.0, 0.0};
   msckf.augmentState();
   CameraStates track_cam_states = msckf.getTrackCameraStates(track);
 
@@ -117,10 +148,10 @@ int test_MSCKF_H() {
   MU_CHECK_EQ(H_x_j.rows(), 4);
   MU_CHECK_EQ(H_x_j.cols(), 39);
 
-  // mat2csv("/tmp/H_f_j.dat", H_f_j);
-  // mat2csv("/tmp/H_x_j.dat", H_x_j);
-  // PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/H_f_j.dat");
-  // PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/H_x_j.dat");
+  mat2csv("/tmp/H_f_j.dat", H_f_j);
+  mat2csv("/tmp/H_x_j.dat", H_x_j);
+  PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/H_f_j.dat");
+  PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/H_x_j.dat");
 
   return 0;
 }
@@ -230,7 +261,7 @@ int test_MSCKF_predictionUpdate() {
     // cv::waitKey(0);
   }
 
-  // PYTHON_SCRIPT("scripts/plot_msckf.py");
+  PYTHON_SCRIPT("scripts/plot_msckf.py /tmp/test_msckf_predictionUpdate");
 
   return 0;
 }
@@ -472,26 +503,7 @@ int test_MSCKF_measurementUpdate() {
 
   // Setup MSCKF
   MSCKF msckf;
-
-  msckf.imu_state.Q(0, 0) = 4e-2;
-  msckf.imu_state.Q(1, 1) = 4e-2;
-  msckf.imu_state.Q(2, 2) = 4e-2;
-
-  msckf.imu_state.Q(3, 3) = 1e-3;
-  msckf.imu_state.Q(4, 4) = 1e-3;
-  msckf.imu_state.Q(5, 5) = 1e-3;
-
-  msckf.imu_state.Q(6, 6) = 4e-2;
-  msckf.imu_state.Q(7, 7) = 4e-2;
-  msckf.imu_state.Q(8, 8) = 4e-2;
-
-  msckf.imu_state.Q(9, 9) = 1e-3;
-  msckf.imu_state.Q(10, 10) = 1e-3;
-  msckf.imu_state.Q(11, 11) = 1e-3;
-
-  msckf.enable_ns_trick = false;
-  msckf.enable_qr_trick = false;
-  msckf.ext_q_CI = Vec4{0.5, -0.5, 0.5, -0.5};
+  msckf.configure(MSCKF_CONFIG);
   msckf.initialize(euler2quat(raw_dataset.oxts.rpy[0]),
                    raw_dataset.oxts.v_G[0],
                    Vec3{0.0, 0.0, 0.0});
@@ -507,9 +519,9 @@ int test_MSCKF_measurementUpdate() {
 
   // Loop through data and do prediction update
   struct timespec msckf_start = tic();
-  // for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
-  // for (int i = 1; i < 50; i++) {
-  for (int i = 1; i < 70; i++) {
+  for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
+    // for (int i = 1; i < 50; i++) {
+    // for (int i = 1; i < 70; i++) {
     // Feature tracker
     const std::string img_path = raw_dataset.cam0[i];
     const cv::Mat img_cur = cv::imread(img_path);
@@ -543,7 +555,6 @@ int test_MSCKF_measurementUpdate() {
 
     printf("frame: %d, nb_tracks: %ld\n", i, tracks.size());
   }
-
   printf("-- total elasped: %fs --\n", toc(&msckf_start));
   blackbox.recordCameraStates(msckf);
   PYTHON_SCRIPT("scripts/plot_msckf.py /tmp/test_msckf_measurementUpdate");
@@ -551,20 +562,84 @@ int test_MSCKF_measurementUpdate() {
   return 0;
 }
 
+int test_MSCKF_measurementUpdate2() {
+  // Setup world
+  SimWorld world;
+  const double dt = 0.1;
+  world.nb_features = 2000;
+  world.configure(dt);
+
+  // Setup blackbox
+  BlackBox blackbox;
+  if (blackbox.configure("/tmp", "test_msckf_measurementUpdate") != 0) {
+    LOG_ERROR("Failed to configure MSCKF blackbox!");
+  }
+
+  // Setup MSCKF
+  MSCKF msckf;
+  // Initialize MSCKF
+  msckf.configure(MSCKF_CONFIG);
+  msckf.initialize(euler2quat(world.robot.rpy_G),
+                   euler321ToRot(world.robot.rpy_G) * world.robot.v_B,
+                   Vec3::Zero());
+
+  // Record initial conditions
+  blackbox.recordTimeStep(world.t,
+                          msckf,
+                          world.robot.a_B,
+                          world.robot.w_B,
+                          world.robot.p_G,
+                          world.robot.v_G,
+                          world.robot.rpy_G);
+
+  // Simulate
+  // for (double t = 0.0; t < 0.8; t += dt) {
+  for (double t = 0.0; t < 20.0; t += dt) {
+    // Step simulation
+    world.step();
+    FeatureTracks tracks = world.removeLostTracks();
+
+    // MSCKF
+    const Vec3 a_m = world.robot.a_B + Vec3{0.0, 0.0, 9.81};
+    const Vec3 w_m = world.robot.w_B;
+    msckf.predictionUpdate(a_m, w_m, dt);
+    msckf.measurementUpdate(tracks);
+
+    // Record
+    blackbox.recordTimeStep(t,
+                            msckf,
+                            world.robot.a_B,
+                            world.robot.w_B,
+                            world.robot.p_G,
+                            world.robot.v_G,
+                            world.robot.rpy_G);
+
+    printf("Time index: %lu, nb_tracks: %lu\n",
+           world.time_index,
+           tracks.size());
+  }
+  blackbox.recordCameraStates(msckf);
+  PYTHON_SCRIPT("scripts/plot_msckf.py /tmp/test_msckf_measurementUpdate");
+
+  return 0;
+}
+
 void test_suite() {
-  MU_ADD_TEST(test_MSCKF_constructor);
-  MU_ADD_TEST(test_MSCKF_P);
-  MU_ADD_TEST(test_MSCKF_N);
+  // MU_ADD_TEST(test_MSCKF_constructor);
+  // MU_ADD_TEST(test_MSCKF_configure);
+  // MU_ADD_TEST(test_MSCKF_P);
+  // MU_ADD_TEST(test_MSCKF_N);
   MU_ADD_TEST(test_MSCKF_H);
-  MU_ADD_TEST(test_MSCKF_augmentState);
-  MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
-  MU_ADD_TEST(test_MSCKF_predictionUpdate);
-  MU_ADD_TEST(test_MSCKF_residualizeTrack);
-  MU_ADD_TEST(test_MSCKF_calResiduals);
-  MU_ADD_TEST(test_MSCKF_correctIMUState);
-  MU_ADD_TEST(test_MSCKF_correctCameraStates);
-  MU_ADD_TEST(test_MSCKF_pruneCameraStates);
-  MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  // MU_ADD_TEST(test_MSCKF_augmentState);
+  // MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
+  // MU_ADD_TEST(test_MSCKF_predictionUpdate);
+  // MU_ADD_TEST(test_MSCKF_residualizeTrack);
+  // MU_ADD_TEST(test_MSCKF_calResiduals);
+  // MU_ADD_TEST(test_MSCKF_correctIMUState);
+  // MU_ADD_TEST(test_MSCKF_correctCameraStates);
+  // MU_ADD_TEST(test_MSCKF_pruneCameraStates);
+  // MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  // MU_ADD_TEST(test_MSCKF_measurementUpdate2);
 }
 
 } // namespace gvio

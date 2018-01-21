@@ -31,5 +31,31 @@ def parse_data(data_path):
 if __name__ == "__main__":
     data_path = sys.argv[1]
     data = parse_data(data_path)
+
+    plt.subplot(411)
     plt.plot(data["x"], data["y"])
+    plt.xlabel("Position - East (m)")
+    plt.ylabel("Position - West (m)")
+
+    plt.subplot(412)
+    plt.plot(data["t"], data["vx"], marker="o")
+    plt.plot(data["t"], data["vy"], marker="o")
+    plt.plot(data["t"], data["vz"], marker="o")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Velocity (m/s)")
+
+    plt.subplot(413)
+    plt.plot(data["t"], data["ax"])
+    plt.plot(data["t"], data["ay"])
+    plt.plot(data["t"], data["az"])
+    plt.xlabel("Time (s)")
+    plt.ylabel("Acceleration (m/s^2)")
+
+    plt.subplot(414)
+    plt.plot(data["t"], data["roll"])
+    plt.plot(data["t"], data["pitch"])
+    plt.plot(data["t"], data["yaw"])
+    plt.xlabel("Time (s)")
+    plt.ylabel("Attitude (radians)")
+
     plt.show()

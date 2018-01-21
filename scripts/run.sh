@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+# set -e
 
 # run clang
 find . -name "*.cpp" | xargs clang-format-3.8 -i
@@ -40,12 +40,12 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-# ./msckf-msckf_test
+./msckf-msckf_test
 # ./msckf-profiler_test
 # ./sim-carrot_controller_test
 # ./sim-twowheel_test
 # ./sim-camera_test
-./sim-world_test
+# ./sim-world_test
 # ./util-config_test
 # ./util-data_test
 # ./util-file_test

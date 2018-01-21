@@ -72,24 +72,24 @@ int test_FeatureEstimator_triangulate() {
   // Camera states
   // -- Camera state 0
   const Vec3 p_G_C0{0.0, 0.0, 0.0};
-  const Vec3 rpy_C0G{deg2rad(0.0), deg2rad(0.0), deg2rad(0.0)};
-  const Vec4 q_C0G = euler2quat(rpy_C0G);
+  const Vec4 q_C0G = Vec4{0.5, -0.5, 0.5, -0.5};
   const Mat3 C_C0G = C(q_C0G);
   // -- Camera state 1
-  const Vec3 p_G_C1{1.0, 1.0, 0.0};
-  const Vec3 rpy_C1G{deg2rad(0.0), deg2rad(0.0), deg2rad(0.0)};
-  const Vec4 q_C1G = euler2quat(rpy_C1G);
+  const Vec3 p_G_C1{0.2, 0.0, 0.0};
+  const Vec4 q_C1G = Vec4{0.5, -0.5, 0.5, -0.5};
   const Mat3 C_C1G = C(q_C1G);
 
   // Features
-  const Vec3 landmark{0.0, 0.0, 10.0};
-  const Vec2 kp1 = cam_model.project(landmark, C_C0G, p_G_C0);
-  const Vec2 kp2 = cam_model.project(landmark, C_C1G, p_G_C1);
+  const Vec3 landmark{1.0, 0.0, 10.0};
+  const Vec2 kp1 = cam_model.project(landmark, I(3), Vec3{0.0, 0.0, 0.0});
+  const Vec2 kp2 = cam_model.project(landmark, I(3), Vec3{0.0, 0.0, 0.2});
   // -- Convert pixel coordinates to image coordinates
   const Vec2 pt1 = cam_model.pixel2image(kp1);
   const Vec2 pt2 = cam_model.pixel2image(kp2);
   // -- Add to feature track
   const FeatureTrack track{0, 1, Feature{pt1}, Feature{pt2}};
+  std::cout << pt1.transpose() << std::endl;
+  std::cout << pt2.transpose() << std::endl;
 
   // Calculate rotation and translation of first and last camera states
   // -- Obtain rotation and translation from camera 0 to camera 1
@@ -100,6 +100,8 @@ int test_FeatureEstimator_triangulate() {
   Vec3 p_C0_f;
   const int retval =
       FeatureEstimator::triangulate(pt1, pt2, C_C0C1, t_C0_C1C0, p_C0_f);
+
+  std::cout << "p_C0_f: " << p_C0_f.transpose() << std::endl;
 
   // Assert
   MU_CHECK(landmark.isApprox(p_C0_f));
@@ -304,19 +306,19 @@ int test_CeresFeatureEstimator_estimate() {
 void test_suite() {
   // FeatureEstimator
   MU_ADD_TEST(test_FeatureEstimator_triangulate);
-  MU_ADD_TEST(test_FeatureEstimator_initialEstimate);
-  MU_ADD_TEST(test_FeatureEstimator_jacobian);
-  MU_ADD_TEST(test_FeatureEstimator_reprojectionError);
-  MU_ADD_TEST(test_FeatureEstimator_estimate);
-
-  // CeresReprojectionError
-  MU_ADD_TEST(test_CeresReprojectionError_constructor);
-  MU_ADD_TEST(test_CeresReprojectionError_evaluate);
-
-  // CeresFeatureEstimator
-  MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
-  MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
-  MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
+  // MU_ADD_TEST(test_FeatureEstimator_initialEstimate);
+  // MU_ADD_TEST(test_FeatureEstimator_jacobian);
+  // MU_ADD_TEST(test_FeatureEstimator_reprojectionError);
+  // MU_ADD_TEST(test_FeatureEstimator_estimate);
+  //
+  // // CeresReprojectionError
+  // MU_ADD_TEST(test_CeresReprojectionError_constructor);
+  // MU_ADD_TEST(test_CeresReprojectionError_evaluate);
+  //
+  // // CeresFeatureEstimator
+  // MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
+  // MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
+  // MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
 }
 
 } // namespace gvio

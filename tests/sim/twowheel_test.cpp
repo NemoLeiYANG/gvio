@@ -9,7 +9,7 @@ int test_TwoWheel_constructor() {
   MU_CHECK(robot.p_G.isApprox(Vec3::Zero()));
   MU_CHECK(robot.rpy_G.isApprox(Vec3::Zero()));
   MU_CHECK(robot.w_B.isApprox(Vec3::Zero()));
-  MU_CHECK(robot.v_B.isApprox(Vec3::Zero()));
+  // MU_CHECK(robot.v_B.isApprox(Vec3::Zero()));
   MU_CHECK(robot.a_B.isApprox(Vec3::Zero()));
 
   return 0;
@@ -24,38 +24,54 @@ int test_TwoWheel_update() {
   }
 
   // Write output file header
-  const std::string header = "t,x,y,z,roll,pitch,yaw";
+  const std::string header = "t,x,y,z,vx,vy,vz,ax,ay,az,roll,pitch,yaw";
   output_file << header << std::endl;
 
   // Setup robot
-  TwoWheelRobot robot;
-  double t_end = 0.0;
+  double t_end = 10.0;
   const double dt = 0.1;
 
   double wz_B = 0.0;
-  double ax_B = 0.0;
-  circle_trajectory(10.0, 1.0, &wz_B, &t_end);
-  robot.v_B(0) = 1.0;
+  const double circle_radius = 10.0;
+  const double circle_velocity = 1.0;
+  circle_trajectory(circle_radius, circle_velocity, &wz_B, &t_end);
+  TwoWheelRobot robot;
+  robot.v_B(0) = circle_velocity;
+  robot.w_B(2) = wz_B;
 
   // Record initial robot state
   output_file << 0.0 << ",";
   output_file << robot.p_G(0) << ",";
   output_file << robot.p_G(1) << ",";
   output_file << robot.p_G(2) << ",";
+  output_file << robot.v_G(0) << ",";
+  output_file << robot.v_G(1) << ",";
+  output_file << robot.v_G(2) << ",";
+  output_file << robot.a_G(0) << ",";
+  output_file << robot.a_G(1) << ",";
+  output_file << robot.a_G(2) << ",";
   output_file << robot.rpy_G(0) << ",";
   output_file << robot.rpy_G(1) << ",";
   output_file << robot.rpy_G(2) << std::endl;
 
   // Simulate robot motion
   for (double t = 0.0; t < t_end; t += dt) {
+    printf("t: %f\n", t);
+
     // Update
-    robot.update(ax_B, wz_B, dt);
+    robot.update(dt);
 
     // Record robot state
     output_file << t << ",";
     output_file << robot.p_G(0) << ",";
     output_file << robot.p_G(1) << ",";
     output_file << robot.p_G(2) << ",";
+    output_file << robot.v_G(0) << ",";
+    output_file << robot.v_G(1) << ",";
+    output_file << robot.v_G(2) << ",";
+    output_file << robot.a_G(0) << ",";
+    output_file << robot.a_G(1) << ",";
+    output_file << robot.a_G(2) << ",";
     output_file << robot.rpy_G(0) << ",";
     output_file << robot.rpy_G(1) << ",";
     output_file << robot.rpy_G(2) << std::endl;

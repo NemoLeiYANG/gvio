@@ -11,28 +11,38 @@ void circle_trajectory(const double r,
   *w = (2 * M_PI) / *time;
 }
 
-void TwoWheelRobot::update(const double ax_B,
-                           const double wz_B,
-                           const double dt) {
-  this->w_B = Vec3{0.0, 0.0, wz_B};
-  this->a_B = Vec3{ax_B, 0.0, 0.0};
-  this->v_B += this->a_B * dt;
+TwoWheelRobot::TwoWheelRobot() {}
 
-  this->p_G(0) += v_B(0) * cos(this->rpy_G(2)) * dt;
-  this->p_G(1) += v_B(0) * sin(this->rpy_G(2)) * dt;
-  this->p_G(2) += v_B(2) * dt;
-  this->rpy_G += w_B * dt;
+TwoWheelRobot::TwoWheelRobot(const Vec3 &p_G,
+                             const Vec3 &v_G,
+                             const Vec3 &rpy_G) {
+  this->p_G = p_G;
+  this->v_G = v_G;
+  this->rpy_G = rpy_G;
 }
 
-void TwoWheelRobot::update(const double dt) {
-  this->w_B = this->w_B;
-  this->a_B = this->a_B;
-  this->v_B += this->a_B * dt;
+TwoWheelRobot::~TwoWheelRobot() {}
 
-  this->p_G(0) += v_B(0) * cos(this->rpy_G(2)) * dt;
-  this->p_G(1) += v_B(0) * sin(this->rpy_G(2)) * dt;
-  this->p_G(2) += v_B(2) * dt;
-  this->rpy_G += w_B * dt;
+void TwoWheelRobot::update(const double dt) {
+  const Vec3 p_G_prev = this->p_G;
+  const Vec3 v_G_prev = this->v_G;
+  const Vec3 rpy_G_prev = this->rpy_G;
+
+  this->p_G += euler321ToRot(this->rpy_G) * this->v_B * dt;
+  this->v_G = (this->p_G - p_G_prev) / dt;
+  this->a_G = (this->v_G - v_G_prev) / dt;
+
+  this->rpy_G += euler321ToRot(this->rpy_G) * this->w_B * dt;
+  this->w_G = this->rpy_G - rpy_G_prev;
+  this->a_B = euler123ToRot(this->rpy_G) * this->a_G;
+
+  // Wrap angles to +/- pi
+  for (int i = 0; i < 3; i++) {
+    this->rpy_G(i) =
+        (this->rpy_G(i) > M_PI) ? this->rpy_G(i) - 2 * M_PI : this->rpy_G(i);
+    this->rpy_G(i) =
+        (this->rpy_G(i) < -M_PI) ? this->rpy_G(i) + 2 * M_PI : this->rpy_G(i);
+  }
 }
 
 } // namespace gvio

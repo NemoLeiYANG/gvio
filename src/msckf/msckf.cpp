@@ -3,23 +3,39 @@
 namespace gvio {
 
 int MSCKF::configure(const std::string &config_file) {
+  // clang-format off
   // Load config file
   ConfigParser parser;
-  parser.addParam("imu.bias_accel", &this->imu_state.b_a);
-  parser.addParam("imu.bias_gyro", &this->imu_state.b_g);
-  parser.addParam("imu.angular_constant", &this->imu_state.w_G);
-  parser.addParam("imu.gravity_constant", &this->imu_state.g_G);
-  parser.addParam("extrinsics.p_IC", &this->ext_p_IC);
-  parser.addParam("extrinsics.q_CI", &this->ext_q_CI);
+  IMUStateConfig imu_config;
+  // -- General Settings
   parser.addParam("max_window_size", &this->max_window_size);
   parser.addParam("max_nb_tracks", &this->max_nb_tracks);
   parser.addParam("min_track_length", &this->min_track_length);
   parser.addParam("enable_ns_trick", &this->enable_ns_trick);
   parser.addParam("enable_qr_trick", &this->enable_ns_trick);
+  // -- IMU Settings
+  parser.addParam("imu.initial_covariance.q_init_var", &imu_config.q_init_var);
+  parser.addParam("imu.initial_covariance.bg_init_var", &imu_config.bg_init_var);
+  parser.addParam("imu.initial_covariance.v_init_var", &imu_config.v_init_var);
+  parser.addParam("imu.initial_covariance.ba_init_var", &imu_config.ba_init_var);
+  parser.addParam("imu.initial_covariance.p_init_var", &imu_config.p_init_var);
+  parser.addParam("imu.process_noise.w_var", &imu_config.w_var);
+  parser.addParam("imu.process_noise.dbg_var", &imu_config.dbg_var);
+  parser.addParam("imu.process_noise.a_var", &imu_config.a_var);
+  parser.addParam("imu.process_noise.dba_var", &imu_config.dba_var);
+  parser.addParam("imu.constants.angular_constant", &imu_config.w_G);
+  parser.addParam("imu.constants.gravity_constant", &imu_config.g_G);
+  // -- Camera Settings
+  parser.addParam("camera.extrinsics.p_IC", &this->ext_p_IC);
+  parser.addParam("camera.extrinsics.q_CI", &this->ext_q_CI);
   if (parser.load(config_file) != 0) {
     LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
     return -1;
   }
+  // clang-format on
+
+  // Set IMU Settings
+  this->imu_state = IMUState(imu_config);
 
   return 0;
 }
@@ -84,8 +100,9 @@ void MSCKF::H(const FeatureTrack &track,
     // dh / dg
     // clang-format off
     MatX dhdg = zeros(2, 3);
-    dhdg << 1.0 / Z, 0.0, -X / pow(Z, 2),
-            0.0, 1.0 / Z, -Y / pow(Z, 2);
+    dhdg << 1.0, 0.0, -X / Z,
+            0.0, 1.0, -Y / Z;
+    dhdg = (1.0 / Z) * dhdg;
     // clang-format on
 
     // Row start index
@@ -265,18 +282,15 @@ int MSCKF::calResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
   for (auto track : tracks) {
     MatX H_j;
     VecX r_j;
-    MatX R_j;
 
     if (this->residualizeTrack(track, H_j, r_j) == 0) {
       // Stack measurement jacobian matrix and residual vector
       if (stack_residuals) {
         H_o = vstack(H_o, H_j);
         r_o = vstack(r_o, r_j);
-        R_o = dstack(R_o, R_j);
       } else {
         H_o = H_j;
         r_o = r_j;
-        R_o = R_j;
         stack_residuals = true;
       }
     }
@@ -350,12 +364,28 @@ void MSCKF::pruneCameraState() {
                         this->P_cam.cols() - CameraState::size * prune_sz);
 }
 
-int MSCKF::measurementUpdate(FeatureTracks &tracks) {
+FeatureTracks MSCKF::filterTracks(const FeatureTracks &tracks) {
+  FeatureTracks filtered_tracks;
+  for (auto track : tracks) {
+    if (track.trackedLength() < (size_t) this->min_track_length) {
+      continue;
+    } else if (track.trackedLength() > (size_t) this->max_window_size) {
+      continue;
+    }
+
+    filtered_tracks.push_back(track);
+  }
+
+  return filtered_tracks;
+}
+
+int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   // Add a camera state to state vector
   this->augmentState();
 
-  // Continue with EKF update?
-  if (tracks.size() == 0) {
+  // Filter feature tracks
+  FeatureTracks filtered_tracks = this->filterTracks(tracks);
+  if (filtered_tracks.size() == 0) {
     // this->pruneCameraState();
     return -1;
   }
@@ -363,15 +393,15 @@ int MSCKF::measurementUpdate(FeatureTracks &tracks) {
   // Calculate residuals
   MatX T_H;
   VecX r_n;
-  if (this->calResiduals(tracks, T_H, r_n) != 0) {
+  if (this->calResiduals(filtered_tracks, T_H, r_n) != 0) {
     // this->pruneCameraState();
     return -2;
   }
 
   // Calculate the Kalman gain.
   const MatX P = this->P();
-  const MatX R_n = 1.0 * I(T_H.rows());
-  const MatX S = T_H * P * T_H.transpose() + 1.0 * I(T_H.rows());
+  const MatX R_n = 1e-3 * I(T_H.rows());
+  const MatX S = T_H * P * T_H.transpose() + R_n;
   const MatX K = S.ldlt().solve(T_H * P).transpose();
   // const MatX K =
   //     P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();

@@ -152,8 +152,7 @@ static int failed = 0;
   }
 
 #define PYTHON_SCRIPT(A)                                                       \
-  int retval = system("python3 " A);                                           \
-  if (retval != 0) {                                                           \
+  if (system("python3 " A) != 0) {                                             \
     LOG_ERROR("Python script [%s] failed !", A);                               \
     return -1;                                                                 \
   }

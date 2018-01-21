@@ -2,6 +2,29 @@
 
 namespace gvio {
 
+IMUState::IMUState() {}
+
+IMUState::IMUState(const IMUStateConfig &config) {
+  // clang-format off
+  // Set estimate covariance matrix
+  VecX init_var = zeros(15, 1);
+  init_var << config.q_init_var,
+              config.bg_init_var,
+              config.v_init_var,
+              config.ba_init_var,
+              config.p_init_var;
+  this->P = init_var.asDiagonal();
+
+  // Set noise covariance matrix
+  VecX n_imu = zeros(12, 1);
+  n_imu << config.w_var,
+           config.dbg_var,
+           config.a_var,
+           config.dba_var;
+  this->Q = n_imu.asDiagonal();
+  // clang-format on
+}
+
 MatX IMUState::F(const Vec3 &w_hat,
                  const Vec4 &q_hat,
                  const Vec3 &a_hat,
@@ -65,8 +88,11 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   // clang-format off
   // -- Orientation
   this->q_IG += 0.5 * Omega(w_hat) * q_IG * dt;
+  this->q_IG = quatnormalize(this->q_IG);
   // -- Velocity
   this->v_G += (C(this->q_IG).transpose() * a_hat - 2 * skew(this->w_G) * this->v_G - skewsq(this->w_G) * this->p_G + this->g_G) * dt;
+  // this->v_G += (C(this->q_IG).transpose() * a_hat + this->g_G) * dt;
+  // this->v_G += (C(this->q_IG).transpose() * a_hat) * dt;
   // -- Position
   this->p_G += v_G * dt;
   // clang-format on

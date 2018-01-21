@@ -7,7 +7,6 @@ int FeatureContainer::addTrack(const FrameID &frame_id,
                                Feature &f2) {
   // Update and get track and frame ids
   const TrackID track_id = this->counter_track_id;
-  DEBUG("Add track [%ld]", track_id);
 
   // Update features with track ids
   f1.setTrackID(track_id);
@@ -25,7 +24,6 @@ int FeatureContainer::addTrack(const FrameID &frame_id,
 int FeatureContainer::removeTrack(const TrackID &track_id, const bool lost) {
   // Make sure track id is in the buffer
   auto index = this->buffer.find(track_id);
-  DEBUG("Remove track [%ld]", track_id);
   if (index == this->buffer.end()) {
     return -1;
   }
@@ -60,8 +58,6 @@ void FeatureContainer::removeLostTracks(std::vector<FeatureTrack> &tracks) {
 int FeatureContainer::updateTrack(const FrameID frame_id,
                                   const TrackID &track_id,
                                   Feature &f) {
-  DEBUG("Update track [%ld]", track_id);
-
   // Make sure track id is in the buffer
   auto index = this->buffer.find(track_id);
   if (index == this->buffer.end()) {

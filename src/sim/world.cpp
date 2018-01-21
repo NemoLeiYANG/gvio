@@ -17,9 +17,10 @@ int SimWorld::configure(const double dt) {
   double vx_B = 1.0;
   double wz_B = 0.0;
   circle_trajectory(circle_radius, vx_B, &wz_B, &this->t_end);
-  this->robot.w_B(2) = wz_B;
+  std::cout << "vx_B: " << vx_B << std::endl;
+  std::cout << "wz_B: " << wz_B << std::endl;
   this->robot.v_B(0) = vx_B;
-  this->robot.a_B = zeros(3, 1);
+  this->robot.w_B(2) = wz_B;
 
   // Camera settings
   const int image_width = 640;
@@ -30,34 +31,7 @@ int SimWorld::configure(const double dt) {
   const double cx = image_width / 2.0;
   const double cy = image_height / 2.0;
   this->camera = VirtualCamera(image_width, image_height, fx, fy, cx, cy);
-
-  // Setup output file
-  // std::ofstream output_file("/tmp/twowheel.dat");
-  // if (output_file.good() == false) {
-  //   LOG_ERROR("Failed to open file for output!");
-  //   return -1;
-  // }
-  //
-  // const std::string header = "t,x,y,z,roll,pitch,yaw";
-  // output_file << header << std::endl;
-  //
-  // Record initial robot state
-  // output_file << 0.0 << ",";
-  // output_file << robot.p_G(0) << ",";
-  // output_file << robot.p_G(1) << ",";
-  // output_file << robot.p_G(2) << ",";
-  // output_file << robot.rpy_G(0) << ",";
-  // output_file << robot.rpy_G(1) << ",";
-  // output_file << robot.rpy_G(2) << std::endl;
-  //
-  // // Record robot state
-  // output_file << t << ",";
-  // output_file << robot.p_G(0) << ",";
-  // output_file << robot.p_G(1) << ",";
-  // output_file << robot.p_G(2) << ",";
-  // output_file << robot.rpy_G(0) << ",";
-  // output_file << robot.rpy_G(1) << ",";
-  // output_file << robot.rpy_G(2) << std::endl;
+  this->detectFeatures();
 
   return 0;
 }
@@ -82,7 +56,9 @@ void SimWorld::detectFeatures() {
   for (size_t i = 0; i < feature_ids.size(); i++) {
     const size_t feature_id = feature_ids[i];
     const Vec2 kp = keypoints.row(i).transpose();
-    const Feature f{kp};
+    const Vec2 img_pt = camera.camera_model.pixel2image(kp);
+    const Vec3 ground_truth = this->features3d.row(feature_id).transpose();
+    const Feature f{img_pt, ground_truth};
 
     if (this->tracks_tracking.count(feature_id)) {
       // Update feature track

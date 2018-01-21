@@ -1,4 +1,6 @@
 import sys
+from math import floor
+from math import ceil
 
 import numpy as np
 import matplotlib.pylab as plt
@@ -31,15 +33,30 @@ def parse_data(data_path):
 def plot_position(est_data, win_data, gnd_data):
     plt.figure()
 
+    plt.subplot(211)
     plt.plot(gnd_data["x"], gnd_data["y"], label="Ground truth")
     plt.plot(est_data["x"], est_data["y"], label="Estimated")
     if win_data:
         plt.plot(win_data["x"], win_data["y"], label="Camera states")
-
     plt.title("Position")
     plt.xlabel("East (m)")
     plt.ylabel("North (m)")
     plt.axis('equal')
+    plt.legend(loc=0)
+
+    plt.subplot(212)
+    plt.plot(gnd_data["t"], gnd_data["z"], label="Ground Truth")
+    plt.plot(est_data["t"], est_data["z"], label="Estimated")
+
+    z_min = floor(min(np.min(gnd_data["z"]), np.min(est_data["z"])))
+    z_max = ceil(max(np.max(gnd_data["z"]), np.max(est_data["z"])))
+    z_min = min(-1, z_min)
+    z_max = max(1, z_max)
+
+    plt.title("Altitude")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Height (m)")
+    plt.ylim([z_min, z_max])
     plt.legend(loc=0)
 
 
@@ -82,11 +99,15 @@ def plot_measurements(mea_data):
     plt.plot(mea_data["ay_B"])
     plt.plot(mea_data["az_B"])
 
+    plt.legend(loc=0)
+
     plt.subplot(212)
     plt.title("Gyroscope")
     plt.plot(mea_data["wx_B"])
     plt.plot(mea_data["wy_B"])
     plt.plot(mea_data["wz_B"])
+
+    plt.legend(loc=0)
 
 
 if __name__ == "__main__":
@@ -98,5 +119,5 @@ if __name__ == "__main__":
 
     plot_position(est_data, win_data, gnd_data)
     plot_attitude(est_data, gnd_data)
-    # plot_measurements(mea_data)
+    plot_measurements(mea_data)
     plt.show()

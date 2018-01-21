@@ -72,7 +72,6 @@ int FeatureTracker::match(const Features &f1,
   // train descriptors), here we use d1 as the query descriptors because
   // d1 represents the latest descriptors from the latest image frame
   this->matcher.match(k0, d0, k1, d1, this->img_size, matches);
-  DEBUG("Number of matches: %d", (int) matches.size());
 
   // Show matches
   if (this->show_matches) {
@@ -123,7 +122,6 @@ int FeatureTracker::match(const Features &f1,
 }
 
 int FeatureTracker::initialize(const cv::Mat &img_cur) {
-  DEBUG("Initialize feature tracker!");
   img_cur.copyTo(this->img_ref);
   this->img_size = img_cur.size();
   return this->detect(img_cur, this->fea_ref);

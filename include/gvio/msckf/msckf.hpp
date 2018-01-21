@@ -70,8 +70,8 @@ public:
   Vec4 ext_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
 
   // Settings
-  int max_window_size = 200;
-  int max_nb_tracks = 200;
+  int max_window_size = 30;
+  int max_nb_tracks = 10;
   int min_track_length = 8;
   bool enable_ns_trick = true;
   bool enable_qr_trick = true;
@@ -200,11 +200,20 @@ public:
   void pruneCameraState();
 
   /**
+   * Filter tracks
+   *
+   * @param tracks Feature tracks
+   * @returns 0 for success, -1 for failure
+   */
+  FeatureTracks filterTracks(const FeatureTracks &tracks);
+
+  /**
    * Measurmement update
    *
    * @param tracks Feature tracks
+   * @returns 0 for success, -1 for failure
    */
-  int measurementUpdate(FeatureTracks &tracks);
+  int measurementUpdate(const FeatureTracks &tracks);
 };
 
 /** @} group msckf */
