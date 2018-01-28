@@ -6,10 +6,13 @@ REPO_URL="https://april.eecs.umich.edu/media/apriltag/apriltag-$REPO_VER.tgz"
 
 install_apriltags()
 {
-    # create build directory for atl
+    # Create build directory for atl
     mkdir -p $DOWNLOAD_PATH
 
-    # download and build michigan apriltags
+    # Make sure we have curl
+    sudo apt-get install -qq -y curl
+
+    # Download and build michigan apriltags
     cd $DOWNLOAD_PATH
     if [ ! -d apriltag_michigan ]; then
         # download and extract

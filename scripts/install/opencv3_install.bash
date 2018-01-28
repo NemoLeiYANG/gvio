@@ -41,7 +41,7 @@ download_opencv() {
   mkdir -p /usr/local/src/opencv
   cd /usr/local/src/opencv
   if [ ! -d opencv-3.2.0 ]; then
-    wget $OPENCV_URL -O opencv3.2.0.zip
+    wget --no-check-certificate $OPENCV_URL -O opencv3.2.0.zip
     unzip -qq opencv3.2.0.zip
     rm opencv3.2.0.zip
   fi

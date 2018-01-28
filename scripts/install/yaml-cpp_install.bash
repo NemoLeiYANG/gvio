@@ -1,4 +1,4 @@
 #!/bin/bash
+set -e  # exit on first error
 
-apt-get install libboost1.58-all-dev
-apt-get install libyaml-cpp-dev
+sudo apt-get install -qq libyaml-cpp-dev
