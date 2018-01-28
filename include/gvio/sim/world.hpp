@@ -40,7 +40,7 @@ public:
   VirtualCamera camera;
 
   Vec3 origin{0.0, 0.0, 0.0};
-  Vec3 dimensions{30.0, 30.0, 30.0};
+  Vec3 dimensions{30.0, 30.0, 60.0};
   size_t nb_features = 1000;
   MatX features3d;
 

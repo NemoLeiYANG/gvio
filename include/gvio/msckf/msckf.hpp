@@ -92,6 +92,19 @@ public:
   MatX P();
 
   /**
+   * Jacobian J matrix
+   *
+   * @param cam_q_CI Rotation from IMU to camera frame in quaternion (x,y,z,w)
+   * @param cam_p_IC Position of camera in IMU frame
+   * @param q_hat_IG Rotation from global to IMU frame
+   * @param N Number of camera states
+   */
+  MatX J(const Vec4 &cam_q_CI,
+         const Vec3 &cam_p_IC,
+         const Vec4 &q_hat_IG,
+         const int N);
+
+  /**
    * Return length of sliding window
    */
   int N();

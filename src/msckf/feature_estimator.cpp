@@ -328,9 +328,10 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
     return -1;
   }
 
-  // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
-  //   p_G_f = this->track.track[0].ground_truth;
-  // }
+  if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
+    p_G_f = this->track.track[0].ground_truth;
+    return 0;
+  }
 
   // Solve
   ceres::Solve(this->options, &this->problem, &this->summary);

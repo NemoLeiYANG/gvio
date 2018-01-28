@@ -30,15 +30,15 @@ MatX IMUState::F(const Vec3 &w_hat,
                  const Vec3 &a_hat,
                  const Vec3 &w_G) {
   MatX F = zeros(15);
-  // -- First row --
+  // -- First row block --
   F.block(0, 0, 3, 3) = -skew(w_hat);
   F.block(0, 3, 3, 3) = -I(3);
-  // -- Third Row --
+  // -- Third Row block --
   F.block(6, 0, 3, 3) = -C(q_hat).transpose() * skew(a_hat);
   F.block(6, 6, 3, 3) = -2.0 * skew(w_G);
   F.block(6, 9, 3, 3) = -C(q_hat).transpose();
   F.block(6, 12, 3, 3) = -skewsq(w_G);
-  // -- Fifth Row --
+  // -- Fifth Row block --
   F.block(12, 6, 3, 3) = I(3);
 
   return F;
@@ -46,42 +46,27 @@ MatX IMUState::F(const Vec3 &w_hat,
 
 MatX IMUState::G(const Vec4 &q_hat) {
   MatX G = zeros(15, 12);
-  // -- First row --
+  // -- First row block --
   G.block(0, 0, 3, 3) = -I(3);
-  // -- Second row --
+  // -- Second row block --
   G.block(3, 3, 3, 3) = I(3);
-  // -- Third row --
+  // -- Third row block --
   G.block(6, 6, 3, 3) = -C(q_hat).transpose();
-  // -- Fourth row --
+  // -- Fourth row block --
   G.block(9, 9, 3, 3) = I(3);
 
   return G;
 }
 
-MatX IMUState::J(const Vec4 &cam_q_CI,
-                 const Vec3 &cam_p_IC,
-                 const Vec4 &q_hat_IG,
-                 const int N) {
-  const Mat3 C_CI = C(cam_q_CI);
-  const Mat3 C_IG = C(q_hat_IG);
-
-  MatX J = zeros(6, 15 + 6 * N);
-  // -- First row --
-  J.block(0, 0, 3, 3) = C_CI;
-  // -- Second row --
-  J.block(3, 0, 3, 3) = skew(C_IG.transpose() * cam_p_IC);
-  J.block(3, 12, 3, 3) = I(3);
-
-  return J;
-}
-
 void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   // Calculate new accel and gyro estimates
-  const Vec3 a_hat = a_m;
-  const Vec3 w_hat = w_m;
+  const Vec3 a_hat = a_m - this->b_a;
+  const Vec3 w_hat = w_m - this->b_g - C(this->q_IG) * this->w_G;
+  // const Vec3 a_hat = a_m;
+  // const Vec3 w_hat = w_m;
 
-  // Build the jacobians F and G
-  const MatX F = this->F(w_hat, this->q_IG, a_hat, w_G);
+  // Build the transition F and input G matrices
+  const MatX F = this->F(w_hat, this->q_IG, a_hat, this->w_G);
   const MatX G = this->G(this->q_IG);
 
   // Propagate IMU states
@@ -91,8 +76,6 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   this->q_IG = quatnormalize(this->q_IG);
   // -- Velocity
   this->v_G += (C(this->q_IG).transpose() * a_hat - 2 * skew(this->w_G) * this->v_G - skewsq(this->w_G) * this->p_G + this->g_G) * dt;
-  // this->v_G += (C(this->q_IG).transpose() * a_hat + this->g_G) * dt;
-  // this->v_G += (C(this->q_IG).transpose() * a_hat) * dt;
   // -- Position
   this->p_G += v_G * dt;
   // clang-format on

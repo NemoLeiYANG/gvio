@@ -64,7 +64,7 @@ public:
   IMUState(const IMUStateConfig &config);
 
   /**
-   * Transition Jacobian F matrix
+   * Transition F matrix
    *
    * @param w_hat Estimated angular velocity
    * @param q_hat Estimated quaternion (x, y, z, w)
@@ -76,7 +76,7 @@ public:
   F(const Vec3 &w_hat, const Vec4 &q_hat, const Vec3 &a_hat, const Vec3 &w_G);
 
   /**
-   * Input Jacobian G matrix
+   * Input G matrix
    *
    * A matrix that maps the input vector (IMU gaussian noise) to the state
    * vector (IMU error state vector), it tells us how the inputs affect the
@@ -86,20 +86,6 @@ public:
    * @returns Input jacobian matrix G
    */
   MatX G(const Vec4 &q_hat);
-
-  /**
-   * Jacobian J matrix
-   *
-   * @param cam_q_CI Rotation from IMU to camera frame in quaternion (x, y, z,
-   * w)
-   * @param cam_p_IC Position of camera in IMU frame
-   * @param q_hat_IG Rotation from global to IMU frame
-   * @param N Number of camera states
-   */
-  MatX J(const Vec4 &cam_q_CI,
-         const Vec3 &cam_p_IC,
-         const Vec4 &q_hat_IG,
-         const int N);
 
   /**
    * Update
