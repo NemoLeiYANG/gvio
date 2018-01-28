@@ -17,15 +17,13 @@ int SimWorld::configure(const double dt) {
   double vx_B = 1.0;
   double wz_B = 0.0;
   circle_trajectory(circle_radius, vx_B, &wz_B, &this->t_end);
-  std::cout << "vx_B: " << vx_B << std::endl;
-  std::cout << "wz_B: " << wz_B << std::endl;
   this->robot.v_B(0) = vx_B;
   this->robot.w_B(2) = wz_B;
 
   // Camera settings
   const int image_width = 640;
   const int image_height = 640;
-  const double fov = 60.0;
+  const double fov = 120.0;
   const double fx = PinholeModel::focalLengthX(image_width, fov);
   const double fy = PinholeModel::focalLengthY(image_height, fov);
   const double cx = image_width / 2.0;
@@ -94,26 +92,12 @@ FeatureTracks SimWorld::removeLostTracks() {
 
 MatX SimWorld::create3DFeatures(const struct feature_bounds &bounds,
                                 const size_t nb_features) {
-  // Setup random number generator
-  // -- Seed random number engine
-  std::random_device rd_x;
-  std::random_device rd_y;
-  std::random_device rd_z;
-  // -- Standard mersenne_twister_engine
-  std::mt19937 gen_x(rd_x());
-  std::mt19937 gen_y(rd_y());
-  std::mt19937 gen_z(rd_z());
-  // -- Create uniform real distribution
-  std::uniform_real_distribution<> x_dist(bounds.x_min, bounds.x_max);
-  std::uniform_real_distribution<> y_dist(bounds.y_min, bounds.y_max);
-  std::uniform_real_distribution<> z_dist(bounds.z_min, bounds.z_max);
-
   // Create random 3D features
   MatX features = zeros(nb_features, 3);
   for (size_t i = 0; i < nb_features; i++) {
-    features(i, 0) = x_dist(gen_x);
-    features(i, 1) = y_dist(gen_y);
-    features(i, 2) = z_dist(gen_z);
+    features(i, 0) = randf(bounds.x_min, bounds.x_max);
+    features(i, 1) = randf(bounds.y_min, bounds.y_max);
+    features(i, 2) = randf(bounds.z_min, bounds.z_max);
   }
 
   return features;

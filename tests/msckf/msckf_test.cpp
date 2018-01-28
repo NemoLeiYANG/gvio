@@ -104,6 +104,20 @@ int test_MSCKF_P() {
   return 0;
 }
 
+int test_MSCKF_J() {
+  MSCKF msckf;
+
+  const Vec4 cam_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
+  const Vec3 cam_p_IC = Vec3{0.0, 0.0, 0.0};
+  const Vec4 q_hat_IG = Vec4{0.0, 0.0, 0.0, 1.0};
+  const int N = 1;
+
+  const MatX J = msckf.J(cam_q_CI, cam_p_IC, q_hat_IG, N);
+  std::cout << J << std::endl;
+
+  return 0;
+}
+
 int test_MSCKF_N() {
   MSCKF msckf;
   MU_CHECK_EQ(0, msckf.N());
@@ -563,10 +577,12 @@ int test_MSCKF_measurementUpdate() {
 }
 
 int test_MSCKF_measurementUpdate2() {
+  std::srand(23);
+
   // Setup world
   SimWorld world;
   const double dt = 0.1;
-  world.nb_features = 2000;
+  world.nb_features = 3000;
   world.configure(dt);
 
   // Setup blackbox
@@ -594,7 +610,7 @@ int test_MSCKF_measurementUpdate2() {
 
   // Simulate
   // for (double t = 0.0; t < 0.8; t += dt) {
-  for (double t = 0.0; t < 20.0; t += dt) {
+  for (double t = 0.0; t < 10.0; t += dt) {
     // Step simulation
     world.step();
     FeatureTracks tracks = world.removeLostTracks();
@@ -603,7 +619,10 @@ int test_MSCKF_measurementUpdate2() {
     const Vec3 a_m = world.robot.a_B + Vec3{0.0, 0.0, 9.81};
     const Vec3 w_m = world.robot.w_B;
     msckf.predictionUpdate(a_m, w_m, dt);
-    msckf.measurementUpdate(tracks);
+
+    if (msckf.measurementUpdate(tracks) == 0) {
+      // PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/H_o.dat");
+    }
 
     // Record
     blackbox.recordTimeStep(t,
@@ -628,8 +647,9 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_constructor);
   // MU_ADD_TEST(test_MSCKF_configure);
   // MU_ADD_TEST(test_MSCKF_P);
+  // MU_ADD_TEST(test_MSCKF_J);
   // MU_ADD_TEST(test_MSCKF_N);
-  MU_ADD_TEST(test_MSCKF_H);
+  // MU_ADD_TEST(test_MSCKF_H);
   // MU_ADD_TEST(test_MSCKF_augmentState);
   // MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
   // MU_ADD_TEST(test_MSCKF_predictionUpdate);
@@ -639,7 +659,7 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_pruneCameraStates);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate);
-  // MU_ADD_TEST(test_MSCKF_measurementUpdate2);
+  MU_ADD_TEST(test_MSCKF_measurementUpdate2);
 }
 
 } // namespace gvio

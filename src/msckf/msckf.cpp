@@ -64,6 +64,23 @@ MatX MSCKF::P() {
   return P;
 }
 
+MatX MSCKF::J(const Vec4 &cam_q_CI,
+              const Vec3 &cam_p_IC,
+              const Vec4 &q_hat_IG,
+              const int N) {
+  const Mat3 C_CI = C(cam_q_CI);
+  const Mat3 C_IG = C(q_hat_IG);
+
+  MatX J = zeros(6, 15 + 6 * N);
+  // -- First row --
+  J.block(0, 0, 3, 3) = C_CI;
+  // -- Second row --
+  J.block(3, 0, 3, 3) = skew(C_IG.transpose() * cam_p_IC);
+  J.block(3, 12, 3, 3) = I(3);
+
+  return J;
+}
+
 int MSCKF::N() { return (int) this->cam_states.size(); }
 
 void MSCKF::H(const FeatureTrack &track,
@@ -144,10 +161,8 @@ int MSCKF::initialize(const Vec4 &q_IG, const Vec3 &v_G, const Vec3 &p_G) {
 
 void MSCKF::augmentState() {
   // Camera pose jacobian
-  const MatX J = this->imu_state.J(this->ext_q_CI,
-                                   this->ext_p_IC,
-                                   this->imu_state.q_IG,
-                                   this->N());
+  const MatX J =
+      this->J(this->ext_q_CI, this->ext_p_IC, this->imu_state.q_IG, this->N());
 
   // Form temporary matrix to augment new camera state
   const int x_imu_size = IMUState::size;
@@ -234,9 +249,9 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     // Transform feature from global frame to i-th camera frame
     const Mat3 C_CG = C(track_cam_states[i].q_CG);
     const Vec3 p_C_f = C_CG * (p_G_f - track_cam_states[i].p_G);
-    const double cu = p_C_f(0) / p_C_f(2);
-    const double cv = p_C_f(1) / p_C_f(2);
-    const Vec2 z_hat{cu, cv};
+    const double u = p_C_f(0) / p_C_f(2);
+    const double v = p_C_f(1) / p_C_f(2);
+    const Vec2 z_hat{u, v};
 
     // Transform idealized measurement
     const Vec2 z{track.track[i].getKeyPoint()};
@@ -258,9 +273,14 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     // away state errors by removing the measurement jacobian w.r.t.
     // feature position via null space projection [Section D:
     // Measurement Model, Mourikis2007]
-    const unsigned int settings = Eigen::ComputeFullU | Eigen::ComputeThinV;
-    Eigen::JacobiSVD<MatX> svd(H_f_j, settings);
-    const MatX A_j = svd.matrixU().rightCols(H_f_j.rows() - 3);
+
+    // const unsigned int settings = Eigen::ComputeFullU | Eigen::ComputeThinV;
+    // Eigen::JacobiSVD<MatX> svd(H_f_j, settings);
+    // const MatX A_j = svd.matrixU().rightCols(H_f_j.rows() - 3);
+    // H_o_j = A_j.transpose() * H_x_j;
+    // r_o_j = A_j.transpose() * r_j;
+
+    const MatX A_j{H_f_j.transpose().fullPivLu().kernel()};
     H_o_j = A_j.transpose() * H_x_j;
     r_o_j = A_j.transpose() * r_j;
 
@@ -303,6 +323,7 @@ int MSCKF::calResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
 
   // Reduce EKF measurement update computation with QR decomposition
   if (H_o.rows() > H_o.cols() && this->enable_qr_trick) {
+    // if (this->enable_qr_trick) {
     // Convert H to a sparse matrix.
     Eigen::SparseMatrix<double> H_sparse = H_o.sparseView();
 
@@ -318,6 +339,18 @@ int MSCKF::calResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
 
     T_H = H_temp.topRows(IMUState::size + this->N() * CameraState::size);
     r_n = r_temp.head(IMUState::size + this->N() * CameraState::size);
+
+    // Eigen::HouseholderQR<MatX> QR(H_o);
+    // QR.compute(H_o);
+    // const MatX R = QR.matrixQR().template triangularView<Eigen::Upper>();
+    // const MatX Q = QR.householderQ();
+    // // -- Find non-zero rows
+    // T_H = R;
+    // MatX Q_1 = Q;
+    // // -- Calculate residual
+    // r_n = Q_1.transpose() * r_o;
+    // T_H = H_o;
+    // r_n = r_o;
 
   } else {
     T_H = H_o;
@@ -400,7 +433,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
 
   // Calculate the Kalman gain.
   const MatX P = this->P();
-  const MatX R_n = 1e-3 * I(T_H.rows());
+  const MatX R_n = 1e-1 * I(T_H.rows());
   const MatX S = T_H * P * T_H.transpose() + R_n;
   const MatX K = S.ldlt().solve(T_H * P).transpose();
   // const MatX K =

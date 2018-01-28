@@ -48,20 +48,6 @@ int test_IMUState_G() {
   return 0;
 }
 
-int test_IMUState_J() {
-  IMUState imu_state;
-
-  const Vec4 cam_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
-  const Vec3 cam_p_IC = Vec3{0.0, 0.0, 0.0};
-  const Vec4 q_hat_IG = Vec4{0.0, 0.0, 0.0, 1.0};
-  const int N = 1;
-
-  const MatX J = imu_state.J(cam_q_CI, cam_p_IC, q_hat_IG, N);
-  std::cout << J << std::endl;
-
-  return 0;
-}
-
 int test_IMUState_update() {
   IMUState imu_state;
 
@@ -70,6 +56,7 @@ int test_IMUState_update() {
   const double dt = 0.1;
 
   imu_state.update(a_m, w_m, dt);
+  MU_CHECK(imu_state.P.maxCoeff() < 1.0);
 
   return 0;
 }
@@ -100,7 +87,6 @@ void test_suite() {
   MU_ADD_TEST(test_IMUState_constructor);
   MU_ADD_TEST(test_IMUState_F);
   MU_ADD_TEST(test_IMUState_G);
-  MU_ADD_TEST(test_IMUState_J);
   MU_ADD_TEST(test_IMUState_update);
   MU_ADD_TEST(test_IMUState_correct);
 }
