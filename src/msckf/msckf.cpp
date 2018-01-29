@@ -419,7 +419,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   // Filter feature tracks
   FeatureTracks filtered_tracks = this->filterTracks(tracks);
   if (filtered_tracks.size() == 0) {
-    // this->pruneCameraState();
+    this->pruneCameraState();
     return -1;
   }
 
@@ -427,7 +427,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   MatX T_H;
   VecX r_n;
   if (this->calResiduals(filtered_tracks, T_H, r_n) != 0) {
-    // this->pruneCameraState();
+    this->pruneCameraState();
     return -2;
   }
 
@@ -461,7 +461,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
                                 P_new.cols() - IMUState::size);
 
   // Prune camera state to maintain sliding window size
-  // this->pruneCameraState();
+  this->pruneCameraState();
 
   return 0;
 }
