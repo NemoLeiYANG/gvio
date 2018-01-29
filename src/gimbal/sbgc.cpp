@@ -104,7 +104,7 @@ void SBGCFrame::buildFrame(int cmd_id) {
 int SBGCFrame::parseHeader(uint8_t *data) {
   uint8_t expected_checksum;
 
-  // pre-check
+  // Pre-check
   if (data[0] != '>') {
     return -1;
   }
@@ -152,14 +152,14 @@ int SBGCFrame::parseBody(uint8_t *data) {
 int SBGCFrame::parseFrame(uint8_t *data) {
   int retval;
 
-  // header
+  // Header
   retval = this->parseHeader(data);
   if (retval == -1) {
     // std::cout << "failed to parse header!" << std::endl;
     return -1;
   }
 
-  // body
+  // Body
   retval = this->parseBody(data);
   if (retval == -1) {
     // std::cout << "failed to parse body!" << std::endl;
@@ -229,17 +229,16 @@ SBGC::SBGC(const std::string &port) {
 }
 
 int SBGC::connect() {
-  // open serial port
+  // Open serial port
   this->serial = open(this->port.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
   if (this->serial < 0) {
     std::cout << "failed to connect to SBGC!" << std::endl;
     return -1;
   }
 
-  // configure serial commnication
+  // Configure serial commnication
   set_interface_attribs(this->serial, B115200, 0);
   set_blocking(this->serial, 1);
-
   std::cout << "connected to SBGC!" << std::endl;
 
   return 0;
@@ -257,33 +256,37 @@ int SBGC::disconnect() {
 }
 
 int SBGC::sendFrame(const SBGCFrame &cmd) {
-  uint8_t start;
+  // Pre-check
   int data_size_limit;
-
-  // pre-check
   data_size_limit = SBGC_CMD_MAX_BYTES - SBGC_CMD_PAYLOAD_BYTES;
   if (cmd.data_size >= data_size_limit) {
     return -1;
   }
 
-  // header
-  start = 0x3E; // ">" character
-  write(this->serial, &start, 1);
-  write(this->serial, &cmd.cmd_id, 1);
-  write(this->serial, &cmd.data_size, 1);
+  // Header
+  ssize_t retval = 0;
+  const uint8_t start = 0x3E; // ">" character
+  retval += write(this->serial, &start, 1);
+  retval += write(this->serial, &cmd.cmd_id, 1);
+  retval += write(this->serial, &cmd.data_size, 1);
 
-  // body
-  write(this->serial, &cmd.header_checksum, 1);
-  write(this->serial, cmd.data, cmd.data_size);
-  write(this->serial, &cmd.data_checksum, 1);
+  // Body
+  retval += write(this->serial, &cmd.header_checksum, 1);
+  retval += write(this->serial, cmd.data, cmd.data_size);
+  retval += write(this->serial, &cmd.data_checksum, 1);
+
+  // Flush
   tcflush(this->serial, TCIOFLUSH); // very critical
   usleep(10 * 1000);
+  if (retval != (5 + cmd.data_size)) {
+    LOG_ERROR("Opps! frame wasn't sent completely!");
+  }
 
   return 0;
 }
 
 int SBGC::readFrame(const uint8_t read_length, SBGCFrame &frame) {
-  // pre-check
+  // Pre-check
   uint8_t buffer[150];
   int16_t nb_bytes = read(this->serial, buffer, read_length);
   if (nb_bytes <= 0 || nb_bytes != read_length) {
@@ -291,7 +294,7 @@ int SBGC::readFrame(const uint8_t read_length, SBGCFrame &frame) {
     return -1;
   }
 
-  // parse sbgc frame
+  // Parse sbgc frame
   int retval = frame.parseFrame(buffer);
   if (retval == -1) {
     // std::cout << "failed to parse SBGC frame!" << std::endl;
@@ -309,23 +312,23 @@ int SBGC::on() {
 
 int SBGC::off() {
   int retval;
-  SBGCFrame cmd;
-  uint8_t data[13];
 
-  // turn off motor control
+  // Turn off motor control
+  uint8_t data[13];
   data[0] = MODE_NO_CONTROL;
   for (int i = 1; i < 13; i++) {
     data[i] = 0;
   }
 
-  // send frame
+  // Send frame
+  SBGCFrame cmd;
   cmd.buildFrame(CMD_CONTROL, data, 13);
   retval = this->sendFrame(cmd);
   if (retval != 0) {
     std::cout << "failed to turn motor control off!" << std::endl;
   }
 
-  // turn off motors
+  // Turn off motors
   cmd.buildFrame(CMD_MOTORS_OFF);
   retval = this->sendFrame(cmd);
   if (retval != 0) {
