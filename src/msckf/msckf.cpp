@@ -2,6 +2,8 @@
 
 namespace gvio {
 
+MSCKF::MSCKF() {}
+
 int MSCKF::configure(const std::string &config_file) {
   // clang-format off
   // Load config file
@@ -28,6 +30,7 @@ int MSCKF::configure(const std::string &config_file) {
   // -- Camera Settings
   parser.addParam("camera.extrinsics.p_IC", &this->ext_p_IC);
   parser.addParam("camera.extrinsics.q_CI", &this->ext_q_CI);
+  parser.addParam("camera.measurement_noise.img_var", &this->img_var);
   if (parser.load(config_file) != 0) {
     LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
     return -1;
@@ -225,6 +228,22 @@ void MSCKF::predictionUpdate(const Vec3 &a_m,
   this->P_imu_cam = this->imu_state.Phi * this->P_imu_cam;
 }
 
+int MSCKF::chiSquaredTest(const MatX &H, const VecX &r, const int dof) {
+  UNUSED(r);
+  UNUSED(dof);
+  const MatX P1 = H * this->P() * H.transpose();
+  const MatX P2 = this->img_var * I(H.rows(), H.rows());
+  // const double gamma = r.transpose() * (P1+P2).ldlt().solve(r);
+
+  // if (gamma < chisq_table[dof]) {
+  //   return true;
+  // } else {
+  //   return false;
+  // }
+
+  return 0;
+}
+
 int MSCKF::residualizeTrack(const FeatureTrack &track,
                             MatX &H_o_j,
                             VecX &r_o_j) {
@@ -273,16 +292,15 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     // away state errors by removing the measurement jacobian w.r.t.
     // feature position via null space projection [Section D:
     // Measurement Model, Mourikis2007]
-
-    // const unsigned int settings = Eigen::ComputeFullU | Eigen::ComputeThinV;
-    // Eigen::JacobiSVD<MatX> svd(H_f_j, settings);
-    // const MatX A_j = svd.matrixU().rightCols(H_f_j.rows() - 3);
-    // H_o_j = A_j.transpose() * H_x_j;
-    // r_o_j = A_j.transpose() * r_j;
-
-    const MatX A_j{H_f_j.transpose().fullPivLu().kernel()};
+    const unsigned int settings = Eigen::ComputeFullU | Eigen::ComputeThinV;
+    Eigen::JacobiSVD<MatX> svd(H_f_j, settings);
+    const MatX A_j = svd.matrixU().rightCols(H_f_j.rows() - 3);
     H_o_j = A_j.transpose() * H_x_j;
     r_o_j = A_j.transpose() * r_j;
+
+    // const MatX A_j{H_f_j.transpose().fullPivLu().kernel()};
+    // H_o_j = A_j.transpose() * H_x_j;
+    // r_o_j = A_j.transpose() * r_j;
 
   } else {
     H_o_j = H_x_j;
@@ -292,11 +310,10 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
   return 0;
 }
 
-int MSCKF::calResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
+int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
   // Residualize feature tracks
   MatX H_o;
   VecX r_o;
-  MatX R_o;
   bool stack_residuals = false;
 
   for (auto track : tracks) {
@@ -317,7 +334,7 @@ int MSCKF::calResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
   }
 
   // No residuals, do not continue
-  if (stack_residuals == false) {
+  if (r_o.rows() == 0) {
     return -1;
   }
 
@@ -419,23 +436,23 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   // Filter feature tracks
   FeatureTracks filtered_tracks = this->filterTracks(tracks);
   if (filtered_tracks.size() == 0) {
-    this->pruneCameraState();
     return -1;
   }
 
   // Calculate residuals
   MatX T_H;
   VecX r_n;
-  if (this->calResiduals(filtered_tracks, T_H, r_n) != 0) {
-    this->pruneCameraState();
+  if (this->calcResiduals(filtered_tracks, T_H, r_n) != 0) {
     return -2;
   }
 
   // Calculate the Kalman gain.
   const MatX P = this->P();
-  const MatX R_n = 1e-1 * I(T_H.rows());
+  const MatX R_n = this->img_var * I(T_H.rows());
   const MatX S = T_H * P * T_H.transpose() + R_n;
   const MatX K = S.ldlt().solve(T_H * P).transpose();
+  // Note: above is equiv to P * T_H^T * (T_H * P * T_H^T + R_n)^-1
+  // But using Cholesky decomposition for matrix inversion
   // const MatX K =
   //     P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
 
@@ -446,7 +463,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
 
   // Update covariance matrices
   const MatX I_KH = I(K.rows(), T_H.cols()) - K * T_H;
-  const MatX P_new = (I_KH * P + (I_KH * P).transpose()) / 2.0;
+  const MatX P_new = ((I_KH * P) + (I_KH * P).transpose()) / 2.0;
   // const MatX P_new = I_KH * P * I_KH.transpose() + K * R_n * K.transpose();
 
   // Update covariance matrix

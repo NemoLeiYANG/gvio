@@ -13,10 +13,12 @@ int KLTTracker::configure(const std::string &config_file) {
 
   // Load config file
   ConfigParser parser;
+  // -- Load feature detector settings
   parser.addParam("max_corners", &this->max_corners);
   parser.addParam("quality_level", &this->quality_level);
   parser.addParam("min_distance", &this->min_distance);
   parser.addParam("show_matches", &this->show_matches);
+  // -- Load camera model settings
   parser.addParam("camera_model.type", &camera_model, true);
   parser.addParam("camera_model.image_width", &image_width, true);
   parser.addParam("camera_model.image_height", &image_height, true);

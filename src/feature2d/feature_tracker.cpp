@@ -2,6 +2,24 @@
 
 namespace gvio {
 
+FeatureTracker::~FeatureTracker() {
+  // Pre-check
+  if (this->camera_model == nullptr) {
+    return;
+  }
+
+  // Delete PinholeModel
+  if (this->camera_model->model_name == "pinhole") {
+    delete (PinholeModel *) this->camera_model;
+  }
+}
+
+int FeatureTracker::configure(const std::string &config_file) {
+  LOG_ERROR("YOU SHOULD OVERRIDE ME!");
+  UNUSED(config_file);
+  return 0;
+}
+
 void FeatureTracker::getKeyPointsAndDescriptors(
     const Features &features,
     std::vector<cv::KeyPoint> &keypoints,

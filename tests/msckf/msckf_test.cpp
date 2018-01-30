@@ -343,7 +343,7 @@ int test_MSCKF_residualizeTrack() {
   return 0;
 }
 
-int test_MSCKF_calResiduals() {
+int test_MSCKF_calcResiduals() {
   // Camera model
   const int image_width = 640;
   const int image_height = 480;
@@ -398,7 +398,7 @@ int test_MSCKF_calResiduals() {
   // Calculate residuals
   MatX T_H;
   VecX r_n;
-  int retval = msckf.calResiduals(tracks, T_H, r_n);
+  int retval = msckf.calcResiduals(tracks, T_H, r_n);
   print_shape("T_H", T_H);
   print_shape("r_n", r_n);
 
@@ -512,7 +512,7 @@ int test_MSCKF_measurementUpdate() {
   PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
 
   // Setup feature tracker
-  ORBTracker tracker{&pinhole_model};
+  KLTTracker tracker{&pinhole_model};
   tracker.initialize(img_ref);
 
   // Setup MSCKF
@@ -620,6 +620,10 @@ int test_MSCKF_measurementUpdate2() {
     const Vec3 w_m = world.robot.w_B;
     msckf.predictionUpdate(a_m, w_m, dt);
 
+    // // Cheat by loading the robot ground truth to MSCKF's imu state
+    // msckf.imu_state.p_G = world.robot.p_G;
+    // msckf.imu_state.q_IG = euler2quat(world.robot.rpy_G);
+
     if (msckf.measurementUpdate(tracks) == 0) {
       // PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/H_o.dat");
     }
@@ -654,7 +658,7 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
   // MU_ADD_TEST(test_MSCKF_predictionUpdate);
   // MU_ADD_TEST(test_MSCKF_residualizeTrack);
-  // MU_ADD_TEST(test_MSCKF_calResiduals);
+  // MU_ADD_TEST(test_MSCKF_calcResiduals);
   // MU_ADD_TEST(test_MSCKF_correctIMUState);
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_pruneCameraStates);

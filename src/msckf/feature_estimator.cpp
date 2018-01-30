@@ -8,13 +8,14 @@ int FeatureEstimator::triangulate(const Vec2 &p1,
                                   const Vec3 &t_C0_C0C1,
                                   Vec3 &p_C0_f) {
   // Convert points to homogenous coordinates and normalize
-  const Vec3 pt1{p1[0], p1[1], 1.0};
-  const Vec3 pt2{p2[0], p2[1], 1.0};
+  Vec3 pt1{p1[0], p1[1], 1.0};
+  Vec3 pt2{p2[0], p2[1], 1.0};
+  pt1.normalize();
+  pt2.normalize();
 
   // Triangulate
   // -- Matrix A
-  MatX A;
-  A.resize(3, 2);
+  MatX A = zeros(3, 2);
   A.block(0, 0, 3, 1) = pt1;
   A.block(0, 1, 3, 1) = -C_C0C1 * pt2;
   // -- Vector b
@@ -29,11 +30,13 @@ int FeatureEstimator::triangulate(const Vec2 &p1,
 
 int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
   // Calculate rotation and translation of first and second camera states
+  const CameraState cam0 = this->track_cam_states[0];
+  const CameraState cam1 = this->track_cam_states[1];
   // -- Get rotation and translation of camera 0 and camera 1
-  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
-  const Mat3 C_C1G = C(this->track_cam_states[1].q_CG);
-  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
-  const Vec3 p_G_C1 = this->track_cam_states[1].p_G;
+  const Mat3 C_C0G = C(cam0.q_CG);
+  const Mat3 C_C1G = C(cam1.q_CG);
+  const Vec3 p_G_C0 = cam0.p_G;
+  const Vec3 p_G_C1 = cam1.p_G;
   // -- Calculate rotation and translation from camera 0 to camera 1
   const Mat3 C_C0C1 = C_C0G * C_C1G.transpose();
   const Vec3 t_C0_C0C1 = C_C0G * (p_G_C1 - p_G_C0);
@@ -212,8 +215,8 @@ bool CeresReprojectionError::Evaluate(double const *const *x,
   // Compute the Jacobian if asked for.
   if (jacobians != NULL && jacobians[0] != NULL) {
     // Pre-compute common terms
-    const double hx_div_hz2 = (h(0) / pow(h(2), 2));
-    const double hy_div_hz2 = (h(1) / pow(h(2), 2));
+    const double hx_div_hz2 = (h(0) / (h(2), h(2)));
+    const double hy_div_hz2 = (h(1) / (h(2), h(2)));
 
     // **IMPORTANT** The ceres-solver documentation does not explain very well
     // how one goes about forming the jacobian. In a ceres analytical cost
@@ -314,10 +317,10 @@ int CeresFeatureEstimator::setupProblem() {
 int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // Set options
   this->options.max_num_iterations = 30;
-  this->options.use_nonmonotonic_steps = false;
+  this->options.use_nonmonotonic_steps = true;
   this->options.use_inner_iterations = false;
-  this->options.preconditioner_type = ceres::SCHUR_JACOBI;
-  this->options.linear_solver_type = ceres::SPARSE_SCHUR;
+  // this->options.preconditioner_type = ceres::SCHUR_JACOBI;
+  // this->options.linear_solver_type = ceres::SPARSE_SCHUR;
   this->options.parameter_tolerance = 1e-10;
   this->options.num_threads = 1;
   this->options.num_linear_solver_threads = 1;
@@ -328,6 +331,7 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
     return -1;
   }
 
+  // Cheat by using ground truth data
   if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
     p_G_f = this->track.track[0].ground_truth;
     return 0;
@@ -342,6 +346,10 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
   const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
   p_G_f = z * (C_C0G.transpose() * X) + p_G_C0;
+
+  std::cout << "ground truth: " << this->track.track[0].ground_truth.transpose()
+            << std::endl;
+  std::cout << "estimated: " << p_G_f.transpose() << std::endl;
 
   if (std::isnan(p_G_f(0)) || std::isnan(p_G_f(1)) || std::isnan(p_G_f(2))) {
     return -2;

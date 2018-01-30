@@ -68,6 +68,8 @@ public:
   // -- Extrinsics
   Vec3 ext_p_IC = zeros(3, 1);
   Vec4 ext_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
+  // -- Measurement noise
+  double img_var = 1e-1;
 
   // Settings
   int max_window_size = 30;
@@ -76,7 +78,7 @@ public:
   bool enable_ns_trick = true;
   bool enable_qr_trick = true;
 
-  MSCKF() {}
+  MSCKF();
 
   /**
    * Configure
@@ -168,6 +170,11 @@ public:
   void predictionUpdate(const Vec3 &a_m, const Vec3 &w_m, const double dt);
 
   /**
+   * Chi-squared test
+   */
+  int chiSquaredTest(const MatX &H, const VecX &r, const int dof);
+
+  /**
    * Residualize track
    *
    * @param track Feature track
@@ -191,7 +198,7 @@ public:
    *  - -1: Track length < Min track length
    *  - -2: Failed to estimate feature position
    */
-  int calResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n);
+  int calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n);
 
   /**
    * Correct IMU state

@@ -46,21 +46,16 @@ public:
   const CameraModel *camera_model = nullptr;
 
   FeatureTracker() {}
-
   FeatureTracker(const CameraModel *camera_model)
       : camera_model{camera_model} {}
+  virtual ~FeatureTracker();
 
-  virtual ~FeatureTracker() {
-    // Pre-check
-    if (this->camera_model == nullptr) {
-      return;
-    }
-
-    // Delete PinholeModel
-    if (this->camera_model->model_name == "pinhole") {
-      delete (PinholeModel *) this->camera_model;
-    }
-  }
+  /**
+   * Configure
+   *
+   * @param config_file Path to config file
+   */
+  virtual int configure(const std::string &config_file);
 
   /**
    * Purge old feature tracks
