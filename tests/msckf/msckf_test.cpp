@@ -58,6 +58,14 @@ int test_MSCKF_configure() {
   return 0;
 }
 
+int test_MSCKF_initialize() {
+  MSCKF msckf;
+
+  msckf.initialize();
+
+  return 0;
+}
+
 int test_MSCKF_P() {
   // Setup
   MSCKF msckf;
@@ -107,7 +115,7 @@ int test_MSCKF_P() {
 int test_MSCKF_J() {
   MSCKF msckf;
 
-  const Vec4 cam_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
+  const Vec4 cam_q_CI = Vec4{0.5, -0.5, 0.5, -0.5};
   const Vec3 cam_p_IC = Vec3{0.0, 0.0, 0.0};
   const Vec4 q_hat_IG = Vec4{0.0, 0.0, 0.0, 1.0};
   const int N = 1;
@@ -182,6 +190,9 @@ int test_MSCKF_augmentState() {
   MU_CHECK_EQ(1, msckf.N());
   MU_CHECK_EQ(1, msckf.counter_frame_id);
 
+  mat2csv("/tmp/P.dat", msckf.P());
+  PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/P.dat");
+
   // Augment state 2
   msckf.augmentState();
   MU_CHECK_EQ(12, msckf.P_cam.rows());
@@ -191,6 +202,9 @@ int test_MSCKF_augmentState() {
   MU_CHECK_EQ(2, msckf.N());
   MU_CHECK_EQ(2, msckf.counter_frame_id);
 
+  mat2csv("/tmp/P.dat", msckf.P());
+  PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/P.dat");
+
   // Augment state 3
   msckf.augmentState();
   MU_CHECK_EQ(18, msckf.P_cam.rows());
@@ -199,6 +213,9 @@ int test_MSCKF_augmentState() {
   MU_CHECK_EQ(18, msckf.P_imu_cam.cols());
   MU_CHECK_EQ(3, msckf.N());
   MU_CHECK_EQ(3, msckf.counter_frame_id);
+
+  mat2csv("/tmp/P.dat", msckf.P());
+  PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/P.dat");
 
   return 0;
 }
@@ -544,11 +561,6 @@ int test_MSCKF_measurementUpdate() {
     // tracker.show_matches = true;
     // cv::waitKey(1);
 
-    // cv::Mat P;
-    // eigen2cv(msckf.P(), P);
-    // cv::imshow("P", P);
-    // cv::waitKey(1);
-
     // MSCKF
     const Vec3 a_B = raw_dataset.oxts.a_B[i];
     const Vec3 w_B = raw_dataset.oxts.w_B[i];
@@ -582,7 +594,7 @@ int test_MSCKF_measurementUpdate2() {
   // Setup world
   SimWorld world;
   const double dt = 0.1;
-  world.nb_features = 3000;
+  world.nb_features = 10000;
   world.configure(dt);
 
   // Setup blackbox
@@ -609,8 +621,8 @@ int test_MSCKF_measurementUpdate2() {
                           world.robot.rpy_G);
 
   // Simulate
-  // for (double t = 0.0; t < 0.8; t += dt) {
   for (double t = 0.0; t < 10.0; t += dt) {
+    // for (double t = 0.0; t < 1.4; t += dt) {
     // Step simulation
     world.step();
     FeatureTracks tracks = world.removeLostTracks();
@@ -624,9 +636,11 @@ int test_MSCKF_measurementUpdate2() {
     // msckf.imu_state.p_G = world.robot.p_G;
     // msckf.imu_state.q_IG = euler2quat(world.robot.rpy_G);
 
-    if (msckf.measurementUpdate(tracks) == 0) {
-      // PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/H_o.dat");
-    }
+    // mat2csv("/tmp/P_before.dat", msckf.P());
+    msckf.measurementUpdate(tracks);
+    // mat2csv("/tmp/P_after.dat", msckf.P());
+    // PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/P_before.dat");
+    // PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/P_after.dat");
 
     // Record
     blackbox.recordTimeStep(t,
@@ -644,12 +658,16 @@ int test_MSCKF_measurementUpdate2() {
   blackbox.recordCameraStates(msckf);
   PYTHON_SCRIPT("scripts/plot_msckf.py /tmp/test_msckf_measurementUpdate");
 
+  // mat2csv("/tmp/features.dat", world.features3d);
+  // PYTHON_SCRIPT("scripts/plot_world.py /tmp/features.dat");
+
   return 0;
 }
 
 void test_suite() {
   // MU_ADD_TEST(test_MSCKF_constructor);
   // MU_ADD_TEST(test_MSCKF_configure);
+  // MU_ADD_TEST(test_MSCKF_initialize);
   // MU_ADD_TEST(test_MSCKF_P);
   // MU_ADD_TEST(test_MSCKF_J);
   // MU_ADD_TEST(test_MSCKF_N);

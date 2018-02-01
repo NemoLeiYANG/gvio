@@ -7,6 +7,8 @@
 
 #include <vector>
 #include <algorithm>
+#include <chrono>
+#include <random>
 
 #include <Eigen/SVD>
 #include <Eigen/QR>
@@ -70,6 +72,9 @@ public:
   Vec4 ext_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
   // -- Measurement noise
   double img_var = 1e-1;
+
+  // Misc
+  std::map<int, double> chi_squared_table;
 
   // Settings
   int max_window_size = 30;

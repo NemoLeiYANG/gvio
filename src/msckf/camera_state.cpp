@@ -4,8 +4,8 @@ namespace gvio {
 
 void CameraState::correct(const VecX &dx) {
   // Split dx into its own components
-  const Vec3 dtheta_CG = dx.block(0, 0, 3, 1);
-  const Vec3 dp_G = dx.block(3, 0, 3, 1);
+  const Vec3 dtheta_CG = dx.segment(0, 3);
+  const Vec3 dp_G = dx.segment(3, 3);
 
   // Time derivative of quaternion (small angle approx)
   const Vec4 dq_CG = quatsmallangle(dtheta_CG);

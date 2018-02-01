@@ -86,17 +86,17 @@ Mat4 quatrcomp(const Vec4 &q) {
 }
 
 Vec4 quatsmallangle(const Vec3 &dtheta) {
-  Vec3 dq = dtheta / 2.0;
+  const Vec3 dq = dtheta / 2.0;
   const double dq_square_norm = dq.squaredNorm();
 
   Vec4 q;
-  if (dq_square_norm <= 1) {
+  if (dq_square_norm <= 1.0) {
     q.head<3>() = dq;
-    q(3) = std::sqrt(1 - dq_square_norm);
+    q(3) = std::sqrt(1.0 - dq_square_norm);
   } else {
     q.head<3>() = dq;
     q(3) = 1;
-    q = q / std::sqrt(1 + dq_square_norm);
+    q = q / std::sqrt(1.0 + dq_square_norm);
   }
 
   return q;

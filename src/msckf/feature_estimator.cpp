@@ -2,6 +2,61 @@
 
 namespace gvio {
 
+Vec3 lls_triangulation(const Vec3 &u1,
+                       const Mat34 &P1,
+                       const Vec3 &u2,
+                       const Mat34 &P2) {
+  // Build matrix A for homogenous equation system Ax = 0, assume X = (x,y,z,1),
+  // for Linear-LS method which turns it into a AX = B system, where:
+  // - A is 4x3,
+  // - X is 3x1
+  // - B is 4x1
+
+  // clang-format off
+  MatX A = zeros(4, 3);
+  A << u1(0) * P1(2, 0) - P1(0, 0), u1(0) * P1(2, 1) - P1(0, 1), u1(0) * P1(2, 2) - P1(0, 2),
+       u1(1) * P1(2, 0) - P1(1, 0), u1(1) * P1(2, 1) - P1(1, 1), u1(1) * P1(2, 2) - P1(1, 2),
+       u2(0) * P2(2, 0) - P2(0, 0), u2(0) * P2(2, 1)- P2(0, 1), u2(0) * P2(2, 2) - P2(0, 2),
+       u2(1) * P2(2, 0) - P2(1, 0), u2(1) * P2(2, 1)- P2(1, 1), u2(1) * P2(2, 2) - P2(1, 2);
+
+  Vec4 B{-(u1(0) * P1(2, 3) - P1(0,3)),
+         -(u1(1) * P1(2, 3) - P1(1,3)),
+         -(u2(0) * P2(2, 3) - P2(0,3)),
+         -(u2(1) * P2(2, 3) - P2(1,3))};
+  // clang-format on
+
+  // SVD
+  Vec3 X = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(B);
+
+  return X;
+}
+
+// int FeatureEstimator::triangulate(const Vec2 &p1,
+//                                   const Vec2 &p2,
+//                                   const Mat3 &C_C0C1,
+//                                   const Vec3 &t_C0_C0C1,
+//                                   Vec3 &p_C0_f) {
+//   // Convert points to homogenous coordinates and normalize
+//   Vec3 pt1{p1[0], p1[1], 1.0};
+//   Vec3 pt2{p2[0], p2[1], 1.0};
+//   // pt1.normalize();
+//   // pt2.normalize();
+//
+//   // Triangulate
+//   // -- Matrix A
+//   MatX A = zeros(3, 2);
+//   A.block(0, 0, 3, 1) = pt1;
+//   A.block(0, 1, 3, 1) = -C_C0C1 * pt2;
+//   // -- Vector b
+//   Vec3 b{t_C0_C0C1};
+//   // -- Perform SVD
+//   VecX x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+//   // -- Calculate p_C0_f
+//   p_C0_f = x(0) * pt1;
+//
+//   return 0;
+// }
+
 int FeatureEstimator::triangulate(const Vec2 &p1,
                                   const Vec2 &p2,
                                   const Mat3 &C_C0C1,
@@ -10,20 +65,18 @@ int FeatureEstimator::triangulate(const Vec2 &p1,
   // Convert points to homogenous coordinates and normalize
   Vec3 pt1{p1[0], p1[1], 1.0};
   Vec3 pt2{p2[0], p2[1], 1.0};
-  pt1.normalize();
-  pt2.normalize();
 
-  // Triangulate
-  // -- Matrix A
-  MatX A = zeros(3, 2);
-  A.block(0, 0, 3, 1) = pt1;
-  A.block(0, 1, 3, 1) = -C_C0C1 * pt2;
-  // -- Vector b
-  Vec3 b{t_C0_C0C1};
-  // -- Perform SVD
-  VecX x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
-  // -- Calculate p_C0_f
-  p_C0_f = x(0) * pt1;
+  // Form camera matrix P1
+  const Mat34 P1 = I(3) * I(3, 4);
+
+  // Form camera matrix P2
+  Mat34 T2;
+  T2.block(0, 0, 3, 3) = C_C0C1;
+  T2.block(0, 3, 3, 1) = -C_C0C1 * t_C0_C0C1;
+  const Mat34 P2 = I(3) * T2;
+
+  // Perform linear least squares triangulation from 2 views
+  p_C0_f = lls_triangulation(pt1, P1, pt2, P2);
 
   return 0;
 }
@@ -183,16 +236,28 @@ int FeatureEstimator::estimate(Vec3 &p_G_f) {
   const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
   p_G_f = z * (C_C0G.transpose() * X) + p_G_C0;
 
-  if (this->debug_mode) {
-    std::cout << "p_G_f: " << p_G_f.transpose() << std::endl;
+  if (std::isnan(p_G_f(0)) || std::isnan(p_G_f(1)) || std::isnan(p_G_f(2))) {
+    return -2;
   }
 
   return 0;
 }
 
-bool CeresReprojectionError::Evaluate(double const *const *x,
-                                      double *residuals,
-                                      double **jacobians) const {
+AutoDiffReprojectionError::AutoDiffReprojectionError(const Mat3 &C_CiC0,
+                                                     const Vec3 &t_Ci_CiC0,
+                                                     const Vec2 &kp) {
+  // Camera extrinsics
+  mat2array(C_CiC0, this->C_CiC0);
+  vec2array(t_Ci_CiC0, this->t_Ci_CiC0);
+
+  // Measurement
+  this->u = kp(0);
+  this->v = kp(1);
+}
+
+bool AnalyticalReprojectionError::Evaluate(double const *const *x,
+                                           double *residuals,
+                                           double **jacobians) const {
   // Inverse depth parameters
   const double alpha = x[0][0];
   const double beta = x[0][1];
@@ -269,12 +334,29 @@ void CeresFeatureEstimator::addResidualBlock(const Vec2 &kp,
                                              const Vec3 &t_Ci_CiC0,
                                              double *x) {
   // Build residual
-  auto cost_func = new CeresReprojectionError(C_CiC0, t_Ci_CiC0, kp);
+  auto cost_func = new AnalyticalReprojectionError(C_CiC0, t_Ci_CiC0, kp);
 
   // Add residual block to problem
   this->problem.AddResidualBlock(cost_func, // Cost function
                                  NULL,      // Loss function
                                  x);        // Optimization parameters
+
+  // // Build residual
+  // auto residual = new AutoDiffReprojectionError(C_CiC0, t_Ci_CiC0, kp);
+  //
+  // // Build cost and loss function
+  // auto cost_func =
+  //     new ceres::AutoDiffCostFunction<AutoDiffReprojectionError, // Residual
+  //                                     2, // Size of residual
+  //                                     3 // Size of 1st parameter - inverse
+  //                                     depth
+  //                                     >(residual);
+  // auto loss_func = new ceres::HuberLoss(1.0);
+  //
+  // // Add residual block to problem
+  // this->problem.AddResidualBlock(cost_func, // Cost function
+  //                                loss_func, // Loss function
+  //                                x);        // Optimization parameters
 }
 
 int CeresFeatureEstimator::setupProblem() {
@@ -283,6 +365,15 @@ int CeresFeatureEstimator::setupProblem() {
   if (this->initialEstimate(p_C0_f) != 0) {
     return -1;
   }
+  // std::cout << "init:" << p_C0_f.transpose() << std::endl;
+
+  // // Cheat by forming p_C0_f using ground truth data
+  // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
+  //   const Vec3 p_G_f = this->track.track[0].ground_truth;
+  //   const Vec3 p_G_C = this->track_cam_states[0].p_G;
+  //   const Mat3 C_CG = C(this->track_cam_states[0].q_CG);
+  //   p_C0_f = C_CG * (p_G_f - p_G_C);
+  // }
 
   // Create inverse depth params (these are to be optimized)
   this->x[0] = p_C0_f(0) / p_C0_f(2); // Alpha
@@ -317,11 +408,6 @@ int CeresFeatureEstimator::setupProblem() {
 int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // Set options
   this->options.max_num_iterations = 30;
-  this->options.use_nonmonotonic_steps = true;
-  this->options.use_inner_iterations = false;
-  // this->options.preconditioner_type = ceres::SCHUR_JACOBI;
-  // this->options.linear_solver_type = ceres::SPARSE_SCHUR;
-  this->options.parameter_tolerance = 1e-10;
   this->options.num_threads = 1;
   this->options.num_linear_solver_threads = 1;
   this->options.minimizer_progress_to_stdout = false;
@@ -332,10 +418,10 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   }
 
   // Cheat by using ground truth data
-  if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
-    p_G_f = this->track.track[0].ground_truth;
-    return 0;
-  }
+  // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
+  //   p_G_f = this->track.track[0].ground_truth;
+  //   return 0;
+  // }
 
   // Solve
   ceres::Solve(this->options, &this->problem, &this->summary);
@@ -345,17 +431,23 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   const double z = 1 / this->x[2];
   const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
   const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
-  p_G_f = z * (C_C0G.transpose() * X) + p_G_C0;
+  p_G_f = z * C_C0G.transpose() * X + p_G_C0;
 
-  std::cout << "ground truth: " << this->track.track[0].ground_truth.transpose()
-            << std::endl;
-  std::cout << "estimated: " << p_G_f.transpose() << std::endl;
+  Vec3 gnd = this->track.track[0].ground_truth;
+  std::cout << "gnd: " << gnd.transpose() << std::endl;
+  std::cout << "est: " << p_G_f.transpose() << std::endl;
+  std::cout << std::endl;
+  // exit(0);
 
   if (std::isnan(p_G_f(0)) || std::isnan(p_G_f(1)) || std::isnan(p_G_f(2))) {
     return -2;
   }
+  // exit(0);
 
   return 0;
 }
+
+// TODO: Make a function to check the estimated feature is infront of all camera
+// states
 
 } // namespace gvio

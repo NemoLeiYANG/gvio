@@ -24,6 +24,25 @@ namespace gvio {
  */
 
 /**
+ * Linear Least Squares Triangulation
+ *
+ * Source:
+ *     Hartley, R.I. and Sturm, P., "Triangulation", Computer vision and image
+ *     understanding, 1997
+ *
+ * @param u1 homogenous image point (u,v,1)
+ * @param P1 camera 1 matrix
+ * @param u2 homogenous image point in 2nd camera
+ * @param P2 camera 2 matrix
+ *
+ * @returns Estimated feature position
+ */
+Vec3 lls_triangulation(const Vec3 &u1,
+                       const Mat34 &P1,
+                       const Vec3 &u2,
+                       const Mat34 &P2);
+
+/**
  * Feature estimator
  */
 class FeatureEstimator {
@@ -90,9 +109,48 @@ public:
 };
 
 /**
- * Ceres-solver reprojection error
+ * Auto-diff reprojection error
  */
-struct CeresReprojectionError : public ceres::SizedCostFunction<2, 3> {
+struct AutoDiffReprojectionError {
+public:
+  // Camera extrinsics
+  double C_CiC0[9];
+  double t_Ci_CiC0[3];
+
+  // Measurement
+  double u = 0.0;
+  double v = 0.0;
+
+  AutoDiffReprojectionError(const Mat3 &C_CiC0,
+                            const Vec3 &t_Ci_CiC0,
+                            const Vec2 &kp);
+
+  /**
+   * JPL Quaternion to rotation matrix R
+   *
+   * Page 9. of Trawny, Nikolas, and Stergios I. Roumeliotis. "Indirect
+   * Kalman filter for 3D attitude estimation." University of Minnesota,
+   * Dept. of Comp. Sci. & Eng., Tech. Rep 2 (2005): 2005.
+   *
+   * @param q JPL quaternion (x, y, z, w)
+   * @returns Rotation matrix
+   */
+  template <typename T>
+  Eigen::Matrix<T, 3, 3> quatToRot(const Eigen::Matrix<T, 4, 1> &q) const;
+
+  /**
+   * Calculate Bundle Adjustment Residual
+   *
+   * @param x Inverse depth parameters (alpha, beta, rho)
+   * @param residual Calculated residual
+   **/
+  template <typename T> bool operator()(const T *const x, T *residual) const;
+};
+
+/**
+ * Analytical reprojection error
+ */
+struct AnalyticalReprojectionError : public ceres::SizedCostFunction<2, 3> {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -103,9 +161,9 @@ public:
   // Measurement
   Vec2 keypoint;
 
-  CeresReprojectionError(const Mat3 &C_CiC0,
-                         const Vec3 &t_Ci_CiC0,
-                         const Vec2 &keypoint)
+  AnalyticalReprojectionError(const Mat3 &C_CiC0,
+                              const Vec3 &t_Ci_CiC0,
+                              const Vec2 &keypoint)
       : C_CiC0{C_CiC0}, t_Ci_CiC0{t_Ci_CiC0}, keypoint{keypoint} {}
 
   /**
@@ -173,4 +231,7 @@ public:
 
 /** @} group msckf */
 } // namespace gvio
+
+#include "impl/feature_estimator.hpp"
+
 #endif // GVIO_MSCKF_FEATURE_ESTIMATOR_HPP

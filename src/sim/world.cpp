@@ -13,7 +13,7 @@ int SimWorld::configure(const double dt) {
                                                     this->nb_features);
 
   // Robot settings
-  double circle_radius = 10.0;
+  double circle_radius = 5.0;
   double vx_B = 1.0;
   double wz_B = 0.0;
   circle_trajectory(circle_radius, vx_B, &wz_B, &this->t_end);

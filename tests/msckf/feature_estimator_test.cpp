@@ -59,6 +59,41 @@ void setup_test(const struct test_config &config,
   track = FeatureTrack{0, 1, Feature{pt1}, Feature{pt2}};
 }
 
+int test_lls_triangulation() {
+  // Camera model
+  struct test_config config;
+  PinholeModel cam_model(config.image_width,
+                         config.image_height,
+                         config.fx,
+                         config.fy,
+                         config.cx,
+                         config.cy);
+
+  // Create keypoints
+  const Vec3 landmark{1.0, 0.0, 10.0};
+  const Vec2 kp1 = cam_model.project(landmark, I(3), Vec3{0.0, 0.0, 0.0});
+  const Vec2 kp2 = cam_model.project(landmark, I(3), Vec3{0.0, 0.0, 0.2});
+
+  // const Vec2 ideal1 = cam_model.pixel2image(kp1);
+  const Vec3 u1{kp1(0), kp1(1), 1.0};
+
+  // const Vec2 ideal2 = cam_model.pixel2image(kp2);
+  const Vec3 u2{kp2(0), kp2(1), 1.0};
+
+  const Mat34 P1{cam_model.P(I(3), Vec3{0.0, 0.0, 0.0})};
+  const Mat34 P2{cam_model.P(I(3), Vec3{0.0, 0.0, 0.2})};
+
+  std::cout << "u1: " << u1.transpose() << std::endl;
+  std::cout << "u2: " << u2.transpose() << std::endl;
+  std::cout << "P1: " << P1 << std::endl;
+  std::cout << "P2: " << P2 << std::endl;
+
+  const Vec3 X = lls_triangulation(u1, P1, u2, P2);
+  std::cout << X << std::endl;
+
+  return 0;
+}
+
 int test_FeatureEstimator_triangulate() {
   // Camera model
   struct test_config config;
@@ -183,7 +218,7 @@ int test_FeatureEstimator_estimate() {
   return 0;
 }
 
-int test_CeresReprojectionError_constructor() {
+int test_AnalyticalReprojectionError_constructor() {
   // Setup test
   const struct test_config config;
   CameraStates track_cam_states;
@@ -203,14 +238,14 @@ int test_CeresReprojectionError_constructor() {
   const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
 
   // Ceres reprojection error
-  CeresReprojectionError error{C_CiC0,
-                               t_Ci_CiC0,
-                               track.track[camera_index].getKeyPoint()};
+  AnalyticalReprojectionError error{C_CiC0,
+                                    t_Ci_CiC0,
+                                    track.track[camera_index].getKeyPoint()};
 
   return 0;
 }
 
-int test_CeresReprojectionError_evaluate() {
+int test_AnalyticalReprojectionError_evaluate() {
   // Setup test
   const struct test_config config;
   CameraStates track_cam_states;
@@ -232,9 +267,9 @@ int test_CeresReprojectionError_evaluate() {
 
     // Calculate reprojection error for first measurement
     double r[2] = {1.0, 1.0};
-    CeresReprojectionError error{C_CiC0,
-                                 t_Ci_CiC0,
-                                 track.track[i].getKeyPoint()};
+    AnalyticalReprojectionError error{C_CiC0,
+                                      t_Ci_CiC0,
+                                      track.track[i].getKeyPoint()};
 
     // Create inverse depth params (these are to be optimized)
     const double alpha = config.landmark(0) / config.landmark(2);
@@ -305,20 +340,21 @@ int test_CeresFeatureEstimator_estimate() {
 
 void test_suite() {
   // FeatureEstimator
+  MU_ADD_TEST(test_lls_triangulation);
   MU_ADD_TEST(test_FeatureEstimator_triangulate);
-  // MU_ADD_TEST(test_FeatureEstimator_initialEstimate);
-  // MU_ADD_TEST(test_FeatureEstimator_jacobian);
-  // MU_ADD_TEST(test_FeatureEstimator_reprojectionError);
-  // MU_ADD_TEST(test_FeatureEstimator_estimate);
-  //
-  // // CeresReprojectionError
-  // MU_ADD_TEST(test_CeresReprojectionError_constructor);
-  // MU_ADD_TEST(test_CeresReprojectionError_evaluate);
-  //
-  // // CeresFeatureEstimator
-  // MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
-  // MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
-  // MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
+  MU_ADD_TEST(test_FeatureEstimator_initialEstimate);
+  MU_ADD_TEST(test_FeatureEstimator_jacobian);
+  MU_ADD_TEST(test_FeatureEstimator_reprojectionError);
+  MU_ADD_TEST(test_FeatureEstimator_estimate);
+
+  // AnalyticalReprojectionError
+  MU_ADD_TEST(test_AnalyticalReprojectionError_constructor);
+  MU_ADD_TEST(test_AnalyticalReprojectionError_evaluate);
+
+  // CeresFeatureEstimator
+  MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
+  MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
+  MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
 }
 
 } // namespace gvio

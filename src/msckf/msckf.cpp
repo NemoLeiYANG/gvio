@@ -1,8 +1,16 @@
 #include "gvio/msckf/msckf.hpp"
 
+#include <boost/math/distributions/chi_squared.hpp>
+
 namespace gvio {
 
-MSCKF::MSCKF() {}
+MSCKF::MSCKF() {
+  // Create Chi-Square lookup table
+  for (int i = 1; i < 100; ++i) {
+    boost::math::chi_squared chi_squared_dist(i);
+    this->chi_squared_table[i] = boost::math::quantile(chi_squared_dist, 0.05);
+  }
+}
 
 int MSCKF::configure(const std::string &config_file) {
   // clang-format off
@@ -120,9 +128,8 @@ void MSCKF::H(const FeatureTrack &track,
     // dh / dg
     // clang-format off
     MatX dhdg = zeros(2, 3);
-    dhdg << 1.0, 0.0, -X / Z,
-            0.0, 1.0, -Y / Z;
-    dhdg = (1.0 / Z) * dhdg;
+    dhdg << 1.0 / Z, 0.0, -X / (Z * Z),
+            0.0, 1.0 / Z, -Y / (Z * Z);
     // clang-format on
 
     // Row start index
@@ -229,19 +236,15 @@ void MSCKF::predictionUpdate(const Vec3 &a_m,
 }
 
 int MSCKF::chiSquaredTest(const MatX &H, const VecX &r, const int dof) {
-  UNUSED(r);
-  UNUSED(dof);
   const MatX P1 = H * this->P() * H.transpose();
   const MatX P2 = this->img_var * I(H.rows(), H.rows());
-  // const double gamma = r.transpose() * (P1+P2).ldlt().solve(r);
+  const double gamma = r.transpose() * (P1 + P2).ldlt().solve(r);
 
-  // if (gamma < chisq_table[dof]) {
-  //   return true;
-  // } else {
-  //   return false;
-  // }
-
-  return 0;
+  if (gamma < this->chi_squared_table[dof]) {
+    return 0;
+  } else {
+    return -1;
+  }
 }
 
 int MSCKF::residualizeTrack(const FeatureTrack &track,
@@ -277,8 +280,7 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
 
     // Calculate reprojection error and add it to the residual vector
     const int rs = 2 * i;
-    const int re = 2 * i + 2;
-    r_j.block(rs, 0, re - rs, 1) = z - z_hat;
+    r_j.block(rs, 0, 2, 1) = z - z_hat;
   }
 
   // Form jacobian of measurement w.r.t both state and feature
@@ -298,13 +300,15 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     H_o_j = A_j.transpose() * H_x_j;
     r_o_j = A_j.transpose() * r_j;
 
-    // const MatX A_j{H_f_j.transpose().fullPivLu().kernel()};
-    // H_o_j = A_j.transpose() * H_x_j;
-    // r_o_j = A_j.transpose() * r_j;
-
   } else {
     H_o_j = H_x_j;
     r_o_j = r_j;
+  }
+
+  // Peform chi squared test
+  const int dof = track.trackedLength() - 1;
+  if (this->chiSquaredTest(H_o_j, r_o_j, dof) != 0) {
+    return -3;
   }
 
   return 0;
@@ -314,7 +318,6 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
   // Residualize feature tracks
   MatX H_o;
   VecX r_o;
-  bool stack_residuals = false;
 
   for (auto track : tracks) {
     MatX H_j;
@@ -322,13 +325,12 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
 
     if (this->residualizeTrack(track, H_j, r_j) == 0) {
       // Stack measurement jacobian matrix and residual vector
-      if (stack_residuals) {
+      if (r_o.rows() > 0) {
         H_o = vstack(H_o, H_j);
         r_o = vstack(r_o, r_j);
       } else {
         H_o = H_j;
         r_o = r_j;
-        stack_residuals = true;
       }
     }
   }
@@ -340,7 +342,6 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
 
   // Reduce EKF measurement update computation with QR decomposition
   if (H_o.rows() > H_o.cols() && this->enable_qr_trick) {
-    // if (this->enable_qr_trick) {
     // Convert H to a sparse matrix.
     Eigen::SparseMatrix<double> H_sparse = H_o.sparseView();
 
@@ -358,6 +359,12 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
     r_n = r_temp.head(IMUState::size + this->N() * CameraState::size);
 
     // Eigen::HouseholderQR<MatX> QR(H_o);
+    // MatX Q = QR.householderQ();
+    // MatX Q1 = Q.leftCols(IMUState::size + this->N() * CameraState::size);
+    // T_H = Q1.transpose() * H_o;
+    // r_n = Q1.transpose() * r_o;
+
+    // Eigen::HouseholderQR<MatX> QR(H_o);
     // QR.compute(H_o);
     // const MatX R = QR.matrixQR().template triangularView<Eigen::Upper>();
     // const MatX Q = QR.householderQ();
@@ -366,8 +373,6 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
     // MatX Q_1 = Q;
     // // -- Calculate residual
     // r_n = Q_1.transpose() * r_o;
-    // T_H = H_o;
-    // r_n = r_o;
 
   } else {
     T_H = H_o;
@@ -385,8 +390,7 @@ void MSCKF::correctIMUState(const VecX &dx) {
 void MSCKF::correctCameraStates(const VecX &dx) {
   for (int i = 0; i < this->N(); i++) {
     const int rs = IMUState::size + CameraState::size * i;
-    const int re = IMUState::size + CameraState::size * i + CameraState::size;
-    const VecX dx_cam{dx.block(rs, 0, re - rs, 1)};
+    const VecX dx_cam{dx.block(rs, 0, CameraState::size, 1)};
     this->cam_states[i].correct(dx_cam);
   }
 }
@@ -417,11 +421,11 @@ void MSCKF::pruneCameraState() {
 FeatureTracks MSCKF::filterTracks(const FeatureTracks &tracks) {
   FeatureTracks filtered_tracks;
   for (auto track : tracks) {
-    if (track.trackedLength() < (size_t) this->min_track_length) {
-      continue;
-    } else if (track.trackedLength() > (size_t) this->max_window_size) {
-      continue;
-    }
+    // if (track.trackedLength() < (size_t) this->min_track_length) {
+    //   continue;
+    // } else if (track.trackedLength() > (size_t) this->max_window_size) {
+    //   continue;
+    // }
 
     filtered_tracks.push_back(track);
   }
