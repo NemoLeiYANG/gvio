@@ -43,6 +43,21 @@ Vec3 lls_triangulation(const Vec3 &u1,
                        const Mat34 &P2);
 
 /**
+ * Linear Least Squares Triangulation
+ *
+ * @param p1 Feature point 1 in pixel coordinates
+ * @param p2 Feature point 2 in pixel coordinates
+ * @param C_C0C1 Rotation matrix from frame C1 to C0
+ * @param t_C0_C0C1 Translation vector from frame C0 to C1 expressed in C0
+ *
+ * @returns Estimated feature position
+ */
+Vec3 lls_triangulation(const Vec2 &p1,
+                       const Vec2 &p2,
+                       const Mat3 &C_C0C1,
+                       const Vec3 &t_C0_C0C1);
+
+/**
  * Feature estimator
  */
 class FeatureEstimator {
@@ -82,6 +97,22 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int initialEstimate(Vec3 &p_C0_f);
+
+  /**
+   * Check estimate
+   *
+   * @param p_G_f Feature position in global frame
+   * @returns 0 for success, -1 for failure
+   */
+  int checkEstimate(const Vec3 &p_G_f);
+
+  /**
+   *
+   */
+  void transformEstimate(const double alpha,
+                         const double beta,
+                         const double rho,
+                         Vec3 &p_G_f);
 
   /**
    * Jacobian

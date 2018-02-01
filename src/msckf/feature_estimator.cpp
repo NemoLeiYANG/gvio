@@ -16,8 +16,8 @@ Vec3 lls_triangulation(const Vec3 &u1,
   MatX A = zeros(4, 3);
   A << u1(0) * P1(2, 0) - P1(0, 0), u1(0) * P1(2, 1) - P1(0, 1), u1(0) * P1(2, 2) - P1(0, 2),
        u1(1) * P1(2, 0) - P1(1, 0), u1(1) * P1(2, 1) - P1(1, 1), u1(1) * P1(2, 2) - P1(1, 2),
-       u2(0) * P2(2, 0) - P2(0, 0), u2(0) * P2(2, 1)- P2(0, 1), u2(0) * P2(2, 2) - P2(0, 2),
-       u2(1) * P2(2, 0) - P2(1, 0), u2(1) * P2(2, 1)- P2(1, 1), u2(1) * P2(2, 2) - P2(1, 2);
+       u2(0) * P2(2, 0) - P2(0, 0), u2(0) * P2(2, 1) - P2(0, 1), u2(0) * P2(2, 2) - P2(0, 2),
+       u2(1) * P2(2, 0) - P2(1, 0), u2(1) * P2(2, 1) - P2(1, 1), u2(1) * P2(2, 2) - P2(1, 2);
 
   Vec4 B{-(u1(0) * P1(2, 3) - P1(0,3)),
          -(u1(1) * P1(2, 3) - P1(1,3)),
@@ -31,31 +31,30 @@ Vec3 lls_triangulation(const Vec3 &u1,
   return X;
 }
 
-// int FeatureEstimator::triangulate(const Vec2 &p1,
-//                                   const Vec2 &p2,
-//                                   const Mat3 &C_C0C1,
-//                                   const Vec3 &t_C0_C0C1,
-//                                   Vec3 &p_C0_f) {
-//   // Convert points to homogenous coordinates and normalize
-//   Vec3 pt1{p1[0], p1[1], 1.0};
-//   Vec3 pt2{p2[0], p2[1], 1.0};
-//   // pt1.normalize();
-//   // pt2.normalize();
-//
-//   // Triangulate
-//   // -- Matrix A
-//   MatX A = zeros(3, 2);
-//   A.block(0, 0, 3, 1) = pt1;
-//   A.block(0, 1, 3, 1) = -C_C0C1 * pt2;
-//   // -- Vector b
-//   Vec3 b{t_C0_C0C1};
-//   // -- Perform SVD
-//   VecX x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
-//   // -- Calculate p_C0_f
-//   p_C0_f = x(0) * pt1;
-//
-//   return 0;
-// }
+Vec3 lls_triangulation(const Vec2 &p1,
+                       const Vec2 &p2,
+                       const Mat3 &C_C0C1,
+                       const Vec3 &t_C0_C0C1) {
+  // Convert points to homogenous coordinates and normalize
+  Vec3 pt1{p1[0], p1[1], 1.0};
+  Vec3 pt2{p2[0], p2[1], 1.0};
+  // pt1.normalize();
+  // pt2.normalize();
+
+  // Triangulate
+  // -- Matrix A
+  MatX A = zeros(3, 2);
+  A.block(0, 0, 3, 1) = pt1;
+  A.block(0, 1, 3, 1) = -C_C0C1 * pt2;
+  // -- Vector b
+  Vec3 b{t_C0_C0C1};
+  // -- Perform SVD
+  VecX x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+  // -- Calculate p_C0_f
+  const Vec3 p_C0_f = x(0) * pt1;
+
+  return p_C0_f;
+}
 
 int FeatureEstimator::triangulate(const Vec2 &p1,
                                   const Vec2 &p2,
@@ -63,8 +62,8 @@ int FeatureEstimator::triangulate(const Vec2 &p1,
                                   const Vec3 &t_C0_C0C1,
                                   Vec3 &p_C0_f) {
   // Convert points to homogenous coordinates and normalize
-  Vec3 pt1{p1[0], p1[1], 1.0};
-  Vec3 pt2{p2[0], p2[1], 1.0};
+  const Vec3 pt1{p1[0], p1[1], 1.0};
+  const Vec3 pt2{p2[0], p2[1], 1.0};
 
   // Form camera matrix P1
   const Mat34 P1 = I(3) * I(3, 4);
@@ -103,16 +102,50 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
   return 0;
 }
 
+int FeatureEstimator::checkEstimate(const Vec3 &p_G_f) {
+  const int N = this->track_cam_states.size();
+
+  // Pre-check
+  if (std::isnan(p_G_f(0)) || std::isnan(p_G_f(1)) || std::isnan(p_G_f(2))) {
+    return -1;
+  }
+
+  // Make sure feature is infront of camera all the way through
+  for (int i = 0; i < N; i++) {
+    // Transform feature from global frame to i-th camera frame
+    const Mat3 C_CG = C(this->track_cam_states[i].q_CG);
+    const Vec3 p_C_f = C_CG * (p_G_f - this->track_cam_states[i].p_G);
+
+    if (p_C_f(2) < 0.0) {
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+void FeatureEstimator::transformEstimate(const double alpha,
+                                         const double beta,
+                                         const double rho,
+                                         Vec3 &p_G_f) {
+  // Transform feature position from camera to global frame
+  const Vec3 X{alpha, beta, 1.0};
+  const double z = 1 / rho;
+  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
+  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
+  p_G_f = z * C_C0G.transpose() * X + p_G_C0;
+}
+
 MatX FeatureEstimator::jacobian(const VecX &x) {
   const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
   const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
 
-  const int N = this->track_cam_states.size();
-  MatX J = zeros(2 * N, 3);
-
   double alpha = x(0);
   double beta = x(1);
   double rho = x(2);
+
+  const int N = this->track_cam_states.size();
+  MatX J = zeros(2 * N, 3);
 
   for (int i = 0; i < N; i++) {
     // Get camera current rotation and translation
@@ -230,12 +263,7 @@ int FeatureEstimator::estimate(Vec3 &p_G_f) {
   }
 
   // Transform feature position from camera to global frame
-  const Vec3 X{x(0), x(1), 1.0};
-  const double z = 1 / x(2);
-  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
-  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
-  p_G_f = z * (C_C0G.transpose() * X) + p_G_C0;
-
+  this->transformEstimate(x(0), x(1), x(2), p_G_f);
   if (std::isnan(p_G_f(0)) || std::isnan(p_G_f(1)) || std::isnan(p_G_f(2))) {
     return -2;
   }
@@ -351,11 +379,10 @@ void CeresFeatureEstimator::addResidualBlock(const Vec2 &kp,
   //                                     3 // Size of 1st parameter - inverse
   //                                     depth
   //                                     >(residual);
-  // auto loss_func = new ceres::HuberLoss(1.0);
   //
   // // Add residual block to problem
   // this->problem.AddResidualBlock(cost_func, // Cost function
-  //                                loss_func, // Loss function
+  //                                nullptr,   // Loss function
   //                                x);        // Optimization parameters
 }
 
@@ -407,7 +434,7 @@ int CeresFeatureEstimator::setupProblem() {
 
 int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // Set options
-  this->options.max_num_iterations = 30;
+  this->options.max_num_iterations = 50;
   this->options.num_threads = 1;
   this->options.num_linear_solver_threads = 1;
   this->options.minimizer_progress_to_stdout = false;
@@ -427,27 +454,18 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   ceres::Solve(this->options, &this->problem, &this->summary);
 
   // Transform feature position from camera to global frame
-  const Vec3 X{this->x[0], this->x[1], 1.0};
-  const double z = 1 / this->x[2];
-  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
-  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
-  p_G_f = z * C_C0G.transpose() * X + p_G_C0;
+  this->transformEstimate(this->x[0], this->x[1], this->x[2], p_G_f);
 
-  Vec3 gnd = this->track.track[0].ground_truth;
-  std::cout << "gnd: " << gnd.transpose() << std::endl;
-  std::cout << "est: " << p_G_f.transpose() << std::endl;
-  std::cout << std::endl;
-  // exit(0);
-
-  if (std::isnan(p_G_f(0)) || std::isnan(p_G_f(1)) || std::isnan(p_G_f(2))) {
+  // Check estimate
+  if (this->checkEstimate(p_G_f) != 0) {
     return -2;
   }
-  // exit(0);
+  // Vec3 gnd = this->track.track[0].ground_truth;
+  // std::cout << "gnd: " << gnd.transpose() << std::endl;
+  // std::cout << "est: " << p_G_f.transpose() << std::endl;
+  // std::cout << std::endl;
 
   return 0;
 }
-
-// TODO: Make a function to check the estimated feature is infront of all camera
-// states
 
 } // namespace gvio

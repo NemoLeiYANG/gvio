@@ -552,7 +552,7 @@ int test_MSCKF_measurementUpdate() {
   struct timespec msckf_start = tic();
   for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
     // for (int i = 1; i < 50; i++) {
-    // for (int i = 1; i < 70; i++) {
+    // for (int i = 1; i < 100; i++) {
     // Feature tracker
     const std::string img_path = raw_dataset.cam0[i];
     const cv::Mat img_cur = cv::imread(img_path);
@@ -568,6 +568,11 @@ int test_MSCKF_measurementUpdate() {
     const double t_now = raw_dataset.oxts.timestamps[i];
     const double dt = t_now - t_prev;
     msckf.predictionUpdate(a_B, w_B, dt);
+
+    // // Cheat by loading the robot ground truth to MSCKF's imu state
+    // msckf.imu_state.p_G = raw_dataset.oxts.p_G[i];
+    // msckf.imu_state.q_IG = euler2quat(raw_dataset.oxts.rpy[i]);
+
     msckf.measurementUpdate(tracks);
 
     // Record
@@ -636,11 +641,7 @@ int test_MSCKF_measurementUpdate2() {
     // msckf.imu_state.p_G = world.robot.p_G;
     // msckf.imu_state.q_IG = euler2quat(world.robot.rpy_G);
 
-    // mat2csv("/tmp/P_before.dat", msckf.P());
-    msckf.measurementUpdate(tracks);
-    // mat2csv("/tmp/P_after.dat", msckf.P());
-    // PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/P_before.dat");
-    // PYTHON_SCRIPT("scripts/plot_matrix.py /tmp/P_after.dat");
+    // msckf.measurementUpdate(tracks);
 
     // Record
     blackbox.recordTimeStep(t,
@@ -680,8 +681,8 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_correctIMUState);
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_pruneCameraStates);
-  // MU_ADD_TEST(test_MSCKF_measurementUpdate);
-  MU_ADD_TEST(test_MSCKF_measurementUpdate2);
+  MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  // MU_ADD_TEST(test_MSCKF_measurementUpdate2);
 }
 
 } // namespace gvio

@@ -118,9 +118,9 @@ void MSCKF::H(const FeatureTrack &track,
   // Form measurement jacobians
   for (int i = 0; i < M; i++) {
     // Feature position in camera frame
-    const Mat3 C_CG = C(track_cam_states[i].q_CG);
-    const Vec3 p_G_C = track_cam_states[i].p_G;
-    const Vec3 p_C_f = C_CG * (p_G_f - p_G_C);
+    const Mat3 C_CiG = C(track_cam_states[i].q_CG);
+    const Vec3 p_G_Ci = track_cam_states[i].p_G;
+    const Vec3 p_C_f = C_CiG * (p_G_f - p_G_Ci);
     const double X = p_C_f(0);
     const double Y = p_C_f(1);
     const double Z = p_C_f(2);
@@ -140,11 +140,11 @@ void MSCKF::H(const FeatureTrack &track,
     const int cs_dhdp = x_imu_size + (x_cam_size * pose_idx) + 3;
 
     // H_f_j measurement jacobian w.r.t feature
-    H_f_j.block(rs, 0, 2, 3) = dhdg * C_CG;
+    H_f_j.block(rs, 0, 2, 3) = dhdg * C_CiG;
 
     // H_x_j measurement jacobian w.r.t state
     H_x_j.block(rs, cs_dhdq, 2, 3) = dhdg * skew(p_C_f);
-    H_x_j.block(rs, cs_dhdp, 2, 3) = -dhdg * C_CG;
+    H_x_j.block(rs, cs_dhdp, 2, 3) = -dhdg * C_CiG;
 
     // Update pose_idx
     pose_idx++;
@@ -342,10 +342,8 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
 
   // Reduce EKF measurement update computation with QR decomposition
   if (H_o.rows() > H_o.cols() && this->enable_qr_trick) {
-    // Convert H to a sparse matrix.
-    Eigen::SparseMatrix<double> H_sparse = H_o.sparseView();
-
     // Perform QR decompostion on H_sparse.
+    Eigen::SparseMatrix<double> H_sparse = H_o.sparseView();
     Eigen::SPQR<Eigen::SparseMatrix<double>> spqr_helper;
     spqr_helper.setSPQROrdering(SPQR_ORDERING_NATURAL);
     spqr_helper.compute(H_sparse);
@@ -363,16 +361,6 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
     // MatX Q1 = Q.leftCols(IMUState::size + this->N() * CameraState::size);
     // T_H = Q1.transpose() * H_o;
     // r_n = Q1.transpose() * r_o;
-
-    // Eigen::HouseholderQR<MatX> QR(H_o);
-    // QR.compute(H_o);
-    // const MatX R = QR.matrixQR().template triangularView<Eigen::Upper>();
-    // const MatX Q = QR.householderQ();
-    // // -- Find non-zero rows
-    // T_H = R;
-    // MatX Q_1 = Q;
-    // // -- Calculate residual
-    // r_n = Q_1.transpose() * r_o;
 
   } else {
     T_H = H_o;
@@ -421,11 +409,11 @@ void MSCKF::pruneCameraState() {
 FeatureTracks MSCKF::filterTracks(const FeatureTracks &tracks) {
   FeatureTracks filtered_tracks;
   for (auto track : tracks) {
-    // if (track.trackedLength() < (size_t) this->min_track_length) {
-    //   continue;
-    // } else if (track.trackedLength() > (size_t) this->max_window_size) {
-    //   continue;
-    // }
+    if (track.trackedLength() < (size_t) this->min_track_length) {
+      continue;
+    } else if (track.trackedLength() > (size_t) this->max_window_size) {
+      continue;
+    }
 
     filtered_tracks.push_back(track);
   }
