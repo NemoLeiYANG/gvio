@@ -2,7 +2,7 @@
 set -e  # exit on first error
 
 sudo bash apriltags_michigan_install.bash
-# sudo bash apriltags_mit_install.bash
+sudo bash apriltags_mit_install.bash
 # sudo bash apriltags_swathmore_install.bash
 sudo bash boost_install.bash
 sudo bash ceres_install.bash
