@@ -2,6 +2,13 @@
 set -e  # exit on first error
 OPENCV_URL=https://github.com/opencv/opencv/archive/3.2.0.zip
 
+MACHINE_TYPE=`uname -m`
+if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+  DOWNLOAD_PATH=/usr/local/src
+else
+  DOWNLOAD_PATH=/mnt/sdcard
+fi
+
 install_dependencies() {
   apt-get -y install -qq \
     build-essential \
@@ -38,8 +45,8 @@ install_dependencies() {
 }
 
 download_opencv() {
-  mkdir -p /usr/local/src/opencv
-  cd /usr/local/src/opencv
+  mkdir -p $DOWNLOAD_PATH
+  cd $DOWNLOAD_PATH
   if [ ! -d opencv-3.2.0 ]; then
     wget --no-check-certificate $OPENCV_URL -O opencv3.2.0.zip
     unzip -qq opencv3.2.0.zip
@@ -50,7 +57,7 @@ download_opencv() {
 
 install_opencv() {
   # compile and install opencv
-  cd /usr/local/src/opencv/
+  cd $DOWNLOAD_PATH/
   cd opencv-3.2.0
   mkdir -p build
   cd build
