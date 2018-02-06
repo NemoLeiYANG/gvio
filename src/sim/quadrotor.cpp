@@ -2,6 +2,7 @@
 
 namespace gvio {
 
+// ATTITUDE CONTROLLER
 Vec4 AttitudeController::update(const Vec4 &setpoints,
                                 const Vec4 &actual,
                                 double dt) {
@@ -54,15 +55,6 @@ Vec4 AttitudeController::update(const Vec4 &setpoints,
   this->dt = 0.0;
 
   return outputs;
-}
-
-Vec4 AttitudeController::update(const Vec4 &psetpoints,
-                                const Vec4 &vsetpoints,
-                                const Vec4 &actual,
-                                double dt) {
-  Vec4 setpoints;
-  setpoints = psetpoints + vsetpoints;
-  return this->update(setpoints, actual, dt);
 }
 
 // POSITION CONTROLLER
@@ -217,7 +209,7 @@ Vec4 QuadrotorModel::attitudeControllerControl(const double dt) {
 }
 
 Vec4 QuadrotorModel::positionControllerControl(const double dt) {
-  // position controller
+  // Position controller
   Vec4 actual_position;
   actual_position(0) = this->position(0); // x
   actual_position(1) = this->position(1); // y
@@ -230,7 +222,7 @@ Vec4 QuadrotorModel::positionControllerControl(const double dt) {
                                        0.0,
                                        dt);
 
-  // attitude controller
+  // Attitude controller
   Vec4 actual_attitude;
   actual_attitude(0) = this->attitude(0); // roll
   actual_attitude(1) = this->attitude(1); // pitch

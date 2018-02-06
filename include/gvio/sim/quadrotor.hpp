@@ -19,6 +19,9 @@ namespace gvio {
  * @{
  */
 
+/**
+ * Attitude controller
+ */
 class AttitudeController {
 public:
   double dt;
@@ -32,13 +35,19 @@ public:
       : dt(0.0), outputs(), roll_controller(200.0, 0.5, 10.0),
         pitch_controller(200.0, 0.5, 10.0), yaw_controller(200.0, 0.5, 10.0) {}
 
-  Vec4 update(const Vec4 &setpoints, const Vec4 &actual, double dt);
-  Vec4 update(const Vec4 &psetpoints,
-              const Vec4 &vsetpoints,
-              const Vec4 &actual,
-              double dt);
+  /**
+   * Update
+   *
+   * @param setpoints Setpoints (roll, pitch, yaw, z)
+   * @param actual Actual (roll, pitch, yaw, z)
+   * @returns Controller command (roll, pitch, yaw, thrust)
+   */
+  Vec4 update(const Vec4 &setpoints, const Vec4 &actual, const double dt);
 };
 
+/**
+ * Position controller
+ */
 class PositionController {
 public:
   double dt;
@@ -52,9 +61,22 @@ public:
       : dt(0.0), outputs(), x_controller(0.5, 0.0, 0.035),
         y_controller(0.5, 0.0, 0.035), z_controller(0.5, 0.0, 0.018) {}
 
-  Vec4 update(const Vec3 &setpoints, const Vec4 &actual, double yaw, double dt);
+  /**
+   * Update
+   *
+   * @param setpoints Setpoints (x, y, z)
+   * @param actual Actual (x, y, z)
+   * @returns Controller command (roll, pitch, yaw, thrust)
+   */
+  Vec4 update(const Vec3 &setpoints,
+              const Vec4 &actual,
+              const double yaw,
+              const double dt);
 };
 
+/**
+ * Quadrotor model
+ */
 class QuadrotorModel {
 public:
   Vec3 attitude;         ///< Attitude
