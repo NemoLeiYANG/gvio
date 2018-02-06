@@ -1,8 +1,15 @@
 #!/bin/bash
 set -e  # halt on first error
-DOWNLOAD_PATH=/usr/local/src
+
 REPO_VER=2016-12-01
 REPO_URL="https://april.eecs.umich.edu/media/apriltag/apriltag-$REPO_VER.tgz"
+
+MACHINE_TYPE=`uname -m`
+if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+  DOWNLOAD_PATH=/usr/local/src
+else
+  DOWNLOAD_PATH=/mnt/sdcard
+fi
 
 install_apriltags()
 {

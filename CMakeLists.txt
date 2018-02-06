@@ -122,6 +122,7 @@ SET(UNITTESTS
   msckf-feature_estimator_test
   msckf-imu_state_test
   msckf-msckf_test
+  pwm-pca9685_test
   sim-camera_test
   sim-carrot_controller_test
   sim-twowheel_test

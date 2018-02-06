@@ -7,11 +7,18 @@ find . -name "*.hpp" | xargs clang-format-3.8 -i
 
 # find . -name *.cpp | xargs clang-tidy
 
+MACHINE_TYPE=`uname -m`
+if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+  CPU_COUNT=8
+else
+  CPU_COUNT=1
+fi
+
 doxygen Doxyfile
 
 mkdir -p build && cd build
 
-cmake .. && time make -j8
+cmake .. && time make -j${CPU_COUNT}
 
 # cd ../ && bash scripts/test_runner.sh
 
@@ -42,6 +49,7 @@ cd tests
 # ./msckf-feature_estimator_test
 # ./msckf-msckf_test
 # ./msckf-profiler_test
+sudo ./pwm-pca9685_test
 # ./sim-carrot_controller_test
 # ./sim-twowheel_test
 # ./sim-camera_test

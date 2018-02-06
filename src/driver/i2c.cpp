@@ -15,6 +15,7 @@ int I2C::setup() {
   // open i2c connection
   fd = open(filename, O_RDWR);
   if (fd < 0) {
+    LOG_INFO("Failed to open i2c connection!");
     return -1;
   } else {
     this->fd = fd;

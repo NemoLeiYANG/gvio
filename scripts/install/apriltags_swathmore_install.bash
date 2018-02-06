@@ -1,7 +1,12 @@
 #!/bin/bash
 set -e  # halt on first error
-DOWNLOAD_PATH=/usr/local/src
 
+MACHINE_TYPE=`uname -m`
+if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+  DOWNLOAD_PATH=/usr/local/src
+else
+  DOWNLOAD_PATH=/mnt/sdcard
+fi
 
 install_dependencies()
 {

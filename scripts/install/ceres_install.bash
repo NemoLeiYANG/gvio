@@ -1,8 +1,14 @@
 #!/bin/bash
 set -e  # exit on first error
 UBUNTU_VERSION=`lsb_release --release | cut -f2`
-SRC_PREFIX_PATH="/usr/local/src/"
+DOWNLOAD_PATH="/usr/local/src/"
 
+MACHINE_TYPE=`uname -m`
+if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+  DOWNLOAD_PATH=/usr/local/src
+else
+  DOWNLOAD_PATH=/mnt/sdcard
+fi
 
 install_dependencies() {
     apt-get update -qq
@@ -21,8 +27,8 @@ install_suitesparse_fix() {
 
 install_ceres_solver() {
     # clone ceres solver
-    mkdir -p $SRC_PREFIX_PATH
-    cd $SRC_PREFIX_PATH
+    mkdir -p $DOWNLOAD_PATH
+    cd $DOWNLOAD_PATH
     git clone https://github.com/ceres-solver/ceres-solver.git
 
     # go into ceres-solver repo and prepare for build

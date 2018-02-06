@@ -1,11 +1,16 @@
 #!/bin/bash
 set -e  # halt on first error
-DOWNLOAD_PATH=/usr/local/src
 REPO_URL=https://svn.csail.mit.edu/apriltags
 INC_DEST=/usr/local/include/apriltags_mit
 LIB_DEST=/usr/local/lib/libapriltags_mit.a
 REGEX_STRING='s/AprilTags\//apriltags_mit\//g'
 
+MACHINE_TYPE=`uname -m`
+if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+  DOWNLOAD_PATH=/usr/local/src
+else
+  DOWNLOAD_PATH=/mnt/sdcard
+fi
 
 install_dependencies()
 {
