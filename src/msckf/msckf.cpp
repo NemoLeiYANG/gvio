@@ -340,6 +340,11 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
     return -1;
   }
 
+  if (r_o.maxCoeff() > 0.1) {
+    std::cout << "Opps! max residual: " << r_o.maxCoeff() << std::endl;
+    return -1;
+  }
+
   // Reduce EKF measurement update computation with QR decomposition
   if (H_o.rows() > H_o.cols() && this->enable_qr_trick) {
     // Perform QR decompostion on H_sparse.

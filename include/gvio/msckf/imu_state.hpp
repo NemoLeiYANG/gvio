@@ -53,12 +53,12 @@ public:
   Vec3 b_a = zeros(3, 1);               ///< Bias of accelerometer
   Vec3 p_G = zeros(3, 1);               ///< Position in Global frame
 
-  Vec3 w_G = zeros(3, 1);           ///< Earth's angular velocity
-  Vec3 g_G = Vec3{0.0, 0.0, -9.81}; ///< Gravitational acceleration
+  Vec3 w_G = zeros(3, 1);          ///< Earth's angular velocity
+  Vec3 g_G = Vec3{0.0, 0.0, -9.8}; ///< Gravitational acceleration
 
   MatX P = 1e-5 * I(15); ///< Covariance matrix
   MatX Q = 1e-2 * I(12); ///< Noise matrix
-  MatX Phi = zeros(15);  ///< Phi matrix
+  MatX Phi = I(15);      ///< Phi matrix
 
   IMUState();
   IMUState(const IMUStateConfig &config);

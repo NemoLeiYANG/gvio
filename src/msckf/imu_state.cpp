@@ -2,7 +2,13 @@
 
 namespace gvio {
 
-IMUState::IMUState() {}
+IMUState::IMUState() {
+  Vec3 w_hat{0.0, 0.0, 0.0};
+  Vec4 q_hat{0.0, 0.0, 0.0, 1.0};
+  Vec3 a_hat{0.0, 0.0, 0.0};
+  Vec3 w_G{0.0, 0.0, 0.0};
+  // this->Phi = I(this->size);
+}
 
 IMUState::IMUState(const IMUStateConfig &config) {
   // clang-format off
@@ -23,6 +29,13 @@ IMUState::IMUState(const IMUStateConfig &config) {
            config.dba_var;
   this->Q = n_imu.asDiagonal();
   // clang-format on
+
+  Vec3 w_hat{0.0, 0.0, 0.0};
+  Vec4 q_hat{0.0, 0.0, 0.0, 1.0};
+  Vec3 a_hat{0.0, 0.0, 0.0};
+  Vec3 w_G{0.0, 0.0, 0.0};
+  // this->Phi = I(this->size) + this->F(w_hat, q_hat, a_hat, w_G) * 0.1;
+  // this->Phi = I(this->size);
 }
 
 MatX IMUState::F(const Vec3 &w_hat,

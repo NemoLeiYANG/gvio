@@ -23,7 +23,7 @@ cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test
-# ./camera-ids_test
+./camera-ids_test
 # ./camera-pinhole_model_test
 # ./feature2d-feature_container_test
 # ./feature2d-feature_test
@@ -40,7 +40,7 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-./msckf-msckf_test
+# ./msckf-msckf_test
 # ./msckf-profiler_test
 # ./sim-carrot_controller_test
 # ./sim-twowheel_test

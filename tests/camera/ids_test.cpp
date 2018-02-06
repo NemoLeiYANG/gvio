@@ -248,7 +248,7 @@ void test_suite() {
   MU_ADD_TEST(test_IDSCamera_setGain_and_getGain);
   MU_ADD_TEST(test_IDSCamera_setROI_and_getROI);
   MU_ADD_TEST(test_IDSCamera_getImageSize);
-  // MU_ADD_TEST(test_IDSCamera_getFrame);
+  MU_ADD_TEST(test_IDSCamera_getFrame);
 }
 
 } // namespace gvio

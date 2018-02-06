@@ -503,7 +503,7 @@ int test_MSCKF_pruneCameraStates() {
 
 int test_MSCKF_measurementUpdate() {
   // Load raw dataset
-  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0046");
   if (raw_dataset.load() != 0) {
     LOG_ERROR("Failed to load KITTI raw dataset [%s]!",
               KITTI_RAW_DATASET.c_str());
@@ -552,7 +552,7 @@ int test_MSCKF_measurementUpdate() {
   struct timespec msckf_start = tic();
   for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
     // for (int i = 1; i < 50; i++) {
-    // for (int i = 1; i < 100; i++) {
+    // for (int i = 1; i < 200; i++) {
     // Feature tracker
     const std::string img_path = raw_dataset.cam0[i];
     const cv::Mat img_cur = cv::imread(img_path);
@@ -641,7 +641,7 @@ int test_MSCKF_measurementUpdate2() {
     // msckf.imu_state.p_G = world.robot.p_G;
     // msckf.imu_state.q_IG = euler2quat(world.robot.rpy_G);
 
-    // msckf.measurementUpdate(tracks);
+    msckf.measurementUpdate(tracks);
 
     // Record
     blackbox.recordTimeStep(t,
