@@ -127,6 +127,7 @@ SET(UNITTESTS
   sim-camera_test
   sim-carrot_controller_test
   sim-twowheel_test
+  sim-quadrotor_test
   sim-world_test
   util-config_test
   util-data_test

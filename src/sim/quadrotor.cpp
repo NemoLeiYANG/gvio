@@ -124,21 +124,21 @@ Vec4 PositionController::update(const Vec3 &setpoints,
 
 // QUADROTOR MODEL
 int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
-  const double ph = this->attitude(0);
-  const double th = this->attitude(1);
-  const double ps = this->attitude(2);
+  const double ph = this->rpy_G(0);
+  const double th = this->rpy_G(1);
+  const double ps = this->rpy_G(2);
 
-  const double p = this->angular_velocity(0);
-  const double q = this->angular_velocity(1);
-  const double r = this->angular_velocity(2);
+  const double p = this->w_G(0);
+  const double q = this->w_G(1);
+  const double r = this->w_G(2);
 
-  const double x = this->position(0);
-  const double y = this->position(1);
-  const double z = this->position(2);
+  const double x = this->p_G(0);
+  const double y = this->p_G(1);
+  const double z = this->p_G(2);
 
-  const double vx = this->linear_velocity(0);
-  const double vy = this->linear_velocity(1);
-  const double vz = this->linear_velocity(2);
+  const double vx = this->v_G(0);
+  const double vy = this->v_G(1);
+  const double vz = this->v_G(2);
 
   const double Ix = this->Ix;
   const double Iy = this->Iy;
@@ -167,38 +167,48 @@ int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
 
   // update
   // clang-format off
-  this->attitude(0) = ph + (p + q * sin(ph) * tan(th) + r * cos(ph) * tan(th)) * dt;
-  this->attitude(1) = th + (q * cos(ph) - r * sin(ph)) * dt;
-  this->attitude(2) = ps + ((1 / cos(th)) * (q * sin(ph) + r * cos(ph))) * dt;
+  this->rpy_G(0) = ph + (p + q * sin(ph) * tan(th) + r * cos(ph) * tan(th)) * dt;
+  this->rpy_G(1) = th + (q * cos(ph) - r * sin(ph)) * dt;
+  this->rpy_G(2) = ps + ((1 / cos(th)) * (q * sin(ph) + r * cos(ph))) * dt;
 
-  this->angular_velocity(0) = p + (-((Iz - Iy) / Ix) * q * r - (kr * p / Ix) + (1 / Ix) * taup) * dt;
-  this->angular_velocity(1) = q + (-((Ix - Iz) / Iy) * p * r - (kr * q / Iy) + (1 / Iy) * tauq) * dt;
-  this->angular_velocity(2) = r + (-((Iy - Ix) / Iz) * p * q - (kr * r / Iz) + (1 / Iz) * taur) * dt;
+  this->w_G(0) = p + (-((Iz - Iy) / Ix) * q * r - (kr * p / Ix) + (1 / Ix) * taup) * dt;
+  this->w_G(1) = q + (-((Ix - Iz) / Iy) * p * r - (kr * q / Iy) + (1 / Iy) * tauq) * dt;
+  this->w_G(2) = r + (-((Iy - Ix) / Iz) * p * q - (kr * r / Iz) + (1 / Iz) * taur) * dt;
 
-  this->position(0) = x + vx * dt;
-  this->position(1) = y + vy * dt;
-  this->position(2) = z + vz * dt;
+  this->p_G(0) = x + vx * dt;
+  this->p_G(1) = y + vy * dt;
+  this->p_G(2) = z + vz * dt;
 
-	const double ax = ((-kt * vx / m) + (1 / m) * (cos(ph) * sin(th) * cos(ps) + sin(ph) * sin(ps)) * tauf) * dt;
-	const double ay = ((-kt * vy / m) + (1 / m) * (cos(ph) * sin(th) * sin(ps) - sin(ph) * cos(ps)) * tauf) * dt;
-	const double az = (-(kt * vz / m) + (1 / m) * (cos(ph) * cos(th)) * tauf - g) * dt;
+	this->a_G(0) = ((-kt * vx / m) + (1 / m) * (cos(ph) * sin(th) * cos(ps) + sin(ph) * sin(ps)) * tauf) * dt;
+	this->a_G(1) = ((-kt * vy / m) + (1 / m) * (cos(ph) * sin(th) * sin(ps) - sin(ph) * cos(ps)) * tauf) * dt;
+	this->a_G(2) = (-(kt * vz / m) + (1 / m) * (cos(ph) * cos(th)) * tauf - g) * dt;
 
-  this->linear_velocity(0) = vx + ax;
-  this->linear_velocity(1) = vy + ay;
-  this->linear_velocity(2) = vz + az;
+  this->v_G(0) = vx + this->a_G(0);
+  this->v_G(1) = vy + this->a_G(1);
+  this->v_G(2) = vz + this->a_G(2);
   // clang-format on
 
   // constrain yaw to be [-180, 180]
-  this->attitude(2) = wrapToPi(this->attitude(2));
+  this->rpy_G(2) = wrapToPi(this->rpy_G(2));
 
   return 0;
 }
 
+int QuadrotorModel::update(const double dt) {
+  Vec4 motor_inputs;
+  if (this->ctrl_mode == "POS_CTRL_MODE") {
+    motor_inputs = this->positionControllerControl(dt);
+  } else if (this->ctrl_mode == "ATT_CTRL_MODE") {
+    motor_inputs = this->attitudeControllerControl(dt);
+  }
+  return this->update(motor_inputs, dt);
+}
+
 Vec4 QuadrotorModel::attitudeControllerControl(const double dt) {
-  const Vec4 actual_attitude{this->attitude(0),  // roll
-                             this->attitude(1),  // pitch
-                             this->attitude(2),  // yaw
-                             this->position(2)}; // z
+  const Vec4 actual_attitude{this->rpy_G(0), // roll
+                             this->rpy_G(1), // pitch
+                             this->rpy_G(2), // yaw
+                             this->p_G(2)};  // z
 
   const Vec4 motor_inputs =
       this->attitude_controller.update(this->attitude_setpoints,
@@ -211,10 +221,10 @@ Vec4 QuadrotorModel::attitudeControllerControl(const double dt) {
 Vec4 QuadrotorModel::positionControllerControl(const double dt) {
   // Position controller
   Vec4 actual_position;
-  actual_position(0) = this->position(0); // x
-  actual_position(1) = this->position(1); // y
-  actual_position(2) = this->position(2); // z
-  actual_position(3) = this->attitude(2); // yaw
+  actual_position(0) = this->p_G(0);   // x
+  actual_position(1) = this->p_G(1);   // y
+  actual_position(2) = this->p_G(2);   // z
+  actual_position(3) = this->rpy_G(2); // yaw
 
   this->attitude_setpoints =
       this->position_controller.update(this->position_setpoints,
@@ -224,10 +234,10 @@ Vec4 QuadrotorModel::positionControllerControl(const double dt) {
 
   // Attitude controller
   Vec4 actual_attitude;
-  actual_attitude(0) = this->attitude(0); // roll
-  actual_attitude(1) = this->attitude(1); // pitch
-  actual_attitude(2) = this->attitude(2); // yaw
-  actual_attitude(3) = this->position(2); // z
+  actual_attitude(0) = this->rpy_G(0); // roll
+  actual_attitude(1) = this->rpy_G(1); // pitch
+  actual_attitude(2) = this->rpy_G(2); // yaw
+  actual_attitude(3) = this->p_G(2);   // z
 
   const Vec4 motor_inputs =
       this->attitude_controller.update(this->attitude_setpoints,
@@ -259,44 +269,42 @@ VecX QuadrotorModel::getPose() {
   VecX pose(6);
 
   // x, y, z
-  pose(0) = this->position(0);
-  pose(1) = this->position(1);
-  pose(2) = this->position(2);
+  pose(0) = this->p_G(0);
+  pose(1) = this->p_G(1);
+  pose(2) = this->p_G(2);
 
   // phi, theta, psi
-  pose(3) = this->attitude(0);
-  pose(4) = this->attitude(1);
-  pose(5) = this->attitude(2);
+  pose(3) = this->rpy_G(0);
+  pose(4) = this->rpy_G(1);
+  pose(5) = this->rpy_G(2);
 
   return pose;
 }
 
-Vec3 QuadrotorModel::getVelocity() {
-  // vx, vy, vz
-  const Vec3 vel{this->linear_velocity(0),
-                 this->linear_velocity(1),
-                 this->linear_velocity(2)};
+Vec3 QuadrotorModel::getVelocity() { return this->v_G; }
 
-  return vel;
+Vec3 QuadrotorModel::getAngularVelocity() { return this->w_G; }
+
+Vec3 QuadrotorModel::getBodyAngularVelocity() {
+  const Mat3 R_BG = euler123ToRot(this->rpy_G);
+  const Vec3 w_B = R_BG * this->w_G;
+  return w_B;
 }
 
-Vec3 QuadrotorModel::getAngularVelocity() {
-  // phi_dot, theta_dot, psi_dot
-  const Vec3 avel{this->angular_velocity(0),
-                  this->angular_velocity(1),
-                  this->angular_velocity(2)};
-
-  return avel;
+Vec3 QuadrotorModel::getBodyAcceleration() {
+  const Mat3 R_BG = euler123ToRot(this->rpy_G);
+  const Vec3 a_B = R_BG * this->a_G;
+  return a_B;
 }
 
 void QuadrotorModel::printState() {
-  printf("x: %f\t", this->position(0));
-  printf("y: %f\t", this->position(1));
-  printf("z: %f\t\t", this->position(2));
+  printf("x: %f\t", this->p_G(0));
+  printf("y: %f\t", this->p_G(1));
+  printf("z: %f\t\t", this->p_G(2));
 
-  printf("phi: %f\t", this->attitude(0));
-  printf("theta: %f\t", this->attitude(1));
-  printf("psi: %f\n", this->attitude(2));
+  printf("phi: %f\t", this->rpy_G(0));
+  printf("theta: %f\t", this->rpy_G(1));
+  printf("psi: %f\n", this->rpy_G(2));
 }
 
 } // namespace gvio

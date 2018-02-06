@@ -51,8 +51,9 @@ cd tests
 # ./msckf-profiler_test
 # sudo ./pwm-pca9685_test
 # ./sim-carrot_controller_test
-# ./sim-twowheel_test
 # ./sim-camera_test
+# ./sim-twowheel_test
+./sim-quadrotor_test
 # ./sim-world_test
 # ./util-config_test
 # ./util-data_test
