@@ -70,6 +70,7 @@ ADD_LIBRARY(
   src/sim/carrot_controller.cpp
   src/sim/twowheel.cpp
   src/sim/pid.cpp
+  src/sim/quadrotor.cpp
   src/sim/world.cpp
   # utils
   src/util/config.cpp

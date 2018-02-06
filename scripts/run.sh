@@ -7,8 +7,8 @@ find . -name "*.hpp" | xargs clang-format-3.8 -i
 
 # find . -name *.cpp | xargs clang-tidy
 
-MACHINE_TYPE=`uname -m`
-if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+MACHINE_TYPE=$(uname -m)
+if [ "${MACHINE_TYPE}" = 'x86_64' ]; then
   CPU_COUNT=8
 else
   CPU_COUNT=1
@@ -30,7 +30,7 @@ cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test
-./camera-ids_test
+# ./camera-ids_test
 # ./camera-pinhole_model_test
 # ./feature2d-feature_container_test
 # ./feature2d-feature_test
@@ -49,7 +49,7 @@ cd tests
 # ./msckf-feature_estimator_test
 # ./msckf-msckf_test
 # ./msckf-profiler_test
-sudo ./pwm-pca9685_test
+# sudo ./pwm-pca9685_test
 # ./sim-carrot_controller_test
 # ./sim-twowheel_test
 # ./sim-camera_test
