@@ -5,6 +5,7 @@ namespace gvio {
 int PCA9685::configure(const int freq) {
   // Setup
   this->i2c = I2C();
+  this->i2c.setup();
   this->i2c.setSlave(PCA9685_I2C_ADDR);
 
   this->reset();
@@ -41,7 +42,7 @@ void PCA9685::setPWMFrequency(const int freq) {
   // Set pwm prescaler
   float prescale = (25000000 / (4096.0 * freq)) - 1;
   prescale = floor(prescale + 0.5);
-  LOG_INFO("prescale: %d", (int) prescale);
+  // LOG_INFO("prescale: %d", (int) prescale);
   this->i2c.writeByte(PCA9685_PRE_SCALE, (int) prescale);
   this->i2c.writeByte(PCA9685_MODE1, mode_1_old);
 

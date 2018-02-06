@@ -49,6 +49,7 @@ cd tests
 # ./msckf-feature_estimator_test
 # ./msckf-msckf_test
 # ./msckf-profiler_test
+sudo ./pwm-pca9685_test
 # ./sim-carrot_controller_test
 # ./sim-twowheel_test
 # ./sim-camera_test

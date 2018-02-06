@@ -115,8 +115,8 @@ public:
   /**
    * Set PWM on a specific channel
    *
-   * @param channel
-   * @param off
+   * @param channel (starting from 0)
+   * @param off PWM off duty cycle (out of 4096)
    * @returns 0 for success, -1 for failure
    */
   void setPWM(const int8_t channel, const int16_t off);
@@ -124,7 +124,7 @@ public:
   /**
    * Set PWM on all channels
    *
-   * @param off
+   * @param off PWM off duty cycle (out of 4096)
    * @returns 0 for success, -1 for failure
    */
   void setAllPWM(const int16_t off);
