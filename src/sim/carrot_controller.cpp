@@ -69,8 +69,6 @@ int CarrotController::update(const Vec3 &pos, Vec3 &carrot_pt) {
   if ((this->wp_index + 1) == this->waypoints.size()) {
     return 1;
   }
-  // std::cout << "status: " << status << std::endl;
-  // std::cout << "wp_end: " << this->wp_end.transpose() << std::endl;
 
   // Update waypoints
   if (status == 1) {

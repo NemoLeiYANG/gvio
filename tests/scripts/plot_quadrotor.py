@@ -81,32 +81,39 @@ def plot_attitude(gnd_data):
     plt.ylabel("Attitude (radians)")
     plt.legend(loc=0)
 
-# def plot_measurements(mea_data):
-#     plt.figure()
-#     plt.title("Measurement")
-#
-#     plt.subplot(211)
-#     plt.title("Accelerometer")
-#     plt.plot(mea_data["ax_B"])
-#     plt.plot(mea_data["ay_B"])
-#     plt.plot(mea_data["az_B"])
-#
-#     plt.legend(loc=0)
-#
-#     plt.subplot(212)
-#     plt.title("Gyroscope")
-#     plt.plot(mea_data["wx_B"])
-#     plt.plot(mea_data["wy_B"])
-#     plt.plot(mea_data["wz_B"])
-#
-#     plt.legend(loc=0)
+
+def plot_measurements(mea_data):
+    plt.figure()
+    plt.title("Measurement")
+
+    plt.subplot(211)
+    plt.plot(mea_data["t"], mea_data["ax_B"], label="ax")
+    plt.plot(mea_data["t"], mea_data["ay_B"], label="ay")
+    plt.plot(mea_data["t"], mea_data["az_B"], label="az")
+
+    plt.title("Accelerometer")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Attitude (radians)")
+    plt.legend(loc=0)
+
+    plt.subplot(212)
+    plt.plot(mea_data["t"], mea_data["wx_B"], label="wx")
+    plt.plot(mea_data["t"], mea_data["wy_B"], label="wy")
+    plt.plot(mea_data["t"], mea_data["wz_B"], label="wz")
+
+    plt.title("Gyroscope")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Attitude (radians)")
+    plt.legend(loc=0)
 
 
 if __name__ == "__main__":
-    data_path = sys.argv[1]
-    gnd_data = parse_data(data_path)
+    gnd_path = sys.argv[1]
+    mea_path = sys.argv[2]
+    gnd_data = parse_data(gnd_path)
+    mea_data = parse_data(mea_path)
 
     plot_position(gnd_data)
     plot_attitude(gnd_data)
-    # plot_measurements(mea_data)
+    plot_measurements(mea_data)
     plt.show()

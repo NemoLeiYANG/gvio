@@ -201,6 +201,7 @@ int QuadrotorModel::update(const double dt) {
   } else if (this->ctrl_mode == "ATT_CTRL_MODE") {
     motor_inputs = this->attitudeControllerControl(dt);
   }
+
   return this->update(motor_inputs, dt);
 }
 
