@@ -14,15 +14,21 @@ int test_MAVDataset_constructor() {
 
 int test_MAVDataset_loadIMUData() {
   MAVDataset mav_data("/data/euroc_mav/raw/mav0");
-  mav_data.loadIMUData();
+  int retval = mav_data.loadIMUData();
+
+  std::cout << mav_data.imu_data << std::endl;
+  MU_CHECK_EQ(0, retval);
 
   return 0;
 }
 
-int test_MAVDataset_load() {
-  MAVDataset mav_data("/tmp");
+int test_MAVDataset_loadCameraData() {
+  MAVDataset mav_data("/data/euroc_mav/raw/mav0");
+  int retval = mav_data.loadCameraData();
 
-  // mav_data.
+  std::cout << mav_data.cam0_data << std::endl;
+  std::cout << mav_data.cam1_data << std::endl;
+  MU_CHECK_EQ(0, retval);
 
   return 0;
 }
@@ -30,7 +36,7 @@ int test_MAVDataset_load() {
 void test_suite() {
   MU_ADD_TEST(test_MAVDataset_constructor);
   MU_ADD_TEST(test_MAVDataset_loadIMUData);
-  MU_ADD_TEST(test_MAVDataset_load);
+  MU_ADD_TEST(test_MAVDataset_loadCameraData);
 }
 
 } // namespace gvio

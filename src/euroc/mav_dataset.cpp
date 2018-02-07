@@ -30,53 +30,111 @@ int IMUData::load(const std::string &data_dir) {
   parser.addParam("accelerometer_noise_density", &this->accel_noise_density);
   parser.addParam("accelerometer_random_walk", &this->accel_random_walk);
   if (parser.load(imu_calib_path) != 0) {
-    LOG_ERROR("Failed to load configure file [%s]!", imu_calib_path.c_str());
+    LOG_ERROR("Failed to load sensor file [%s]!", imu_calib_path.c_str());
     return -1;
   }
 
   return 0;
 }
 
+std::ostream &operator<<(std::ostream &os, const IMUData &data) {
+  // clang-format off
+  os << "sensor_type: " << data.sensor_type << std::endl;
+  os << "comment: " << data.comment << std::endl;
+  os << "T_BS:\n" << data.T_BS << std::endl;
+  os << "rate_hz: " << data.rate_hz << std::endl;
+  os << "gyroscope_noise_density: " << data.gyro_noise_density << std::endl;
+  os << "gyroscope_random_walk: " << data.gyro_random_walk << std::endl;
+  os << "accelerometer_noise_density: " << data.accel_noise_density << std::endl;
+  os << "accelerometer_random_walk: " << data.accel_random_walk << std::endl;
+  // clang-format on
+
+  return os;
+}
+
+int CameraData::load(const std::string &data_dir) {
+  const std::string cam_data_path = data_dir + "/data.csv";
+  const std::string cam_calib_path = data_dir + "/sensor.yaml";
+
+  // Get list of image paths for cam0
+  if (list_dir(data_dir + "/data", this->image_paths) != 0) {
+    return -1;
+  }
+  std::sort(this->image_paths.begin(), this->image_paths.end());
+
+  // Load calibration data
+  ConfigParser parser;
+  parser.addParam("sensor_type", &this->sensor_type);
+  parser.addParam("comment", &this->comment);
+  parser.addParam("T_BS", &this->T_BS);
+  parser.addParam("rate_hz", &this->rate_hz);
+  parser.addParam("resolution", &this->resolution);
+  parser.addParam("camera_model", &this->camera_model);
+  parser.addParam("intrinsics", &this->intrinsics);
+  parser.addParam("distortion_model", &this->distortion_model);
+  parser.addParam("distortion_coefficients", &this->distortion_coefficients);
+  if (parser.load(cam_calib_path) != 0) {
+    LOG_ERROR("Failed to load senor file [%s]!", cam_calib_path.c_str());
+    return -1;
+  }
+
+  return 0;
+}
+
+std::ostream &operator<<(std::ostream &os, const CameraData &data) {
+  // clang-format off
+  os << "sensor_type: " << data.sensor_type << std::endl;
+  os << "comment: " << data.comment << std::endl;
+  os << "T_BS:\n" << data.T_BS << std::endl;
+  os << "rate_hz: " << data.rate_hz << std::endl;
+  os << "resolution: " << data.resolution.transpose() << std::endl;
+  os << "camera_model: " << data.camera_model << std::endl;
+  os << "intrinsics: " << data.intrinsics.transpose() << std::endl;
+  os << "distortion_model: " << data.distortion_model << std::endl;
+  os << "distortion_coefficients: " << data.distortion_coefficients.transpose() << std::endl;
+  // clang-format on
+
+  return os;
+}
+
 int MAVDataset::loadIMUData() {
-  // Load IMU data
   const std::string imu_data_dir = this->data_path + "/imu0";
   if (this->imu_data.load(imu_data_dir) != 0) {
     LOG_ERROR("Failed to load IMU data [%s]!", imu_data_dir.c_str());
     return -1;
   }
 
-  // clang-format off
-  std::cout << "sensor_type: " << this->imu_data.sensor_type << std::endl;
-  std::cout << "comment: " << this->imu_data.comment << std::endl;
-  std::cout << "T_BS:\n" << this->imu_data.T_BS << std::endl;
-  std::cout << "rate_hz: " << this->imu_data.rate_hz << std::endl;
-  std::cout << "gyroscope_noise_density: " << this->imu_data.gyro_noise_density << std::endl;
-  std::cout << "gyroscope_random_walk: " << this->imu_data.gyro_random_walk << std::endl;
-  std::cout << "accelerometer_noise_density: " << this->imu_data.accel_noise_density << std::endl;
-  std::cout << "accelerometer_random_walk: " << this->imu_data.accel_random_walk << std::endl;
-  // clang-format on
-
   return 0;
 }
 
 int MAVDataset::loadCameraData() {
-  // Get list of image paths for cam0
-  if (list_dir(this->data_path + "/cam0/data", this->cam0) != 0) {
+  const std::string cam0_dir = this->data_path + "/cam0";
+  if (this->cam0_data.load(cam0_dir) != 0) {
+    LOG_ERROR("Failed to load cam0 data [%s]!", cam0_dir.c_str());
     return -1;
   }
 
-  // Get list of image paths for cam1
-  if (list_dir(this->data_path + "/cam1/data", this->cam1) != 0) {
+  const std::string cam1_dir = this->data_path + "/cam1";
+  if (this->cam1_data.load(cam1_dir) != 0) {
+    LOG_ERROR("Failed to load cam1 data [%s]!", cam1_dir.c_str());
     return -1;
   }
-
-  // Sort image paths
-  std::sort(this->cam0.begin(), this->cam0.end());
-  std::sort(this->cam1.begin(), this->cam1.end());
 
   return 0;
 }
 
-int MAVDataset::load() { return 0; }
+int MAVDataset::load() {
+  if (this->loadIMUData() != 0) {
+    LOG_ERROR("Failed to load imu data!");
+    return -1;
+  }
+
+  if (this->loadCameraData() != 0) {
+    LOG_ERROR("Failed to load camera data!");
+    return -1;
+  }
+
+  return 0;
+}
 
 } // namespace gvio
