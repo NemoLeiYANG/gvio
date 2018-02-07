@@ -1,9 +1,9 @@
 /**
  * @file
- * @ingroup sim
+ * @ingroup control
  */
-#ifndef GVIO_SIM_CARROT_CONTROLLER_HPP
-#define GVIO_SIM_CARROT_CONTROLLER_HPP
+#ifndef GVIO_CONTROL_CARROT_CONTROLLER_HPP
+#define GVIO_CONTROL_CARROT_CONTROLLER_HPP
 
 #include <vector>
 
@@ -11,7 +11,7 @@
 
 namespace gvio {
 /**
- * @addtogroup sim
+ * @addtogroup control
  * @{
  */
 
@@ -84,6 +84,6 @@ public:
   int update(const Vec3 &pos, Vec3 &carrot_pt);
 };
 
-/** @} group sim */
+/** @} group control */
 } // namespace gvio
-#endif // GVIO_SIM_CARROT_CONTROLLER_HPP
+#endif // GVIO_CONTROL_CARROT_CONTROLLER_HPP

@@ -1,4 +1,4 @@
-#include "gvio/sim/pid.hpp"
+#include "gvio/control/pid.hpp"
 
 namespace gvio {
 

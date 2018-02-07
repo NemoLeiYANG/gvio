@@ -1,9 +1,9 @@
 /**
  * @file
- * @ingroup sim
+ * @ingroup control
  */
-#ifndef GVIO_SIM_PID_HPP
-#define GVIO_SIM_PID_HPP
+#ifndef GVIO_CONTROL_PID_HPP
+#define GVIO_CONTROL_PID_HPP
 
 #include <float.h>
 #include <iostream>
@@ -11,7 +11,7 @@
 
 namespace gvio {
 /**
- * @addtogroup sim
+ * @addtogroup quadrotor
  * @{
  */
 
@@ -60,6 +60,6 @@ public:
   void reset();
 };
 
-/** @} group sim */
+/** @} group quadrotor */
 } // namespace gvio
-#endif // GVIO_SIM_PID_HPP
+#endif // GVIO_CONTROL_PID_HPP

@@ -1,128 +1,7 @@
-#include "gvio/sim/quadrotor.hpp"
+#include "gvio/quadrotor/quadrotor_model.hpp"
 
 namespace gvio {
 
-// ATTITUDE CONTROLLER
-Vec4 AttitudeController::update(const Vec4 &setpoints,
-                                const Vec4 &actual,
-                                double dt) {
-  // check rate
-  this->dt += dt;
-  if (this->dt < 0.001) {
-    return this->outputs;
-  }
-
-  // calculate yaw error
-  double actual_yaw = rad2deg(actual(2));
-  double setpoint_yaw = rad2deg(setpoints(2));
-  double error_yaw = setpoint_yaw - actual_yaw;
-  if (error_yaw > 180.0) {
-    error_yaw -= 360.0;
-  } else if (error_yaw < -180.0) {
-    error_yaw += 360.0;
-  }
-  error_yaw = deg2rad(error_yaw);
-
-  // roll pitch yaw
-  double r = this->roll_controller.update(setpoints(0), actual(0), this->dt);
-  double p = this->pitch_controller.update(setpoints(1), actual(1), this->dt);
-  double y = this->yaw_controller.update(error_yaw, 0.0, this->dt);
-
-  // thrust
-  double max_thrust = 5.0;
-  double t = max_thrust * setpoints(3);  // convert relative to true thrust
-  t = (t > max_thrust) ? max_thrust : t; // limit thrust
-  t = (t < 0) ? 0.0 : t;                 // limit thrust
-
-  // map roll, pitch, yaw and thrust to motor outputs
-  Vec4 outputs;
-  outputs(0) = -p - y + t;
-  outputs(1) = -r + y + t;
-  outputs(2) = p - y + t;
-  outputs(3) = r + y + t;
-
-  // limit outputs
-  for (int i = 0; i < 4; i++) {
-    if (outputs(i) > max_thrust) {
-      outputs(i) = max_thrust;
-    } else if (outputs(i) < 0.0) {
-      outputs(i) = 0.0;
-    }
-  }
-
-  // keep track of outputs
-  this->outputs = outputs;
-  this->dt = 0.0;
-
-  return outputs;
-}
-
-// POSITION CONTROLLER
-Vec4 PositionController::update(const Vec3 &setpoints,
-                                const Vec4 &actual,
-                                double yaw,
-                                double dt) {
-  // check rate
-  this->dt += dt;
-  if (this->dt < 0.01) {
-    return this->outputs;
-  }
-
-  // calculate RPY errors relative to quadrotor by incorporating yaw
-  Vec3 errors;
-  errors(0) = setpoints(0) - actual(0);
-  errors(1) = setpoints(1) - actual(1);
-  errors(2) = setpoints(2) - actual(2);
-
-  Vec3 euler{0.0, 0.0, actual(3)};
-  Mat3 R = euler123ToRot(euler);
-  errors = R * errors;
-
-  // roll, pitch, yaw and thrust
-  double r = -this->y_controller.update(errors(1), 0.0, dt);
-  double p = this->x_controller.update(errors(0), 0.0, dt);
-  double y = yaw;
-  double t = 0.5 + this->z_controller.update(errors(2), 0.0, dt);
-  outputs << r, p, y, t;
-
-  // limit roll, pitch
-  for (int i = 0; i < 2; i++) {
-    if (outputs(i) > deg2rad(30.0)) {
-      outputs(i) = deg2rad(30.0);
-    } else if (outputs(i) < deg2rad(-30.0)) {
-      outputs(i) = deg2rad(-30.0);
-    }
-  }
-
-  // limit yaw
-  while (outputs(2) > deg2rad(360.0)) {
-    outputs(2) -= deg2rad(360.0);
-  }
-  while (outputs(2) < deg2rad(0.0)) {
-    outputs(2) += deg2rad(360.0);
-  }
-
-  // limit thrust
-  if (outputs(3) > 1.0) {
-    outputs(3) = 1.0;
-  } else if (outputs(3) < 0.0) {
-    outputs(3) = 0.0;
-  }
-
-  // yaw first if threshold reached
-  if (fabs(yaw - actual(3)) > deg2rad(2)) {
-    outputs(0) = 0.0;
-    outputs(1) = 0.0;
-  }
-
-  // keep track of outputs
-  this->outputs = outputs;
-  this->dt = 0.0;
-
-  return outputs;
-}
-
-// QUADROTOR MODEL
 int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
   const double ph = this->rpy_G(0);
   const double th = this->rpy_G(1);
@@ -188,13 +67,13 @@ int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
   this->v_G(2) = vz + this->a_G(2) * dt;
   // clang-format on
 
+  // Constrain yaw to be [-180, 180]
+  this->rpy_G(2) = wrapToPi(this->rpy_G(2));
+
   // Calculate body acceleration and angular velocity
   const Mat3 R_BG = euler123ToRot(this->rpy_G);
   this->w_B = R_BG * this->w_G;
   this->a_B = R_BG * this->a_G;
-
-  // Constrain yaw to be [-180, 180]
-  this->rpy_G(2) = wrapToPi(this->rpy_G(2));
 
   return 0;
 }

@@ -27,6 +27,9 @@ ADD_LIBRARY(
   src/apriltag/michigan.cpp
   # ceres
   src/ceres/jpl_quaternion_parameterization.cpp
+  # control
+  src/control/carrot_controller.cpp
+  src/control/pid.cpp
   # camera
   src/camera/camera.cpp
   src/camera/camera_config.cpp
@@ -63,14 +66,15 @@ ADD_LIBRARY(
   src/kitti/raw/raw.cpp
   # pwm
   src/pwm/pca9685.cpp
+  # quadrotor
+  src/quadrotor/control/attitude_controller.cpp
+  src/quadrotor/control/position_controller.cpp
+  src/quadrotor/quadrotor_model.cpp
   # quaternion
   src/quaternion/jpl.cpp
   # sim
   src/sim/camera.cpp
-  src/sim/carrot_controller.cpp
   src/sim/twowheel.cpp
-  src/sim/pid.cpp
-  src/sim/quadrotor.cpp
   src/sim/world.cpp
   # utils
   src/util/config.cpp
@@ -107,6 +111,7 @@ SET(UNITTESTS
   camera-camera_config_test
   camera-ids_test
   camera-pinhole_model_test
+  control-carrot_controller_test
   feature2d-feature_container_test
   feature2d-feature_test
   feature2d-feature_track_test
@@ -124,10 +129,9 @@ SET(UNITTESTS
   msckf-imu_state_test
   msckf-msckf_test
   pwm-pca9685_test
+  quadrotor-quadrotor_model_test
   sim-camera_test
-  sim-carrot_controller_test
   sim-twowheel_test
-  sim-quadrotor_test
   sim-world_test
   util-config_test
   util-data_test

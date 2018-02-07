@@ -1,4 +1,4 @@
-#include "gvio/sim/carrot_controller.hpp"
+#include "gvio/control/carrot_controller.hpp"
 
 namespace gvio {
 

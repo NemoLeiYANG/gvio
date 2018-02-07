@@ -6,7 +6,7 @@
 #define GVIO_SIM_TWOWHEEL_HPP
 
 #include "gvio/util/util.hpp"
-#include "gvio/sim/pid.hpp"
+#include "gvio/control/pid.hpp"
 
 namespace gvio {
 /**

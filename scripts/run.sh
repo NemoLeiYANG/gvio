@@ -50,10 +50,10 @@ cd tests
 # ./msckf-msckf_test
 # ./msckf-profiler_test
 # sudo ./pwm-pca9685_test
+./quadrotor-quadrotor_model_test
 # ./sim-carrot_controller_test
 # ./sim-camera_test
 # ./sim-twowheel_test
-./sim-quadrotor_test
 # ./sim-world_test
 # ./util-config_test
 # ./util-data_test

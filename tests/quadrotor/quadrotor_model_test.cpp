@@ -1,7 +1,7 @@
 #include "gvio/munit.hpp"
-#include "gvio/sim/quadrotor.hpp"
-#include "gvio/sim/carrot_controller.hpp"
 #include "gvio/msckf/imu_state.hpp"
+#include "gvio/control/carrot_controller.hpp"
+#include "gvio/quadrotor/quadrotor_model.hpp"
 
 namespace gvio {
 
