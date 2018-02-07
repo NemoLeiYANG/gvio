@@ -58,12 +58,13 @@ def plot_position(gnd_data, est_data):
     plt.legend(loc=0)
 
 
-def plot_attitude(gnd_data):
+def plot_attitude(gnd_data, est_data):
     plt.figure()
     plt.suptitle("Attitude")
 
     plt.subplot(311)
     plt.plot(gnd_data["t"], gnd_data["roll"], label="Ground truth")
+    plt.plot(est_data["t"], est_data["roll"], label="Estimate")
     plt.title("Roll")
     plt.xlabel("Time (s)")
     plt.ylabel("Attitude (radians)")
@@ -71,6 +72,7 @@ def plot_attitude(gnd_data):
 
     plt.subplot(312)
     plt.plot(gnd_data["t"], gnd_data["pitch"], label="Ground truth")
+    plt.plot(est_data["t"], est_data["pitch"], label="Estimate")
     plt.title("Pitch")
     plt.xlabel("Time (s)")
     plt.ylabel("Attitude (radians)")
@@ -78,6 +80,7 @@ def plot_attitude(gnd_data):
 
     plt.subplot(313)
     plt.plot(gnd_data["t"], gnd_data["yaw"], label="Ground truth")
+    plt.plot(est_data["t"], est_data["yaw"], label="Estimate")
     plt.title("Yaw")
     plt.xlabel("Time (s)")
     plt.ylabel("Attitude (radians)")
@@ -119,6 +122,6 @@ if __name__ == "__main__":
     est_data = parse_data(est_path)
 
     plot_position(gnd_data, est_data)
-    plot_attitude(gnd_data)
+    plot_attitude(gnd_data, est_data)
     plot_measurements(mea_data)
     plt.show()

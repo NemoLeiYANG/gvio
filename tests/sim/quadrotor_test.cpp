@@ -10,10 +10,12 @@ int test_QuadrotorModel_constructor() {
   return 0;
 }
 
-int test_QuadrotorModel_update() {
+int setup_output_files(std::ofstream &gnd_file,
+                       std::ofstream &mea_file,
+                       std::ofstream &est_file) {
   // Ground truth file
   const std::string gnd_file_path = "/tmp/quadrotor_gnd.dat";
-  std::ofstream gnd_file(gnd_file_path);
+  gnd_file.open(gnd_file_path);
   if (gnd_file.good() == false) {
     LOG_ERROR("Failed to open ground truth file for recording [%s]",
               gnd_file_path.c_str());
@@ -22,7 +24,7 @@ int test_QuadrotorModel_update() {
 
   // Measurement file
   const std::string mea_file_path = "/tmp/quadrotor_mea.dat";
-  std::ofstream mea_file(mea_file_path);
+  mea_file.open(mea_file_path);
   if (mea_file.good() == false) {
     LOG_ERROR("Failed to open measurement file for recording [%s]",
               mea_file_path.c_str());
@@ -31,7 +33,7 @@ int test_QuadrotorModel_update() {
 
   // Estimate file
   const std::string est_file_path = "/tmp/quadrotor_est.dat";
-  std::ofstream est_file(est_file_path);
+  est_file.open(est_file_path);
   if (est_file.good() == false) {
     LOG_ERROR("Failed to open estimate file for recording [%s]",
               est_file_path.c_str());
@@ -45,6 +47,72 @@ int test_QuadrotorModel_update() {
   mea_file << mea_header << std::endl;
   const std::string est_header = "t,x,y,z,vx,vy,vz,roll,pitch,yaw";
   est_file << est_header << std::endl;
+
+  return 0;
+}
+
+void record_timestep(const double t,
+                     const QuadrotorModel &quad,
+                     const IMUState &imu,
+                     std::ofstream &gnd_file,
+                     std::ofstream &mea_file,
+                     std::ofstream &est_file) {
+  // -- Time
+  gnd_file << t << ",";
+  // -- Position
+  gnd_file << quad.p_G(0) << ",";
+  gnd_file << quad.p_G(1) << ",";
+  gnd_file << quad.p_G(2) << ",";
+  // -- Velocity
+  gnd_file << quad.v_G(0) << ",";
+  gnd_file << quad.v_G(1) << ",";
+  gnd_file << quad.v_G(2) << ",";
+  // -- Attitude
+  gnd_file << quad.rpy_G(0) << ",";
+  gnd_file << quad.rpy_G(1) << ",";
+  gnd_file << quad.rpy_G(2) << std::endl;
+
+  // Record initial quadrotor body acceleration and angular velocity
+  // -- Time
+  mea_file << t << ",";
+  // -- Body acceleration
+  mea_file << quad.a_B(0) << ",";
+  mea_file << quad.a_B(1) << ",";
+  mea_file << quad.a_B(2) << ",";
+  // -- Body angular velocity
+  mea_file << quad.w_B(0) << ",";
+  mea_file << quad.w_B(1) << ",";
+  mea_file << quad.w_B(2) << std::endl;
+
+  // Record initial estimate
+  // -- Time
+  est_file << t << ",";
+  // -- Position
+  est_file << imu.p_G(0) << ",";
+  est_file << imu.p_G(1) << ",";
+  est_file << imu.p_G(2) << ",";
+  // -- Velocity
+  est_file << imu.v_G(0) << ",";
+  est_file << imu.v_G(1) << ",";
+  est_file << imu.v_G(2) << ",";
+  // -- Attitude
+  const Vec3 rpy = quat2euler(imu.q_IG);
+  est_file << rpy(0) << ",";
+  est_file << rpy(1) << ",";
+  est_file << rpy(2) << std::endl;
+}
+
+int test_QuadrotorModel_update() {
+  // Setup output files
+  std::ofstream gnd_file;
+  std::ofstream mea_file;
+  std::ofstream est_file;
+
+  int retval = setup_output_files(gnd_file, mea_file, est_file);
+  if (retval != 0) {
+    LOG_ERROR("Failed to setup output files!");
+    return -1;
+  }
 
   // Setup quadrotor model
   QuadrotorModel quad(Vec3{0.0, 0.0, 0.0}, Vec3{0.0, 0.0, 5.0});
@@ -66,51 +134,7 @@ int test_QuadrotorModel_update() {
   imu.q_IG = euler2quat(quad.rpy_G);
 
   // Record initial quadrotor state
-  // -- Time
-  gnd_file << 0.0 << ",";
-  // -- Position
-  gnd_file << quad.p_G(0) << ",";
-  gnd_file << quad.p_G(1) << ",";
-  gnd_file << quad.p_G(2) << ",";
-  // -- Velocity
-  gnd_file << quad.v_G(0) << ",";
-  gnd_file << quad.v_G(1) << ",";
-  gnd_file << quad.v_G(2) << ",";
-  // -- Attitude
-  gnd_file << quad.rpy_G(0) << ",";
-  gnd_file << quad.rpy_G(1) << ",";
-  gnd_file << quad.rpy_G(2) << std::endl;
-
-  // Record initial quadrotor body acceleration and angular velocity
-  const Vec3 a_B = quad.getBodyAcceleration();
-  const Vec3 w_B = quad.getBodyAngularVelocity();
-  // -- Time
-  mea_file << 0.0 << ",";
-  // -- Body acceleration
-  mea_file << a_B(0) << ",";
-  mea_file << a_B(1) << ",";
-  mea_file << a_B(2) << ",";
-  // -- Body angular velocity
-  mea_file << w_B(0) << ",";
-  mea_file << w_B(1) << ",";
-  mea_file << w_B(2) << std::endl;
-
-  // Record initial estimate
-  // -- Time
-  est_file << 0.0 << ",";
-  // -- Position
-  est_file << imu.p_G(0) << ",";
-  est_file << imu.p_G(1) << ",";
-  est_file << imu.p_G(2) << ",";
-  // -- Velocity
-  est_file << imu.v_G(0) << ",";
-  est_file << imu.v_G(1) << ",";
-  est_file << imu.v_G(2) << ",";
-  // -- Attitude
-  const Vec3 rpy = quat2euler(imu.q_IG);
-  est_file << rpy(0) << ",";
-  est_file << rpy(1) << ",";
-  est_file << rpy(2) << std::endl;
+  record_timestep(0.0, quad, imu, gnd_file, mea_file, est_file);
 
   // Simulate
   const double dt = 0.001;
@@ -126,56 +150,12 @@ int test_QuadrotorModel_update() {
     // Update imu
     const Vec3 g_G{0.0, 0.0, 10.0};
     const Vec3 g_B = euler123ToRot(quad.rpy_G) * g_G;
-    const Vec3 a_m = quad.getBodyAcceleration() + g_B;
-    const Vec3 w_m = quad.getBodyAngularVelocity();
+    const Vec3 a_m = quad.a_B + g_B;
+    const Vec3 w_m = quad.w_B;
     imu.update(a_m, w_m, dt);
 
     // Record quadrotor state
-    // -- Time
-    gnd_file << t << ",";
-    // -- Position
-    gnd_file << quad.p_G(0) << ",";
-    gnd_file << quad.p_G(1) << ",";
-    gnd_file << quad.p_G(2) << ",";
-    // -- Velocity
-    gnd_file << quad.v_G(0) << ",";
-    gnd_file << quad.v_G(1) << ",";
-    gnd_file << quad.v_G(2) << ",";
-    // -- Attitude
-    gnd_file << quad.rpy_G(0) << ",";
-    gnd_file << quad.rpy_G(1) << ",";
-    gnd_file << quad.rpy_G(2) << std::endl;
-
-    // Record quadrotor body acceleration and angular velocity
-    const Vec3 a_B = quad.getBodyAcceleration();
-    const Vec3 w_B = quad.getBodyAngularVelocity();
-    // -- Time
-    mea_file << t << ",";
-    // -- Body acceleration
-    mea_file << a_B(0) << ",";
-    mea_file << a_B(1) << ",";
-    mea_file << a_B(2) << ",";
-    // -- Body angular velocity
-    mea_file << w_B(0) << ",";
-    mea_file << w_B(1) << ",";
-    mea_file << w_B(2) << std::endl;
-
-    // Record initial estimate
-    // -- Time
-    est_file << t << ",";
-    // -- Position
-    est_file << imu.p_G(0) << ",";
-    est_file << imu.p_G(1) << ",";
-    est_file << imu.p_G(2) << ",";
-    // -- Velocity
-    est_file << imu.v_G(0) << ",";
-    est_file << imu.v_G(1) << ",";
-    est_file << imu.v_G(2) << ",";
-    // -- Attitude
-    const Vec3 rpy = quat2euler(imu.q_IG);
-    est_file << rpy(0) << ",";
-    est_file << rpy(1) << ",";
-    est_file << rpy(2) << std::endl;
+    record_timestep(t, quad, imu, gnd_file, mea_file, est_file);
   }
   gnd_file.close();
   mea_file.close();

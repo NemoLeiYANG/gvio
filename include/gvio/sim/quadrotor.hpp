@@ -98,6 +98,9 @@ public:
   Vec3 a_G{0.0, 0.0, 0.0};   ///< Acceleration in global frame
   Vec3 v_G{0.0, 0.0, 0.0};   ///< Linear velocity in global frame
 
+  Vec3 w_B{0.0, 0.0, 0.0}; ///< Angular velocity in body frame
+  Vec3 a_B{0.0, 0.0, 0.0}; ///< Acceleration in body frame
+
   double Ix = 0.0963; ///< Moment of inertia in x-axis
   double Iy = 0.0963; ///< Moment of inertia in y-axis
   double Iz = 0.1927; ///< Moment of inertia in z-axis
@@ -173,35 +176,65 @@ public:
    */
   void setPosition(const Vec3 &p_G);
 
-  /**
-   * Get pose
-   * @returns Pose as a vector (x, y, z, roll, pitch, yaw)
-   */
-  VecX getPose();
-
-  /**
-   * Get velocity in the global frame
-   * @returns Linear Velocity as a vector (vx_G, vy_G, vz_G)
-   */
-  Vec3 getVelocity();
-
-  /**
-   * Get angular velocity in the global frame
-   * @returns Angular velocity as a vector (wx_G, wy_G, wz_G)
-   */
-  Vec3 getAngularVelocity();
-
-  /**
-   * Get angular velocity in the body frame
-   * @returns Body angular velocity as a vector (wx_B, wy_B, wz_B)
-   */
-  Vec3 getBodyAngularVelocity();
-
-  /**
-   * Get acceleration in the body frame
-   * @returns Body acceleration as a vector (ax_B, ay_B, az_B)
-   */
-  Vec3 getBodyAcceleration();
+  // #<{(|*
+  //  * Get pose
+  //  * @returns Pose as a vector (x, y, z, roll, pitch, yaw)
+  //  |)}>#
+  // VecX getPose() const;
+  //
+  // #<{(|*
+  //  * Get velocity in the global frame
+  //  * @returns Linear Velocity as a vector (vx_G, vy_G, vz_G)
+  //  |)}>#
+  // Vec3 getVelocity() const;
+  //
+  // #<{(|*
+  //  * Get angular velocity in the global frame
+  //  * @returns Angular velocity as a vector (wx_G, wy_G, wz_G)
+  //  |)}>#
+  // Vec3 getAngularVelocity() const;
+  //
+  // #<{(|*
+  //  * Get angular velocity in the body frame
+  //  * @returns Body angular velocity as a vector (wx_B, wy_B, wz_B)
+  //  |)}>#
+  // Vec3 getBodyAngularVelocity() const;
+  //
+  // #<{(|*
+  //  * Get acceleration in the body frame
+  //  * @returns Body acceleration as a vector (ax_B, ay_B, az_B)
+  //  |)}>#
+  // Vec3 getBodyAcceleration() const;
+  //
+  // #<{(|*
+  //  * Get pose
+  //  * @returns Pose as a vector (x, y, z, roll, pitch, yaw)
+  //  |)}>#
+  // VecX getPose();
+  //
+  // #<{(|*
+  //  * Get velocity in the global frame
+  //  * @returns Linear Velocity as a vector (vx_G, vy_G, vz_G)
+  //  |)}>#
+  // Vec3 getVelocity();
+  //
+  // #<{(|*
+  //  * Get angular velocity in the global frame
+  //  * @returns Angular velocity as a vector (wx_G, wy_G, wz_G)
+  //  |)}>#
+  // Vec3 getAngularVelocity();
+  //
+  // #<{(|*
+  //  * Get angular velocity in the body frame
+  //  * @returns Body angular velocity as a vector (wx_B, wy_B, wz_B)
+  //  |)}>#
+  // Vec3 getBodyAngularVelocity();
+  //
+  // #<{(|*
+  //  * Get acceleration in the body frame
+  //  * @returns Body acceleration as a vector (ax_B, ay_B, az_B)
+  //  |)}>#
+  // Vec3 getBodyAcceleration();
 
   /**
    * Print state

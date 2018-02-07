@@ -165,7 +165,7 @@ int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
   const double tauq = tau(2);
   const double taur = tau(3);
 
-  // update
+  // Update
   // clang-format off
   this->rpy_G(0) = ph + (p + q * sin(ph) * tan(th) + r * cos(ph) * tan(th)) * dt;
   this->rpy_G(1) = th + (q * cos(ph) - r * sin(ph)) * dt;
@@ -188,7 +188,12 @@ int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
   this->v_G(2) = vz + this->a_G(2) * dt;
   // clang-format on
 
-  // constrain yaw to be [-180, 180]
+  // Calculate body acceleration and angular velocity
+  const Mat3 R_BG = euler123ToRot(this->rpy_G);
+  this->w_B = R_BG * this->w_G;
+  this->a_B = R_BG * this->a_G;
+
+  // Constrain yaw to be [-180, 180]
   this->rpy_G(2) = wrapToPi(this->rpy_G(2));
 
   return 0;
@@ -260,38 +265,6 @@ void QuadrotorModel::setAttitude(const double roll,
 
 void QuadrotorModel::setPosition(const Vec3 &p_G) {
   this->position_setpoints = p_G;
-}
-
-VecX QuadrotorModel::getPose() {
-  VecX pose(6);
-
-  // x, y, z
-  pose(0) = this->p_G(0);
-  pose(1) = this->p_G(1);
-  pose(2) = this->p_G(2);
-
-  // phi, theta, psi
-  pose(3) = this->rpy_G(0);
-  pose(4) = this->rpy_G(1);
-  pose(5) = this->rpy_G(2);
-
-  return pose;
-}
-
-Vec3 QuadrotorModel::getVelocity() { return this->v_G; }
-
-Vec3 QuadrotorModel::getAngularVelocity() { return this->w_G; }
-
-Vec3 QuadrotorModel::getBodyAngularVelocity() {
-  const Mat3 R_BG = euler123ToRot(this->rpy_G);
-  const Vec3 w_B = R_BG * this->w_G;
-  return w_B;
-}
-
-Vec3 QuadrotorModel::getBodyAcceleration() {
-  const Mat3 R_BG = euler123ToRot(this->rpy_G);
-  const Vec3 a_B = R_BG * this->a_G;
-  return a_B;
 }
 
 void QuadrotorModel::printState() {
