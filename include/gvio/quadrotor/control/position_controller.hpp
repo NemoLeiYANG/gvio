@@ -48,6 +48,16 @@ public:
               const Vec4 &actual,
               const double yaw,
               const double dt);
+
+  /**
+   * Reset controller
+   */
+  void reset();
+
+  /**
+   * Print outputs
+   */
+  void printOutputs();
 };
 
 /** @} group quadrotor */

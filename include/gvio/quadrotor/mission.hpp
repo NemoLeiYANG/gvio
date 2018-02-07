@@ -39,18 +39,19 @@ public:
   double heading = 0.0;
 
   Waypoint() {}
-  Waypoint(double latitude, double longitude)
+  Waypoint(const double latitude, const double longitude)
       : latitude{latitude}, longitude{longitude} {}
-  Waypoint(double latitude,
-           double longitude,
-           double altitude,
-           double staytime,
-           double heading)
+  Waypoint(const double latitude,
+           const double longitude,
+           const double altitude,
+           const double staytime,
+           const double heading)
       : latitude{latitude}, longitude{longitude}, altitude{altitude},
         staytime{staytime}, heading{heading} {}
 
   /**
    * Calculate distance away from another waypoint
+   *
    * @param wp 2nd Waypoint to calculate distance away from
    * @return Distance between this waypoint and waypoint `wp`
    */
@@ -58,15 +59,12 @@ public:
     return latlon_dist(latitude, longitude, wp.latitude, wp.longitude);
   }
 
-  friend std::ostream &operator<<(std::ostream &out, const Waypoint &wp) {
-    out << "latitude: " << wp.latitude << std::endl;
-    out << "longitude: " << wp.longitude << std::endl;
-    out << "altitude: " << wp.altitude << std::endl;
-    out << "staytime: " << wp.staytime << std::endl;
-    out << "heading: " << wp.heading;
-    return out;
-  }
 };
+
+/**
+ * Waypoint to output stream
+ */
+std::ostream &operator<<(std::ostream &out, const Waypoint &wp);
 
 /**
  * Mission
@@ -132,38 +130,38 @@ public:
   /**
    * Calculate closest point
    *
-   * @param position Actual position of robot
+   * @param p_G Position in global frame
    * @return Closest point
    */
-  Vec3 closestPoint(const Vec3 &position);
+  Vec3 closestPoint(const Vec3 &p_G);
 
   /**
    * Calcuate which side the point is compared to waypoint track
    *
-   * @param position Position
+   * @param p_G Position
    * @return
    *    - 0: Position is colinear with waypoint track
    *    - 1: Position is left of waypoint track
    *    - -1: Position is right of waypoint track
    */
-  int pointLineSide(const Vec3 &position);
+  int pointLineSide(const Vec3 &p_G);
 
   /**
    * Calculate waypoint point
    *
-   * @param position Actual position of robot
+   * @param p_G Position in global frame
    * @param r Lookahead distance in meters
    */
-  Vec3 waypointInterpolate(const Vec3 &position, const double r);
+  Vec3 waypointInterpolate(const Vec3 &p_G, const double r);
 
   /**
    * Calcuate cross track error
    *
-   * @param position Position
+   * @param p_G Position
    * @param mode Cross track error mode
    * @return Cross track error
    */
-  double crossTrackError(const Vec3 &position, int mode = CTRACK_HORIZ);
+  double crossTrackError(const Vec3 &p_G, int mode = CTRACK_HORIZ);
 
   /**
    * Calculate waypoint yaw
@@ -179,25 +177,25 @@ public:
   /**
    * Check whether waypoint is reached
    *
-   * @param position Actual position of robot
+   * @param p_G Position in global frame
    * @return
    *    - 0: Waypoint not reached
    *    - 1: Waypoint reached
    *    - -1: Not configured
    */
-  int waypointReached(const Vec3 &position);
+  int waypointReached(const Vec3 &p_G);
 
   /**
    * Update waypoint
    *
-   * @param position Actual position of robot
+   * @param p_G Position in global frame
    * @param waypoint Waypoint to update
    * @return
    *   - 0: Success
    *   - -1: Not configured
    *   - -2: No more waypoints
    */
-  int update(const Vec3 &position, Vec3 &waypoint);
+  int update(const Vec3 &p_G, Vec3 &waypoint);
 };
 
 } // namespace gvio

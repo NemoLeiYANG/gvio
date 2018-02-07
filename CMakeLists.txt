@@ -69,6 +69,7 @@ ADD_LIBRARY(
   # quadrotor
   src/quadrotor/control/attitude_controller.cpp
   src/quadrotor/control/position_controller.cpp
+  src/quadrotor/mission.cpp
   src/quadrotor/quadrotor_model.cpp
   # quaternion
   src/quaternion/jpl.cpp
@@ -131,6 +132,7 @@ SET(UNITTESTS
   msckf-msckf_test
   pwm-pca9685_test
   quadrotor-quadrotor_model_test
+  quadrotor-mission_test
   sim-camera_test
   sim-twowheel_test
   sim-world_test
