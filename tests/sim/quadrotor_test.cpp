@@ -57,6 +57,7 @@ void record_timestep(const double t,
                      std::ofstream &gnd_file,
                      std::ofstream &mea_file,
                      std::ofstream &est_file) {
+  // Record quadrotor ground truth
   // -- Time
   gnd_file << t << ",";
   // -- Position
@@ -72,7 +73,7 @@ void record_timestep(const double t,
   gnd_file << quad.rpy_G(1) << ",";
   gnd_file << quad.rpy_G(2) << std::endl;
 
-  // Record initial quadrotor body acceleration and angular velocity
+  // Record quadrotor body acceleration and angular velocity
   // -- Time
   mea_file << t << ",";
   // -- Body acceleration
@@ -84,7 +85,7 @@ void record_timestep(const double t,
   mea_file << quad.w_B(1) << ",";
   mea_file << quad.w_B(2) << std::endl;
 
-  // Record initial estimate
+  // Record estimate
   // -- Time
   est_file << t << ",";
   // -- Position
@@ -154,7 +155,7 @@ int test_QuadrotorModel_update() {
     const Vec3 w_m = quad.w_B;
     imu.update(a_m, w_m, dt);
 
-    // Record quadrotor state
+    // Record
     record_timestep(t, quad, imu, gnd_file, mea_file, est_file);
   }
   gnd_file.close();
