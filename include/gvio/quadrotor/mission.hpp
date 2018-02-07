@@ -58,7 +58,6 @@ public:
   double distance(const Waypoint &wp) {
     return latlon_dist(latitude, longitude, wp.latitude, wp.longitude);
   }
-
 };
 
 /**

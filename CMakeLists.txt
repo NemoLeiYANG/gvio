@@ -39,6 +39,8 @@ ADD_LIBRARY(
   # driver
   src/driver/i2c.cpp
   src/driver/uart.cpp
+  # euroc
+  src/euroc/mav_dataset.cpp
   # msckf
   src/msckf/blackbox.cpp
   src/msckf/camera_state.cpp
@@ -114,6 +116,7 @@ SET(UNITTESTS
   camera-pinhole_model_test
   control-carrot_controller_test
   control-pid_test
+  euroc-mav_dataset_test
   feature2d-feature_container_test
   feature2d-feature_test
   feature2d-feature_track_test

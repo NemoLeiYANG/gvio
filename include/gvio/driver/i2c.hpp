@@ -42,12 +42,12 @@ public:
   }
 
   int setup();
-  int setSlave(char slave_addr);
-  int readBytes(char reg_addr, char *data, size_t length);
-  int readByte(char reg_addr, char *data);
-  int writeByte(char reg_addr, char byte);
-  int writeRawByte(char byte);
-  int writeBytes(char reg_addr, char *data, size_t length);
+  int setSlave(const char slave_addr);
+  int readBytes(const char reg_addr, char *data, size_t length);
+  int readByte(const char reg_addr, char *data);
+  int writeByte(const char reg_addr, const char byte);
+  int writeRawByte(const char byte);
+  int writeBytes(const char reg_addr, const char *data, const size_t length);
 };
 
 /** @} group driver */

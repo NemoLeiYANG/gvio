@@ -258,7 +258,7 @@ public:
 };
 
 /**
- * MPU6050 to string
+ * MPU6050 to output stream
  */
 std::ostream &operator<<(std::ostream &os, const MPU6050 &imu);
 

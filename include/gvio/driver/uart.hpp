@@ -21,21 +21,19 @@ namespace gvio {
 
 class UART {
 public:
-  bool connected;
-  int connection;
+  bool connected = false;
+  int connection = -1;
   std::string port;
   int speed;
-  int parity;
-  int blocking;
+  int parity = 0;
+  int blocking = 1;
 
-  UART(const std::string &port, int speed)
-      : connected{false}, connection{-1}, port{port}, speed{speed}, parity{0},
-        blocking{1} {}
+  UART(const std::string &port, const int speed) : port{port}, speed{speed} {}
 
   int connect();
   int disconnect();
-  int setInterfaceAttributes(int speed, int parity);
-  void setBlocking(int blocking);
+  int setInterfaceAttributes(const int speed, const int parity);
+  void setBlocking(const int blocking);
 };
 
 int set_interface_attribs(int fd, int speed, int parity);

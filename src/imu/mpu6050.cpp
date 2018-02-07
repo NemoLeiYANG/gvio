@@ -5,12 +5,12 @@ namespace gvio {
 int MPU6050::configure() {
   int8_t retval;
 
-  // setup
+  // Setup
   this->i2c = I2C();
   this->i2c.setup();
   this->i2c.setSlave(MPU6050_ADDRESS);
 
-  // set dplf
+  // Set dplf
   this->setDPLF(6);
   retval = this->getDPLF();
   if (retval > 7 || retval < 0) {
@@ -20,10 +20,10 @@ int MPU6050::configure() {
     LOG_INFO("dplf config: %d", this->dplf_config);
   }
 
-  // set power management register
+  // Set power management register
   this->i2c.writeByte(MPU6050_RA_PWR_MGMT_1, 0x00);
 
-  // get gyro range
+  // Get gyro range
   this->setGyroRange(0);
   retval = this->getGyroRange();
   if (retval == 0) {
@@ -38,7 +38,7 @@ int MPU6050::configure() {
     return -2;
   }
 
-  // get accel range
+  // Get accel range
   this->setAccelRange(0);
   retval = this->getAccelRange();
   if (retval == 0) {
@@ -53,7 +53,7 @@ int MPU6050::configure() {
     return -3;
   }
 
-  // get sample rate
+  // Get sample rate
   this->sample_rate = this->getSampleRate();
 
   return 0;
@@ -71,7 +71,7 @@ int MPU6050::ping() {
 }
 
 int MPU6050::getData() {
-  // read this data
+  // Read data
   char raw_data[14];
   memset(raw_data, '\0', 14);
   this->i2c.setSlave(MPU6050_ADDRESS);
@@ -80,7 +80,7 @@ int MPU6050::getData() {
     return -1;
   }
 
-  // accelerometer
+  // Accelerometer
   this->accel.raw_x = (raw_data[0] << 8) | (raw_data[1]);
   this->accel.raw_y = (raw_data[2] << 8) | (raw_data[3]);
   this->accel.raw_z = (raw_data[4] << 8) | (raw_data[5]);
@@ -93,11 +93,11 @@ int MPU6050::getData() {
   this->accel.y = this->accel.raw_y / this->accel.sensitivity;
   this->accel.z = this->accel.raw_z / this->accel.sensitivity;
 
-  // temperature
+  // Temperature
   const int8_t raw_temp = (raw_data[6] << 8) | (raw_data[7]);
   this->temperature = raw_temp / 340.0 + 36.53;
 
-  // gyroscope
+  // Gyroscope
   this->gyro.raw_x = (raw_data[8] << 8) | (raw_data[9]);
   this->gyro.raw_y = (raw_data[10] << 8) | (raw_data[11]);
   this->gyro.raw_z = (raw_data[12] << 8) | (raw_data[13]);
@@ -110,7 +110,7 @@ int MPU6050::getData() {
   this->gyro.y = this->gyro.raw_y / this->gyro.sensitivity;
   this->gyro.z = this->gyro.raw_z / this->gyro.sensitivity;
 
-  // set last_updated
+  // Set last_updated
   this->last_updated = clock();
 
   return 0;
@@ -160,7 +160,7 @@ int MPU6050::setDPLF(const int setting) {
 }
 
 int MPU6050::getDPLF() {
-  // get dplf config
+  // Get dplf config
   char data[1] = {0x00};
   this->i2c.setSlave(MPU6050_ADDRESS);
   int retval = this->i2c.readBytes(MPU6050_RA_CONFIG, data, 1);
@@ -218,17 +218,17 @@ int MPU6050::getSampleRate() {
     return -2;
   }
 
-  // calculate sample rate
+  // Calculate sample rate
   return gyro_rate / (1 + sample_div);
 }
 
 int MPU6050::setGyroRange(const int range) {
-  // pre-check
+  // Pre-check
   if (range > 3 || range < 0) {
     return -2;
   }
 
-  // set sample rate
+  // Set sample rate
   char data = range << 3;
   this->i2c.setSlave(MPU6050_ADDRESS);
   int retval = this->i2c.writeByte(MPU6050_RA_GYRO_CONFIG, data);
@@ -240,7 +240,7 @@ int MPU6050::setGyroRange(const int range) {
 }
 
 int MPU6050::getGyroRange() {
-  // get gyro config
+  // Get gyro config
   char data = 0x00;
   this->i2c.setSlave(MPU6050_ADDRESS);
   int retval = this->i2c.readByte(MPU6050_RA_GYRO_CONFIG, &data);
@@ -248,19 +248,19 @@ int MPU6050::getGyroRange() {
     return -1;
   }
 
-  // get gyro range bytes
+  // Get gyro range bytes
   data = (data >> 3) & 0b00000011;
 
   return data;
 }
 
 int MPU6050::setAccelRange(const int range) {
-  // pre-check
+  // Pre-check
   if (range > 3 || range < 0) {
     return -2;
   }
 
-  // set sample rate
+  // Set sample rate
   char data = range << 3;
   this->i2c.setSlave(MPU6050_ADDRESS);
   int retval = this->i2c.writeByte(MPU6050_RA_ACCEL_CONFIG, data);
@@ -272,18 +272,16 @@ int MPU6050::setAccelRange(const int range) {
 }
 
 int MPU6050::getAccelRange() {
-  char data;
-  int retval;
 
-  // get accel config
-  data = 0x00;
+  // Get accel config
+  char data = 0x00;
   this->i2c.setSlave(MPU6050_ADDRESS);
-  retval = this->i2c.readByte(MPU6050_RA_ACCEL_CONFIG, &data);
+  int retval = this->i2c.readByte(MPU6050_RA_ACCEL_CONFIG, &data);
   if (retval != 0) {
     return -1;
   }
 
-  // get accel range bytes
+  // Get accel range bytes
   data = (data >> 3) & 0b00000011;
 
   return data;
