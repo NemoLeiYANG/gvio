@@ -112,6 +112,7 @@ SET(UNITTESTS
   camera-ids_test
   camera-pinhole_model_test
   control-carrot_controller_test
+  control-pid_test
   feature2d-feature_container_test
   feature2d-feature_test
   feature2d-feature_track_test
