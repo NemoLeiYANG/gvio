@@ -30,11 +30,12 @@ def parse_data(data_path):
     return data_dict
 
 
-def plot_position(gnd_data):
+def plot_position(gnd_data, est_data):
     plt.figure()
 
     plt.subplot(211)
     plt.plot(gnd_data["x"], gnd_data["y"], label="Ground truth")
+    plt.plot(est_data["x"], est_data["y"], label="Estimated")
     plt.title("Position")
     plt.xlabel("East (m)")
     plt.ylabel("North (m)")
@@ -43,16 +44,17 @@ def plot_position(gnd_data):
 
     plt.subplot(212)
     plt.plot(gnd_data["t"], gnd_data["z"], label="Ground Truth")
+    plt.plot(est_data["t"], est_data["z"], label="Estimated")
 
-    # z_min = floor(min(np.min(gnd_data["z"]), np.min(est_data["z"])))
-    # z_max = ceil(max(np.max(gnd_data["z"]), np.max(est_data["z"])))
-    # z_min = min(-1, z_min)
-    # z_max = max(1, z_max)
+    z_min = floor(min(np.min(gnd_data["z"]), np.min(est_data["z"])))
+    z_max = ceil(max(np.max(gnd_data["z"]), np.max(est_data["z"])))
+    z_min = min(-1, z_min)
+    z_max = max(1, z_max)
 
     plt.title("Altitude")
     plt.xlabel("Time (s)")
     plt.ylabel("Height (m)")
-    # plt.ylim([z_min, z_max])
+    plt.ylim([z_min, z_max])
     plt.legend(loc=0)
 
 
@@ -110,10 +112,13 @@ def plot_measurements(mea_data):
 if __name__ == "__main__":
     gnd_path = sys.argv[1]
     mea_path = sys.argv[2]
+    est_path = sys.argv[3]
+
     gnd_data = parse_data(gnd_path)
     mea_data = parse_data(mea_path)
+    est_data = parse_data(est_path)
 
-    plot_position(gnd_data)
+    plot_position(gnd_data, est_data)
     plot_attitude(gnd_data)
     plot_measurements(mea_data)
     plt.show()

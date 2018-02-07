@@ -169,11 +169,9 @@ public:
   /**
    * Set quadrotor position controller setpoints
    *
-   * @param x Position in x-axis
-   * @param y Position in y-axis
-   * @param z Position in z-axis
+   * @param p_G Position in global frame
    */
-  void setPosition(const double x, const double y, const double z);
+  void setPosition(const Vec3 &p_G);
 
   /**
    * Get pose

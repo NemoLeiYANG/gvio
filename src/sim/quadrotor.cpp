@@ -179,13 +179,13 @@ int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
   this->p_G(1) = y + vy * dt;
   this->p_G(2) = z + vz * dt;
 
-	this->a_G(0) = ((-kt * vx / m) + (1 / m) * (cos(ph) * sin(th) * cos(ps) + sin(ph) * sin(ps)) * tauf) * dt;
-	this->a_G(1) = ((-kt * vy / m) + (1 / m) * (cos(ph) * sin(th) * sin(ps) - sin(ph) * cos(ps)) * tauf) * dt;
-	this->a_G(2) = (-(kt * vz / m) + (1 / m) * (cos(ph) * cos(th)) * tauf - g) * dt;
+	this->a_G(0) = ((-kt * vx / m) + (1 / m) * (cos(ph) * sin(th) * cos(ps) + sin(ph) * sin(ps)) * tauf);
+	this->a_G(1) = ((-kt * vy / m) + (1 / m) * (cos(ph) * sin(th) * sin(ps) - sin(ph) * cos(ps)) * tauf);
+	this->a_G(2) = (-(kt * vz / m) + (1 / m) * (cos(ph) * cos(th)) * tauf - g);
 
-  this->v_G(0) = vx + this->a_G(0);
-  this->v_G(1) = vy + this->a_G(1);
-  this->v_G(2) = vz + this->a_G(2);
+  this->v_G(0) = vx + this->a_G(0) * dt;
+  this->v_G(1) = vy + this->a_G(1) * dt;
+  this->v_G(2) = vz + this->a_G(2) * dt;
   // clang-format on
 
   // constrain yaw to be [-180, 180]
@@ -258,12 +258,8 @@ void QuadrotorModel::setAttitude(const double roll,
   this->attitude_setpoints(3) = z;
 }
 
-void QuadrotorModel::setPosition(const double x,
-                                 const double y,
-                                 const double z) {
-  this->position_setpoints(0) = x;
-  this->position_setpoints(1) = y;
-  this->position_setpoints(2) = z;
+void QuadrotorModel::setPosition(const Vec3 &p_G) {
+  this->position_setpoints = p_G;
 }
 
 VecX QuadrotorModel::getPose() {
