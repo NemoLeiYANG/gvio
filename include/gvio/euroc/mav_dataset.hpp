@@ -115,6 +115,9 @@ public:
   CameraData cam1_data;
   GroundTruthData ground_truth;
 
+  long ts_start = 0;
+  long ts_end = 0;
+
   MAVDataset(const std::string &data_path)
       : data_path{strip_end(data_path, "/")} {}
 
@@ -135,6 +138,16 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int loadGroundTruthData();
+
+  /**
+   * Return min timestamp
+   */
+  long minTimestamp();
+
+  /**
+   * Return max timestamp
+   */
+  long maxTimestamp();
 
   /**
    * Load data

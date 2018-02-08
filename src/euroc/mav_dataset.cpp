@@ -13,10 +13,11 @@ int IMUData::load(const std::string &data_dir) {
     return -1;
   }
 
-  const double t0 = data(0, 0);
+  const long t0 = data(0, 0);
   for (long i = 0; i < data.rows(); i++) {
+    const long ts = data(i, 0);
     this->timestamps.emplace_back(data(i, 0));
-    this->time.emplace_back((data(i, 0) - t0) * 1e-9);
+    this->time.emplace_back((ts - t0) * 1e-9);
     this->w_B.emplace_back(data(i, 1), data(i, 2), data(i, 3));
     this->a_B.emplace_back(data(i, 4), data(i, 5), data(i, 6));
   }
@@ -64,11 +65,12 @@ int CameraData::load(const std::string &data_dir) {
     LOG_ERROR("Failed to load camera data [%s]!", cam_data_path.c_str());
     return -1;
   }
-  const double t0 = data(0, 0);
+  const long t0 = data(0, 0);
   for (long i = 0; i < data.rows(); i++) {
     const std::string image_file = std::to_string((long) data(i, 0)) + ".png";
-    this->timestamps.emplace_back(data(i, 0));
-    this->time.emplace_back((data(i, 0) - t0) * 1e-9);
+    const long ts = data(i, 0);
+    this->timestamps.emplace_back(ts);
+    this->time.emplace_back((ts - t0) * 1e-9);
     this->image_paths.emplace_back(data_dir + "/data/" + image_file);
   }
 
@@ -166,21 +168,50 @@ int MAVDataset::loadGroundTruthData() {
   return 0;
 }
 
+long MAVDataset::minTimestamp() {
+  const long cam0_first_ts = this->cam0_data.timestamps.front();
+  const long imu_first_ts = this->imu_data.timestamps.front();
+  const long gnd_first_ts = this->ground_truth.timestamps.front();
+
+  std::vector<long> first_ts{cam0_first_ts, imu_first_ts, gnd_first_ts};
+  auto first_result = std::min_element(first_ts.begin(), first_ts.end());
+  const long first_ts_index = std::distance(first_ts.begin(), first_result);
+  const long min_ts = first_ts[first_ts_index];
+
+  return min_ts;
+}
+
+long MAVDataset::maxTimestamp() {
+  const long cam0_last_ts = this->cam0_data.timestamps.back();
+  const long imu_last_ts = this->imu_data.timestamps.back();
+  const long gnd_last_ts = this->ground_truth.timestamps.back();
+
+  std::vector<long> last_ts{cam0_last_ts, imu_last_ts, gnd_last_ts};
+  auto last_result = std::max_element(last_ts.begin(), last_ts.end());
+  const long last_ts_index = std::distance(last_ts.begin(), last_result);
+  const long max_ts = last_ts[last_ts_index];
+
+  return max_ts;
+}
+
 int MAVDataset::load() {
+  // Load data
   if (this->loadIMUData() != 0) {
     LOG_ERROR("Failed to load imu data!");
     return -1;
   }
-
   if (this->loadCameraData() != 0) {
     LOG_ERROR("Failed to load camera data!");
     return -1;
   }
-
   if (this->loadGroundTruthData() != 0) {
     LOG_ERROR("Failed to load ground truth data!");
     return -1;
   }
+
+  // Timestamp
+  this->ts_start = this->minTimestamp();
+  this->ts_end = this->maxTimestamp();
 
   this->ok = true;
   return 0;

@@ -46,6 +46,13 @@ int test_MAVDataset_load() {
   std::cout << mav_data.cam0_data.timestamps.size() << std::endl;
   std::cout << mav_data.imu_data.timestamps.size() << std::endl;
   std::cout << mav_data.ground_truth.timestamps.size() << std::endl;
+  std::cout << mav_data.ts_start << std::endl;
+  std::cout << mav_data.ts_end << std::endl;
+
+  for (long t = mav_data.ts_start; t < mav_data.ts_end; t++) {
+    // printf("%ld\n", t);
+  }
+
   MU_CHECK_EQ(0, retval);
 
   return 0;
