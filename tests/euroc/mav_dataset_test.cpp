@@ -16,7 +16,6 @@ int test_MAVDataset_loadIMUData() {
   MAVDataset mav_data("/data/euroc_mav/raw/mav0");
   int retval = mav_data.loadIMUData();
 
-  std::cout << mav_data.imu_data << std::endl;
   MU_CHECK_EQ(0, retval);
 
   return 0;
@@ -26,8 +25,27 @@ int test_MAVDataset_loadCameraData() {
   MAVDataset mav_data("/data/euroc_mav/raw/mav0");
   int retval = mav_data.loadCameraData();
 
-  std::cout << mav_data.cam0_data << std::endl;
-  std::cout << mav_data.cam1_data << std::endl;
+  MU_CHECK_EQ(0, retval);
+
+  return 0;
+}
+
+int test_MAVDataset_loadGroundTruthData() {
+  MAVDataset mav_data("/data/euroc_mav/raw/mav0");
+  int retval = mav_data.loadGroundTruthData();
+
+  MU_CHECK_EQ(0, retval);
+
+  return 0;
+}
+
+int test_MAVDataset_load() {
+  MAVDataset mav_data("/data/euroc_mav/raw/mav0");
+  int retval = mav_data.load();
+
+  std::cout << mav_data.cam0_data.timestamps.size() << std::endl;
+  std::cout << mav_data.imu_data.timestamps.size() << std::endl;
+  std::cout << mav_data.ground_truth.timestamps.size() << std::endl;
   MU_CHECK_EQ(0, retval);
 
   return 0;
@@ -37,6 +55,8 @@ void test_suite() {
   MU_ADD_TEST(test_MAVDataset_constructor);
   MU_ADD_TEST(test_MAVDataset_loadIMUData);
   MU_ADD_TEST(test_MAVDataset_loadCameraData);
+  MU_ADD_TEST(test_MAVDataset_loadGroundTruthData);
+  MU_ADD_TEST(test_MAVDataset_load);
 }
 
 } // namespace gvio

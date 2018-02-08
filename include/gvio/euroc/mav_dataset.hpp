@@ -23,7 +23,8 @@ namespace gvio {
  */
 struct IMUData {
   // Data
-  std::vector<double> timestamps;
+  std::vector<long> timestamps;
+  std::vector<double> time;
   std::vector<Vec3> w_B;
   std::vector<Vec3> a_B;
 
@@ -53,6 +54,8 @@ std::ostream &operator<<(std::ostream &os, const IMUData &data);
 
 struct CameraData {
   // Data
+  std::vector<long> timestamps;
+  std::vector<double> time;
   std::vector<std::string> image_paths;
 
   // Sensor properties
@@ -80,32 +83,63 @@ struct CameraData {
  */
 std::ostream &operator<<(std::ostream &os, const CameraData &data);
 
+struct GroundTruthData {
+  // Data
+  std::vector<long> timestamps;
+  std::vector<double> time;
+  std::vector<Vec3> p_RS_R;
+  std::vector<Vec4> q_RS;
+  std::vector<Vec3> v_RS_R;
+  std::vector<Vec3> b_w_RS_S;
+  std::vector<Vec3> b_a_RS_S;
+
+  /**
+   * Load ground truth data
+   *
+   * @param data_dir Ground truth data directory
+   * @returns 0 for success, -1 for failure
+   */
+  int load(const std::string &data_dir);
+};
+
 /**
  * EuRoC MAV Dataset
  */
 class MAVDataset {
 public:
   bool ok = false;
-
   std::string data_path;
 
-  // IMU data
   IMUData imu_data;
-
-  // Camera data
   CameraData cam0_data;
   CameraData cam1_data;
+  GroundTruthData ground_truth;
 
   MAVDataset(const std::string &data_path)
       : data_path{strip_end(data_path, "/")} {}
 
-  /// Load imu data
+  /**
+   * Load imu data
+   * @returns 0 for success, -1 for failure
+   */
   int loadIMUData();
 
-  /// Load camera data
+  /**
+   * Load camera data
+   * @returns 0 for success, -1 for failure
+   */
   int loadCameraData();
 
-  /// Load
+  /**
+   * Load ground truth data
+   * @returns 0 for success, -1 for failure
+   */
+  int loadGroundTruthData();
+
+  /**
+   * Load data
+   * @returns 0 for success, -1 for failure
+   */
   int load();
 };
 

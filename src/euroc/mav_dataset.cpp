@@ -13,8 +13,10 @@ int IMUData::load(const std::string &data_dir) {
     return -1;
   }
 
-  for (int i = 0; i < data.rows(); i++) {
+  const double t0 = data(0, 0);
+  for (long i = 0; i < data.rows(); i++) {
     this->timestamps.emplace_back(data(i, 0));
+    this->time.emplace_back((data(i, 0) - t0) * 1e-9);
     this->w_B.emplace_back(data(i, 1), data(i, 2), data(i, 3));
     this->a_B.emplace_back(data(i, 4), data(i, 5), data(i, 6));
   }
@@ -56,11 +58,19 @@ int CameraData::load(const std::string &data_dir) {
   const std::string cam_data_path = data_dir + "/data.csv";
   const std::string cam_calib_path = data_dir + "/sensor.yaml";
 
-  // Get list of image paths for cam0
-  if (list_dir(data_dir + "/data", this->image_paths) != 0) {
+  // Load camera data
+  MatX data;
+  if (csv2mat(cam_data_path, true, data) != 0) {
+    LOG_ERROR("Failed to load camera data [%s]!", cam_data_path.c_str());
     return -1;
   }
-  std::sort(this->image_paths.begin(), this->image_paths.end());
+  const double t0 = data(0, 0);
+  for (long i = 0; i < data.rows(); i++) {
+    const std::string image_file = std::to_string((long) data(i, 0)) + ".png";
+    this->timestamps.emplace_back(data(i, 0));
+    this->time.emplace_back((data(i, 0) - t0) * 1e-9);
+    this->image_paths.emplace_back(data_dir + "/data/" + image_file);
+  }
 
   // Load calibration data
   ConfigParser parser;
@@ -97,6 +107,29 @@ std::ostream &operator<<(std::ostream &os, const CameraData &data) {
   return os;
 }
 
+int GroundTruthData::load(const std::string &data_dir) {
+  // Load ground truth data
+  const std::string gnd_data_path = data_dir + "/data.csv";
+  MatX data;
+  if (csv2mat(gnd_data_path, true, data) != 0) {
+    LOG_ERROR("Failed to load ground truth data [%s]!", gnd_data_path.c_str());
+    return -1;
+  }
+
+  const double t0 = data(0, 0);
+  for (long i = 0; i < data.rows(); i++) {
+    this->timestamps.emplace_back(data(i, 0));
+    this->time.emplace_back((data(i, 0) - t0) * 1e-9);
+    this->p_RS_R.emplace_back(data(i, 1), data(i, 2), data(i, 3));
+    this->q_RS.emplace_back(data(i, 4), data(i, 5), data(i, 6), data(i, 7));
+    this->v_RS_R.emplace_back(data(i, 8), data(i, 9), data(i, 10));
+    this->b_w_RS_S.emplace_back(data(i, 11), data(i, 12), data(i, 13));
+    this->b_a_RS_S.emplace_back(data(i, 14), data(i, 15), data(i, 16));
+  }
+
+  return 0;
+}
+
 int MAVDataset::loadIMUData() {
   const std::string imu_data_dir = this->data_path + "/imu0";
   if (this->imu_data.load(imu_data_dir) != 0) {
@@ -123,6 +156,16 @@ int MAVDataset::loadCameraData() {
   return 0;
 }
 
+int MAVDataset::loadGroundTruthData() {
+  const std::string gnd_dir = this->data_path + "/state_groundtruth_estimate0";
+  if (this->ground_truth.load(gnd_dir) != 0) {
+    LOG_ERROR("Failed to load ground truth data !");
+    return -1;
+  }
+
+  return 0;
+}
+
 int MAVDataset::load() {
   if (this->loadIMUData() != 0) {
     LOG_ERROR("Failed to load imu data!");
@@ -134,6 +177,12 @@ int MAVDataset::load() {
     return -1;
   }
 
+  if (this->loadGroundTruthData() != 0) {
+    LOG_ERROR("Failed to load ground truth data!");
+    return -1;
+  }
+
+  this->ok = true;
   return 0;
 }
 
