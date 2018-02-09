@@ -43,15 +43,29 @@ int test_MAVDataset_load() {
   MAVDataset mav_data("/data/euroc_mav/raw/mav0");
   int retval = mav_data.load();
 
-  std::cout << mav_data.cam0_data.timestamps.size() << std::endl;
-  std::cout << mav_data.imu_data.timestamps.size() << std::endl;
-  std::cout << mav_data.ground_truth.timestamps.size() << std::endl;
-  std::cout << mav_data.ts_start << std::endl;
-  std::cout << mav_data.ts_end << std::endl;
-
-  for (long t = mav_data.ts_start; t < mav_data.ts_end; t++) {
-    // printf("%ld\n", t);
-  }
+  // // Get timestamps
+  // std::vector<long> timestamps;
+  // auto it = mav_data.timeline.begin();
+  // auto it_end = mav_data.timeline.end();
+  // while (it != it_end) {
+  //   timestamps.push_back(it->first);
+  //   it = mav_data.timeline.upper_bound(it->first);
+  // }
+  //
+  // // Iterate through timestamps
+  // long time_index = 0;
+  // for (auto ts : timestamps) {
+  //   std::cout << "time index: " << time_index << std::endl;
+  //
+  //   auto it = mav_data.timeline.lower_bound(ts);
+  //   auto it_end = mav_data.timeline.upper_bound(ts);
+  //   while (it != it_end) {
+  //     std::cout << it->second << std::endl;
+  //     it++;
+  //   }
+  //   std::cout << std::endl;
+  //   time_index++;
+  // }
 
   MU_CHECK_EQ(0, retval);
 

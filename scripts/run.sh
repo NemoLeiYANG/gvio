@@ -1,5 +1,5 @@
 #!/bin/sh
-# set -e
+set -e
 
 # run clang
 find . -name "*.cpp" | xargs clang-format-3.8 -i

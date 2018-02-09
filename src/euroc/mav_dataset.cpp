@@ -68,10 +68,17 @@ int CameraData::load(const std::string &data_dir) {
   const long t0 = data(0, 0);
   for (long i = 0; i < data.rows(); i++) {
     const std::string image_file = std::to_string((long) data(i, 0)) + ".png";
+    const std::string image_path = data_dir + "/data/" + image_file;
     const long ts = data(i, 0);
+
+    if (file_exists(image_path) == false) {
+      LOG_ERROR("File [%s] does not exist!", image_path.c_str());
+      return -1;
+    }
+
     this->timestamps.emplace_back(ts);
     this->time.emplace_back((ts - t0) * 1e-9);
-    this->image_paths.emplace_back(data_dir + "/data/" + image_file);
+    this->image_paths.emplace_back(image_path);
   }
 
   // Load calibration data
@@ -132,11 +139,32 @@ int GroundTruthData::load(const std::string &data_dir) {
   return 0;
 }
 
+std::ostream &operator<<(std::ostream &os, const DatasetEvent &data) {
+  if (data.type == IMU_EVENT) {
+    os << "event_type: imu" << std::endl;
+    os << "a_m: " << data.a_m.transpose() << std::endl;
+    os << "w_m: " << data.w_m.transpose() << std::endl;
+  } else if (data.type == CAMERA_EVENT) {
+    os << "event_type: camera" << std::endl;
+    os << "camera_index: " << data.camera_index << std::endl;
+    os << "image_path: " << data.image_path << std::endl;
+  }
+
+  return os;
+}
+
 int MAVDataset::loadIMUData() {
   const std::string imu_data_dir = this->data_path + "/imu0";
   if (this->imu_data.load(imu_data_dir) != 0) {
     LOG_ERROR("Failed to load IMU data [%s]!", imu_data_dir.c_str());
     return -1;
+  }
+
+  for (size_t i = 0; i < this->imu_data.timestamps.size(); i++) {
+    const long ts = this->imu_data.timestamps[i];
+    const auto imu_event =
+        DatasetEvent(this->imu_data.a_B[i], this->imu_data.w_B[i]);
+    this->timeline.insert({ts, imu_event});
   }
 
   return 0;
@@ -153,6 +181,18 @@ int MAVDataset::loadCameraData() {
   if (this->cam1_data.load(cam1_dir) != 0) {
     LOG_ERROR("Failed to load cam1 data [%s]!", cam1_dir.c_str());
     return -1;
+  }
+
+  for (size_t i = 0; i < this->cam0_data.timestamps.size(); i++) {
+    const long ts = this->cam0_data.timestamps[i];
+    const auto cam0_event = DatasetEvent(0, this->cam0_data.image_paths[i]);
+    this->timeline.insert({ts, cam0_event});
+  }
+
+  for (size_t i = 0; i < this->cam1_data.timestamps.size(); i++) {
+    const long ts = this->cam1_data.timestamps[i];
+    const auto cam1_event = DatasetEvent(1, this->cam1_data.image_paths[i]);
+    this->timeline.insert({ts, cam1_event});
   }
 
   return 0;
@@ -196,12 +236,12 @@ long MAVDataset::maxTimestamp() {
 
 int MAVDataset::load() {
   // Load data
-  if (this->loadIMUData() != 0) {
-    LOG_ERROR("Failed to load imu data!");
-    return -1;
-  }
   if (this->loadCameraData() != 0) {
     LOG_ERROR("Failed to load camera data!");
+    return -1;
+  }
+  if (this->loadIMUData() != 0) {
+    LOG_ERROR("Failed to load imu data!");
     return -1;
   }
   if (this->loadGroundTruthData() != 0) {
@@ -212,8 +252,106 @@ int MAVDataset::load() {
   // Timestamp
   this->ts_start = this->minTimestamp();
   this->ts_end = this->maxTimestamp();
+  this->ts_now = this->ts_start;
+
+  // Get timestamps
+  std::vector<long> timestamps;
+  auto it = this->timeline.begin();
+  auto it_end = this->timeline.end();
+  while (it != it_end) {
+    timestamps.push_back(it->first);
+    it = this->timeline.upper_bound(it->first);
+  }
 
   this->ok = true;
+  return 0;
+}
+
+void MAVDataset::reset() {
+  this->ts_start = this->minTimestamp();
+  this->ts_end = this->maxTimestamp();
+  this->ts_now = this->ts_start;
+  this->time_index = 0;
+  this->imu_index = 0;
+  this->frame_index = 0;
+}
+
+int MAVDataset::step() {
+  bool imu_event = false;
+  bool cam0_event = false;
+  bool cam1_event = false;
+
+  Vec3 a_m{0.0, 0.0, 0.0};
+  Vec3 w_m{0.0, 0.0, 0.0};
+  std::string cam0_image_path;
+  std::string cam1_image_path;
+
+  // Loop through events at a specific timestamp
+  // and get the imu or camera data
+  auto it = this->timeline.lower_bound(this->ts_now);
+  auto it_end = this->timeline.upper_bound(this->ts_now);
+  while (it != it_end) {
+    DatasetEvent event = it->second;
+    if (event.type == IMU_EVENT) {
+      imu_event = true;
+      a_m = event.a_m;
+      w_m = event.w_m;
+    } else if (event.camera_index == 0) {
+      cam0_event = true;
+      cam0_image_path = event.image_path;
+    } else if (event.camera_index == 1) {
+      cam1_event = true;
+      cam1_image_path = event.image_path;
+    }
+
+    it++;
+  }
+
+  // Trigger imu callback
+  if (imu_event && this->imu_cb != nullptr) {
+    if (this->imu_cb(a_m, w_m, this->ts_now) != 0) {
+      LOG_ERROR("IMU callback failed! Stopping MAVDataset!");
+      return -1;
+    }
+    this->imu_index++;
+  }
+
+  // Trigger camera callback
+  if (cam0_event && cam1_event) {
+    if (this->mono_camera_cb != nullptr) {
+      const cv::Mat frame = cv::imread(cam0_image_path);
+      if (this->mono_camera_cb(frame, this->ts_now) != 0) {
+        LOG_ERROR("Mono camera callback failed! Stopping MAVDataset!");
+        return -2;
+      }
+    } else if (this->stereo_camera_cb != nullptr) {
+      const cv::Mat frame0 = cv::imread(cam0_image_path);
+      const cv::Mat frame1 = cv::imread(cam1_image_path);
+      if (this->stereo_camera_cb(frame0, frame1, this->ts_now) != 0) {
+        LOG_ERROR("Stereo camera callback failed! Stopping MAVDataset!");
+        return -2;
+      }
+    }
+
+    this->frame_index++;
+  }
+
+  // Update timestamp
+  this->time_index++;
+  this->ts_now++;
+
+  return 0;
+}
+
+int MAVDataset::run() {
+  long ts_len = this->ts_end - this->ts_start;
+  for (long i = 0; i < ts_len; i++) {
+    const int retval = this->step();
+    if (retval != 0) {
+      return retval;
+    }
+  }
+
   return 0;
 }
 

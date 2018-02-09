@@ -503,7 +503,7 @@ int test_MSCKF_pruneCameraStates() {
 
 int test_MSCKF_measurementUpdate() {
   // Load raw dataset
-  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0046");
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
   if (raw_dataset.load() != 0) {
     LOG_ERROR("Failed to load KITTI raw dataset [%s]!",
               KITTI_RAW_DATASET.c_str());

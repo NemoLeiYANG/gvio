@@ -6,9 +6,11 @@
 #define GVIO_EUROC_MAV_DATASET_HPP
 
 #include <iostream>
+#include <map>
+#include <vector>
+#include <string>
 #include <fstream>
 #include <sstream>
-#include <string>
 
 #include "gvio/util/util.hpp"
 
@@ -102,6 +104,32 @@ struct GroundTruthData {
   int load(const std::string &data_dir);
 };
 
+enum DatasetEventType { NOT_SET, IMU_EVENT, CAMERA_EVENT };
+
+struct DatasetEvent {
+  // Event Type
+  DatasetEventType type;
+
+  // IMU data
+  Vec3 a_m;
+  Vec3 w_m;
+
+  // Camera data
+  int camera_index;
+  std::string image_path;
+
+  DatasetEvent(const Vec3 &a_m, const Vec3 &w_m)
+      : type{IMU_EVENT}, a_m{a_m}, w_m{w_m} {}
+  DatasetEvent(const int camera_index, const std::string &image_path)
+      : type{CAMERA_EVENT}, camera_index{camera_index}, image_path{image_path} {
+  }
+};
+
+/**
+ * DatasetEvent to output stream
+ */
+std::ostream &operator<<(std::ostream &os, const DatasetEvent &data);
+
 /**
  * EuRoC MAV Dataset
  */
@@ -117,6 +145,19 @@ public:
 
   long ts_start = 0;
   long ts_end = 0;
+  long ts_now = 0;
+  long time_index = 0;
+  long imu_index = 0;
+  long frame_index = 0;
+
+  std::vector<long> timestamps;
+  std::multimap<long, DatasetEvent> timeline;
+
+  int (*imu_cb)(const Vec3 &a_m, const Vec3 &w_m, const long t) = nullptr;
+  int (*mono_camera_cb)(const cv::Mat &frame, const long t) = nullptr;
+  int (*stereo_camera_cb)(const cv::Mat &frame0,
+                          const cv::Mat &frame1,
+                          const long t) = nullptr;
 
   MAVDataset(const std::string &data_path)
       : data_path{strip_end(data_path, "/")} {}
@@ -154,6 +195,31 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int load();
+
+  /**
+   * Reset
+   */
+  void reset();
+
+  /**
+   * Step
+   *
+   * @returns
+   * - 0 for success
+   * - -1 for imu callback failure
+   * - -2 for camera callback failure
+   */
+  int step();
+
+  /**
+   * Run
+   *
+   * @returns
+   * - 0 for success
+   * - -1 for imu callback failure
+   * - -2 for camera callback failure
+   */
+  int run();
 };
 
 /** @} group euroc */
