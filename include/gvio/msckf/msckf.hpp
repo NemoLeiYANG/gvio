@@ -54,8 +54,6 @@ class MSCKF {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  MSCKFState state = MSCKFState::IDLE;
-
   // Covariance matrices
   MatX P_cam = zeros(CameraState::size, CameraState::size);
   MatX P_imu_cam = zeros(IMUState::size, CameraState::size);
@@ -75,6 +73,7 @@ public:
 
   // Misc
   std::map<int, double> chi_squared_table;
+  long last_updated = 0;
 
   // Settings
   int max_window_size = 30;
@@ -141,13 +140,17 @@ public:
   /**
    * Initialize
    *
+   * @param ts timestamp in nano-seconds
    * @param q_IG Initial quaternion
    * @param v_G Initial velocity
    * @param p_G Initial position
    *
    * @returns 0 for success, -1 for failure
    */
-  int initialize(const Vec4 &q_IG, const Vec3 &v_G, const Vec3 &p_G);
+  int initialize(const long ts,
+                 const Vec4 &q_IG,
+                 const Vec3 &v_G,
+                 const Vec3 &p_G);
 
   /**
    * Augment state vector with new camera state
@@ -170,9 +173,9 @@ public:
    *
    * @param a_m Measured acceleration in body frame
    * @param w_m Measured angular velicty in body frame
-   * @param dt Time difference in seconds
+   * @param ts Timestamp in nano-seconds
    */
-  void predictionUpdate(const Vec3 &a_m, const Vec3 &w_m, const double dt);
+  void predictionUpdate(const Vec3 &a_m, const Vec3 &w_m, const long ts);
 
   /**
    * Chi-squared test

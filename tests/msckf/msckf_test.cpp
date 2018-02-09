@@ -256,12 +256,13 @@ int test_MSCKF_predictionUpdate() {
 
   // Setup MSCKF
   MSCKF msckf;
-  msckf.initialize(euler2quat(raw_dataset.oxts.rpy[0]),
+  msckf.initialize(raw_dataset.oxts.timestamps[0],
+                   euler2quat(raw_dataset.oxts.rpy[0]),
                    raw_dataset.oxts.v_G[0],
                    Vec3{0.0, 0.0, 0.0});
 
   // Record initial conditions
-  blackbox.recordTimeStep(raw_dataset.oxts.timestamps[0],
+  blackbox.recordTimeStep(raw_dataset.oxts.time[0],
                           msckf,
                           raw_dataset.oxts.a_B[0],
                           raw_dataset.oxts.w_B[0],
@@ -270,15 +271,13 @@ int test_MSCKF_predictionUpdate() {
                           raw_dataset.oxts.rpy[0]);
 
   // Loop through data and do prediction update
-  for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
+  for (int i = 1; i < (int) raw_dataset.oxts.time.size() - 1; i++) {
     const Vec3 a_B = raw_dataset.oxts.a_B[i];
     const Vec3 w_B = raw_dataset.oxts.w_B[i];
-    const double t_prev = raw_dataset.oxts.timestamps[i - 1];
-    const double t_now = raw_dataset.oxts.timestamps[i];
-    const double dt = t_now - t_prev;
+    const long ts = raw_dataset.oxts.timestamps[i];
 
-    msckf.predictionUpdate(a_B, w_B, dt);
-    blackbox.recordTimeStep(raw_dataset.oxts.timestamps[i],
+    msckf.predictionUpdate(a_B, w_B, ts);
+    blackbox.recordTimeStep(raw_dataset.oxts.time[i],
                             msckf,
                             a_B,
                             w_B,
@@ -535,12 +534,13 @@ int test_MSCKF_measurementUpdate() {
   // Setup MSCKF
   MSCKF msckf;
   msckf.configure(MSCKF_CONFIG);
-  msckf.initialize(euler2quat(raw_dataset.oxts.rpy[0]),
+  msckf.initialize(raw_dataset.oxts.timestamps[0],
+                   euler2quat(raw_dataset.oxts.rpy[0]),
                    raw_dataset.oxts.v_G[0],
                    Vec3{0.0, 0.0, 0.0});
 
   // Record initial conditions
-  blackbox.recordTimeStep(raw_dataset.oxts.timestamps[0],
+  blackbox.recordTimeStep(raw_dataset.oxts.time[0],
                           msckf,
                           raw_dataset.oxts.a_B[0],
                           raw_dataset.oxts.w_B[0],
@@ -550,7 +550,7 @@ int test_MSCKF_measurementUpdate() {
 
   // Loop through data and do prediction update
   struct timespec msckf_start = tic();
-  for (int i = 1; i < (int) raw_dataset.oxts.timestamps.size() - 1; i++) {
+  for (size_t i = 1; i < raw_dataset.oxts.time.size() - 1; i++) {
     // for (int i = 1; i < 50; i++) {
     // for (int i = 1; i < 200; i++) {
     // Feature tracker
@@ -564,10 +564,8 @@ int test_MSCKF_measurementUpdate() {
     // MSCKF
     const Vec3 a_B = raw_dataset.oxts.a_B[i];
     const Vec3 w_B = raw_dataset.oxts.w_B[i];
-    const double t_prev = raw_dataset.oxts.timestamps[i - 1];
-    const double t_now = raw_dataset.oxts.timestamps[i];
-    const double dt = t_now - t_prev;
-    msckf.predictionUpdate(a_B, w_B, dt);
+    const long ts = raw_dataset.oxts.timestamps[i];
+    msckf.predictionUpdate(a_B, w_B, ts);
 
     // // Cheat by loading the robot ground truth to MSCKF's imu state
     // msckf.imu_state.p_G = raw_dataset.oxts.p_G[i];
@@ -576,7 +574,7 @@ int test_MSCKF_measurementUpdate() {
     msckf.measurementUpdate(tracks);
 
     // Record
-    blackbox.recordTimeStep(raw_dataset.oxts.timestamps[i],
+    blackbox.recordTimeStep(raw_dataset.oxts.time[i],
                             msckf,
                             a_B,
                             w_B,
@@ -584,7 +582,7 @@ int test_MSCKF_measurementUpdate() {
                             raw_dataset.oxts.v_G[i],
                             raw_dataset.oxts.rpy[i]);
 
-    printf("frame: %d, nb_tracks: %ld\n", i, tracks.size());
+    printf("frame: %zu, nb_tracks: %ld\n", i, tracks.size());
   }
   printf("-- total elasped: %fs --\n", toc(&msckf_start));
   blackbox.recordCameraStates(msckf);
@@ -612,7 +610,8 @@ int test_MSCKF_measurementUpdate2() {
   MSCKF msckf;
   // Initialize MSCKF
   msckf.configure(MSCKF_CONFIG);
-  msckf.initialize(euler2quat(world.robot.rpy_G),
+  msckf.initialize(0,
+                   euler2quat(world.robot.rpy_G),
                    euler321ToRot(world.robot.rpy_G) * world.robot.v_B,
                    Vec3::Zero());
 
@@ -626,7 +625,7 @@ int test_MSCKF_measurementUpdate2() {
                           world.robot.rpy_G);
 
   // Simulate
-  for (double t = 0.0; t < 10.0; t += dt) {
+  for (double t = dt; t < 10.0; t += dt) {
     // for (double t = 0.0; t < 1.4; t += dt) {
     // Step simulation
     world.step();
@@ -635,7 +634,8 @@ int test_MSCKF_measurementUpdate2() {
     // MSCKF
     const Vec3 a_m = world.robot.a_B + Vec3{0.0, 0.0, 9.81};
     const Vec3 w_m = world.robot.w_B;
-    msckf.predictionUpdate(a_m, w_m, dt);
+    const long ts = t * 1e9;
+    msckf.predictionUpdate(a_m, w_m, ts);
 
     // // Cheat by loading the robot ground truth to MSCKF's imu state
     // msckf.imu_state.p_G = world.robot.p_G;
@@ -681,7 +681,7 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_correctIMUState);
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_pruneCameraStates);
-  MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  // MU_ADD_TEST(test_MSCKF_measurementUpdate);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate2);
 }
 

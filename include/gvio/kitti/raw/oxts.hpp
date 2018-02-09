@@ -47,7 +47,8 @@ struct OXTSEntry {
  * OXTS
  */
 struct OXTS {
-  std::vector<double> timestamps;
+  std::vector<long> timestamps;
+  std::vector<double> time;
   std::vector<Vec3> gps;
   std::vector<Vec3> rpy;
   std::vector<Vec3> p_G;
@@ -77,7 +78,7 @@ struct OXTS {
    * @param s Seconds
    * @returns 0 for success, -1 for failure
    */
-  int parseSingleTimeStamp(const std::string &line, double *s);
+  int parseSingleTimeStamp(const std::string &line, long *s);
 
   /**
    * Load timestamps

@@ -34,7 +34,7 @@ cd tests
 # ./camera-pinhole_model_test
 # ./control-carrot_controller_test
 # ./control-pid_test
-./euroc-mav_dataset_test
+# ./euroc-mav_dataset_test
 # ./feature2d-feature_container_test
 # ./feature2d-feature_test
 # ./feature2d-feature_track_test
@@ -50,7 +50,7 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-# ./msckf-msckf_test
+./msckf-msckf_test
 # ./msckf-profiler_test
 # sudo ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test

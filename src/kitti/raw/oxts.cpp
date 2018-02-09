@@ -122,18 +122,18 @@ int OXTS::loadOXTS(const std::string &oxts_dir) {
   return 0;
 }
 
-int OXTS::parseSingleTimeStamp(const std::string &line, double *s) {
+int OXTS::parseSingleTimeStamp(const std::string &line, long *s) {
   // Parse datetime string
-  unsigned int year, month, day, hour, minute, second, milliseconds;
+  unsigned int year, month, day, hour, minute, second, subsecond;
   int scanned = std::sscanf(line.c_str(),
-                            "%4u-%2u-%2u %2u:%2u:%2u.%3u",
+                            "%4u-%2u-%2u %2u:%2u:%2u.%9u",
                             &year,
                             &month,
                             &day,
                             &hour,
                             &minute,
                             &second,
-                            &milliseconds);
+                            &subsecond);
   if (scanned != 7) {
     return -1;
   }
@@ -146,7 +146,7 @@ int OXTS::parseSingleTimeStamp(const std::string &line, double *s) {
   t.tm_hour = hour;
   t.tm_min = minute;
   t.tm_sec = second;
-  *s = (double) mktime(&t) + milliseconds / 1000.0;
+  *s = (mktime(&t) * 1e9) + subsecond;
 
   return 0;
 }
@@ -158,16 +158,18 @@ int OXTS::loadTimeStamps(const std::string &oxts_dir) {
   std::ifstream timestamps_file(file_path.c_str());
 
   // Get first timestamp
-  double ts_first;
+  long ts_first;
   std::getline(timestamps_file, line);
   this->parseSingleTimeStamp(line, &ts_first);
-  this->timestamps.push_back(0.0);
+  this->timestamps.push_back(ts_first);
+  this->time.push_back(0.0);
 
   // Parse the rest of timestamps
-  double ts;
+  long ts;
   while (std::getline(timestamps_file, line)) {
     this->parseSingleTimeStamp(line, &ts);
-    this->timestamps.push_back(ts - ts_first);
+    this->timestamps.push_back(ts);
+    this->time.push_back((double) (ts - ts_first) * 1e-9);
   }
 
   return 0;

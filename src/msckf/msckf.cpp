@@ -153,18 +153,18 @@ void MSCKF::H(const FeatureTrack &track,
 
 int MSCKF::initialize() {
   this->augmentState();
-  this->state = MSCKFState::INITIALIZED;
-
   return 0;
 }
 
-int MSCKF::initialize(const Vec4 &q_IG, const Vec3 &v_G, const Vec3 &p_G) {
+int MSCKF::initialize(const long ts,
+                      const Vec4 &q_IG,
+                      const Vec3 &v_G,
+                      const Vec3 &p_G) {
+  this->last_updated = ts;
   this->imu_state.q_IG = q_IG;
   this->imu_state.v_G = v_G;
   this->imu_state.p_G = p_G;
-
   this->augmentState();
-  this->state = MSCKFState::INITIALIZED;
 
   return 0;
 }
@@ -227,12 +227,12 @@ CameraStates MSCKF::getTrackCameraStates(const FeatureTrack &track) {
   return track_cam_states;
 }
 
-void MSCKF::predictionUpdate(const Vec3 &a_m,
-                             const Vec3 &w_m,
-                             const double dt) {
+void MSCKF::predictionUpdate(const Vec3 &a_m, const Vec3 &w_m, const long ts) {
+  const double dt = (ts - this->last_updated) * 1e-9;
   this->imu_state.update(a_m, w_m, dt);
   this->P_cam = this->P_cam;
   this->P_imu_cam = this->imu_state.Phi * this->P_imu_cam;
+  this->last_updated = ts;
 }
 
 int MSCKF::chiSquaredTest(const MatX &H, const VecX &r, const int dof) {
