@@ -93,6 +93,13 @@ public:
   int configure(const std::string &config_file);
 
   /**
+   * Get State
+   *
+   * @returns State (p_G, v_G, rpy_G)
+   */
+  VecX getState();
+
+  /**
    * Return covariance matrix P
    */
   MatX P();
@@ -133,9 +140,10 @@ public:
   /**
    * Initialize
    *
+   * @param ts timestamp in nano-seconds
    * @returns 0 for success, -1 for failure
    */
-  int initialize();
+  int initialize(const long ts);
 
   /**
    * Initialize
@@ -174,8 +182,10 @@ public:
    * @param a_m Measured acceleration in body frame
    * @param w_m Measured angular velicty in body frame
    * @param ts Timestamp in nano-seconds
+   *
+   * @returns 0 for success, -1 for failure
    */
-  void predictionUpdate(const Vec3 &a_m, const Vec3 &w_m, const long ts);
+  int predictionUpdate(const Vec3 &a_m, const Vec3 &w_m, const long ts);
 
   /**
    * Chi-squared test

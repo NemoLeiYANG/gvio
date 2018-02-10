@@ -78,7 +78,7 @@ int BlackBox::configure(const std::string &output_path,
   return 0;
 }
 
-int BlackBox::recordEstimate(const double time, const MSCKF &msckf) {
+int BlackBox::recordMSCKF(const double time, const MSCKF &msckf) {
   // Pre-check
   if (this->est_file.good() == false) {
     LOG_ERROR("BlackBox not configured!");
@@ -97,6 +97,34 @@ int BlackBox::recordEstimate(const double time, const MSCKF &msckf) {
   this->est_file << msckf.imu_state.v_G(2) << ",";
   // -- Roll, pitch and yaw
   const Vec3 rpy_G = quat2euler(msckf.imu_state.q_IG);
+  this->est_file << rpy_G(0) << ",";
+  this->est_file << rpy_G(1) << ",";
+  this->est_file << rpy_G(2) << std::endl;
+
+  return 0;
+}
+
+int BlackBox::recordEstimate(const double time,
+                             const Vec3 &p_G,
+                             const Vec3 &v_G,
+                             const Vec3 &rpy_G) {
+  // Pre-check
+  if (this->est_file.good() == false) {
+    LOG_ERROR("BlackBox not configured!");
+    return -1;
+  }
+
+  // -- Time
+  this->est_file << time << ",";
+  // -- Position
+  this->est_file << p_G(0) << ",";
+  this->est_file << p_G(1) << ",";
+  this->est_file << p_G(2) << ",";
+  // -- Velocity
+  this->est_file << v_G(0) << ",";
+  this->est_file << v_G(1) << ",";
+  this->est_file << v_G(2) << ",";
+  // -- Roll, pitch and yaw
   this->est_file << rpy_G(0) << ",";
   this->est_file << rpy_G(1) << ",";
   this->est_file << rpy_G(2) << std::endl;
@@ -186,7 +214,7 @@ int BlackBox::recordTimeStep(const double time,
                              const Vec3 &ground_truth_v_G,
                              const Vec3 &ground_truth_rpy_G) {
   // Estimated
-  this->recordEstimate(time, msckf);
+  this->recordMSCKF(time, msckf);
 
   // Measurements
   this->recordMeasurement(time, measurement_a_B, measurement_w_B);

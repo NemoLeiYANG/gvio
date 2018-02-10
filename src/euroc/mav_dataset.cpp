@@ -130,7 +130,7 @@ int GroundTruthData::load(const std::string &data_dir) {
     this->timestamps.emplace_back(data(i, 0));
     this->time.emplace_back((data(i, 0) - t0) * 1e-9);
     this->p_RS_R.emplace_back(data(i, 1), data(i, 2), data(i, 3));
-    this->q_RS.emplace_back(data(i, 4), data(i, 5), data(i, 6), data(i, 7));
+    this->q_RS.emplace_back(data(i, 5), data(i, 6), data(i, 7), data(i, 4));
     this->v_RS_R.emplace_back(data(i, 8), data(i, 9), data(i, 10));
     this->b_w_RS_S.emplace_back(data(i, 11), data(i, 12), data(i, 13));
     this->b_a_RS_S.emplace_back(data(i, 14), data(i, 15), data(i, 16));
@@ -255,11 +255,10 @@ int MAVDataset::load() {
   this->ts_now = this->ts_start;
 
   // Get timestamps
-  std::vector<long> timestamps;
   auto it = this->timeline.begin();
   auto it_end = this->timeline.end();
   while (it != it_end) {
-    timestamps.push_back(it->first);
+    this->timestamps.push_back(it->first);
     it = this->timeline.upper_bound(it->first);
   }
 
@@ -311,41 +310,47 @@ int MAVDataset::step() {
   if (imu_event && this->imu_cb != nullptr) {
     if (this->imu_cb(a_m, w_m, this->ts_now) != 0) {
       LOG_ERROR("IMU callback failed! Stopping MAVDataset!");
-      return -1;
+      return -2;
     }
     this->imu_index++;
   }
 
-  // Trigger camera callback
-  if (cam0_event && cam1_event) {
-    if (this->mono_camera_cb != nullptr) {
-      const cv::Mat frame = cv::imread(cam0_image_path);
-      if (this->mono_camera_cb(frame, this->ts_now) != 0) {
-        LOG_ERROR("Mono camera callback failed! Stopping MAVDataset!");
-        return -2;
-      }
-    } else if (this->stereo_camera_cb != nullptr) {
-      const cv::Mat frame0 = cv::imread(cam0_image_path);
-      const cv::Mat frame1 = cv::imread(cam1_image_path);
-      if (this->stereo_camera_cb(frame0, frame1, this->ts_now) != 0) {
-        LOG_ERROR("Stereo camera callback failed! Stopping MAVDataset!");
-        return -2;
-      }
-    }
+  // // Trigger camera callback
+  // if (cam0_event && cam1_event) {
+  //   if (this->mono_camera_cb != nullptr) {
+  //     const cv::Mat frame = cv::imread(cam0_image_path);
+  //     if (this->mono_camera_cb(frame, this->ts_now) != 0) {
+  //       LOG_ERROR("Mono camera callback failed! Stopping MAVDataset!");
+  //       return -3;
+  //     }
+  //   } else if (this->stereo_camera_cb != nullptr) {
+  //     const cv::Mat frame0 = cv::imread(cam0_image_path);
+  //     const cv::Mat frame1 = cv::imread(cam1_image_path);
+  //     if (this->stereo_camera_cb(frame0, frame1, this->ts_now) != 0) {
+  //       LOG_ERROR("Stereo camera callback failed! Stopping MAVDataset!");
+  //       return -3;
+  //     }
+  //   }
+  //
+  //   this->frame_index++;
+  // }
 
-    this->frame_index++;
+  if (this->record_cb != nullptr && this->get_state != nullptr) {
+    const VecX state = this->get_state();
+    this->record_cb(this->ts_now,
+                    state.segment(0, 3),
+                    state.segment(3, 3),
+                    state.segment(6, 3));
   }
 
   // Update timestamp
-  this->time_index++;
-  this->ts_now++;
+  this->ts_now = this->timestamps[this->time_index++];
 
   return 0;
 }
 
 int MAVDataset::run() {
-  long ts_len = this->ts_end - this->ts_start;
-  for (long i = 0; i < ts_len; i++) {
+  for (size_t i = 0; i < this->timestamps.size(); i++) {
     const int retval = this->step();
     if (retval != 0) {
       return retval;

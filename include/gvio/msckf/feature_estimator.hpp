@@ -175,7 +175,8 @@ public:
    * @param x Inverse depth parameters (alpha, beta, rho)
    * @param residual Calculated residual
    **/
-  template <typename T> bool operator()(const T *const x, T *residual) const;
+  template <typename T>
+  bool operator()(const T *const x, T *residual) const;
 };
 
 /**

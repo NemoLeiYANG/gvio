@@ -1,6 +1,7 @@
 #include "gvio/munit.hpp"
 #include "gvio/util/util.hpp"
 #include "gvio/kitti/kitti.hpp"
+#include "gvio/euroc/mav_dataset.hpp"
 #include "gvio/msckf/msckf.hpp"
 #include "gvio/msckf/blackbox.hpp"
 #include "gvio/feature2d/klt_tracker.hpp"
@@ -61,7 +62,8 @@ int test_MSCKF_configure() {
 int test_MSCKF_initialize() {
   MSCKF msckf;
 
-  msckf.initialize();
+  msckf.initialize(1e9);
+  MU_CHECK_EQ(1e9, msckf.last_updated);
 
   return 0;
 }
@@ -313,7 +315,7 @@ int test_MSCKF_residualizeTrack() {
   // -- Modify default settings for test
   msckf.min_track_length = 2;
   // -- Add first camera state
-  msckf.initialize();
+  msckf.initialize(0);
   // -- Add second camera state
   msckf.imu_state.p_G = Vec3{1.0, 1.0, 0.0};
   msckf.augmentState();
@@ -375,7 +377,7 @@ int test_MSCKF_calcResiduals() {
   // -- Modify default settings for test
   msckf.min_track_length = 2;
   // -- Add first camera state
-  msckf.initialize();
+  msckf.initialize(0);
   // -- Add second camera state
   msckf.imu_state.p_G = Vec3{1.0, 1.0, 0.0};
   msckf.augmentState();
@@ -427,7 +429,7 @@ int test_MSCKF_calcResiduals() {
 int test_MSCKF_correctIMUState() {
   // Setup MSCKF
   MSCKF msckf;
-  msckf.initialize();
+  msckf.initialize(0);
 
   // Form correction vector
   const Vec3 dtheta_IG{0.0, 0.0, 0.0};
@@ -453,7 +455,7 @@ int test_MSCKF_correctIMUState() {
 int test_MSCKF_correctCameraStates() {
   // Setup MSCKF
   MSCKF msckf;
-  msckf.initialize();
+  msckf.initialize(0);
 
   // Form correction vector
   const Vec3 dtheta_IG{0.0, 0.0, 0.0};
@@ -592,6 +594,81 @@ int test_MSCKF_measurementUpdate() {
 }
 
 int test_MSCKF_measurementUpdate2() {
+  // Load raw dataset
+  const std::string dataset_path = "/data/euroc_mav/raw/mav0";
+  MAVDataset dataset(dataset_path);
+  if (dataset.load() != 0) {
+    LOG_ERROR("Failed to load mav raw dataset [%s]!", dataset_path.c_str());
+    return -1;
+  }
+
+  // Setup blackbox
+  BlackBox blackbox;
+  if (blackbox.configure("/tmp", "test_msckf_measurementUpdate") != 0) {
+    LOG_ERROR("Failed to configure MSCKF blackbox!");
+  }
+
+  // Load first image
+  // cv::Mat img_ref = cv::imread(dataset.cam0[0]);
+
+  // // Setup camera model
+  // const int image_width = img_ref.cols;
+  // const int image_height = img_ref.rows;
+  // const double fx = raw_dataset.calib_cam_to_cam.K[0](0, 0);
+  // const double fy = raw_dataset.calib_cam_to_cam.K[0](1, 1);
+  // const double cx = raw_dataset.calib_cam_to_cam.K[0](0, 2);
+  // const double cy = raw_dataset.calib_cam_to_cam.K[0](1, 2);
+  // PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
+
+  // // Setup feature tracker
+  // KLTTracker tracker{&pinhole_model};
+  // tracker.initialize(img_ref);
+
+  // Setup MSCKF
+  MSCKF msckf;
+  msckf.configure(MSCKF_CONFIG);
+  msckf.initialize(dataset.timestamps[0],
+                   dataset.ground_truth.q_RS[0],
+                   dataset.ground_truth.v_RS_R[0],
+                   dataset.ground_truth.p_RS_R[0]);
+
+  // Record initial conditions
+  blackbox.recordTimeStep(dataset.ground_truth.time[0],
+                          msckf,
+                          dataset.imu_data.a_B[0],
+                          dataset.imu_data.w_B[0],
+                          dataset.ground_truth.p_RS_R[0],
+                          dataset.ground_truth.v_RS_R[0],
+                          quat2euler(dataset.ground_truth.q_RS[0]));
+
+  // Loop through data and do prediction update
+  struct timespec msckf_start = tic();
+
+  dataset.get_state = std::bind(&MSCKF::getState, &msckf);
+
+  dataset.imu_cb = std::bind(&MSCKF::predictionUpdate,
+                             &msckf,
+                             std::placeholders::_1,
+                             std::placeholders::_2,
+                             std::placeholders::_3);
+
+  dataset.record_cb = std::bind(&BlackBox::recordEstimate,
+                                &blackbox,
+                                std::placeholders::_1,
+                                std::placeholders::_2,
+                                std::placeholders::_3,
+                                std::placeholders::_4);
+
+  dataset.run();
+
+  printf("-- total elasped: %fs --\n", toc(&msckf_start));
+  // blackbox.recordCameraStates(msckf);
+  PYTHON_SCRIPT("scripts/plot_msckf.py /tmp/test_msckf_measurementUpdate");
+
+  return 0;
+}
+
+int test_MSCKF_measurementUpdate3() {
   std::srand(23);
 
   // Setup world
@@ -682,7 +759,8 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_pruneCameraStates);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate);
-  // MU_ADD_TEST(test_MSCKF_measurementUpdate2);
+  MU_ADD_TEST(test_MSCKF_measurementUpdate2);
+  // MU_ADD_TEST(test_MSCKF_measurementUpdate3);
 }
 
 } // namespace gvio

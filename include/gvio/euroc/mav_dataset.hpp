@@ -6,6 +6,7 @@
 #define GVIO_EUROC_MAV_DATASET_HPP
 
 #include <iostream>
+#include <functional>
 #include <map>
 #include <vector>
 #include <string>
@@ -13,6 +14,7 @@
 #include <sstream>
 
 #include "gvio/util/util.hpp"
+#include "gvio/msckf/msckf.hpp"
 
 namespace gvio {
 /**
@@ -153,11 +155,13 @@ public:
   std::vector<long> timestamps;
   std::multimap<long, DatasetEvent> timeline;
 
-  int (*imu_cb)(const Vec3 &a_m, const Vec3 &w_m, const long t) = nullptr;
-  int (*mono_camera_cb)(const cv::Mat &frame, const long t) = nullptr;
-  int (*stereo_camera_cb)(const cv::Mat &frame0,
-                          const cv::Mat &frame1,
-                          const long t) = nullptr;
+  // clang-format off
+  std::function<VecX()> get_state;
+  std::function<int(const Vec3 &a_m, const Vec3 &w_m, const long ts)> imu_cb;
+  std::function<int(const cv::Mat &frame, const long ts)> mono_camera_cb;
+  std::function<int(const cv::Mat &frame0, const cv::Mat &frame1, const long ts)> stereo_camera_cb;
+  std::function<int(const double time, const Vec3 &p_G, const Vec3 &v_G, const Vec3 &rpy_G)> record_cb;
+  // clang-format on
 
   MAVDataset(const std::string &data_path)
       : data_path{strip_end(data_path, "/")} {}
@@ -206,8 +210,8 @@ public:
    *
    * @returns
    * - 0 for success
-   * - -1 for imu callback failure
-   * - -2 for camera callback failure
+   * - -2 for imu callback failure
+   * - -3 for camera callback failure
    */
   int step();
 
@@ -216,8 +220,8 @@ public:
    *
    * @returns
    * - 0 for success
-   * - -1 for imu callback failure
-   * - -2 for camera callback failure
+   * - -2 for imu callback failure
+   * - -3 for camera callback failure
    */
   int run();
 };
