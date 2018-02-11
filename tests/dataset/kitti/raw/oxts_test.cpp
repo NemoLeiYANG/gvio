@@ -1,5 +1,5 @@
 #include "gvio/munit.hpp"
-#include "gvio/kitti/raw/oxts.hpp"
+#include "gvio/dataset/kitti/raw/oxts.hpp"
 
 #ifndef TEST_KITTI_DATA
 #define TEST_KITTI_DATA "test_data/kitti"

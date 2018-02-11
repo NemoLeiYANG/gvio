@@ -1,13 +1,14 @@
 /**
  * @file
- * @ingroup kitti
+ * @defgroup kitti kitti
+ * @ingroup dataset
  */
-#ifndef GVIO_KITTI_RAW_CALIB_HPP
-#define GVIO_KITTI_RAW_CALIB_HPP
+#ifndef GVIO_DATASET_KITTI_RAW_CALIB_HPP
+#define GVIO_DATASET_KITTI_RAW_CALIB_HPP
 
 #include "gvio/util/util.hpp"
-#include "gvio/kitti/raw/calib.hpp"
-#include "gvio/kitti/raw/parse.hpp"
+#include "gvio/dataset/kitti/raw/calib.hpp"
+#include "gvio/dataset/kitti/raw/parse.hpp"
 
 namespace gvio {
 /**
@@ -80,4 +81,4 @@ struct CalibVeloToCam {
 
 /** @} group kitti */
 } // namespace gvio
-#endif // GVIO_KITTI_RAW_CALIB_HPP
+#endif // GVIO_DATASET_KITTI_RAW_CALIB_HPP

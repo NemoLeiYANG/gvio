@@ -1,9 +1,10 @@
 /**
  * @file
- * @ingroup euroc
+ * @defgroup euroc euroc
+ * @ingroup dataset
  */
-#ifndef GVIO_EUROC_MAV_DATASET_HPP
-#define GVIO_EUROC_MAV_DATASET_HPP
+#ifndef GVIO_DATASET_EUROC_MAV_DATASET_HPP
+#define GVIO_DATASET_EUROC_MAV_DATASET_HPP
 
 #include <iostream>
 #include <functional>
@@ -230,4 +231,4 @@ public:
 
 /** @} group euroc */
 } // namespace gvio
-#endif // GVIO_EUROC_MAV_DATASET_HPP
+#endif // GVIO_DATASET_EUROC_MAV_DATASET_HPP

@@ -1,5 +1,5 @@
 #include "gvio/munit.hpp"
-#include "gvio/euroc/mav_dataset.hpp"
+#include "gvio/dataset/euroc/mav_dataset.hpp"
 
 namespace gvio {
 

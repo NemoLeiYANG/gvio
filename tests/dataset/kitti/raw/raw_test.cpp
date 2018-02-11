@@ -1,5 +1,5 @@
 #include "gvio/munit.hpp"
-#include "gvio/kitti/raw/raw.hpp"
+#include "gvio/dataset/kitti/raw/raw.hpp"
 
 namespace gvio {
 

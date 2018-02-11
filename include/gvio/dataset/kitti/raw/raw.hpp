@@ -1,9 +1,10 @@
 /**
  * @file
- * @ingroup kitti
+ * @defgroup kitti kitti
+ * @ingroup dataset
  */
-#ifndef GVIO_KITTI_RAW_HPP
-#define GVIO_KITTI_RAW_HPP
+#ifndef GVIO_DATASET_KITTI_RAW_HPP
+#define GVIO_DATASET_KITTI_RAW_HPP
 
 #include <iostream>
 #include <fstream>
@@ -11,9 +12,9 @@
 #include <string>
 
 #include "gvio/util/util.hpp"
-#include "gvio/kitti/raw/calib.hpp"
-#include "gvio/kitti/raw/oxts.hpp"
-#include "gvio/kitti/raw/parse.hpp"
+#include "gvio/dataset/kitti/raw/calib.hpp"
+#include "gvio/dataset/kitti/raw/oxts.hpp"
+#include "gvio/dataset/kitti/raw/parse.hpp"
 
 namespace gvio {
 /**
@@ -66,4 +67,4 @@ public:
 
 /** @} group kitti */
 } // namespace gvio
-#endif // GVIO_KITTI_RAW_HPP
+#endif // GVIO_DATASET_KITTI_RAW_HPP

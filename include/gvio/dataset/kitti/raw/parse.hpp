@@ -1,9 +1,10 @@
 /**
  * @file
- * @ingroup kitti
+ * @defgroup kitti kitti
+ * @ingroup dataset
  */
-#ifndef GVIO_KITTI_RAW_PARSE_HPP
-#define GVIO_KITTI_RAW_PARSE_HPP
+#ifndef GVIO_DATASET_KITTI_RAW_PARSE_HPP
+#define GVIO_DATASET_KITTI_RAW_PARSE_HPP
 
 #include <iostream>
 #include <fstream>
@@ -44,4 +45,4 @@ Mat34 parseMat34(const std::string &line);
 
 /** @} group kitti */
 } // namespace gvio
-#endif // GVIO_KITTI_RAW_PARSE_HPP
+#endif // GVIO_DATASET_KITTI_RAW_PARSE_HPP

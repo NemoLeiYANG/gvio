@@ -1,5 +1,5 @@
 #include "gvio/munit.hpp"
-#include "gvio/kitti/kitti.hpp"
+#include "gvio/dataset/kitti/kitti.hpp"
 #include "gvio/feature2d/klt_tracker.hpp"
 
 namespace gvio {

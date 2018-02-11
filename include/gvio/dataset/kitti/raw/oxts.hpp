@@ -1,9 +1,10 @@
 /**
  * @file
- * @ingroup kitti
+ * @defgroup kitti kitti
+ * @ingroup dataset
  */
-#ifndef GVIO_KITTI_RAW_OXTS_HPP
-#define GVIO_KITTI_RAW_OXTS_HPP
+#ifndef GVIO_DATASET__RAW_OXTS_HPP
+#define GVIO_DATASET__RAW_OXTS_HPP
 
 #include <algorithm>
 #include <vector>
@@ -11,7 +12,7 @@
 #include <chrono>
 
 #include "gvio/util/util.hpp"
-#include "gvio/kitti/raw/parse.hpp"
+#include "gvio/dataset/kitti/raw/parse.hpp"
 
 namespace gvio {
 /**
@@ -99,4 +100,4 @@ struct OXTS {
 
 /** @} group kitti */
 } // namespace gvio
-#endif // GVIO_KITTI_RAW_OXTS_HPP
+#endif // GVIO_DATASET__RAW_OXTS_HPP

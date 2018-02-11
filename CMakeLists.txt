@@ -36,11 +36,15 @@ ADD_LIBRARY(
   src/camera/ids.cpp
   src/camera/distortion.cpp
   src/camera/pinhole_model.cpp
+  # dataset
+  src/dataset/euroc/mav_dataset.cpp
+  src/dataset/kitti/raw/calib.cpp
+  src/dataset/kitti/raw/oxts.cpp
+  src/dataset/kitti/raw/parse.cpp
+  src/dataset/kitti/raw/raw.cpp
   # driver
   src/driver/i2c.cpp
   src/driver/uart.cpp
-  # euroc
-  src/euroc/mav_dataset.cpp
   # msckf
   src/msckf/blackbox.cpp
   src/msckf/camera_state.cpp
@@ -61,11 +65,6 @@ ADD_LIBRARY(
   # imu
   src/imu/imu.cpp
   src/imu/mpu6050.cpp
-  # kitti
-  src/kitti/raw/calib.cpp
-  src/kitti/raw/oxts.cpp
-  src/kitti/raw/parse.cpp
-  src/kitti/raw/raw.cpp
   # pwm
   src/pwm/pca9685.cpp
   # quadrotor
@@ -116,7 +115,11 @@ SET(UNITTESTS
   camera-pinhole_model_test
   control-carrot_controller_test
   control-pid_test
-  euroc-mav_dataset_test
+  dataset-euroc-mav_dataset_test
+  dataset-kitti-raw-calib_test
+  dataset-kitti-raw-oxts_test
+  dataset-kitti-raw-parse_test
+  dataset-kitti-raw-raw_test
   feature2d-feature_container_test
   feature2d-feature_test
   feature2d-feature_track_test
@@ -125,10 +128,6 @@ SET(UNITTESTS
   feature2d-klt_tracker_test
   feature2d-orb_tracker_test
   imu-mpu6050_test
-  kitti-raw-calib_test
-  kitti-raw-oxts_test
-  kitti-raw-parse_test
-  kitti-raw-raw_test
   msckf-camera_state_test
   msckf-feature_estimator_test
   msckf-imu_state_test
