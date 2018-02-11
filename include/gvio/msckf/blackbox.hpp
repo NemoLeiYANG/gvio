@@ -75,16 +75,16 @@ public:
    * Record ground truth
    *
    * @param time Relative time in seconds (where 0 is start)
-   * @param ground_truth_p_G Ground Truth position in global frame
-   * @param ground_truth_v_G Ground Truth velocity in global frame
-   * @param ground_truth_rpy_G Ground Truth roll, pitch, and yaw in global frame
+   * @param p_G Ground Truth position in global frame
+   * @param v_G Ground Truth velocity in global frame
+   * @param rpy_G Ground Truth roll, pitch, and yaw in global frame
    *
    * @returns 0 for success, -1 for failure
    */
   int recordGroundTruth(const double time,
-                        const Vec3 &ground_truth_p_G,
-                        const Vec3 &ground_truth_v_G,
-                        const Vec3 &ground_truth_rpy_G);
+                        const Vec3 &p_G,
+                        const Vec3 &v_G,
+                        const Vec3 &rpy_G);
 
   /**
    * Record MSCKF camera states

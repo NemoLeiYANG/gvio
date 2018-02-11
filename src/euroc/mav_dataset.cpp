@@ -293,8 +293,9 @@ int MAVDataset::step() {
     DatasetEvent event = it->second;
     if (event.type == IMU_EVENT) {
       imu_event = true;
-      a_m = event.a_m;
-      w_m = event.w_m;
+      const Mat3 R = euler321ToRot(Vec3{0.0, deg2rad(-90.0), deg2rad(180)});
+      a_m = R * event.a_m;
+      w_m = R * event.w_m;
     } else if (event.camera_index == 0) {
       cam0_event = true;
       cam0_image_path = event.image_path;
@@ -335,12 +336,12 @@ int MAVDataset::step() {
   //   this->frame_index++;
   // }
 
-  if (this->record_cb != nullptr && this->get_state != nullptr) {
+  if (this->record_est_cb != nullptr && this->get_state != nullptr) {
     const VecX state = this->get_state();
-    this->record_cb(this->ts_now,
-                    state.segment(0, 3),
-                    state.segment(3, 3),
-                    state.segment(6, 3));
+    this->record_est_cb(this->ts_now,
+                        state.segment(0, 3),
+                        state.segment(3, 3),
+                        state.segment(6, 3));
   }
 
   // Update timestamp
@@ -350,7 +351,8 @@ int MAVDataset::step() {
 }
 
 int MAVDataset::run() {
-  for (size_t i = 0; i < this->timestamps.size(); i++) {
+  // for (size_t i = 0; i < this->timestamps.size(); i++) {
+  for (size_t i = 0; i < 20; i++) {
     const int retval = this->step();
     if (retval != 0) {
       return retval;

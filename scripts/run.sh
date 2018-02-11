@@ -7,14 +7,14 @@ find . -name "*.hpp" | xargs clang-format-3.8 -i
 
 # find . -name *.cpp | xargs clang-tidy
 
-MACHINE_TYPE=$(uname -m)
-if [ "${MACHINE_TYPE}" = 'x86_64' ]; then
-  CPU_COUNT=8
-else
-  CPU_COUNT=1
-fi
+# MACHINE_TYPE=$(uname -m)
+# if [ "${MACHINE_TYPE}" = 'x86_64' ]; then
+#   CPU_COUNT=8
+# else
+#   CPU_COUNT=1
+# fi
 
-doxygen Doxyfile
+# doxygen Doxyfile
 
 mkdir -p build && cd build
 
@@ -50,7 +50,7 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-./msckf-msckf_test
+# ./msckf-msckf_test
 # ./msckf-profiler_test
 # sudo ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test
@@ -69,6 +69,7 @@ cd tests
 # ./util-time_test
 
 # python3 scripts/plot_msckf.py
+python3 scripts/plot_euroc_mav_dataset.py /data/euroc_mav/raw/mav0
 # python3 scripts/plot_feature_track.py /tmp/track.dat 1242 375
 # python3 scripts/plot_feature_tracks.py /tmp/feature_tracks 1242 375
 # python3 scripts/plot_twowheel.py /tmp/twowheel.dat

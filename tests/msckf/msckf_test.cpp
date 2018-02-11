@@ -652,12 +652,12 @@ int test_MSCKF_measurementUpdate2() {
                              std::placeholders::_2,
                              std::placeholders::_3);
 
-  dataset.record_cb = std::bind(&BlackBox::recordEstimate,
-                                &blackbox,
-                                std::placeholders::_1,
-                                std::placeholders::_2,
-                                std::placeholders::_3,
-                                std::placeholders::_4);
+  dataset.record_est_cb = std::bind(&BlackBox::recordEstimate,
+                                    &blackbox,
+                                    std::placeholders::_1,
+                                    std::placeholders::_2,
+                                    std::placeholders::_3,
+                                    std::placeholders::_4);
 
   dataset.run();
 

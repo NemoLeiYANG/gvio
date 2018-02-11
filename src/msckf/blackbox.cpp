@@ -133,8 +133,8 @@ int BlackBox::recordEstimate(const double time,
 }
 
 int BlackBox::recordMeasurement(const double time,
-                                const Vec3 &measurement_a_B,
-                                const Vec3 &measurement_w_B) {
+                                const Vec3 &a_B,
+                                const Vec3 &w_B) {
   // Pre-check
   if (this->mea_file.good() == false) {
     LOG_ERROR("BlackBox not configured!");
@@ -144,21 +144,21 @@ int BlackBox::recordMeasurement(const double time,
   // -- Time
   this->mea_file << time << ",";
   // -- Acceleration
-  this->mea_file << measurement_a_B(0) << ",";
-  this->mea_file << measurement_a_B(1) << ",";
-  this->mea_file << measurement_a_B(2) << ",";
+  this->mea_file << a_B(0) << ",";
+  this->mea_file << a_B(1) << ",";
+  this->mea_file << a_B(2) << ",";
   // -- Angular velocity
-  this->mea_file << measurement_w_B(0) << ",";
-  this->mea_file << measurement_w_B(1) << ",";
-  this->mea_file << measurement_w_B(2) << std::endl;
+  this->mea_file << w_B(0) << ",";
+  this->mea_file << w_B(1) << ",";
+  this->mea_file << w_B(2) << std::endl;
 
   return 0;
 }
 
 int BlackBox::recordGroundTruth(const double time,
-                                const Vec3 &ground_truth_p_G,
-                                const Vec3 &ground_truth_v_G,
-                                const Vec3 &ground_truth_rpy_G) {
+                                const Vec3 &p_G,
+                                const Vec3 &v_G,
+                                const Vec3 &rpy_G) {
   // Pre-check
   if (this->gnd_file.good() == false) {
     LOG_ERROR("BlackBox not configured!");
@@ -168,17 +168,17 @@ int BlackBox::recordGroundTruth(const double time,
   // -- Time
   this->gnd_file << time << ",";
   // -- Position
-  this->gnd_file << ground_truth_p_G(0) << ",";
-  this->gnd_file << ground_truth_p_G(1) << ",";
-  this->gnd_file << ground_truth_p_G(2) << ",";
+  this->gnd_file << p_G(0) << ",";
+  this->gnd_file << p_G(1) << ",";
+  this->gnd_file << p_G(2) << ",";
   // -- Velocity
-  this->gnd_file << ground_truth_v_G(0) << ",";
-  this->gnd_file << ground_truth_v_G(1) << ",";
-  this->gnd_file << ground_truth_v_G(2) << ",";
+  this->gnd_file << v_G(0) << ",";
+  this->gnd_file << v_G(1) << ",";
+  this->gnd_file << v_G(2) << ",";
   // -- Roll, pitch and yaw
-  this->gnd_file << ground_truth_rpy_G(0) << ",";
-  this->gnd_file << ground_truth_rpy_G(1) << ",";
-  this->gnd_file << ground_truth_rpy_G(2) << std::endl;
+  this->gnd_file << rpy_G(0) << ",";
+  this->gnd_file << rpy_G(1) << ",";
+  this->gnd_file << rpy_G(2) << std::endl;
 
   return 0;
 }
