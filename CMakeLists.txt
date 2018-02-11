@@ -58,7 +58,7 @@ ADD_LIBRARY(
   src/feature2d/orb_tracker.cpp
   src/feature2d/klt_tracker.cpp
   # gimbal
-  # src/gimbal/gimbal.cpp
+  src/gimbal/gimbal.cpp
   src/gimbal/sbgc.cpp
   # imu
   src/imu/imu.cpp
