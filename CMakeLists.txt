@@ -25,8 +25,6 @@ ADD_LIBRARY(
   src/apriltag/base_detector.cpp
   src/apriltag/mit.cpp
   src/apriltag/michigan.cpp
-  # ceres
-  src/ceres/jpl_quaternion_parameterization.cpp
   # control
   src/control/carrot_controller.cpp
   src/control/pid.cpp
