@@ -28,6 +28,13 @@ BlackBox::~BlackBox() {
 
 int BlackBox::configure(const std::string &output_path,
                         const std::string &base_name) {
+  // Make directory if it does not exist already
+  if (dir_exists(output_path) == false && dir_create(output_path) != 0) {
+    LOG_ERROR("Failed to create directory [%s] for blackbox!",
+              output_path.c_str());
+    return -1;
+  }
+
   // Estimation file
   this->est_file.open(output_path + "/" + base_name + "_est.dat");
   if (this->est_file.good() == false) {

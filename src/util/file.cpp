@@ -28,6 +28,11 @@ bool dir_exists(const std::string &path) {
   }
 }
 
+int dir_create(const std::string &path) {
+  std::string command = "mkdir -p " + path;
+  return system(command.c_str());
+}
+
 std::string strip(const std::string &s, const std::string &target) {
   size_t first = s.find_first_not_of(target);
   if (std::string::npos == first) {

@@ -1,0 +1,12 @@
+output_dir: "/tmp/kitti_raw_2011_09_26_0005"
+kitti_runner: "./build/experiments/kitti_runner"
+kitti:
+    dataset_path: "/data/kitti/raw"
+    date: "2011_09_26"
+    seq: "0005"
+
+simulated_annealing:
+    T: 1000
+    dT: 1
+    output_file: "/tmp/kitti_raw_2011_09_26_0005/tuner_results.dat"
+    best_file: "/tmp/kitti_raw_2011_09_26_0005/tuner_best.yaml"

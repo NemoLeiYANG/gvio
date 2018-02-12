@@ -9,6 +9,7 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <iostream>
 #include <numeric>
@@ -38,6 +39,14 @@ bool file_exists(const std::string &path);
  * @returns true or false
  */
 bool dir_exists(const std::string &path);
+
+/**
+ * Create dir
+ *
+ * @param path Path
+ * @returns 0 for success, -1 for failure
+ */
+int dir_create(const std::string &path);
 
 /**
  * Strips a target character from the start and end of a string

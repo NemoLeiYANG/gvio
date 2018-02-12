@@ -1,8 +1,18 @@
 import unittest
 import os
-import random
+import sys
+import time
 import copy
+import random
 from math import exp
+
+import yaml
+import numpy as np
+
+
+def print_usage():
+    print("Usage: msckf_tuner.py <config_file>")
+    print("Example: msckf_tuner.py ./experiments/configs/kitti_raw_2011_09_26_0005.yaml")
 
 
 def randval(size):
@@ -10,7 +20,7 @@ def randval(size):
     exponent = round(random.uniform(0.0, 9.0), 0)
 
     if size == 1:
-        value = base * 10**exponent
+        value = base * 10**-exponent
         return value
     else:
         value = []
@@ -33,7 +43,7 @@ def tweak_fn(x):
         "imu.process_noise.dbg_var",
         "imu.process_noise.a_var",
         "imu.process_noise.dba_var",
-        "camera.measurement_noise"
+        "camera.measurement_noise.img_var"
     ]
 
     nb_tweaks = random.randint(1, 5)
@@ -64,8 +74,8 @@ def tweak_fn(x):
             x_tweaked["imu"]["process_noise"]["a_var"] = randval(3)
         elif tweak == "imu.process_noise.dba_var":
             x_tweaked["imu"]["process_noise"]["dba_var"] = randval(3)
-        elif tweak == "camera.measurement_noise":
-            x_tweaked["camera"]["measurement_noise"] = randval(1)
+        elif tweak == "camera.measurement_noise.img_var":
+            x_tweaked["camera"]["measurement_noise"]["img_var"] = randval(1)
         else:
             raise RuntimeError("Tweak target [%s] not implemented!" % tweak)
 
@@ -126,47 +136,172 @@ camera:
     msckf_config.close()
 
 
-def cost_fn(x, iteration, base_dir):
-    # import pprint
-    # pprint.pprint(x)
+def parse_data(data_path):
+    # Check number of lines
+    data_file = open(data_path, "r")
+    nb_lines = sum(1 for line in data_file)
+    data_file.seek(0)
+    if nb_lines <= 2:
+        print("No data in [" + data_path + "]?")
+        return None
 
-    # run_path = os.path.join(base_dir, "run" + str(iteration))
-    # os.mkdir(run_path)
+    # Load csv as numpy matrix
+    header = data_file.readline()
+    data = np.loadtxt(data_file, delimiter=",", skiprows=0)
+    data_file.close()
 
-    return 0
+    # Convert numpy matrix as dictionary where each column is represented by
+    # its header name
+    data_dict = {}
+    index = 0
+    for element in header.split(","):
+        data_dict[element.strip()] = data[:, index]
+        index += 1
+
+    return data_dict
 
 
-def simulated_annealing(T, dT, S, tweak_fn, cost_fn):
-    # Setup
+def nb_kitti_entries(dataset_path, date, seq):
+    seq_path = date + "_drive_" + seq + "_sync"
+    data_path = os.path.join(dataset_path, date, seq_path)
+    ground_truth_path = os.path.join(data_path, "oxts", "data")
+
+    oxts_files = os.listdir(ground_truth_path)
+    return len(oxts_files)
+
+
+def rms_error(gnd_data, est_data):
+    assert gnd_data["t"][0] == 0.0
+    assert len(gnd_data["t"]) == len(est_data["t"])
+
+    rms_x = np.sqrt(((est_data["x"] - gnd_data["x"]) ** 2).mean())
+    rms_y = np.sqrt(((est_data["y"] - gnd_data["y"]) ** 2).mean())
+    rms_z = np.sqrt(((est_data["z"] - gnd_data["z"]) ** 2).mean())
+    rms_vx = np.sqrt(((est_data["vx"] - gnd_data["vx"]) ** 2).mean())
+    rms_vy = np.sqrt(((est_data["vy"] - gnd_data["vy"]) ** 2).mean())
+    rms_vz = np.sqrt(((est_data["vz"] - gnd_data["vz"]) ** 2).mean())
+    rms_roll = np.sqrt(((est_data["roll"] - gnd_data["roll"]) ** 2).mean())
+    rms_pitch = np.sqrt(((est_data["pitch"] - gnd_data["pitch"]) ** 2).mean())
+    rms_yaw = np.sqrt(((est_data["yaw"] - gnd_data["yaw"]) ** 2).mean())
+
+    return (rms_x, rms_y, rms_z,
+            rms_vx, rms_vy, rms_vz,
+            rms_roll, rms_pitch, rms_yaw)
+
+
+def cost_fn(x, iteration, config, cache):
+    # Check if x has already been evaluated
+    if str(x) in cache:
+        return cache[str(x)]
+
+    # Output MSCKF config yaml file
+    output_path = os.path.join(config["output_dir"], "run" + str(iteration))
+    os.system("mkdir -p " + output_path)
+    msckf_config_path = os.path.join(output_path, "msckf.yaml")
+    output_msckf_config(msckf_config_path, x)
+
+    # Build command line string
+    command = """
+{kitti_runner} {dataset_path} {date} {seq} {msckf_config_path} {output_path} > /dev/null
+    """.format(kitti_runner=config["kitti_runner"],
+               dataset_path=config["kitti"]["dataset_path"],
+               date=config["kitti"]["date"],
+               seq=config["kitti"]["seq"],
+               msckf_config_path=msckf_config_path,
+               output_path=output_path)
+
+    # Execute MSCKF run and measure time taken
+    time_start = time.time()
+    os.system(command)
+    time_taken = time.time() - time_start
+
+    # Calculate RMS Error
+    est_data = parse_data(os.path.join(output_path, "msckf_est.dat"))
+    gnd_data = parse_data(os.path.join(output_path, "msckf_gnd.dat"))
+    error = sum(rms_error(gnd_data, est_data))
+
+
+    # Double check output data
+    nb_entries = nb_kitti_entries(config["kitti"]["dataset_path"],
+                                  config["kitti"]["date"],
+                                  config["kitti"]["seq"])
+    cost = float("inf")
+    if len(est_data["t"]) != nb_entries:
+        cost = float("inf")
+    else:
+        cost = error + time_taken
+
+    # Update cache
+    cache[str(x)] = x
+
+    return cost
+
+
+def record_progress(output_path, T, iteration, score_current, score_best):
+    results_file = open(output_path, "a")
+    if iteration == 0:
+        results_file.write("#T, iteration, score_current, score_best\n")
+    results_entry = "{0}, {1}, {2}, {3}\n".format(T,
+                                                  iteration,
+                                                  score_current,
+                                                  score_best)
+    results_file.write(results_entry)
+    results_file.close()
+
+
+def simulated_annealing(S, tweak_fn, cost_fn, config):
+    # Simulated annealing settings
+    T = config["simulated_annealing"]["T"]
+    dT = config["simulated_annealing"]["dT"]
+
+    # Cache
+    cache = {}
+
+    # Initialize best
     best = copy.deepcopy(S)  # initialize best
-    best_score = cost_fn(best)
+    best_score = cost_fn(best, 0, config, cache)
+    S_score = best_score
 
     # Iterate
     iteration = 0
+    time_start = time.time()
     while T > 0:
         # Tweak current candidate solution
         R = tweak_fn(S)
 
         # Evaluate
-        R_score = cost_fn(R)
-        S_score = cost_fn(S)
+        R_score = cost_fn(R, iteration, config, cache)
 
         # Replace current candidate solution?
-        threshold = exp(-(S_score - R_score) / T)
-        if R_score < S_score or random.random() < threshold:
+        threshold = exp((S_score - R_score) / T)
+        if S_score > R_score or random.random() < threshold:
             S = copy.deepcopy(R)
+            S_score = R_score
 
         # Keep record of best candidate solution
-        if S_score < best_score:
+        if best_score > S_score:
             best = copy.deepcopy(S)
             best_score = S_score
+
+        # Record progress
+        record_progress(config["simulated_annealing"]["output_file"],
+                        T,
+                        iteration,
+                        R_score,
+                        best_score)
 
         # Update
         T -= dT  # Decrease temperature
         iteration += 1
         print("iteration: {} \t best_score: {}".format(iteration, best_score))
 
-    return (best, best_score)
+    # Record best config
+    output_msckf_config(config["simulated_annealing"]["best_file"])
+
+    # Print stats
+    time_taken = time.time() - time_start
+    print("Time taken: {0}".format(time_taken))
+    print("Best score: {0}".format(round(best_score, 2)))
 
 
 class TestSA(unittest.TestCase):
@@ -216,9 +351,75 @@ class TestSA(unittest.TestCase):
         for i in range(100):
             self.assertNotEqual(str(x_tweaked), str(self.x))
 
+    def test_rms_error(self):
+        est_data = parse_data("/tmp/msckf/msckf_est.dat")
+        gnd_data = parse_data("/tmp/msckf/msckf_gnd.dat")
+        errors = rms_error(gnd_data, est_data)
+        self.assertTrue(len(errors) == 9)
+
+    def test_nb_kitti_entries(self):
+        nb_kitti_entries("/data/kitti/raw", "2011_09_26", "0005")
+
     def test_cost_fn(self):
-        cost_fn(self.x, 0, "/tmp")
+        config = {
+            "output_dir": "/tmp/experiment",
+            "kitti_runner": "./build/experiments/kitti_runner",
+            "kitti": {
+                "dataset_path": "/data/kitti/raw",
+                "date": "2011_09_26",
+                "seq": "0005"
+            }
+        }
+        cache = {}
+        print(cost_fn(self.x, 0, config, cache))
 
 
 if __name__ == "__main__":
-    unittest.main()
+    # Check CLI args
+    if len(sys.argv) != 2:
+        print_usage()
+
+    # Load config
+    config_path = sys.argv[1]
+    config_file = open(config_path, "r")
+    config = yaml.load(config_file)
+
+    # Initial config
+    x = {
+        "max_window_size": 60,
+        "max_nb_tracks": 200,
+        "min_track_length": 15,
+        "enable_ns_trick": True,
+        "enable_qr_trick": True,
+        "imu": {
+            "initial_covariance": {
+                "q_init_var": [1e-3, 1e-3, 1e-3],
+                "bg_init_var": [1e-3, 1e-3, 1e-3],
+                "v_init_var": [1e-3, 1e-3, 1e-3],
+                "ba_init_var": [1e-3, 1e-3, 1e-3],
+                "p_init_var": [1e-3, 1e-3, 1e-3],
+            },
+            "process_noise": {
+                "w_var": [1e-2, 1e-2, 1e-2],
+                "dbg_var": [1e-3, 1e-3, 1e-3],
+                "a_var": [1e-2, 1e-2, 1e-2],
+                "dba_var": [1e-3, 1e-3, 1e-3]
+            },
+            "constants": {
+                "angular_constant": [0.0, 0.0, 0.0],
+                "gravity_constant": [0.0, 0.0, -9.8]
+            }
+        },
+        "camera": {
+            "extrinsics": {
+                "p_IC": [0.0, 0.0, 0.0],
+                "q_CI": [0.5, -0.5, 0.5, -0.5]
+            },
+            "measurement_noise": {
+                "img_var": 1e-2
+            }
+        }
+    }
+
+    # Perform MSCKF Tuning
+    simulated_annealing(x, tweak_fn, cost_fn, config)

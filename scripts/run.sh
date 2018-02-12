@@ -14,14 +14,14 @@ else
   CPU_COUNT=1
 fi
 
-python3 scripts/msckf_tuner.py
 
 # doxygen Doxyfile
-
+#
 # mkdir -p build && cd build
-
+#
 # cmake .. && time make -j${CPU_COUNT}
 
+python3 scripts/msckf_tuner.py experiments/configs/kitti_raw_2011_09_26_0005.yaml
 # cd ../ && bash scripts/test_runner.sh
 
 # VALGRIND="valgrind --leak-check=full \
