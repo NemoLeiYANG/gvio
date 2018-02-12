@@ -154,6 +154,7 @@ public:
   long frame_index = 0;
 
   std::vector<long> timestamps;
+  std::map<long, double> time;
   std::multimap<long, DatasetEvent> timeline;
 
   // clang-format off
@@ -161,9 +162,7 @@ public:
   std::function<int(const Vec3 &a_m, const Vec3 &w_m, const long ts)> imu_cb;
   std::function<int(const cv::Mat &frame, const long ts)> mono_camera_cb;
   std::function<int(const cv::Mat &frame0, const cv::Mat &frame1, const long ts)> stereo_camera_cb;
-  std::function<int(const double time, const Vec3 &p_G, const Vec3 &v_G, const Vec3 &rpy_G)> record_est_cb;
-  std::function<int(const double time, const Vec3 &p_G, const Vec3 &v_G, const Vec3 &rpy_G)> record_gnd_cb;
-  std::function<int(const double time, const Vec3 &a_m, const Vec3 &w_m)> record_mea_cb;
+  std::function<int(const double time, const Vec3 &p_G, const Vec3 &v_G, const Vec3 &rpy_G)> record_cb;
   // clang-format on
 
   MAVDataset(const std::string &data_path)

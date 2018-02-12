@@ -627,13 +627,16 @@ int test_MSCKF_measurementUpdate2() {
   // Setup MSCKF
   MSCKF msckf;
   msckf.configure(MSCKF_CONFIG);
-  msckf.initialize(dataset.timestamps[0],
-                   dataset.ground_truth.q_RS[0],
-                   dataset.ground_truth.v_RS_R[0],
-                   dataset.ground_truth.p_RS_R[0]);
+  msckf.initialize(dataset.timestamps[0]);
+  // msckf.initialize(dataset.timestamps[0],
+  //                  dataset.ground_truth.q_RS[0],
+  //                  dataset.ground_truth.v_RS_R[0],
+  //                  dataset.ground_truth.p_RS_R[0]);
+
+  // std::cout << "init v: " << dataset.ground_truth.v_RS_R[0] << std::endl;
 
   // Record initial conditions
-  blackbox.recordTimeStep(dataset.ground_truth.time[0],
+  blackbox.recordTimeStep(dataset.time[0],
                           msckf,
                           dataset.imu_data.a_B[0],
                           dataset.imu_data.w_B[0],
@@ -652,12 +655,12 @@ int test_MSCKF_measurementUpdate2() {
                              std::placeholders::_2,
                              std::placeholders::_3);
 
-  dataset.record_est_cb = std::bind(&BlackBox::recordEstimate,
-                                    &blackbox,
-                                    std::placeholders::_1,
-                                    std::placeholders::_2,
-                                    std::placeholders::_3,
-                                    std::placeholders::_4);
+  dataset.record_cb = std::bind(&BlackBox::recordEstimate,
+                                &blackbox,
+                                std::placeholders::_1,
+                                std::placeholders::_2,
+                                std::placeholders::_3,
+                                std::placeholders::_4);
 
   dataset.run();
 

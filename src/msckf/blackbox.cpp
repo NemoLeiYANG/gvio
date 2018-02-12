@@ -208,22 +208,19 @@ int BlackBox::recordCameraStates(const MSCKF &msckf) {
 
 int BlackBox::recordTimeStep(const double time,
                              const MSCKF &msckf,
-                             const Vec3 &measurement_a_B,
-                             const Vec3 &measurement_w_B,
-                             const Vec3 &ground_truth_p_G,
-                             const Vec3 &ground_truth_v_G,
-                             const Vec3 &ground_truth_rpy_G) {
+                             const Vec3 &mea_a_B,
+                             const Vec3 &mea_w_B,
+                             const Vec3 &gnd_p_G,
+                             const Vec3 &gnd_v_G,
+                             const Vec3 &gnd_rpy_G) {
   // Estimated
   this->recordMSCKF(time, msckf);
 
   // Measurements
-  this->recordMeasurement(time, measurement_a_B, measurement_w_B);
+  this->recordMeasurement(time, mea_a_B, mea_w_B);
 
   // Ground truth
-  this->recordGroundTruth(time,
-                          ground_truth_p_G,
-                          ground_truth_v_G,
-                          ground_truth_rpy_G);
+  this->recordGroundTruth(time, gnd_p_G, gnd_v_G, gnd_rpy_G);
 
   return 0;
 }

@@ -14,11 +14,13 @@ else
   CPU_COUNT=1
 fi
 
-doxygen Doxyfile
+python3 scripts/msckf_tuner.py
 
-mkdir -p build && cd build
+# doxygen Doxyfile
 
-cmake .. && time make -j${CPU_COUNT}
+# mkdir -p build && cd build
+
+# cmake .. && time make -j${CPU_COUNT}
 
 # cd ../ && bash scripts/test_runner.sh
 
@@ -26,7 +28,7 @@ cmake .. && time make -j${CPU_COUNT}
 # 									 --show-leak-kinds=all \
 # 									 --suppressions=../../.valgrind-suppression"
 
-cd tests
+# cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test
@@ -50,7 +52,7 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-./msckf-msckf_test
+# ./msckf-msckf_test
 # ./msckf-profiler_test
 # sudo ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test

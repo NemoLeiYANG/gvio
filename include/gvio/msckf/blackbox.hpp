@@ -99,21 +99,21 @@ public:
    *
    * @param time Relative time in seconds (where 0 is start)
    * @param msckf MSCKF
-   * @param measurement_a_B Accelerometer measurement
-   * @param measurement_w_B Gyroscope measurement
-   * @param ground_truth_p_G Ground Truth position in global frame
-   * @param ground_truth_v_G Ground Truth velocity in global frame
-   * @param ground_truth_rpy_G Ground Truth roll, pitch, and yaw in global frame
+   * @param mea_a_B Accelerometer measurement
+   * @param mea_w_B Gyroscope measurement
+   * @param gnd_p_G Ground Truth position in global frame
+   * @param gnd_v_G Ground Truth velocity in global frame
+   * @param gnd_rpy_G Ground Truth roll, pitch, and yaw in global frame
    *
    * @returns 0 for success, -1 for failure
    */
   int recordTimeStep(const double time,
                      const MSCKF &msckf,
-                     const Vec3 &measurement_a_B,
-                     const Vec3 &measurement_w_B,
-                     const Vec3 &ground_truth_p_G,
-                     const Vec3 &ground_truth_v_G,
-                     const Vec3 &ground_truth_rpy_G);
+                     const Vec3 &mea_a_B,
+                     const Vec3 &mea_w_B,
+                     const Vec3 &gnd_p_G,
+                     const Vec3 &gnd_v_G,
+                     const Vec3 &gnd_rpy_G);
 };
 
 } // namespace gvio
