@@ -201,14 +201,14 @@ def cost_fn(x, iteration, config, cache):
     output_msckf_config(msckf_config_path, x)
 
     # Build command line string
-    command = """
-{kitti_runner} {dataset_path} {date} {seq} {msckf_config_path} {output_path} > /dev/null
-    """.format(kitti_runner=config["kitti_runner"],
-               dataset_path=config["kitti"]["dataset_path"],
-               date=config["kitti"]["date"],
-               seq=config["kitti"]["seq"],
-               msckf_config_path=msckf_config_path,
-               output_path=output_path)
+    command = "%s %s %s %s %s %s > /dev/null" % (
+        config["kitti_runner"],
+        config["kitti"]["dataset_path"],
+        config["kitti"]["date"],
+        config["kitti"]["seq"],
+        msckf_config_path,
+        output_path
+    )
 
     # Execute MSCKF run and measure time taken
     time_start = time.time()
@@ -218,8 +218,8 @@ def cost_fn(x, iteration, config, cache):
     # Calculate RMS Error
     est_data = parse_data(os.path.join(output_path, "msckf_est.dat"))
     gnd_data = parse_data(os.path.join(output_path, "msckf_gnd.dat"))
-    error = sum(rms_error(gnd_data, est_data))
-
+    errors = rms_error(gnd_data, est_data)
+    total_error = sum(errors)
 
     # Double check output data
     nb_entries = nb_kitti_entries(config["kitti"]["dataset_path"],
@@ -229,23 +229,38 @@ def cost_fn(x, iteration, config, cache):
     if len(est_data["t"]) != nb_entries:
         cost = float("inf")
     else:
-        cost = error + time_taken
+        cost = total_error + time_taken
 
     # Update cache
     cache[str(x)] = x
 
-    return cost
+    return cost, errors, time_taken
 
 
-def record_progress(output_path, T, iteration, score_current, score_best):
+def record_progress(output_path, T, iteration, scores, errors, time_taken):
+    # Open results file
     results_file = open(output_path, "a")
+
+    # Write header
     if iteration == 0:
-        results_file.write("#T, iteration, score_current, score_best\n")
-    results_entry = "{0}, {1}, {2}, {3}\n".format(T,
-                                                  iteration,
-                                                  score_current,
-                                                  score_best)
+        header = ["#T", "iter", "score_current", "score_best", "score_tweaked",
+                  "rms_err_x", "rms_err_y", "rms_err_z",
+                  "rms_err_vx", "rms_err_vy", "rms_err_vz",
+                  "rms_err_roll", "rms_err_pitch", "rms_err_yaw",
+                  "time_taken"]
+        results_file.write(",".join(header) + "\n")
+
+    # Record progress
+    results_entry = "{0},{1},{2},{3},{4},".format(T, iteration, scores[0],
+                                                  scores[1], scores[2])
+    results_entry += "{0},{1},{2},".format(errors[0], errors[1], errors[2])
+    results_entry += "{0},{1},{2},".format(errors[3], errors[4], errors[5])
+    results_entry += "{0},{1},{2},".format(errors[6], errors[7], errors[8])
+    results_entry += "{0}".format(time_taken)
+    results_entry += "\n"
     results_file.write(results_entry)
+
+    # Close up
     results_file.close()
 
 
@@ -259,7 +274,7 @@ def simulated_annealing(S, tweak_fn, cost_fn, config):
 
     # Initialize best
     best = copy.deepcopy(S)  # initialize best
-    best_score = cost_fn(best, 0, config, cache)
+    best_score, error, time_taken = cost_fn(best, 0, config, cache)
     S_score = best_score
 
     # Iterate
@@ -270,7 +285,7 @@ def simulated_annealing(S, tweak_fn, cost_fn, config):
         R = tweak_fn(S)
 
         # Evaluate
-        R_score = cost_fn(R, iteration, config, cache)
+        R_score, errors, time_taken = cost_fn(R, iteration, config, cache)
 
         # Replace current candidate solution?
         threshold = exp((S_score - R_score) / T)
@@ -287,13 +302,15 @@ def simulated_annealing(S, tweak_fn, cost_fn, config):
         record_progress(config["simulated_annealing"]["output_file"],
                         T,
                         iteration,
-                        R_score,
-                        best_score)
+                        [S_score, best_score, R_score],
+                        errors,
+                        time_taken)
 
         # Update
         T -= dT  # Decrease temperature
         iteration += 1
-        print("iteration: {} \t best_score: {}".format(iteration, best_score))
+        print("iteration: {} \t best_score: {}".format(iteration,
+                                                       round(best_score, 2)))
 
     # Record best config
     output_msckf_config(config["simulated_annealing"]["best_file"])
