@@ -761,8 +761,8 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_correctIMUState);
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_pruneCameraStates);
-  // MU_ADD_TEST(test_MSCKF_measurementUpdate);
-  MU_ADD_TEST(test_MSCKF_measurementUpdate2);
+  MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  // MU_ADD_TEST(test_MSCKF_measurementUpdate2);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate3);
 }
 

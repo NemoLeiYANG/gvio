@@ -95,7 +95,12 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
 
   // Update covariance
   // clang-format off
-  this->Phi = I(this->size) + F * dt;
+  // Approximate matrix exponential to the 3rd order, which can be considered
+  // to be accurate enough assuming dtime is within 0.01s.
+  const MatX F_dt = F * dt;
+  const MatX F_dt_sq = F_dt * F_dt;
+  const MatX F_dt_cube = F_dt_sq * F_dt;
+  this->Phi = I(this->size) + F_dt + 0.5 * F_dt_sq + (1.0 / 6.0) * F_dt_cube;
   this->P = Phi * this->P * Phi.transpose() + (G * this->Q * G.transpose()) * dt;
   this->P = enforce_psd(P);
   // clang-format on
