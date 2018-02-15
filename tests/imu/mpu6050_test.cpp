@@ -8,7 +8,7 @@ int test_MPU6050_configure() {
   MPU6050 imu;
 
   retval = imu.configure();
-  MU_CHECK_EQ(0.0, retval);
+  MU_CHECK_EQ(0, retval);
 
   return 0;
 }

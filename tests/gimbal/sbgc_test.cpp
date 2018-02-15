@@ -98,10 +98,32 @@ int test_SBGC_setAngle() {
   MU_CHECK_EQ(0, sbgc.connect());
   sbgc.on();
 
-  sbgc.setAngle(0, -90, 0);
+  // Test Roll
+  std::cout << "Testing roll!" << std::endl;
+  sbgc.setAngle(-20, 0, 0);
   sleep(2);
-  for (int angle = -95; angle < 20; angle += 3) {
+
+  for (int angle = -20; angle <= 20; angle += 5) {
+    sbgc.setAngle(angle, 0, 0);
+    sleep(2);
+
+    sbgc.getRealtimeData();
+    MU_CHECK_NEAR(angle, sbgc.data.camera_angles(0), 2);
+  }
+
+  // Zero gimal
+  std::cout << "Zero-ing gimbal!" << std::endl;
+  sbgc.setAngle(0, 0, 0);
+  sleep(2);
+
+  // Test Pitch
+  std::cout << "Testing pitch!" << std::endl;
+  for (int angle = 0; angle <= 20; angle += 5) {
     sbgc.setAngle(0, angle, 0);
+    sleep(2);
+
+    sbgc.getRealtimeData();
+    MU_CHECK_NEAR(angle, sbgc.data.camera_angles(1), 2);
   }
   sbgc.off();
 
