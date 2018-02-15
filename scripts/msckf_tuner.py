@@ -46,7 +46,8 @@ def tweak_fn(x):
         "camera.measurement_noise.img_var"
     ]
 
-    nb_tweaks = random.randint(1, 5)
+    # nb_tweaks = random.randint(1)
+    nb_tweaks = 1
     tweak_targets = random.sample(tweak_targets, nb_tweaks)
     x_tweaked = copy.deepcopy(x)
     for tweak in tweak_targets:

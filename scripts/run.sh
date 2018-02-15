@@ -20,10 +20,11 @@ mkdir -p build && cd build
 
 cmake .. && time make -j${CPU_COUNT}
 
-./experiments/kitti_runner /data/kitti/raw 2011_09_26 0046 ./experiments/configs/msckf_kitti_raw-2011_09_26-0046.yaml ./experiments
-python3 tests/scripts/plot_msckf.py ./experiments/msckf
+# ./experiments/kitti_runner /data/kitti/raw 2011_09_26 0046 ./experiments/configs/msckf_kitti_raw-2011_09_26-0046.yaml ./experiments
+# python3 tests/scripts/plot_msckf.py ./experiments/msckf
 
-# python3 scripts/msckf_tuner.py experiments/configs/kitti_raw_2011_09_26_0005.yaml
+# cd ../
+# python3 scripts/msckf_tuner.py experiments/configs/kitti_raw_2011_09_26_0009.yaml
 # cd ../ && bash scripts/test_runner.sh
 
 # VALGRIND="valgrind --leak-check=full \
