@@ -20,8 +20,8 @@ mkdir -p build && cd build
 
 cmake .. && time make -j${CPU_COUNT}
 
-# ./experiments/kitti_runner /data/kitti/raw 2011_09_26 0005 ./experiments/configs/msckf_kitti_raw.yaml ./experiments
-# python3 tests/scripts/plot_msckf.py ./experiments/msckf
+./experiments/kitti_runner /data/kitti/raw 2011_09_26 0046 ./experiments/configs/msckf_kitti_raw-2011_09_26-0046.yaml ./experiments
+python3 tests/scripts/plot_msckf.py ./experiments/msckf
 
 # python3 scripts/msckf_tuner.py experiments/configs/kitti_raw_2011_09_26_0005.yaml
 # cd ../ && bash scripts/test_runner.sh
@@ -30,7 +30,7 @@ cmake .. && time make -j${CPU_COUNT}
 # 									 --show-leak-kinds=all \
 # 									 --suppressions=../../.valgrind-suppression"
 
-cd tests
+# cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test
