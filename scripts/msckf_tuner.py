@@ -209,6 +209,7 @@ def cost_fn(x, iteration, config, cache):
         msckf_config_path,
         output_path
     )
+    print(command)
 
     # Execute MSCKF run and measure time taken
     time_start = time.time()

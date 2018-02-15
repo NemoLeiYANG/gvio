@@ -2,7 +2,6 @@
 #include "gvio/msckf/msckf.hpp"
 #include "gvio/msckf/blackbox.hpp"
 #include "gvio/feature2d/klt_tracker.hpp"
-#include "gvio/feature2d/orb_tracker.hpp"
 
 using namespace gvio;
 
@@ -69,7 +68,7 @@ int main(const int argc, const char *argv[]) {
   msckf.initialize(raw_dataset.oxts.timestamps[0],
                    euler2quat(raw_dataset.oxts.rpy[0]),
                    raw_dataset.oxts.v_G[0],
-                   raw_dataset.oxts.p_G[0]);
+                   Vec3{0.0, 0.0, 0.0});
 
   // Record initial conditions
   blackbox.recordTimeStep(raw_dataset.oxts.time[0],

@@ -96,7 +96,7 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   // Update covariance
   // clang-format off
   // Approximate matrix exponential to the 3rd order, which can be considered
-  // to be accurate enough assuming dtime is within 0.01s.
+  // to be accurate enough assuming dt is within 0.01s.
   const MatX F_dt = F * dt;
   const MatX F_dt_sq = F_dt * F_dt;
   const MatX F_dt_cube = F_dt_sq * F_dt;

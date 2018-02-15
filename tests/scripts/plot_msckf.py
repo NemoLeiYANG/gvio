@@ -119,5 +119,5 @@ if __name__ == "__main__":
 
     plot_position(est_data, win_data, gnd_data)
     plot_attitude(est_data, gnd_data)
-    # plot_measurements(mea_data)
+    plot_measurements(mea_data)
     plt.show()
