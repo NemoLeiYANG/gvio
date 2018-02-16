@@ -49,20 +49,18 @@ Vec4 PositionController::update(const Vec3 &setpoints,
   }
 
   // Calculate RPY errors relative to quadrotor by incorporating yaw
-  Vec3 errors;
-  errors(0) = setpoints(0) - actual(0);
-  errors(1) = setpoints(1) - actual(1);
-  errors(2) = setpoints(2) - actual(2);
-
-  Vec3 euler{0.0, 0.0, actual(3)};
-  Mat3 R = euler123ToRot(euler);
+  Vec3 errors{setpoints(0) - actual(0),
+              setpoints(1) - actual(1),
+              setpoints(2) - actual(2)};
+  const Vec3 euler{0.0, 0.0, actual(3)};
+  const Mat3 R = euler123ToRot(euler);
   errors = R * errors;
 
   // Roll, pitch, yaw and thrust
-  double r = -this->y_controller.update(errors(1), 0.0, dt);
-  double p = this->x_controller.update(errors(0), 0.0, dt);
+  double r = -this->y_controller.update(errors(1), dt);
+  double p = this->x_controller.update(errors(0), dt);
   double y = yaw;
-  double t = 0.5 + this->z_controller.update(errors(2), 0.0, dt);
+  double t = 0.5 + this->z_controller.update(errors(2), dt);
   outputs << r, p, y, t;
 
   // Limit roll, pitch

@@ -3,8 +3,8 @@
 namespace gvio {
 
 int QuadrotorModel::loadMission(const std::string &mission_file) {
+  this->ctrl_mode = "WP_CTRL_MODE";
   if (this->mission.configure(mission_file) != 0) {
-    LOG_ERROR("Failed to load mission!");
     return -1;
   }
 
@@ -80,9 +80,10 @@ int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
   this->rpy_G(2) = wrapToPi(this->rpy_G(2));
 
   // Calculate body acceleration and angular velocity
-  const Mat3 R_BG = euler123ToRot(this->rpy_G);
+  const Mat3 R_BG = euler321ToRot(this->rpy_G);
+  const Vec3 g_B = euler321ToRot(this->rpy_G) * Vec3{0.0, 0.0, this->g};
   this->w_B = R_BG * this->w_G;
-  this->a_B = R_BG * this->a_G;
+  this->a_B = R_BG * this->a_G + g_B;
 
   return 0;
 }
@@ -91,9 +92,16 @@ int QuadrotorModel::update(const double dt) {
   Vec4 motor_inputs;
   if (this->ctrl_mode == "POS_CTRL_MODE") {
     motor_inputs = this->positionControllerControl(dt);
+
   } else if (this->ctrl_mode == "ATT_CTRL_MODE") {
     motor_inputs = this->attitudeControllerControl(dt);
+
   } else if (this->ctrl_mode == "WP_CTRL_MODE") {
+    if (this->mission.configured == false) {
+      LOG_ERROR("Mission is not configured!");
+      return -1;
+    }
+
     motor_inputs = this->waypointControllerControl(dt);
   }
 
@@ -120,7 +128,6 @@ Vec4 QuadrotorModel::positionControllerControl(const double dt) {
                              this->p_G(1),    // y
                              this->p_G(2),    // z
                              this->rpy_G(2)}; // yaw
-
   this->attitude_setpoints =
       this->position_controller.update(this->position_setpoints,
                                        actual_position,
@@ -143,19 +150,22 @@ Vec4 QuadrotorModel::positionControllerControl(const double dt) {
 
 Vec4 QuadrotorModel::waypointControllerControl(const double dt) {
   // Waypoint controller
-  this->waypoint_controller.update(this->mission,
-                                   this->p_G,
-                                   this->rpy_G,
-                                   this->v_G,
-                                   dt);
-  this->attitude_setpoints = this->waypoint_controller.outputs;
+  int retval = this->waypoint_controller.update(this->mission,
+                                                this->p_G,
+                                                this->v_G,
+                                                this->rpy_G,
+                                                dt);
+  if (retval != 0) {
+    this->attitude_setpoints = Vec4{0.0, 0.0, 0.0, 0.5};
+  } else {
+    this->attitude_setpoints = this->waypoint_controller.outputs;
+  }
 
   // Attitude controller
   const Vec4 actual_attitude{this->rpy_G(0), // roll
                              this->rpy_G(1), // pitch
                              this->rpy_G(2), // yaw
                              this->p_G(2)};  // z
-
   const Vec4 motor_inputs =
       this->attitude_controller.update(this->attitude_setpoints,
                                        actual_attitude,
@@ -168,10 +178,7 @@ void QuadrotorModel::setAttitude(const double roll,
                                  const double pitch,
                                  const double yaw,
                                  const double z) {
-  this->attitude_setpoints(0) = roll;
-  this->attitude_setpoints(1) = pitch;
-  this->attitude_setpoints(2) = yaw;
-  this->attitude_setpoints(3) = z;
+  this->attitude_setpoints = Vec4{roll, pitch, yaw, z};
 }
 
 void QuadrotorModel::setPosition(const Vec3 &p_G) {

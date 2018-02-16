@@ -31,48 +31,50 @@ cmake .. && time make -j${CPU_COUNT}
 # 									 --show-leak-kinds=all \
 # 									 --suppressions=../../.valgrind-suppression"
 
-cd tests
-# ./apriltag-mit_test
-# ./camera-camera_test
-# ./camera-camera_config_test
-# ./camera-ids_test
-# ./camera-pinhole_model_test
-# ./control-carrot_controller_test
-# ./control-pid_test
-# ./euroc-mav_dataset_test
-# ./feature2d-feature_container_test
-# ./feature2d-feature_test
-# ./feature2d-feature_track_test
-# ./feature2d-feature_tracker_test
-# ./feature2d-gms_matcher_test
-# ./feature2d-klt_tracker_test
-# ./feature2d-orb_tracker_test
-# ./gimbal-sbgc_test
-# ./imu-mpu6050_test
-# ./kitti-raw-calib_test
-# ./kitti-raw-oxts_test
-# ./kitti-raw-parse_test
-# ./kitti-raw-raw_test
-# ./msckf-camera_state_test
-# ./msckf-imu_state_test
-# ./msckf-feature_estimator_test
-# ./msckf-msckf_test
-# ./msckf-profiler_test
-# ./pwm-pca9685_test
-# ./quadrotor-quadrotor_model_test
-./quadrotor-mission_test
-# ./sim-carrot_controller_test
-# ./sim-camera_test
-# ./sim-twowheel_test
-# ./sim-world_test
-# ./util-config_test
-# ./util-data_test
-# ./util-file_test
-# ./util-gps_test
-# ./util-linalg_test
-# ./util-math_test
-# ./util-stats_test
-# ./util-time_test
+# ./tests/apriltag-mit_test
+# ./tests/camera-camera_test
+# ./tests/camera-camera_config_test
+# ./tests/camera-ids_test
+# ./tests/camera-pinhole_model_test
+# ./tests/control-carrot_controller_test
+# ./tests/control-pid_test
+# ./tests/euroc-mav_dataset_test
+# ./tests/feature2d-feature_container_test
+# ./tests/feature2d-feature_test
+# ./tests/feature2d-feature_track_test
+# ./tests/feature2d-feature_tracker_test
+# ./tests/feature2d-gms_matcher_test
+# ./tests/feature2d-klt_tracker_test
+# ./tests/feature2d-orb_tracker_test
+# ./tests/gimbal-sbgc_test
+# ./tests/imu-mpu6050_test
+# ./tests/kitti-raw-calib_test
+# ./tests/kitti-raw-oxts_test
+# ./tests/kitti-raw-parse_test
+# ./tests/kitti-raw-raw_test
+# ./tests/msckf-camera_state_test
+# ./tests/msckf-imu_state_test
+# ./tests/msckf-feature_estimator_test
+# ./tests/msckf-msckf_test
+# ./tests/msckf-profiler_test
+# ./tests/pwm-pca9685_test
+# ./tests/quadrotor-quadrotor_model_test
+# ./tests/quadrotor-mission_test
+# ./tests/sim-carrot_controller_test
+# ./tests/sim-camera_test
+# ./tests/sim-twowheel_test
+# ./tests/sim-world_test
+# ./tests/util-config_test
+# ./tests/util-data_test
+# ./tests/util-file_test
+# ./tests/util-gps_test
+# ./tests/util-linalg_test
+# ./tests/util-math_test
+# ./tests/util-stats_test
+# ./tests/util-time_test
+
+# ./utils/camera_runner configs/camera/ueye/cam1.yaml &
+# ./utils/camera_runner configs/camera/ueye/cam3.yaml
 
 # python3 scripts/plot_msckf.py /tmp/kitti_raw_2011_09_26_0005/run2/msckf
 # python3 scripts/plot_euroc_mav_dataset.py /data/euroc_mav/raw/mav0

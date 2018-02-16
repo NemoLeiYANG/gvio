@@ -1,7 +1,7 @@
-desired_velocity: 0.5
-look_ahead_dist: 0.5
+desired_velocity: 0.3
+look_ahead_dist: 0.2
 threshold_waypoint_gap: 20.0
-threshold_waypoint_reached: 0.2
+threshold_waypoint_reached: 0.1
 
 waypoint_type: "LOCAL"
 waypoints: [

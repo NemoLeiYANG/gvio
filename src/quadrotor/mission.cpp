@@ -173,10 +173,11 @@ Vec3 Mission::closestPoint(const Vec3 &p_G) {
 }
 
 int Mission::pointLineSide(const Vec3 &p_G) {
-  Vec3 a = this->wp_start;
-  Vec3 b = this->wp_end;
-  Vec3 c = p_G;
-  double s = ((b(0) - a(0)) * (c(1) - a(1)) - (b(1) - a(1)) * (c(0) - a(0)));
+  const Vec3 a = this->wp_start;
+  const Vec3 b = this->wp_end;
+  const Vec3 c = p_G;
+  const double s =
+      ((b(0) - a(0)) * (c(1) - a(1)) - (b(1) - a(1)) * (c(0) - a(0)));
 
   // Position is colinear with waypoint track
   if (fltcmp(s, 0.0) == 0) {
@@ -228,11 +229,11 @@ double Mission::waypointHeading() {
 
 Vec3 Mission::waypointInterpolate(const Vec3 &p_G, const double r) {
   // Get closest point
-  Vec3 pt_on_line = this->closestPoint(p_G);
+  const Vec3 pt_on_line = this->closestPoint(p_G);
 
   // Calculate waypoint between wp_start and wp_end
-  Vec3 v = this->wp_end - this->wp_start;
-  Vec3 u = v / v.norm();
+  const Vec3 v = this->wp_end - this->wp_start;
+  const Vec3 u = v / v.norm();
   return pt_on_line + r * u;
 }
 
@@ -243,8 +244,8 @@ int Mission::waypointReached(const Vec3 &p_G) {
   }
 
   // Calculate distance to waypoint
-  Vec3 x = this->wp_end - p_G;
-  double dist = x.norm();
+  const Vec3 x = this->wp_end - p_G;
+  const double dist = x.norm();
 
   // Waypoint reached?
   if (dist > this->threshold_waypoint_reached) {
@@ -267,7 +268,9 @@ int Mission::update(const Vec3 &p_G, Vec3 &waypoint) {
   }
 
   // Interpolate new waypoint
-  waypoint = this->waypointInterpolate(p_G, this->look_ahead_dist);
+  if (this->completed != true) {
+    waypoint = this->waypointInterpolate(p_G, this->look_ahead_dist);
+  }
 
   // Waypoint reached? get new wp_start and wp_end
   if (this->waypointReached(waypoint)) {

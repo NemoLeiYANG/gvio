@@ -5,6 +5,8 @@
 
 namespace gvio {
 
+#define TEST_MISSION "test_configs/missions/mission_local.yaml"
+
 int test_QuadrotorModel_constructor() {
   QuadrotorModel quad;
   return 0;
@@ -117,6 +119,10 @@ int test_QuadrotorModel_update() {
 
   // Setup quadrotor model
   QuadrotorModel quad(Vec3{0.0, 0.0, 0.0}, Vec3{0.0, 0.0, 5.0});
+  // if (quad.loadMission(TEST_MISSION) != 0) {
+  //   LOG_ERROR("Failed to load mission!");
+  //   return -1;
+  // }
 
   // Setup carrot controller
   CarrotController controller;
@@ -138,8 +144,9 @@ int test_QuadrotorModel_update() {
   record_timestep(0.0, quad, imu, gnd_file, mea_file, est_file);
 
   // Simulate
+  double imu_dt = 0.01;
   const double dt = 0.001;
-  for (double t = 0.0; t <= 25.0; t += dt) {
+  for (double t = 0.0; t <= 20.0; t += dt) {
     // Calculate carrot point
     Vec3 carrot_pt;
     controller.update(quad.p_G, carrot_pt);
@@ -150,10 +157,14 @@ int test_QuadrotorModel_update() {
 
     // Update imu
     const Vec3 g_G{0.0, 0.0, 10.0};
-    const Vec3 g_B = euler123ToRot(quad.rpy_G) * g_G;
-    const Vec3 a_m = quad.a_B + g_B;
+    const Vec3 a_m = quad.a_B;
     const Vec3 w_m = quad.w_B;
-    imu.update(a_m, w_m, dt);
+
+    imu_dt += dt;
+    if (imu_dt > 0.1) {
+      imu.update(a_m, w_m, imu_dt);
+      imu_dt = 0.0;
+    }
 
     // Record
     record_timestep(t, quad, imu, gnd_file, mea_file, est_file);
@@ -162,11 +173,11 @@ int test_QuadrotorModel_update() {
   mea_file.close();
   est_file.close();
 
-  // // Plot quadrotor trajectory
-  // PYTHON_SCRIPT("scripts/plot_quadrotor.py "
-  //               "/tmp/quadrotor_gnd.dat "
-  //               "/tmp/quadrotor_mea.dat "
-  //               "/tmp/quadrotor_est.dat");
+  // Plot quadrotor trajectory
+  PYTHON_SCRIPT("scripts/plot_quadrotor.py "
+                "/tmp/quadrotor_gnd.dat "
+                "/tmp/quadrotor_mea.dat "
+                "/tmp/quadrotor_est.dat");
 
   return 0;
 }
