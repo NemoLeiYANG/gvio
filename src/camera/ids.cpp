@@ -7,6 +7,10 @@ enum TriggerMode ueye_str2capturemode(const std::string &mode) {
     return TriggerMode::FREE_RUN;
   } else if (mode == "SOFTWARE_TRIGGER") {
     return TriggerMode::SOFTWARE_TRIGGER;
+  } else if (mode == "TRIGGER_HI_LO") {
+    return TriggerMode::TRIGGER_HI_LO;
+  } else if (mode == "TRIGGER_LO_HI") {
+    return TriggerMode::TRIGGER_LO_HI;
   }
   LOG_ERROR("Opps! [%s] is invalid or its not implemented!", mode.c_str());
 
@@ -177,6 +181,25 @@ void ueye_list_cameras() {
     LOG_ERROR("Hint: is the IDS daemon (/etc/init.d/ueyeusbdrc) is running?");
   }
   LOG_INFO("Number of cameras %d", nb_cameras);
+
+  // Create new list with suitable size
+  UEYE_CAMERA_LIST *camera_list;
+  camera_list =
+      (UEYE_CAMERA_LIST
+           *) new BYTE[sizeof(DWORD) + nb_cameras * sizeof(UEYE_CAMERA_INFO)];
+  camera_list->dwCount = nb_cameras;
+
+  // Retrieve camera info
+  if (is_GetCameraList(camera_list) == IS_SUCCESS) {
+    for (int i = 0; i < (int) camera_list->dwCount; i++) {
+      // Test output of camera info on the screen
+      printf("Camera %i camera id: %d camera serial no: %s\n",
+             i,
+             camera_list->uci[i].dwCameraID,
+             camera_list->uci[i].SerNo);
+    }
+  }
+  delete camera_list;
 }
 
 void ueye_print_error(const HIDS &handle) {
@@ -324,26 +347,8 @@ IDSCamera::~IDSCamera() {
   }
 }
 
-int IDSCamera::configure(const std::string &config_file) {
+int IDSCamera::initialize() {
   int retval = 0;
-
-  // Load config file
-  ConfigParser parser;
-  parser.addParam("camera_index", &this->camera_index);
-  parser.addParam("nb_buffers", &this->nb_buffers);
-  parser.addParam("trigger_mode", &this->trigger_mode);
-  parser.addParam("color_mode", &this->color_mode);
-  parser.addParam("image_width", &this->image_width);
-  parser.addParam("image_height", &this->image_height);
-  parser.addParam("offset_x", &this->offset_x);
-  parser.addParam("offset_y", &this->offset_y);
-  parser.addParam("pixel_clock", &this->pixel_clock);
-  parser.addParam("frame_rate", &this->frame_rate);
-  parser.addParam("gain", &this->gain);
-  if (parser.load(config_file) != 0) {
-    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
-    return -1;
-  }
 
   // Query for number of connected cameras
   int nb_cameras = -1;
@@ -358,8 +363,75 @@ int IDSCamera::configure(const std::string &config_file) {
     return -1;
   }
 
+  // Get and set camera id with serial number
+  if (this->camera_serial_no != "") {
+    // Create camera list
+    UEYE_CAMERA_LIST *camera_list;
+    camera_list =
+        (UEYE_CAMERA_LIST
+             *) new BYTE[sizeof(DWORD) + nb_cameras * sizeof(UEYE_CAMERA_INFO)];
+    camera_list->dwCount = nb_cameras;
+
+    // Retrieve camera list
+    if (is_GetCameraList(camera_list) != IS_SUCCESS) {
+      LOG_ERROR("Failed to retrieve camera info!");
+    }
+
+    // Iterate through camera list and find device id
+    bool found_camera = false;
+    for (int i = 0; i < (int) camera_list->dwCount; i++) {
+      UEYE_CAMERA_INFO camera_info = camera_list->uci[i];
+      if (strcmp(camera_info.SerNo, this->camera_serial_no.c_str()) == 0) {
+        LOG_INFO("Camera with serial no [%s] found!",
+                 this->camera_serial_no.c_str());
+        this->camera_handle = camera_info.dwDeviceID | IS_USE_DEVICE_ID;
+        found_camera = true;
+        break;
+      }
+    }
+    delete camera_list;
+
+    // Check if camera handle is set
+    if (found_camera == false) {
+      LOG_ERROR("Camera with serial no [%s] was not found!",
+                this->camera_serial_no.c_str());
+      return -1;
+    }
+  }
+
   // Initialize camera
   retval = is_InitCamera(&this->camera_handle, NULL);
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::configure(const std::string &config_file) {
+  int retval = 0;
+
+  // Load config file
+  ConfigParser parser;
+  parser.addParam("camera_serial_no", &this->camera_serial_no, true);
+  parser.addParam("nb_buffers", &this->nb_buffers);
+  parser.addParam("trigger_mode", &this->trigger_mode);
+  parser.addParam("color_mode", &this->color_mode);
+  parser.addParam("image_width", &this->image_width);
+  parser.addParam("image_height", &this->image_height);
+  parser.addParam("offset_x", &this->offset_x);
+  parser.addParam("offset_y", &this->offset_y);
+  parser.addParam("pixel_clock", &this->pixel_clock);
+  parser.addParam("frame_rate", &this->frame_rate);
+  parser.addParam("exposure_time", &this->exposure_time);
+  parser.addParam("gain", &this->gain);
+  if (parser.load(config_file) != 0) {
+    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
+    return -1;
+  }
+
+  // Initialize camera
+  retval = this->initialize();
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to initialize camera!");
     return -1;
@@ -389,7 +461,8 @@ int IDSCamera::configure(const std::string &config_file) {
   // Set trigger mode
   retval = this->setTriggerMode(this->trigger_mode);
   if (retval != IS_SUCCESS) {
-    LOG_ERROR("This camera does not support Device Independent Bitmap mode");
+    LOG_ERROR("Failed to set trigger mode!");
+    LOG_ERROR("Double check the camera actually supports the trigger mode!");
     return -1;
   }
 
@@ -400,10 +473,27 @@ int IDSCamera::configure(const std::string &config_file) {
     return -1;
   }
 
-  // Set frame rate
-  retval = this->setFrameRate(this->frame_rate);
+  // Set pixel clock
+  retval = this->setPixelClock(this->pixel_clock);
   if (retval != 0) {
-    LOG_ERROR("Failed to set frame rate!");
+    LOG_ERROR("Failed to set pixel clock!");
+    return -1;
+  }
+
+  // Set frame rate
+  if (this->trigger_mode == "SOFTWARE_TRIGGER" ||
+      this->trigger_mode == "FREE_RUN") {
+    retval = this->setFrameRate(this->frame_rate);
+    if (retval != 0) {
+      LOG_ERROR("Failed to set frame rate!");
+      return -1;
+    }
+  }
+
+  // Set exposure time
+  retval = this->setExposureTime(this->exposure_time);
+  if (retval != 0) {
+    LOG_ERROR("Failed to set exposure time ms!");
     return -1;
   }
 
@@ -522,6 +612,12 @@ int IDSCamera::setTriggerMode(const std::string &trigger_mode) {
     case TriggerMode::SOFTWARE_TRIGGER:
       retval =
           is_SetExternalTrigger(this->camera_handle, IS_SET_TRIGGER_SOFTWARE);
+      break;
+    case TriggerMode::TRIGGER_HI_LO:
+      retval = is_SetExternalTrigger(this->camera_handle, IS_SET_TRIGGER_HI_LO);
+      break;
+    case TriggerMode::TRIGGER_LO_HI:
+      retval = is_SetExternalTrigger(this->camera_handle, IS_SET_TRIGGER_LO_HI);
       break;
     default:
       LOG_ERROR("Not implemented or [%s] is invalid!", trigger_mode.c_str());
@@ -671,6 +767,24 @@ int IDSCamera::getFrameRate(double &frame_rate) {
   return 0;
 }
 
+int IDSCamera::getFrameRateRange(double &rate_min, double &rate_max) {
+  double time_min = 0.0;
+  double time_max = 0.0;
+  double time_interval = 0.0;
+
+  if (is_GetFrameTimeRange(this->camera_handle,
+                           &time_min,
+                           &time_max,
+                           &time_interval) != IS_SUCCESS) {
+    LOG_ERROR("Failed to the range of frame rates available!");
+    return -1;
+  }
+  rate_min = 1.0 / time_max;
+  rate_max = 1.0 / time_min;
+
+  return 0;
+}
+
 int IDSCamera::setGain(const int gain) {
   // Pre-check gain value
   if (gain < 0 || gain > 100) {
@@ -779,6 +893,59 @@ int IDSCamera::getROI(int &offset_x,
 int IDSCamera::getImageSize(int &image_width, int &image_height) {
   int offset_x, offset_y;
   return this->getROI(offset_x, offset_y, image_width, image_height);
+}
+
+int IDSCamera::setExposureTime(const double exposure_time_ms) {
+  int retval = is_Exposure(this->camera_handle,
+                           IS_EXPOSURE_CMD_SET_EXPOSURE,
+                           (void *) &exposure_time_ms,
+                           sizeof(double));
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::getExposureTime(double &exposure_time_ms) {
+  int retval = is_Exposure(this->camera_handle,
+                           IS_EXPOSURE_CMD_GET_EXPOSURE,
+                           (void *) &exposure_time_ms,
+                           sizeof(double));
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::setTriggerDelay(const int delay_us) {
+  // Get trigger min/max delay
+  const int min_delay_us =
+      is_SetTriggerDelay(this->camera_handle, IS_GET_MIN_TRIGGER_DELAY);
+  const int max_delay_us =
+      is_SetTriggerDelay(this->camera_handle, IS_GET_MAX_TRIGGER_DELAY);
+
+  // Check whether input is within allowable range
+  if (delay_us < min_delay_us || delay_us > max_delay_us) {
+    LOG_ERROR("Invalid trigger delay value [%d us]!", delay_us);
+    LOG_ERROR("Delay value has to be within %d to %d us!",
+              min_delay_us,
+              max_delay_us);
+  }
+
+  // Set trigger delay
+  if (is_SetTriggerDelay(this->camera_handle, delay_us) != IS_SUCCESS) {
+    LOG_ERROR("Failed to set trigger delay to [%d us]!", delay_us);
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::getTriggerDelay(int &delay_us) {
+  delay_us = is_SetTriggerDelay(this->camera_handle, IS_GET_TRIGGER_DELAY);
+  return 0;
 }
 
 int IDSCamera::getFrame(cv::Mat &image) {

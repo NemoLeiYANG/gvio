@@ -7,6 +7,11 @@ namespace gvio {
 
 static const std::string TEST_CONFIG = "test_configs/camera/ueye/config.yaml";
 
+int test_ueye_list_cameras() {
+  ueye_list_cameras();
+  return 0;
+}
+
 int test_IDSCamera_constructor() {
   IDSCamera camera;
 
@@ -103,8 +108,13 @@ int test_IDSCamera_setPixelClock_and_getPixelClock() {
 int test_IDSCamera_setColorMode_and_getColorMode() {
   int retval;
   IDSCamera camera;
-  retval = camera.configure(TEST_CONFIG);
-  MU_CHECK_EQ(0, retval);
+
+  // Initialize camera
+  retval = is_InitCamera(&camera.camera_handle, NULL);
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to initialize camera!");
+    return -1;
+  }
 
   // Set color mode
   std::string set_color_mode = "MONO8";
@@ -116,6 +126,9 @@ int test_IDSCamera_setColorMode_and_getColorMode() {
   retval = camera.getColorMode(get_color_mode);
   MU_CHECK_EQ(0, retval);
   MU_CHECK_EQ(get_color_mode, set_color_mode);
+
+  // Clean up
+  is_ExitCamera(camera.camera_handle);
 
   return 0;
 }
@@ -211,12 +224,52 @@ int test_IDSCamera_getImageSize() {
   return 0;
 }
 
+int test_IDSCamera_setExposureTime_and_getExposureTime() {
+  int retval;
+  IDSCamera camera;
+  retval = camera.configure(TEST_CONFIG);
+  MU_CHECK_EQ(0, retval);
+
+  retval = camera.setExposureTime(20.0);
+  MU_CHECK_EQ(0, retval);
+
+  double exposure_time_ms = 0.0;
+  retval = camera.getExposureTime(exposure_time_ms);
+  std::cout << exposure_time_ms << std::endl;
+  MU_CHECK_EQ(0, retval);
+  MU_CHECK_NEAR(20.0, exposure_time_ms, 1.0);
+
+  return 0;
+}
+
+int test_IDSCamera_setTriggerDelay_and_getTriggerDelay() {
+  int retval = 0;
+  IDSCamera camera;
+  camera.configure(TEST_CONFIG);
+
+  retval = camera.setTriggerDelay(15);
+  MU_CHECK_EQ(0, retval);
+
+  int delay_us = 0;
+  retval = camera.getTriggerDelay(delay_us);
+  MU_CHECK_EQ(0, retval);
+  MU_CHECK_EQ(15, delay_us);
+
+  return 0;
+}
+
 int test_IDSCamera_getFrame() {
   IDSCamera camera;
   camera.configure(TEST_CONFIG);
 
   struct timespec start = tic();
-  // int index = 0;
+  int index = 0;
+
+  double rate_min = 0.0;
+  double rate_max = 0.0;
+  camera.getFrameRateRange(rate_min, rate_max);
+  std::cout << "rate_min: " << rate_min << std::endl;
+  std::cout << "rate_max: " << rate_max << std::endl;
 
   while (true) {
     cv::Mat image;
@@ -229,15 +282,19 @@ int test_IDSCamera_getFrame() {
       break;
     }
 
-    printf("fps: %fs\n", 1.0 / toc(&start));
-    start = tic();
-    // index = 0;
+    index++;
+    if (index == 30) {
+      index = 0;
+      printf("fps: %fs\n", 30.0 / toc(&start));
+      start = tic();
+    }
   }
 
   return 0;
 }
 
 void test_suite() {
+  MU_ADD_TEST(test_ueye_list_cameras);
   MU_ADD_TEST(test_IDSCamera_constructor);
   MU_ADD_TEST(test_IDSCamera_configure);
   MU_ADD_TEST(test_IDSCamera_allocBuffers_and_freeBuffers);
@@ -248,6 +305,8 @@ void test_suite() {
   MU_ADD_TEST(test_IDSCamera_setGain_and_getGain);
   MU_ADD_TEST(test_IDSCamera_setROI_and_getROI);
   MU_ADD_TEST(test_IDSCamera_getImageSize);
+  MU_ADD_TEST(test_IDSCamera_setExposureTime_and_getExposureTime);
+  MU_ADD_TEST(test_IDSCamera_setTriggerDelay_and_getTriggerDelay);
   MU_ADD_TEST(test_IDSCamera_getFrame);
 }
 

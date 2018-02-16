@@ -144,7 +144,7 @@ public:
   SENSORINFO sensor_info;
 
   // Camera settings
-  int camera_index = -1;
+  std::string camera_serial_no;
   HIDS camera_handle = 0;
   std::string trigger_mode = "NOT_SET";
 
@@ -158,6 +158,7 @@ public:
   // Capture settings
   int pixel_clock = 0;
   double frame_rate = 0.0;
+  double exposure_time = 0.0;
   int gain = 0.0;
 
   // Buffers
@@ -167,6 +168,8 @@ public:
 
   IDSCamera() {}
   ~IDSCamera();
+
+  int initialize();
 
   /**
    * Configure
@@ -282,12 +285,21 @@ public:
   int setFrameRate(const double frame_rate);
 
   /**
-   * Get frame rate
+   * Get configured frame rate
    *
    * @param frame_rate Frame rate (Hz)
    * @returns 0 for success, -1 for failure
    */
   int getFrameRate(double &frame_rate);
+
+  /**
+   * Get min frame rate
+   *
+   * @param rate_min Min frame rate (Hz)
+   * @param rate_max Max frame rate (Hz)
+   * @returns 0 for success, -1 for failure
+   */
+  int getFrameRateRange(double &rate_min, double &rate_max);
 
   /**
    * Set gain
@@ -336,6 +348,32 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int getImageSize(int &image_width, int &image_height);
+
+  /**
+   * Set exposure time
+   */
+  int setExposureTime(const double exposure_time_ms);
+
+  /**
+   * Get exposure time
+   */
+  int getExposureTime(double &exposure_time_ms);
+
+  /**
+   * Set trigger delay in microsecond
+   *
+   * @param delay_us Trigger time delay in microseconds
+   * @returns 0 for success, -1 for failure
+   */
+  int setTriggerDelay(const int delay_us);
+
+  /**
+   * Get trigger delay in microsecond
+   *
+   * @param delay_us Trigger time delay in microseconds
+   * @returns 0 for success, -1 for failure
+   */
+  int getTriggerDelay(int &delay_us);
 
   /**
    * Set HDR mode

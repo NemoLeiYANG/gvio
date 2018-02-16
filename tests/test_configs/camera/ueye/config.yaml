@@ -1,7 +1,9 @@
-camera_index: 0
+# camera_serial_no: "4103241613"
+camera_serial_no: "4103241612"
 nb_buffers: 8
 
-trigger_mode: "SOFTWARE_TRIGGER"
+# trigger_mode: "SOFTWARE_TRIGGER"
+trigger_mode: "TRIGGER_HI_LO"
 color_mode: "MONO8"
 image_width: 0
 image_height: 0
@@ -10,4 +12,5 @@ offset_y: 0
 
 pixel_clock: 32
 frame_rate: 43.0
-gain: 20
+exposure_time: 5
+gain: 30
