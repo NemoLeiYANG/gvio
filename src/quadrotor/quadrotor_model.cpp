@@ -2,6 +2,15 @@
 
 namespace gvio {
 
+int QuadrotorModel::loadMission(const std::string &mission_file) {
+  if (this->mission.configure(mission_file) != 0) {
+    LOG_ERROR("Failed to load mission!");
+    return -1;
+  }
+
+  return 0;
+}
+
 int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
   const double ph = this->rpy_G(0);
   const double th = this->rpy_G(1);
@@ -84,6 +93,8 @@ int QuadrotorModel::update(const double dt) {
     motor_inputs = this->positionControllerControl(dt);
   } else if (this->ctrl_mode == "ATT_CTRL_MODE") {
     motor_inputs = this->attitudeControllerControl(dt);
+  } else if (this->ctrl_mode == "WP_CTRL_MODE") {
+    motor_inputs = this->waypointControllerControl(dt);
   }
 
   return this->update(motor_inputs, dt);
@@ -105,11 +116,10 @@ Vec4 QuadrotorModel::attitudeControllerControl(const double dt) {
 
 Vec4 QuadrotorModel::positionControllerControl(const double dt) {
   // Position controller
-  Vec4 actual_position;
-  actual_position(0) = this->p_G(0);   // x
-  actual_position(1) = this->p_G(1);   // y
-  actual_position(2) = this->p_G(2);   // z
-  actual_position(3) = this->rpy_G(2); // yaw
+  const Vec4 actual_position{this->p_G(0),    // x
+                             this->p_G(1),    // y
+                             this->p_G(2),    // z
+                             this->rpy_G(2)}; // yaw
 
   this->attitude_setpoints =
       this->position_controller.update(this->position_setpoints,
@@ -118,11 +128,33 @@ Vec4 QuadrotorModel::positionControllerControl(const double dt) {
                                        dt);
 
   // Attitude controller
-  Vec4 actual_attitude;
-  actual_attitude(0) = this->rpy_G(0); // roll
-  actual_attitude(1) = this->rpy_G(1); // pitch
-  actual_attitude(2) = this->rpy_G(2); // yaw
-  actual_attitude(3) = this->p_G(2);   // z
+  const Vec4 actual_attitude{this->rpy_G(0), // roll
+                             this->rpy_G(1), // pitch
+                             this->rpy_G(2), // yaw
+                             this->p_G(2)};  // z
+
+  const Vec4 motor_inputs =
+      this->attitude_controller.update(this->attitude_setpoints,
+                                       actual_attitude,
+                                       dt);
+
+  return motor_inputs;
+}
+
+Vec4 QuadrotorModel::waypointControllerControl(const double dt) {
+  // Waypoint controller
+  this->waypoint_controller.update(this->mission,
+                                   this->p_G,
+                                   this->rpy_G,
+                                   this->v_G,
+                                   dt);
+  this->attitude_setpoints = this->waypoint_controller.outputs;
+
+  // Attitude controller
+  const Vec4 actual_attitude{this->rpy_G(0), // roll
+                             this->rpy_G(1), // pitch
+                             this->rpy_G(2), // yaw
+                             this->p_G(2)};  // z
 
   const Vec4 motor_inputs =
       this->attitude_controller.update(this->attitude_setpoints,

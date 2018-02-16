@@ -162,11 +162,11 @@ int test_QuadrotorModel_update() {
   mea_file.close();
   est_file.close();
 
-  // Plot quadrotor trajectory
-  PYTHON_SCRIPT("scripts/plot_quadrotor.py "
-                "/tmp/quadrotor_gnd.dat "
-                "/tmp/quadrotor_mea.dat "
-                "/tmp/quadrotor_est.dat");
+  // // Plot quadrotor trajectory
+  // PYTHON_SCRIPT("scripts/plot_quadrotor.py "
+  //               "/tmp/quadrotor_gnd.dat "
+  //               "/tmp/quadrotor_mea.dat "
+  //               "/tmp/quadrotor_est.dat");
 
   return 0;
 }

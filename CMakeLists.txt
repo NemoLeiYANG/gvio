@@ -69,6 +69,7 @@ ADD_LIBRARY(
   # quadrotor
   src/quadrotor/control/attitude_controller.cpp
   src/quadrotor/control/position_controller.cpp
+  src/quadrotor/control/waypoint_controller.cpp
   src/quadrotor/mission.cpp
   src/quadrotor/quadrotor_model.cpp
   # quaternion

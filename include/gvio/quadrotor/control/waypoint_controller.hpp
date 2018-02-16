@@ -17,6 +17,11 @@
 namespace gvio {
 
 /**
+ *  * Obtain yaw only from euler angles
+ *   */
+static inline Vec3 yaw(const Vec3 &rpy) { return Vec3{0.0, 0.0, rpy(2)}; }
+
+/**
  * Waypoint Controller
  */
 class WaypointController {

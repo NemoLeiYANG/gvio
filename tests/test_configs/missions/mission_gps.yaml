@@ -3,6 +3,7 @@ look_ahead_dist: 0.5
 threshold_waypoint_gap: 20.0
 threshold_waypoint_reached: 0.2
 
+waypoint_type: "GPS"
 waypoints: [
   # latitude, longitude, altitude
   43.474024, -80.540287, 10.0,

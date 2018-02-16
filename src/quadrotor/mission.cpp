@@ -13,7 +13,8 @@ std::ostream &operator<<(std::ostream &out, const Waypoint &wp) {
 
 int Mission::configure(const std::string &config_file) {
   ConfigParser parser;
-  std::vector<double> waypoint_data;
+  std::vector<double> wp_data;
+  std::string wp_type;
 
   // Load config
   // clang-format off
@@ -21,23 +22,42 @@ int Mission::configure(const std::string &config_file) {
   parser.addParam("look_ahead_dist", &this->look_ahead_dist);
   parser.addParam("threshold_waypoint_gap", &this->threshold_waypoint_gap);
   parser.addParam("threshold_waypoint_reached", &this->threshold_waypoint_reached);
-  parser.addParam("waypoints", &waypoint_data);
+  parser.addParam("waypoint_type", &wp_type);
+  parser.addParam("waypoints", &wp_data);
   // clang-format on
   if (parser.load(config_file) != 0) {
     return -1;
   }
 
   // Check number waypoint data
-  if (waypoint_data.size() % 3 != 0) {
+  if (wp_data.size() % 3 != 0) {
     LOG_ERROR("Invalid number of waypoint data!");
     return -1;
   }
 
+  // Load waypoints
+  if (wp_type == "GPS" && this->loadGPSWaypoints(wp_data) != 0) {
+    LOG_ERROR("Failed to load GPS waypoints!");
+    return -1;
+  } else if (wp_type == "LOCAL" && this->loadLocalWaypoints(wp_data) != 0) {
+    LOG_ERROR("Failed to load local waypoints!");
+    return -1;
+  } else if (wp_type != "GPS" && wp_type != "LOCAL") {
+    LOG_ERROR("Invalid waypoint type [%s]!", wp_type.c_str());
+    return -1;
+  }
+
+  // Update
+  this->configured = true;
+  return 0;
+}
+
+int Mission::loadGPSWaypoints(const std::vector<double> &waypoint_data) {
   // Convert waypoint data into waypoints in the local frame
   for (size_t i = 0; i < waypoint_data.size(); i += 3) {
-    double lat = waypoint_data[i];
-    double lon = waypoint_data[i + 1];
-    double alt = waypoint_data[i + 2];
+    const double lat = waypoint_data[i];
+    const double lon = waypoint_data[i + 1];
+    const double alt = waypoint_data[i + 2];
 
     // Check lat, lon
     if (fltcmp(lat, 0.0) == 0.0 || fltcmp(lon, 0.0) == 0.0) {
@@ -55,16 +75,29 @@ int Mission::configure(const std::string &config_file) {
   }
 
   // Check waypoints
-  if (this->check_waypoints && this->checkWaypoints() != 0) {
+  if (this->check_waypoints && this->checkGPSWaypoints() != 0) {
     return -2;
   }
 
-  // Update
-  this->configured = true;
   return 0;
 }
 
-int Mission::checkWaypoints() {
+int Mission::loadLocalWaypoints(const std::vector<double> &waypoint_data) {
+  // Load local waypoints
+  for (size_t i = 0; i < waypoint_data.size(); i += 3) {
+    const Vec3 wp{waypoint_data[i], waypoint_data[i + 1], waypoint_data[i + 2]};
+    std::cout << "Adding local waypoint: " << wp.transpose() << std::endl;
+    this->local_waypoints.emplace_back(wp);
+  }
+
+  // Set first pair of waypoints
+  this->wp_start = this->local_waypoints[0];
+  this->wp_end = this->local_waypoints[1];
+
+  return 0;
+}
+
+int Mission::checkGPSWaypoints() {
   // Pre-check
   if (this->gps_waypoints.size() <= 2) {
     return -1;
@@ -94,7 +127,7 @@ int Mission::checkWaypoints() {
   return 0;
 }
 
-int Mission::setHomePoint(double home_lat, double home_lon) {
+int Mission::setGPSHomePoint(double home_lat, double home_lon) {
   // Pre-check
   if (this->gps_waypoints.size() == 0) {
     return -1;
@@ -116,7 +149,7 @@ int Mission::setHomePoint(double home_lat, double home_lon) {
     this->local_waypoints.push_back(nwu);
   }
 
-  // set first pair of waypoints
+  // Set first pair of waypoints
   this->wp_start = this->local_waypoints[0];
   this->wp_end = this->local_waypoints[1];
 

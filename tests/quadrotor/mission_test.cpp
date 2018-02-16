@@ -3,7 +3,8 @@
 
 namespace gvio {
 
-#define TEST_CONFIG "test_configs/missions/mission.yaml"
+#define TEST_GPS_CONFIG "test_configs/missions/mission_gps.yaml"
+#define TEST_LOCAL_CONFIG "test_configs/missions/mission_local.yaml"
 #define WAYPOINTS_FILE "/tmp/waypoints.dat"
 #define STATE_FILE "/tmp/state.dat"
 
@@ -18,11 +19,11 @@ int test_Mission_constructor() {
   return 0;
 }
 
-int test_Mission_configure() {
+int test_Mission_configure_GPS() {
   Mission mission;
 
-  int retval = mission.configure(TEST_CONFIG);
-  mission.setHomePoint(43.474024, -80.540287);
+  int retval = mission.configure(TEST_GPS_CONFIG);
+  mission.setGPSHomePoint(43.474024, -80.540287);
 
   MU_CHECK_EQ(0, retval);
 
@@ -46,6 +47,37 @@ int test_Mission_configure() {
 
   MU_CHECK_NEAR(-10.5754, mission.local_waypoints[3](0), 0.001);
   MU_CHECK_NEAR(-9.20928, mission.local_waypoints[3](1), 0.001);
+  MU_CHECK_NEAR(10.0, mission.local_waypoints[3](2), 0.001);
+
+  return 0;
+}
+
+int test_Mission_configure_LOCAL() {
+  Mission mission;
+
+  int retval = mission.configure(TEST_LOCAL_CONFIG);
+  MU_CHECK_EQ(0, retval);
+
+  MU_CHECK(mission.check_waypoints);
+  MU_CHECK_FLOAT(20.0, mission.threshold_waypoint_gap);
+
+  MU_CHECK_FLOAT(0.5, mission.desired_velocity);
+  MU_CHECK_EQ(4, (size_t) mission.local_waypoints.size());
+
+  MU_CHECK_NEAR(0.0, mission.local_waypoints[0](0), 0.001);
+  MU_CHECK_NEAR(0.0, mission.local_waypoints[0](1), 0.001);
+  MU_CHECK_NEAR(10.0, mission.local_waypoints[0](2), 0.001);
+
+  MU_CHECK_NEAR(5.0, mission.local_waypoints[1](0), 0.001);
+  MU_CHECK_NEAR(0.0, mission.local_waypoints[1](1), 0.001);
+  MU_CHECK_NEAR(10.0, mission.local_waypoints[1](2), 0.001);
+
+  MU_CHECK_NEAR(5.0, mission.local_waypoints[2](0), 0.001);
+  MU_CHECK_NEAR(5.0, mission.local_waypoints[2](1), 0.001);
+  MU_CHECK_NEAR(10.0, mission.local_waypoints[2](2), 0.001);
+
+  MU_CHECK_NEAR(0.0, mission.local_waypoints[3](0), 0.001);
+  MU_CHECK_NEAR(5.0, mission.local_waypoints[3](1), 0.001);
   MU_CHECK_NEAR(10.0, mission.local_waypoints[3](2), 0.001);
 
   return 0;
@@ -266,7 +298,8 @@ int test_Mission_update() {
 
 void test_suite() {
   MU_ADD_TEST(test_Mission_constructor);
-  MU_ADD_TEST(test_Mission_configure);
+  MU_ADD_TEST(test_Mission_configure_GPS);
+  MU_ADD_TEST(test_Mission_configure_LOCAL);
   MU_ADD_TEST(test_Mission_closestPoint);
   MU_ADD_TEST(test_Mission_pointLineSide);
   MU_ADD_TEST(test_Mission_crossTrackError);

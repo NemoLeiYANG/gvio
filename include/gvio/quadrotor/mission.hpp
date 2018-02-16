@@ -102,7 +102,23 @@ public:
   int configure(const std::string &config_file);
 
   /**
-   * Check waypoints
+   * Load GPS waypoints
+   *
+   * @param waypoint_data Waypoint data
+   * @return 0 for success, -1 for failure
+   */
+  int loadGPSWaypoints(const std::vector<double> &waypoint_data);
+
+  /**
+   * Load local waypoints
+   *
+   * @param waypoint_data Waypoint data
+   * @return 0 for success, -1 for failure
+   */
+  int loadLocalWaypoints(const std::vector<double> &waypoint_data);
+
+  /**
+   * Check GPS waypoints
    *
    * Make sure the distance between waypoints does not exceed
    * `Mission.waypoint_threshold`
@@ -112,19 +128,17 @@ public:
    *    - -1: no waypoints loaded
    *    - -2: invalid GPS waypoints
    */
-  int checkWaypoints();
+  int checkGPSWaypoints();
 
   /**
-   * Set home point and calculate local waypoints by converting GPS to local
-   * waypoints
+   * Set GPS home point and calculate local waypoints by converting GPS to
+   * local waypoints
    *
    * @param home_lat Home latitude point
    * @param home_lon Home longitude point
-   * @return
-   *    - 0: Success
-   *    - -1: Failure
+   * @return 0 for success, -1 for failure
    */
-  int setHomePoint(double home_lat, double home_lon);
+  int setGPSHomePoint(const double home_lat, const double home_lon);
 
   /**
    * Calculate closest point

@@ -11,6 +11,7 @@
 #include "gvio/util/util.hpp"
 #include "gvio/quadrotor/control/attitude_controller.hpp"
 #include "gvio/quadrotor/control/position_controller.hpp"
+#include "gvio/quadrotor/control/waypoint_controller.hpp"
 
 namespace gvio {
 /**
@@ -46,13 +47,23 @@ public:
   double g = 10.0; ///< Gravity
 
   std::string ctrl_mode = "POS_CTRL_MODE";
-  Vec4 attitude_setpoints{0.0, 0.0, 0.0, 0.5}; ///< Quadrotor attitude setpoints
-  Vec3 position_setpoints{0.0, 0.0, 0.0};      ///< Quadrotor position setpoints
-  AttitudeController attitude_controller; ///< Quadrotor attitude controller
-  PositionController position_controller; ///< Quadrotor position controller
+  Vec4 attitude_setpoints{0.0, 0.0, 0.0, 0.5}; ///< Attitude setpoints
+  Vec3 position_setpoints{0.0, 0.0, 0.0};      ///< Position setpoints
+  Mission mission;                             ///< Mission
+  AttitudeController attitude_controller;      ///< Attitude controller
+  PositionController position_controller;      ///< Position controller
+  WaypointController waypoint_controller;      ///< Waypoint controller
 
   QuadrotorModel() {}
   QuadrotorModel(const Vec3 &rpy_G, const Vec3 &p_G) : rpy_G{rpy_G}, p_G{p_G} {}
+
+  /**
+   * Load mission
+   *
+   * @param mission_file Mission file
+   * @returns 0 for success, -1 for failure
+   */
+  int loadMission(const std::string &mission_file);
 
   /**
    * Update
@@ -86,6 +97,14 @@ public:
    * @returns Attitude command (roll, pitch, yaw, thrust)
    */
   Vec4 positionControllerControl(const double dt);
+
+  /**
+   * Update waypoint controller
+   *
+   * @param dt Time difference (s)
+   * @returns Attitude command (roll, pitch, yaw, thrust)
+   */
+  Vec4 waypointControllerControl(const double dt);
 
   /**
    * Set quadrotor attitude controller setpoints

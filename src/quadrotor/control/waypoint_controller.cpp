@@ -31,17 +31,24 @@ int WaypointController::update(Mission &mission,
   }
 
   // Current waypoint
-  Vec3 waypoint = Vec3::Zero();
-  int retval = mission.update(p_G, waypoint);
+  Vec3 wp_G = Vec3::Zero();
+  int retval = mission.update(p_G, wp_G);
   if (retval != 0) {
     return retval;
   }
 
   // Calculate waypoint relative to quadrotor
-  Vec3 errors = T_P_W{pose.orientation} * Vec3{waypoint - p_G};
+  Mat4 T_P_W = zeros(4, 4);
+  T_P_W.block(0, 0, 3, 3) = euler123ToRot(yaw(rpy_G));
+  const Vec4 wp_B_homo{wp_G(0) - p_G(0),
+                       wp_G(1) - p_G(1),
+                       wp_G(2) - p_G(2),
+                       1.0};
+  const Vec4 errors = T_P_W * wp_B_homo;
 
   // Calculate velocity relative to quadrotor
-  const Vec3 v_B = T_P_W{pose.orientation} * v_G;
+  const Vec4 v_G_homo{v_G(0), v_G(1), v_G(2), 1.0};
+  const Vec4 v_B = T_P_W * v_G_homo;
 
   // Roll
   double r = -this->ct_controller.update(errors(1), this->dt);
@@ -54,7 +61,7 @@ int WaypointController::update(Mission &mission,
   double y = mission.waypointHeading();
 
   // Throttle
-  const double error_z = waypoint(2) - p_G(2);
+  const double error_z = wp_G(2) - p_G(2);
   double t = this->hover_throttle;
   t += this->z_controller.update(error_z, this->dt);
   t /= fabs(cos(r) * cos(p)); // adjust throttle for roll and pitch
@@ -68,7 +75,7 @@ int WaypointController::update(Mission &mission,
   t = (t > 1.0) ? 1.0 : t;
 
   // Keep track of setpoints and outputs
-  this->setpoints = waypoint;
+  this->setpoints = wp_G;
   this->outputs << r, p, y, t;
   this->dt = 0.0;
 
