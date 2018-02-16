@@ -14,7 +14,7 @@ else
   CPU_COUNT=1
 fi
 
-doxygen Doxyfile
+# doxygen Doxyfile
 
 mkdir -p build && cd build
 
@@ -47,6 +47,7 @@ cd tests
 # ./feature2d-gms_matcher_test
 # ./feature2d-klt_tracker_test
 # ./feature2d-orb_tracker_test
+./gimbal-sbgc_test
 # ./imu-mpu6050_test
 # ./kitti-raw-calib_test
 # ./kitti-raw-oxts_test
@@ -57,7 +58,7 @@ cd tests
 # ./msckf-feature_estimator_test
 # ./msckf-msckf_test
 # ./msckf-profiler_test
-# sudo ./pwm-pca9685_test
+# ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test
 # ./quadrotor-mission_test
 # ./sim-carrot_controller_test

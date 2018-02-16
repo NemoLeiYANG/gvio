@@ -126,6 +126,7 @@ SET(UNITTESTS
   feature2d-gms_matcher_test
   feature2d-klt_tracker_test
   feature2d-orb_tracker_test
+  gimbal-sbgc_test
   imu-mpu6050_test
   msckf-camera_state_test
   msckf-feature_estimator_test
