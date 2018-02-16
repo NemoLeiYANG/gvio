@@ -366,8 +366,7 @@ int IDSCamera::initialize() {
   // Get and set camera id with serial number
   if (this->camera_serial_no != "") {
     // Create camera list
-    UEYE_CAMERA_LIST *camera_list;
-    camera_list =
+    UEYE_CAMERA_LIST *camera_list =
         (UEYE_CAMERA_LIST
              *) new BYTE[sizeof(DWORD) + nb_cameras * sizeof(UEYE_CAMERA_INFO)];
     camera_list->dwCount = nb_cameras;

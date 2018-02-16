@@ -35,7 +35,7 @@ cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test
-./camera-ids_test
+# ./camera-ids_test
 # ./camera-pinhole_model_test
 # ./control-carrot_controller_test
 # ./control-pid_test
@@ -47,7 +47,7 @@ cd tests
 # ./feature2d-gms_matcher_test
 # ./feature2d-klt_tracker_test
 # ./feature2d-orb_tracker_test
-./gimbal-sbgc_test
+# ./gimbal-sbgc_test
 # ./imu-mpu6050_test
 # ./kitti-raw-calib_test
 # ./kitti-raw-oxts_test
