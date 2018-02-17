@@ -73,8 +73,10 @@ cmake .. && time make -j${CPU_COUNT}
 # ./tests/util-stats_test
 # ./tests/util-time_test
 
-# ./utils/camera_runner configs/camera/ueye/cam1.yaml &
-# ./utils/camera_runner configs/camera/ueye/cam3.yaml
+# ./utils/pwm 40
+# ./utils/camera configs/camera/ueye/cam1.yaml
+./utils/camera configs/camera/ueye/cam2.yaml
+# ./utils/camera configs/camera/ueye/cam3.yaml
 
 # python3 scripts/plot_msckf.py /tmp/kitti_raw_2011_09_26_0005/run2/msckf
 # python3 scripts/plot_euroc_mav_dataset.py /data/euroc_mav/raw/mav0

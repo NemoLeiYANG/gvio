@@ -1,10 +1,10 @@
-#include "gvio/camera/ids.hpp"
+#include "gvio/gvio.hpp"
 
 using namespace gvio;
 
 void print_usage() {
-  std::cout << "Usage: camera_runner <camera config>" << std::endl;
-  std::cout << "Example: camera_runner camera.yaml" << std::endl;
+  std::cout << "Usage: camera <camera config>" << std::endl;
+  std::cout << "Example: camera camera.yaml" << std::endl;
 }
 
 int main(const int argc, const char *argv[]) {

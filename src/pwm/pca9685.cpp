@@ -25,6 +25,7 @@ int PCA9685::configure(const int freq) {
 
   // Set frequency
   this->setPWMFrequency(freq);
+  usleep(PCA9685_WAIT_MS);
 
   return 0;
 }

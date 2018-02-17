@@ -7,6 +7,9 @@
 
 #include "gvio/util/util.hpp"
 #include "gvio/camera/camera_config.hpp"
+#include "gvio/camera/distortion.hpp"
+#include "gvio/camera/ids.hpp"
+#include "gvio/camera/pinhole_model.hpp"
 
 namespace gvio {
 /**
