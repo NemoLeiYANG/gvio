@@ -2,12 +2,15 @@
 
 namespace gvio {
 
+Gimbal::Gimbal() {}
+
+Gimbal::~Gimbal() { this->off(); }
+
 int Gimbal::configure(const std::string &config_file) {
   // Parse config file
   ConfigParser parser;
   std::string device_path;
   parser.addParam("device_path", &device_path);
-  parser.addParam("enable_tracking", &this->enable_tracking);
   parser.addParam("gimbal_limits.roll_min", &this->roll_limits[0]);
   parser.addParam("gimbal_limits.roll_max", &this->roll_limits[1]);
   parser.addParam("gimbal_limits.pitch_min", &this->pitch_limits[0]);
@@ -16,6 +19,12 @@ int Gimbal::configure(const std::string &config_file) {
     LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
     return -1;
   }
+
+  // Convert degrees to radians
+  this->roll_limits[0] = deg2rad(this->roll_limits[0]);
+  this->roll_limits[1] = deg2rad(this->roll_limits[1]);
+  this->pitch_limits[0] = deg2rad(this->pitch_limits[0]);
+  this->pitch_limits[1] = deg2rad(this->pitch_limits[1]);
 
   // SBGC
   this->sbgc = SBGC(device_path);
@@ -32,24 +41,7 @@ int Gimbal::on() { return this->sbgc.on(); }
 
 int Gimbal::off() { return this->sbgc.off(); }
 
-int Gimbal::trackTarget(const Vec3 &target_P) {
-  // Pre-check
-  if (this->enable_tracking == false) {
-    return 0;
-  }
-
-  // Calculate roll pitch yaw setpoints
-  // Note: setpoints are assuming Gimbal are in FLU
-  // FLU: (x - forward, y - left, z - up)
-  const double dist = target_P.norm();
-  this->setpoints(0) = asin(target_P(1) / dist); // Roll setpoint
-  this->setpoints(1) = asin(target_P(0) / dist); // Pitch setpoint
-  this->setpoints(2) = 0.0; // Yaw setpoint - unsupported at the moment
-
-  return 0;
-}
-
-int Gimbal::updateGimbalStates() {
+int Gimbal::update() {
   int retval = this->sbgc.getRealtimeData4();
   if (retval != 0) {
     LOG_ERROR("Failed to get data from SBGC!");
@@ -98,12 +90,7 @@ int Gimbal::setAngle(const double roll, const double pitch) {
 
 void Gimbal::printSetpoints() {
   std::cout << "roll setpoint: " << this->setpoints(0) << "\t";
-  std::cout << "pitch setpoint: " << this->setpoints(1) << "\t";
-  std::cout << "target: [";
-  std::cout << "x: " << this->target_P(0) << "\t";
-  std::cout << "y: " << this->target_P(1) << "\t";
-  std::cout << "z: " << this->target_P(2);
-  std::cout << "]" << std::endl;
+  std::cout << "pitch setpoint: " << this->setpoints(1) << std::endl;
 }
 
 } // namespace gvio

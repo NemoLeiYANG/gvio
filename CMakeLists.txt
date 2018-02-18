@@ -21,87 +21,90 @@ INCLUDE_DIRECTORIES(include /usr/include/eigen3 ${SUITESPARSE_INCLUDE_DIRS})
 
 # LIBRARY
 FILE(COPY configs DESTINATION ${PROJECT_BINARY_DIR})
-ADD_LIBRARY(
-  ${PROJECT_NAME}
-  # apriltag
-  src/apriltag/base_detector.cpp
-  src/apriltag/mit.cpp
-  src/apriltag/michigan.cpp
-  # control
-  src/control/carrot_controller.cpp
-  src/control/pid.cpp
-  # camera
-  src/camera/camera.cpp
-  src/camera/camera_config.cpp
-  src/camera/ids.cpp
-  src/camera/distortion.cpp
-  src/camera/pinhole_model.cpp
-  # dataset
-  src/dataset/euroc/mav_dataset.cpp
-  src/dataset/kitti/raw/calib.cpp
-  src/dataset/kitti/raw/oxts.cpp
-  src/dataset/kitti/raw/parse.cpp
-  src/dataset/kitti/raw/raw.cpp
-  # driver
-  src/driver/i2c.cpp
-  src/driver/uart.cpp
-  # msckf
-  src/msckf/blackbox.cpp
-  src/msckf/camera_state.cpp
-  src/msckf/feature_estimator.cpp
-  src/msckf/imu_state.cpp
-  src/msckf/msckf.cpp
-  # feature
-  src/feature2d/draw.cpp
-  src/feature2d/feature_container.cpp
-  src/feature2d/feature_track.cpp
-  src/feature2d/feature_tracker.cpp
-  src/feature2d/gms_matcher.cpp
-  src/feature2d/orb_tracker.cpp
-  src/feature2d/klt_tracker.cpp
-  # gimbal
-  src/gimbal/gimbal.cpp
-  src/gimbal/sbgc.cpp
-  # imu
-  src/imu/imu.cpp
-  src/imu/mpu6050.cpp
-  # pwm
-  src/pwm/pca9685.cpp
-  # quadrotor
-  src/quadrotor/control/attitude_controller.cpp
-  src/quadrotor/control/position_controller.cpp
-  src/quadrotor/control/waypoint_controller.cpp
-  src/quadrotor/mission.cpp
-  src/quadrotor/quadrotor_model.cpp
-  # quaternion
-  src/quaternion/jpl.cpp
-  # sim
-  src/sim/camera.cpp
-  src/sim/twowheel.cpp
-  src/sim/world.cpp
-  # utils
-  src/util/config.cpp
-  src/util/data.cpp
-  src/util/euler.cpp
-  src/util/file.cpp
-  src/util/gps.cpp
-  src/util/linalg.cpp
-  src/util/math.cpp
-  src/util/vision.cpp
-  src/util/stats.cpp
-  src/util/time.cpp
-)
+ADD_LIBRARY(${PROJECT_NAME}
+            # apriltag
+            src/apriltag/base_detector.cpp
+            src/apriltag/mit.cpp
+            src/apriltag/michigan.cpp
+            # control
+            src/control/carrot_controller.cpp
+            src/control/pid.cpp
+            # camera
+            src/camera/camera.cpp
+            src/camera/camera_config.cpp
+            src/camera/ids.cpp
+            src/camera/distortion.cpp
+            src/camera/pinhole_model.cpp
+            # dataset
+            src/dataset/euroc/mav_dataset.cpp
+            src/dataset/kitti/raw/calib.cpp
+            src/dataset/kitti/raw/oxts.cpp
+            src/dataset/kitti/raw/parse.cpp
+            src/dataset/kitti/raw/raw.cpp
+            # driver
+            src/driver/i2c.cpp
+            src/driver/uart.cpp
+            # msckf
+            src/msckf/blackbox.cpp
+            src/msckf/camera_state.cpp
+            src/msckf/feature_estimator.cpp
+            src/msckf/imu_state.cpp
+            src/msckf/msckf.cpp
+            # feature
+            src/feature2d/draw.cpp
+            src/feature2d/feature_container.cpp
+            src/feature2d/feature_track.cpp
+            src/feature2d/feature_tracker.cpp
+            src/feature2d/gms_matcher.cpp
+            src/feature2d/orb_tracker.cpp
+            src/feature2d/klt_tracker.cpp
+            # gimbal
+            src/gimbal/gimbal.cpp
+            src/gimbal/sbgc.cpp
+            # imu
+            src/imu/imu.cpp
+            src/imu/mpu6050.cpp
+            # pwm
+            src/pwm/pca9685.cpp
+            # quadrotor
+            src/quadrotor/control/attitude_controller.cpp
+            src/quadrotor/control/position_controller.cpp
+            src/quadrotor/control/waypoint_controller.cpp
+            src/quadrotor/mission.cpp
+            src/quadrotor/quadrotor_model.cpp
+            # quaternion
+            src/quaternion/jpl.cpp
+            # sim
+            src/sim/camera.cpp
+            src/sim/twowheel.cpp
+            src/sim/world.cpp
+            # utils
+            src/util/config.cpp
+            src/util/data.cpp
+            src/util/euler.cpp
+            src/util/file.cpp
+            src/util/gps.cpp
+            src/util/linalg.cpp
+            src/util/math.cpp
+            src/util/vision.cpp
+            src/util/stats.cpp
+            src/util/time.cpp)
 SET(${PROJECT_NAME}_DEPS
-  ${OpenCV_LIBS}
-  ${SUITESPARSE_LIBRARIES}
-  apriltags_mit
-  apriltag
-  yaml-cpp
-  pthread
-  ceres
-  ueye_api
-)
+    ${OpenCV_LIBS}
+    ${SUITESPARSE_LIBRARIES}
+    apriltags_mit
+    apriltag
+    yaml-cpp
+    pthread
+    ceres
+    ueye_api)
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+INSTALL(TARGETS ${PROJECT_NAME}
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
+INSTALL(DIRECTORY include/${PROJECT_NAME}
+        DESTINATION include)
 
 # UNIT TESTS
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tests)
@@ -109,46 +112,45 @@ FILE(COPY tests/scripts DESTINATION ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_data DESTINATION ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_configs DESTINATION ${PROJECT_BINARY_DIR}/tests)
 SET(UNITTESTS
-  apriltag-mit_test
-  camera-camera_test
-  camera-camera_config_test
-  camera-ids_test
-  camera-pinhole_model_test
-  control-carrot_controller_test
-  control-pid_test
-  dataset-euroc-mav_dataset_test
-  dataset-kitti-raw-calib_test
-  dataset-kitti-raw-oxts_test
-  dataset-kitti-raw-parse_test
-  dataset-kitti-raw-raw_test
-  feature2d-feature_container_test
-  feature2d-feature_test
-  feature2d-feature_track_test
-  feature2d-feature_tracker_test
-  feature2d-gms_matcher_test
-  feature2d-klt_tracker_test
-  feature2d-orb_tracker_test
-  gimbal-sbgc_test
-  imu-mpu6050_test
-  msckf-camera_state_test
-  msckf-feature_estimator_test
-  msckf-imu_state_test
-  msckf-msckf_test
-  pwm-pca9685_test
-  quadrotor-quadrotor_model_test
-  quadrotor-mission_test
-  sim-camera_test
-  sim-twowheel_test
-  sim-world_test
-  util-config_test
-  util-data_test
-  util-file_test
-  util-gps_test
-  util-linalg_test
-  util-math_test
-  util-stats_test
-  util-time_test
-)
+    apriltag-mit_test
+    camera-camera_test
+    camera-camera_config_test
+    camera-ids_test
+    camera-pinhole_model_test
+    control-carrot_controller_test
+    control-pid_test
+    dataset-euroc-mav_dataset_test
+    dataset-kitti-raw-calib_test
+    dataset-kitti-raw-oxts_test
+    dataset-kitti-raw-parse_test
+    dataset-kitti-raw-raw_test
+    feature2d-feature_container_test
+    feature2d-feature_test
+    feature2d-feature_track_test
+    feature2d-feature_tracker_test
+    feature2d-gms_matcher_test
+    feature2d-klt_tracker_test
+    feature2d-orb_tracker_test
+    gimbal-sbgc_test
+    imu-mpu6050_test
+    msckf-camera_state_test
+    msckf-feature_estimator_test
+    msckf-imu_state_test
+    msckf-msckf_test
+    pwm-pca9685_test
+    quadrotor-quadrotor_model_test
+    quadrotor-mission_test
+    sim-camera_test
+    sim-twowheel_test
+    sim-world_test
+    util-config_test
+    util-data_test
+    util-file_test
+    util-gps_test
+    util-linalg_test
+    util-math_test
+    util-stats_test
+    util-time_test)
 FOREACH(TEST ${UNITTESTS})
   STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
   ADD_EXECUTABLE(${TEST} tests/${TEST_PATH}.cpp)
@@ -159,8 +161,7 @@ ENDFOREACH(TEST)
 FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
 SET(EXPERIMENTS
-  kitti_runner
-)
+    kitti_runner)
 FOREACH(TEST ${EXPERIMENTS})
   STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
   ADD_EXECUTABLE(${TEST} experiments/${TEST_PATH}.cpp)
@@ -170,9 +171,8 @@ ENDFOREACH(TEST)
 # UTILS
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/utils)
 SET(UTILS
-  camera
-  pwm
-)
+    camera
+    pwm)
 FOREACH(TEST ${UTILS})
   STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
   ADD_EXECUTABLE(${TEST} utils/${TEST_PATH}.cpp)
