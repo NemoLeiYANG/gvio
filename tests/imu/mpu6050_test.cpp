@@ -3,11 +3,12 @@
 
 namespace gvio {
 
+#define TEST_CONFIG "test_configs/imu/config.yaml"
 int test_MPU6050_configure() {
   int retval;
   MPU6050 imu;
 
-  retval = imu.configure();
+  retval = imu.configure(TEST_CONFIG);
   MU_CHECK_EQ(0, retval);
 
   return 0;

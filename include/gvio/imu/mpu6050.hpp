@@ -150,9 +150,11 @@ public:
 
   /**
    * Configure
+   *
+   * @param config_file Path to configuration file
    * @returns 0 for success, -1 for failure
    */
-  int configure();
+  int configure(const std::string &config_file);
 
   /**
    * Ping

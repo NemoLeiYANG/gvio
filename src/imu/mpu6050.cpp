@@ -2,16 +2,27 @@
 
 namespace gvio {
 
-int MPU6050::configure() {
-  int8_t retval;
+int MPU6050::configure(const std::string &config_file) {
+  int retval = 0;
 
-  // Setup
+  // Load config file
+  ConfigParser parser;
+  int dplf, gyro_range, accel_range = 0;
+  parser.addParam("dplf", &dplf);
+  parser.addParam("gyro_range", &gyro_range);
+  parser.addParam("accel_range", &accel_range);
+  if (parser.load(config_file) != 0) {
+    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
+    return -1;
+  }
+
+  // Setup i2c
   this->i2c = I2C();
   this->i2c.setup();
   this->i2c.setSlave(MPU6050_ADDRESS);
 
   // Set dplf
-  this->setDPLF(6);
+  this->setDPLF(dplf);
   retval = this->getDPLF();
   if (retval > 7 || retval < 0) {
     return -1;
@@ -24,7 +35,7 @@ int MPU6050::configure() {
   this->i2c.writeByte(MPU6050_RA_PWR_MGMT_1, 0x00);
 
   // Get gyro range
-  this->setGyroRange(0);
+  this->setGyroRange(gyro_range);
   retval = this->getGyroRange();
   if (retval == 0) {
     this->gyro.sensitivity = 131.0;
@@ -35,11 +46,12 @@ int MPU6050::configure() {
   } else if (retval == 3) {
     this->gyro.sensitivity = 16.4;
   } else {
+    LOG_ERROR("Invalid gyro range [%d]!", retval);
     return -2;
   }
 
   // Get accel range
-  this->setAccelRange(0);
+  this->setAccelRange(accel_range);
   retval = this->getAccelRange();
   if (retval == 0) {
     this->accel.sensitivity = 16384.0;
@@ -50,6 +62,7 @@ int MPU6050::configure() {
   } else if (retval == 3) {
     this->accel.sensitivity = 2048.0;
   } else {
+    LOG_ERROR("Invalid accel range [%d]!", retval);
     return -3;
   }
 
