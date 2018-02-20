@@ -28,7 +28,7 @@ int main(const int argc, const char *argv[]) {
     }
 
     cv::imshow(win_name, image);
-    if (cv::waitKey(1) == 113) {
+    if (cv::waitKey(1) == 113) { // Break loop if 'q' is pressed
       break;
     }
   }

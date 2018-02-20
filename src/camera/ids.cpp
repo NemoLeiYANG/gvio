@@ -613,6 +613,11 @@ int IDSCamera::setTriggerMode(const std::string &trigger_mode) {
           is_SetExternalTrigger(this->camera_handle, IS_SET_TRIGGER_SOFTWARE);
       break;
     case TriggerMode::TRIGGER_HI_LO:
+      retval = is_EnableEvent(this->camera_handle, IS_SET_EVENT_FRAME);
+      if (retval != IS_SUCCESS) {
+        return -1;
+      }
+
       retval = is_SetExternalTrigger(this->camera_handle, IS_SET_TRIGGER_HI_LO);
       break;
     case TriggerMode::TRIGGER_LO_HI:

@@ -9,7 +9,7 @@ image_height: 0
 offset_x: 0
 offset_y: 0
 
-pixel_clock: 32
-frame_rate: 43.0
-exposure_time: 5
+pixel_clock: 10
+frame_rate: 10.0
+exposure_time: 70
 gain: 30
