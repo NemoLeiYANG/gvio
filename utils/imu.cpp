@@ -1,4 +1,5 @@
 #include "gvio/gvio.hpp"
+#include "gvio/imu/mpu6050.hpp"
 
 using namespace gvio;
 
@@ -16,8 +17,22 @@ int main(const int argc, const char *argv[]) {
   std::string imu_config(argv[1]);
 
   // Setup camera
-  IDSCamera camera;
-  camera.configure(imu_config);
+  MPU6050 imu;
+  imu.configure(imu_config);
+
+  while (true) {
+    imu.getData();
+
+    std::cout << imu.gyro.x << "\t";
+    std::cout << imu.gyro.y << "\t";
+    std::cout << imu.gyro.z << std::endl;
+
+    std::cout << imu.accel.x << "\t";
+    std::cout << imu.accel.y << "\t";
+    std::cout << imu.accel.z << std::endl;
+
+    std::cout << std::endl;
+  }
 
   return 0;
 }

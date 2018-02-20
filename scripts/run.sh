@@ -74,6 +74,7 @@ cmake .. && time make -j${CPU_COUNT}
 # ./tests/util-time_test
 
 # ./utils/pwm 40
+./utils/imu configs/imu/config.yaml
 # ./utils/camera configs/camera/ueye/cam1.yaml
 # ./utils/camera configs/camera/ueye/cam2.yaml
 # ./utils/camera configs/camera/ueye/cam3.yaml
