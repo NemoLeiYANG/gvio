@@ -1,9 +1,10 @@
 camera_serial_no: "4103241615"
 nb_buffers: 8
 
-# trigger_mode: "SOFTWARE_TRIGGER"
 trigger_mode: "TRIGGER_HI_LO"
+trigger_delay: 15
 color_mode: "MONO8"
+hdr_mode: true
 image_width: 0
 image_height: 0
 offset_x: 0

@@ -147,6 +147,9 @@ public:
   std::string camera_serial_no;
   HIDS camera_handle = 0;
   std::string trigger_mode = "NOT_SET";
+  int trigger_delay = 0;
+  int trigger_prescaler = 1;
+  bool hdr_mode = false;
 
   // Image settings
   int image_width = 0;
@@ -180,6 +183,11 @@ public:
   int configure(const std::string &config_file);
 
   /**
+   * List image formats
+   */
+  void listImageFormats();
+
+  /**
    * Allocate buffers
    *
    * @param nb_buffers Number of buffers
@@ -210,6 +218,30 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int getTriggerMode(std::string &trigger_mode);
+
+  /**
+   * Set trigger prescaler
+   *
+   * @param prescaler Trigger prescaler
+   * @returns 0 for success, -1 for failure
+   */
+  int setTriggerPrescaler(const int prescaler);
+
+  /**
+   * Get trigger prescaler
+   *
+   * @param prescaler Trigger prescaler
+   * @returns 0 for success, -1 for failure
+   */
+  int getTriggerPrescaler(int &prescaler);
+
+  /**
+   * Set HDR mode
+   *
+   * @param enable Enable HDR mode
+   * @returns 0 for success, -1 for failure
+   */
+  int setHDRMode(const bool enable);
 
   /**
    * Set pixel clock
@@ -351,11 +383,17 @@ public:
 
   /**
    * Set exposure time
+   *
+   * @param exposure_time_ms Exposure time (ms)
+   * @returns 0 for success, -1 for failure
    */
   int setExposureTime(const double exposure_time_ms);
 
   /**
    * Get exposure time
+   *
+   * @param exposure_time_ms Exposure time (ms)
+   * @returns 0 for success, -1 for failure
    */
   int getExposureTime(double &exposure_time_ms);
 

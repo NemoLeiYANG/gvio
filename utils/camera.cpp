@@ -20,7 +20,7 @@ int main(const int argc, const char *argv[]) {
   camera.configure(camera_config);
 
   // Listen for camera images
-  const std::string win_name = "Image" + std::to_string(rand() % 10);
+  const std::string win_name = "Camera " + std::to_string(camera.camera_handle);
   while (true) {
     cv::Mat image;
     if (camera.getFrame(image) != 0) {

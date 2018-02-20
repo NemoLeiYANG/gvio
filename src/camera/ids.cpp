@@ -415,6 +415,9 @@ int IDSCamera::configure(const std::string &config_file) {
   parser.addParam("camera_serial_no", &this->camera_serial_no, true);
   parser.addParam("nb_buffers", &this->nb_buffers);
   parser.addParam("trigger_mode", &this->trigger_mode);
+  parser.addParam("trigger_delay", &this->trigger_delay);
+  parser.addParam("trigger_prescaler", &this->trigger_prescaler, true);
+  parser.addParam("hdr_mode", &this->hdr_mode);
   parser.addParam("color_mode", &this->color_mode);
   parser.addParam("image_width", &this->image_width);
   parser.addParam("image_height", &this->image_height);
@@ -462,6 +465,27 @@ int IDSCamera::configure(const std::string &config_file) {
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to set trigger mode!");
     LOG_ERROR("Double check the camera actually supports the trigger mode!");
+    return -1;
+  }
+
+  // Set trigger delay
+  retval = this->setTriggerDelay(this->trigger_delay);
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to set trigger delay!");
+    return -1;
+  }
+
+  // Set trigger prescaler
+  retval = this->setTriggerPrescaler(this->trigger_prescaler);
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to set trigger delay!");
+    return -1;
+  }
+
+  // Set HDR mode
+  retval = this->setHDRMode(this->hdr_mode);
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to set HDR mode!");
     return -1;
   }
 
@@ -534,6 +558,59 @@ int IDSCamera::configure(const std::string &config_file) {
 
   this->configured = true;
   return 0;
+}
+
+void IDSCamera::listImageFormats() {
+  int retval = 0;
+
+  // Get number of available formats and size of list
+  UINT count = 0;
+  retval = is_ImageFormat(this->camera_handle,
+                          IMGFRMT_CMD_GET_NUM_ENTRIES,
+                          &count,
+                          sizeof(count));
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to obtain count of image formats!");
+    return;
+  }
+
+  // Allocate memory for image format list
+  UINT format_list_size = sizeof(IMAGE_FORMAT_LIST);
+  format_list_size += (count - 1) * sizeof(IMAGE_FORMAT_INFO);
+  void *ptr = malloc(format_list_size);
+  IMAGE_FORMAT_LIST *format_list = (IMAGE_FORMAT_LIST *) ptr;
+
+  // Get image formats
+  format_list->nSizeOfListEntry = sizeof(IMAGE_FORMAT_INFO);
+  format_list->nNumListElements = count;
+  retval = is_ImageFormat(this->camera_handle,
+                          IMGFRMT_CMD_GET_LIST,
+                          format_list,
+                          format_list_size);
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to obtain list of image formats!");
+    return;
+  }
+
+  // List image formats
+  for (int i = 0; i < count; i++) {
+    // clang-format off
+    std::cout << "format id: " << format_list->FormatInfo[i].nFormatID << std::endl;
+    std::cout << "AOI width: " << format_list->FormatInfo[i].nWidth << std::endl;
+    std::cout << "AOI height: " << format_list->FormatInfo[i].nHeight << std::endl;
+    std::cout << "AOI x0: " << format_list->FormatInfo[i].nX0 << std::endl;
+    std::cout << "AOI y0: " << format_list->FormatInfo[i].nY0 << std::endl;
+    std::cout << "Supported capture modes: " << format_list->FormatInfo[i].nSupportedCaptureModes << std::endl;
+    std::cout << "Binning mode: " << format_list->FormatInfo[i].nBinningMode << std::endl;
+    std::cout << "Subsampling mode: " << format_list->FormatInfo[i].nSubsamplingMode << std::endl;
+    std::cout << "Format description: " << format_list->FormatInfo[i].strFormatName << std::endl;
+    std::cout << "Sensor scalar factor: " << format_list->FormatInfo[i].dSensorScalerFactor << std::endl;
+    std::cout << std::endl;
+    // clang-format on
+  }
+
+  // Clean up
+  free(ptr);
 }
 
 int IDSCamera::allocBuffers(const int nb_buffers, const int bpp) {
@@ -613,11 +690,6 @@ int IDSCamera::setTriggerMode(const std::string &trigger_mode) {
           is_SetExternalTrigger(this->camera_handle, IS_SET_TRIGGER_SOFTWARE);
       break;
     case TriggerMode::TRIGGER_HI_LO:
-      retval = is_EnableEvent(this->camera_handle, IS_SET_EVENT_FRAME);
-      if (retval != IS_SUCCESS) {
-        return -1;
-      }
-
       retval = is_SetExternalTrigger(this->camera_handle, IS_SET_TRIGGER_HI_LO);
       break;
     case TriggerMode::TRIGGER_LO_HI:
@@ -640,6 +712,82 @@ int IDSCamera::setTriggerMode(const std::string &trigger_mode) {
 
 int IDSCamera::getTriggerMode(std::string &trigger_mode) {
   trigger_mode = this->trigger_mode;
+  return 0;
+}
+
+int IDSCamera::setTriggerPrescaler(const int prescaler) {
+  // Pre-check
+  if (prescaler == 1) {
+    // Prescaler has no effect, skipping
+    return 0;
+  }
+
+  // Check prescaler support
+  UINT is_prescaler_supported = 0;
+  int retval = is_Trigger(this->camera_handle,
+                          IS_TRIGGER_CMD_GET_FRAME_PRESCALER_SUPPORTED,
+                          (void *) &is_prescaler_supported,
+                          sizeof(is_prescaler_supported));
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to query whether trigger prescaler is supported!");
+    return -1;
+  } else if (is_prescaler_supported == 0) {
+    LOG_ERROR("Trigger Prescaler is not supported!");
+    return -1;
+  }
+
+  // Get range of trigger prescaler supported
+  RANGE_OF_VALUES_U32 range;
+  retval = is_Trigger(this->camera_handle,
+                      IS_TRIGGER_CMD_GET_FRAME_PRESCALER_RANGE,
+                      (void *) &range,
+                      sizeof(range));
+  if (retval != IS_SUCCESS) {
+    LOG_ERROR("Failed to obtain trigger prescaler range!");
+    return -1;
+  }
+  const UINT prescaler_min = range.u32Minimum;
+  const UINT prescaler_max = range.u32Maximum;
+
+  // Double check desired trigger prescaler is supported
+  if (prescaler < prescaler_min || prescaler > prescaler_max) {
+    LOG_ERROR("Unsupported trigger prescaler value [%d]!", prescaler);
+    LOG_ERROR("Min supported trigger prescaler: %d", prescaler_min);
+    LOG_ERROR("Max supported trigger prescaler: %d", prescaler_max);
+    return -1;
+  }
+
+  // Set trigger prescaler
+  retval = is_Trigger(this->camera_handle,
+                      IS_TRIGGER_CMD_SET_FRAME_PRESCALER,
+                      (void *) &prescaler,
+                      sizeof(UINT));
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::getTriggerPrescaler(int &prescaler) {
+  // Set trigger prescaler
+  int retval = is_Trigger(this->camera_handle,
+                          IS_TRIGGER_CMD_GET_FRAME_PRESCALER,
+                          (void *) &prescaler,
+                          sizeof(UINT));
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::setHDRMode(const bool enable) {
+  const int retval = is_EnableHdr(this->camera_handle, enable);
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
   return 0;
 }
 
@@ -953,6 +1101,12 @@ int IDSCamera::getTriggerDelay(int &delay_us) {
 }
 
 int IDSCamera::getFrame(cv::Mat &image) {
+  // Pre-check
+  if (this->configured = false) {
+    LOG_ERROR("Camera is not configured!");
+    return -1;
+  }
+
   // Query camera's current resolution settings
   int image_width = 0;
   int image_height = 0;
