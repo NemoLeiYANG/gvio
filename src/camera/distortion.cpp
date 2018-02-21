@@ -8,7 +8,6 @@ MatX radtan_distort(const double k1,
                     const double p1,
                     const double p2,
                     const MatX points) {
-
   const Eigen::ArrayXd z = points.col(2).array();
   const Eigen::ArrayXd x = points.col(0).array() / z.array();
   const Eigen::ArrayXd y = points.col(1).array() / z.array();

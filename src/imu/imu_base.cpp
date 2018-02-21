@@ -31,36 +31,36 @@ namespace gvio {
 //   this->gyroscopeCalcAngle(dt);
 // }
 
-// int MPU6050::calibrate() {
-//   // Let it stablize for a while first
-//   LOG_INFO("calibrating mpu6050");
-//   for (int16_t i = 0; i < 50; i++) {
-//     this->getData();
-//   }
-//
-//   // Calculate offset
-//   for (int i = 0; i < 50; i++) {
-//     this->getData();
-//
-//     this->accel.offset_x += this->accel.raw_x;
-//     this->accel.offset_y += this->accel.raw_y;
-//     this->accel.offset_z += this->accel.raw_z;
-//
-//     this->accel.offset_x = this->accel.offset_x / 2.0;
-//     this->accel.offset_y = this->accel.offset_y / 2.0;
-//     this->accel.offset_z = this->accel.offset_z / 2.0;
-//
-//     this->gyro.offset_x += this->gyro.raw_x;
-//     this->gyro.offset_y += this->gyro.raw_y;
-//     this->gyro.offset_z += this->gyro.raw_z;
-//
-//     this->gyro.offset_x = this->gyro.offset_x / 2.0;
-//     this->gyro.offset_y = this->gyro.offset_y / 2.0;
-//     this->gyro.offset_z = this->gyro.offset_z / 2.0;
-//   }
-//
-//   return 0;
-// }
+void IMUBase::calibrate() {
+  // Let it stablize for a while first
+  LOG_INFO("Calibrating IMU - DO NOT MOVE!");
+  for (int16_t i = 0; i < 50; i++) {
+    this->getData();
+  }
+
+  // Calculate offset
+  for (int i = 0; i < 50; i++) {
+    this->getData();
+
+    this->accel.offset_x += this->accel.raw_x;
+    this->accel.offset_y += this->accel.raw_y;
+    this->accel.offset_z += this->accel.raw_z;
+
+    this->accel.offset_x = this->accel.offset_x / 2.0;
+    this->accel.offset_y = this->accel.offset_y / 2.0;
+    this->accel.offset_z = this->accel.offset_z / 2.0;
+
+    this->gyro.offset_x += this->gyro.raw_x;
+    this->gyro.offset_y += this->gyro.raw_y;
+    this->gyro.offset_z += this->gyro.raw_z;
+
+    this->gyro.offset_x = this->gyro.offset_x / 2.0;
+    this->gyro.offset_y = this->gyro.offset_y / 2.0;
+    this->gyro.offset_z = this->gyro.offset_z / 2.0;
+  }
+
+  LOG_INFO("Finished calibrating IMU!");
+}
 
 void IMUBase::recordHeader(FILE *output_file) {
   fprintf(output_file, "gyro.x,");

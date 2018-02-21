@@ -70,6 +70,11 @@ public:
   virtual int ping() = 0;
 
   /**
+   * Calibrate
+   */
+  void calibrate();
+
+  /**
    * Get data
    *
    * @returns 0 for success, -1 for failure

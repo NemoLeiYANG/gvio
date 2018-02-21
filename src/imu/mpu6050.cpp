@@ -81,7 +81,7 @@ int MPU6050::ping() {
   // print mpu6050 address
   this->i2c.setSlave(MPU6050_ADDRESS);
   this->i2c.readByte(MPU6050_RA_WHO_AM_I, &buf);
-  printf("MPU6050 ADDRESS: 0x%02X\n", buf);
+  LOG_INFO("MPU6050 ADDRESS: 0x%02X\n", buf);
 
   return 0;
 }
