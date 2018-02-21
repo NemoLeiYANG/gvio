@@ -141,7 +141,7 @@ int SBGCFrame::parseBody(uint8_t *data) {
   // check the body checksum
   expected_checksum = expected_checksum % 256;
   if (this->data_checksum != expected_checksum) {
-    // std::cout << "failed body checksum!" << std::endl;
+    // LOG_ERROR("Failed body checksum!");
     free(this->data);
     return -1;
   }
@@ -155,14 +155,14 @@ int SBGCFrame::parseFrame(uint8_t *data) {
   // Header
   retval = this->parseHeader(data);
   if (retval == -1) {
-    // std::cout << "failed to parse header!" << std::endl;
+    // LOG_ERROR("Failed to parse header!");
     return -1;
   }
 
   // Body
   retval = this->parseBody(data);
   if (retval == -1) {
-    // std::cout << "failed to parse body!" << std::endl;
+    // LOG_ERROR("Failed to parse body!");
     return -1;
   }
 
@@ -203,7 +203,7 @@ void SBGCRealtimeData::printData() {
 }
 
 SBGC::SBGC() {
-  this->configured = false;
+  this->connected = false;
 
   this->port = "";
   this->serial = -1;
@@ -216,7 +216,7 @@ SBGC::SBGC() {
 }
 
 SBGC::SBGC(const std::string &port) {
-  this->configured = false;
+  this->connected = false;
 
   this->port = port;
   this->serial = -1;
@@ -232,31 +232,36 @@ int SBGC::connect() {
   // Open serial port
   this->serial = open(this->port.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
   if (this->serial < 0) {
-    std::cout << "failed to connect to SBGC!" << std::endl;
     return -1;
   }
 
   // Configure serial commnication
   set_interface_attribs(this->serial, B115200, 0);
   set_blocking(this->serial, 1);
-  std::cout << "connected to SBGC!" << std::endl;
+  LOG_INFO("Connected to SBGC!");
 
+  this->connected = true;
   return 0;
 }
 
 int SBGC::disconnect() {
   if (close(this->serial) != 0) {
-    std::cout << "failed to disconnect from SBGC!" << std::endl;
+    LOG_ERROR("Failed to disconnect from SBGC!");
     return -1;
 
   } else {
-    std::cout << "disconnected from SBGC!" << std::endl;
+    LOG_INFO("Disconnect from SBGC!");
     return 0;
   }
 }
 
 int SBGC::sendFrame(const SBGCFrame &cmd) {
-  // Pre-check
+  // Check connection
+  if (this->connected == false) {
+    return -1;
+  }
+
+  // Check command data size
   int data_size_limit;
   data_size_limit = SBGC_CMD_MAX_BYTES - SBGC_CMD_PAYLOAD_BYTES;
   if (cmd.data_size >= data_size_limit) {
@@ -286,18 +291,23 @@ int SBGC::sendFrame(const SBGCFrame &cmd) {
 }
 
 int SBGC::readFrame(const uint8_t read_length, SBGCFrame &frame) {
-  // Pre-check
+  // Check connection
+  if (this->connected == false) {
+    return -1;
+  }
+
+  // Send query
   uint8_t buffer[150];
   int16_t nb_bytes = read(this->serial, buffer, read_length);
   if (nb_bytes <= 0 || nb_bytes != read_length) {
-    // std::cout << "failed to read SBGC frame!" << std::endl;
+    // LOG_ERROR("Failed to read SBGC frame!");
     return -1;
   }
 
   // Parse sbgc frame
   int retval = frame.parseFrame(buffer);
   if (retval == -1) {
-    // std::cout << "failed to parse SBGC frame!" << std::endl;
+    // LOG_ERROR("Failed to parse SBGC frame!");
     return -1;
   }
 
@@ -311,7 +321,10 @@ int SBGC::on() {
 }
 
 int SBGC::off() {
-  int retval;
+  // Check connection
+  if (this->connected == false) {
+    return -1;
+  }
 
   // Turn off motor control
   uint8_t data[13];
@@ -323,24 +336,29 @@ int SBGC::off() {
   // Send frame
   SBGCFrame cmd;
   cmd.buildFrame(CMD_CONTROL, data, 13);
-  retval = this->sendFrame(cmd);
+  int retval = this->sendFrame(cmd);
   if (retval != 0) {
-    std::cout << "failed to turn motor control off!" << std::endl;
+    LOG_ERROR("Failed to turn motor control off!");
   }
 
   // Turn off motors
   cmd.buildFrame(CMD_MOTORS_OFF);
   retval = this->sendFrame(cmd);
   if (retval != 0) {
-    std::cout << "failed to turn motor control off!" << std::endl;
+    LOG_ERROR("Failed to turn motor control off!");
   }
 
   return 0;
 }
 
 int SBGC::reset() {
+  // Check connection
+  if (this->connected == false) {
+    return -1;
+  }
+
   if (this->off() || this->on()) {
-    std::cout << "failed to reset SBGC!" << std::endl;
+    LOG_ERROR("Failed to reset SBGC!");
     return -1;
   }
 
@@ -351,29 +369,29 @@ int SBGC::getBoardInfo() {
   int retval;
   SBGCFrame frame;
 
-  // request board info
+  // Request board info
   frame.buildFrame(CMD_BOARD_INFO);
   retval = this->sendFrame(frame);
   if (retval == -1) {
-    std::cout << "failed to request SBGC board info!" << std::endl;
+    LOG_ERROR("Failed to request SBGC board info!");
     return -1;
   }
 
-  // obtain board info
+  // Obtain board info
   retval = this->readFrame(CMD_BOARD_INFO_FRAME_SIZE, frame);
   if (retval == -1) {
-    std::cout << "failed to parse SBGC frame for board info!" << std::endl;
+    LOG_ERROR("Failed to parse SBGC frame for board info!");
     return -1;
   }
 
-  // set object board info
+  // Set object board info
   this->board_version = frame.data[0];
   this->firmware_version = (frame.data[2] << 8) | (frame.data[1] & 0xff);
   this->debug_mode = frame.data[3];
   this->board_features = (frame.data[5] << 8) | (frame.data[4] & 0xff);
   this->connection_flags = frame.data[6];
 
-  // clean up
+  // Clean up
   free(frame.data);
 
   return 0;
@@ -387,14 +405,14 @@ int SBGC::getRealtimeData4() {
   frame.buildFrame(CMD_REALTIME_DATA_4);
   retval = this->sendFrame(frame);
   if (retval == -1) {
-    // std::cout << "failed to request SBGC realtime data!" << std::endl;
+    // LOG_ERROR("Failed to request SBGC realtime data!");
     return -1;
   }
 
   // Obtain real time data
   retval = this->readFrame(129, frame);
   if (retval == -1) {
-    // std::cout << "failed to parse SBGC frame for realtime data!" <<
+    // LOG_ERROR("Failed to parse SBGC frame for realtime data!" <<
     // std::endl;
     return -1;
   }
@@ -467,14 +485,14 @@ int SBGC::getRealtimeData() {
   frame.buildFrame(CMD_REALTIME_DATA_3);
   retval = this->sendFrame(frame);
   if (retval == -1) {
-    std::cout << "failed to request SBGC realtime data!" << std::endl;
+    LOG_ERROR("Failed to request SBGC realtime data!");
     return -1;
   }
 
   // Obtain real time data
   retval = this->readFrame(68, frame);
   if (retval == -1) {
-    std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
+    LOG_ERROR("Failed to parse SBGC frame for realtime data!");
     return -1;
   }
 
@@ -540,14 +558,14 @@ int SBGC::getAnglesExt() {
   frame.buildFrame(CMD_GET_ANGLES_EXT);
   retval = this->sendFrame(frame);
   if (retval == -1) {
-    std::cout << "failed to request SBGC realtime data!" << std::endl;
+    LOG_ERROR("Failed to request SBGC realtime data!");
     return -1;
   }
 
   // Obtain real time data
   retval = this->readFrame(54, frame);
   if (retval == -1) {
-    std::cout << "failed to parse SBGC frame for realtime data!" << std::endl;
+    LOG_ERROR("Failed to parse SBGC frame for realtime data!");
     return -1;
   }
 

@@ -16,7 +16,7 @@ int main(const int argc, const char *argv[]) {
   }
   std::string imu_config(argv[1]);
 
-  // Setup camera
+  // Setup IMU
   MPU6050 imu;
   imu.configure(imu_config);
 

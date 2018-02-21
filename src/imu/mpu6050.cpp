@@ -18,7 +18,10 @@ int MPU6050::configure(const std::string &config_file) {
 
   // Setup i2c
   this->i2c = I2C();
-  this->i2c.setup();
+  if (this->i2c.setup() != 0) {
+    LOG_INFO("Failed to open i2c connection!");
+    return -1;
+  }
   this->i2c.setSlave(MPU6050_ADDRESS);
 
   // Set dplf

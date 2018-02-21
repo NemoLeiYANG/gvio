@@ -173,7 +173,8 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/utils)
 SET(UTILS
     imu
     camera
-    pwm)
+    pwm
+    recorder)
 FOREACH(TEST ${UTILS})
   STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
   ADD_EXECUTABLE(${TEST} utils/${TEST_PATH}.cpp)

@@ -75,9 +75,10 @@ cmake .. && time make -j${CPU_COUNT}
 
 # ./utils/pwm 40
 # ./utils/imu configs/imu/config.yaml
-./utils/camera configs/camera/ueye/cam1.yaml
+# ./utils/camera configs/camera/ueye/cam1.yaml
 # ./utils/camera configs/camera/ueye/cam2.yaml
 # ./utils/camera configs/camera/ueye/cam3.yaml
+./utils/recorder configs/recorder/config.yaml
 
 # python3 scripts/plot_msckf.py /tmp/kitti_raw_2011_09_26_0005/run2/msckf
 # python3 scripts/plot_euroc_mav_dataset.py /data/euroc_mav/raw/mav0

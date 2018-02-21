@@ -5,7 +5,10 @@ namespace gvio {
 int PCA9685::configure(const int freq) {
   // Setup
   this->i2c = I2C();
-  this->i2c.setup();
+  if (this->i2c.setup() != 0) {
+    LOG_INFO("Failed to open i2c connection!");
+    return -1;
+  }
   this->i2c.setSlave(PCA9685_I2C_ADDR);
 
   this->reset();

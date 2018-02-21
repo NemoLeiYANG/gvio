@@ -156,7 +156,7 @@ public:
 
 class SBGC {
 public:
-  bool configured;
+  bool connected;
 
   SBGCRealtimeData data;
   std::string port;
