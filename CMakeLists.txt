@@ -62,7 +62,7 @@ ADD_LIBRARY(${PROJECT_NAME}
             src/gimbal/gimbal.cpp
             src/gimbal/sbgc.cpp
             # imu
-            src/imu/imu.cpp
+            src/imu/imu_base.cpp
             src/imu/mpu6050.cpp
             # pwm
             src/pwm/pca9685.cpp

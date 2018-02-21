@@ -1,10 +1,6 @@
-#include "gvio/imu/imu.hpp"
+#include "gvio/imu/imu_base.hpp"
 
 namespace gvio {
-/**
- * @addtogroup imu
- * @{
- */
 
 // void MPU6050::accelerometerCalcAngle() {
 //   float x;
@@ -66,7 +62,7 @@ namespace gvio {
 //   return 0;
 // }
 
-void IMU::recordHeader(FILE *output_file) {
+void IMUBase::recordHeader(FILE *output_file) {
   fprintf(output_file, "gyro.x,");
   fprintf(output_file, "gyro.y,");
   fprintf(output_file, "gyro.z,");
@@ -76,7 +72,7 @@ void IMU::recordHeader(FILE *output_file) {
   fprintf(output_file, "accel.z\n");
 }
 
-void IMU::recordData(FILE *output_file) {
+void IMUBase::recordData(FILE *output_file) {
   fprintf(output_file, "%f,", this->gyro.x);
   fprintf(output_file, "%f,", this->gyro.y);
   fprintf(output_file, "%f,", this->gyro.z);
@@ -86,7 +82,7 @@ void IMU::recordData(FILE *output_file) {
   fprintf(output_file, "%f\n", this->accel.z);
 }
 
-int IMU::record(std::string output_path, int nb_samples) {
+int IMUBase::record(std::string output_path, int nb_samples) {
   // setup
   FILE *output_file = fopen(output_path.c_str(), "w");
   this->recordHeader(output_file);
@@ -114,5 +110,4 @@ int IMU::record(std::string output_path, int nb_samples) {
   return 0;
 }
 
-/** @} group imu */
 } // namespace gvio

@@ -139,7 +139,7 @@ namespace gvio {
 /**
  * Invensense MPU6050 I2C Driver
  */
-class MPU6050 : public IMU {
+class MPU6050 : public IMUBase {
 public:
   float temperature = 0.0f;
   float sample_rate = -1.0f;

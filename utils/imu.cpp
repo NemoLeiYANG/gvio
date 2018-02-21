@@ -1,5 +1,4 @@
 #include "gvio/gvio.hpp"
-#include "gvio/imu/mpu6050.hpp"
 
 using namespace gvio;
 
