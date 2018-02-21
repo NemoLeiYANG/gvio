@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup sim
+ * @ingroup quadrotor
  */
 #ifndef GVIO_QUADROTOR_QUADROTOR_MODEL_HPP
 #define GVIO_QUADROTOR_QUADROTOR_MODEL_HPP

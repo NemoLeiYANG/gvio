@@ -11,6 +11,7 @@
 #include "gvio/imu/imu.hpp"
 #include "gvio/msckf/msckf.hpp"
 #include "gvio/pwm/pwm.hpp"
+#include "gvio/quadrotor/quadrotor.hpp"
 #include "gvio/quaternion/quaternion.hpp"
 #include "gvio/sim/sim.hpp"
 #include "gvio/util/util.hpp"

@@ -15,6 +15,10 @@
 #include "gvio/quadrotor/mission.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup quadrotor
+ * @{
+ */
 
 /**
  * Waypoint Controller

@@ -10,10 +10,13 @@
 #include <libgen.h>
 #include <vector>
 
-// #include "gvio/data/data.hpp"
 #include "gvio/util/util.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup quadrotor
+ * @{
+ */
 
 // ERROR MESSAGES
 #define EDISTLATLON "Waypoint %d: (%f, %f) has dist > %f from prev waypoint!"
@@ -211,5 +214,6 @@ public:
   int update(const Vec3 &p_G, Vec3 &waypoint);
 };
 
+/** @} group quadrotor */
 } // namespace gvio
 #endif // GVIO_QUADROTOR_MISSION_HPP
