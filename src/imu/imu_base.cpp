@@ -34,30 +34,38 @@ namespace gvio {
 void IMUBase::calibrate() {
   // Let it stablize for a while first
   LOG_INFO("Calibrating IMU - DO NOT MOVE!");
-  for (int16_t i = 0; i < 50; i++) {
-    this->getData();
-  }
+  sleep(1);
 
   // Calculate offset
-  for (int i = 0; i < 50; i++) {
+  double ax_sum, ay_sum, az_sum = 0.0;
+  double gx_sum, gy_sum, gz_sum = 0.0;
+  const double nb_samples = 10000;
+  for (int i = 0; i < (int) nb_samples; i++) {
     this->getData();
-
-    this->accel.offset_x += this->accel.raw_x;
-    this->accel.offset_y += this->accel.raw_y;
-    this->accel.offset_z += this->accel.raw_z;
-
-    this->accel.offset_x = this->accel.offset_x / 2.0;
-    this->accel.offset_y = this->accel.offset_y / 2.0;
-    this->accel.offset_z = this->accel.offset_z / 2.0;
-
-    this->gyro.offset_x += this->gyro.raw_x;
-    this->gyro.offset_y += this->gyro.raw_y;
-    this->gyro.offset_z += this->gyro.raw_z;
-
-    this->gyro.offset_x = this->gyro.offset_x / 2.0;
-    this->gyro.offset_y = this->gyro.offset_y / 2.0;
-    this->gyro.offset_z = this->gyro.offset_z / 2.0;
+    ax_sum += this->accel.x;
+    ay_sum += this->accel.y;
+    az_sum += this->accel.z;
+    gx_sum += this->gyro.x;
+    gy_sum += this->gyro.y;
+    gz_sum += this->gyro.z;
   }
+
+  // this->accel.offset_x = ax_sum / nb_samples;
+  // this->accel.offset_y = ay_sum / nb_samples;
+  // this->accel.offset_z = (az_sum / nb_samples) - 9.81;
+
+  this->gyro.offset_x = gx_sum / nb_samples;
+  this->gyro.offset_y = gy_sum / nb_samples;
+  this->gyro.offset_z = gz_sum / nb_samples;
+
+  std::cout << "accel offsets: ";
+  std::cout << this->accel.offset_x << "\t";
+  std::cout << this->accel.offset_y << "\t";
+  std::cout << this->accel.offset_z << std::endl;
+  std::cout << "gyro offsets: ";
+  std::cout << this->gyro.offset_x << "\t";
+  std::cout << this->gyro.offset_y << "\t";
+  std::cout << this->gyro.offset_z << std::endl;
 
   LOG_INFO("Finished calibrating IMU!");
 }

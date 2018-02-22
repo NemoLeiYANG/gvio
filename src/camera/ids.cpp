@@ -782,6 +782,35 @@ int IDSCamera::getTriggerPrescaler(int &prescaler) {
   return 0;
 }
 
+int IDSCamera::setTriggerDelay(const int delay_us) {
+  // Get trigger min/max delay
+  const int min_delay_us =
+      is_SetTriggerDelay(this->camera_handle, IS_GET_MIN_TRIGGER_DELAY);
+  const int max_delay_us =
+      is_SetTriggerDelay(this->camera_handle, IS_GET_MAX_TRIGGER_DELAY);
+
+  // Check whether input is within allowable range
+  if (delay_us < min_delay_us || delay_us > max_delay_us) {
+    LOG_ERROR("Invalid trigger delay value [%d us]!", delay_us);
+    LOG_ERROR("Delay value has to be within %d to %d us!",
+              min_delay_us,
+              max_delay_us);
+  }
+
+  // Set trigger delay
+  if (is_SetTriggerDelay(this->camera_handle, delay_us) != IS_SUCCESS) {
+    LOG_ERROR("Failed to set trigger delay to [%d us]!", delay_us);
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::getTriggerDelay(int &delay_us) {
+  delay_us = is_SetTriggerDelay(this->camera_handle, IS_GET_TRIGGER_DELAY);
+  return 0;
+}
+
 int IDSCamera::setHDRMode(const bool enable) {
   const int retval = is_EnableHdr(this->camera_handle, enable);
   if (retval != IS_SUCCESS) {
@@ -1068,35 +1097,6 @@ int IDSCamera::getExposureTime(double &exposure_time_ms) {
     return -1;
   }
 
-  return 0;
-}
-
-int IDSCamera::setTriggerDelay(const int delay_us) {
-  // Get trigger min/max delay
-  const int min_delay_us =
-      is_SetTriggerDelay(this->camera_handle, IS_GET_MIN_TRIGGER_DELAY);
-  const int max_delay_us =
-      is_SetTriggerDelay(this->camera_handle, IS_GET_MAX_TRIGGER_DELAY);
-
-  // Check whether input is within allowable range
-  if (delay_us < min_delay_us || delay_us > max_delay_us) {
-    LOG_ERROR("Invalid trigger delay value [%d us]!", delay_us);
-    LOG_ERROR("Delay value has to be within %d to %d us!",
-              min_delay_us,
-              max_delay_us);
-  }
-
-  // Set trigger delay
-  if (is_SetTriggerDelay(this->camera_handle, delay_us) != IS_SUCCESS) {
-    LOG_ERROR("Failed to set trigger delay to [%d us]!", delay_us);
-    return -1;
-  }
-
-  return 0;
-}
-
-int IDSCamera::getTriggerDelay(int &delay_us) {
-  delay_us = is_SetTriggerDelay(this->camera_handle, IS_GET_TRIGGER_DELAY);
   return 0;
 }
 

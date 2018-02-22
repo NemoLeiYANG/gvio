@@ -72,6 +72,9 @@ int MPU6050::configure(const std::string &config_file) {
   // Get sample rate
   this->sample_rate = this->getSampleRate();
 
+  // Calibrate offsets
+  this->calibrate();
+
   return 0;
 }
 
@@ -97,17 +100,18 @@ int MPU6050::getData() {
   }
 
   // Accelerometer
+  const double g = 9.81; // Gravitational constant
   this->accel.raw_x = (raw_data[0] << 8) | (raw_data[1]);
   this->accel.raw_y = (raw_data[2] << 8) | (raw_data[3]);
   this->accel.raw_z = (raw_data[4] << 8) | (raw_data[5]);
 
-  this->accel.raw_x -= this->accel.offset_x;
-  this->accel.raw_y -= this->accel.offset_y;
-  this->accel.raw_z -= this->accel.offset_z;
+  this->accel.x = (this->accel.raw_x / this->accel.sensitivity) * g;
+  this->accel.y = (this->accel.raw_y / this->accel.sensitivity) * g;
+  this->accel.z = (this->accel.raw_z / this->accel.sensitivity) * g;
 
-  this->accel.x = this->accel.raw_x / this->accel.sensitivity;
-  this->accel.y = this->accel.raw_y / this->accel.sensitivity;
-  this->accel.z = this->accel.raw_z / this->accel.sensitivity;
+  this->accel.x = this->accel.x - this->accel.offset_x;
+  this->accel.y = this->accel.y - this->accel.offset_y;
+  this->accel.z = this->accel.z - this->accel.offset_z;
 
   // Temperature
   const int8_t raw_temp = (raw_data[6] << 8) | (raw_data[7]);
@@ -118,13 +122,13 @@ int MPU6050::getData() {
   this->gyro.raw_y = (raw_data[10] << 8) | (raw_data[11]);
   this->gyro.raw_z = (raw_data[12] << 8) | (raw_data[13]);
 
-  this->gyro.raw_x -= this->gyro.offset_x;
-  this->gyro.raw_y -= this->gyro.offset_y;
-  this->gyro.raw_z -= this->gyro.offset_z;
+  this->gyro.x = deg2rad(this->gyro.raw_x / this->gyro.sensitivity);
+  this->gyro.y = deg2rad(this->gyro.raw_y / this->gyro.sensitivity);
+  this->gyro.z = deg2rad(this->gyro.raw_z / this->gyro.sensitivity);
 
-  this->gyro.x = this->gyro.raw_x / this->gyro.sensitivity;
-  this->gyro.y = this->gyro.raw_y / this->gyro.sensitivity;
-  this->gyro.z = this->gyro.raw_z / this->gyro.sensitivity;
+  this->gyro.x = this->gyro.x - this->gyro.offset_x;
+  this->gyro.y = this->gyro.y - this->gyro.offset_y;
+  this->gyro.z = this->gyro.z - this->gyro.offset_z;
 
   // Set last_updated
   this->last_updated = clock();

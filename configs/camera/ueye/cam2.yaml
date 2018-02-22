@@ -12,5 +12,5 @@ offset_y: 0
 
 pixel_clock: 10
 frame_rate: 10.0
-exposure_time: 80
-gain: 30
+exposure_time: 15
+gain: 100
