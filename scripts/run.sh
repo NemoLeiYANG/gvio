@@ -18,7 +18,7 @@ fi
 
 mkdir -p build && cd build
 
-cmake .. && time make -j${CPU_COUNT}
+# cmake .. && time make -j${CPU_COUNT}
 
 # ./experiments/kitti_runner /data/kitti/raw 2011_09_26 0046 ./experiments/configs/msckf_kitti_raw-2011_09_26-0046.yaml ./experiments
 # python3 tests/scripts/plot_msckf.py ./experiments/msckf
@@ -78,6 +78,7 @@ cmake .. && time make -j${CPU_COUNT}
 # ./utils/camera configs/camera/ueye/cam1.yaml
 # ./utils/camera configs/camera/ueye/cam2.yaml
 # ./utils/camera configs/camera/ueye/cam3.yaml
+rm -rf /mnt/sdcard/gvio_recording
 ./utils/recorder configs/recorder/config.yaml
 
 # python3 scripts/plot_msckf.py /tmp/kitti_raw_2011_09_26_0005/run2/msckf

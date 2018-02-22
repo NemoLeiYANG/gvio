@@ -19,37 +19,37 @@ namespace gvio {
  */
 
 struct GyroData {
-  float sensitivity = 0.0f;
+  double sensitivity = 0.0;
 
   int16_t raw_x = 0.0f;
   int16_t raw_y = 0.0f;
   int16_t raw_z = 0.0f;
 
-  float offset_x = 0.0f;
-  float offset_y = 0.0f;
-  float offset_z = 0.0f;
+  double offset_x = 0.0;
+  double offset_y = 0.0;
+  double offset_z = 0.0;
 
-  float x = 0.0f;
-  float y = 0.0f;
-  float z = 0.0f;
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
 
   GyroData() {}
 };
 
 struct AccelData {
-  float sensitivity = 0.0f;
+  double sensitivity = 0.0;
 
   int16_t raw_x = 0;
   int16_t raw_y = 0;
   int16_t raw_z = 0;
 
-  float offset_x = 0.0f;
-  float offset_y = 0.0f;
-  float offset_z = 0.0f;
+  double offset_x = 0.0;
+  double offset_y = 0.0;
+  double offset_z = 0.0;
 
-  float x = 0.0f;
-  float y = 0.0f;
-  float z = 0.0f;
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
 
   AccelData() {}
 };

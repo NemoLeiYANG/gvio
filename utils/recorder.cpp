@@ -1,3 +1,5 @@
+#include <map>
+#include <mutex>
 #include <thread>
 #include <signal.h>
 
@@ -9,6 +11,7 @@ using namespace gvio;
 static volatile sig_atomic_t halt = 0;
 
 void signal_handler(int signum) {
+  LOG_INFO("Stop recording!");
   UNUSED(signum);
   halt = 1;
 }
@@ -20,6 +23,12 @@ struct recorder_state {
   bool cam0_ready = false;
   bool cam1_ready = false;
   bool cam2_ready = false;
+
+  std::map<long, long> camera_timestamps;
+  long cam0_counter = -1;
+  long cam1_counter = -1;
+  long cam2_counter = -1;
+
   bool record = false;
 };
 
@@ -121,8 +130,8 @@ void gimbal_thread(const std::string config_file,
   output_file << "t, roll, pitch, yaw" << std::endl;
 
   // Loop settings
-  const double frequency = 30.0;
-  double t_prev = 0.0;
+  const double frequency = 20.0;
+  double t_prev = time_now();
   double t = 0.0;
 
   // Loop
@@ -134,6 +143,7 @@ void gimbal_thread(const std::string config_file,
     if (t < (1.0 / frequency)) {
       continue;
     }
+    t = 0.0;
 
     // Update gimbal
     gimbal.update();
@@ -141,7 +151,8 @@ void gimbal_thread(const std::string config_file,
     // Record gimbal measurements
     recorder_is_ready(state);
     if (state->record) {
-      output_file << time_now() << ",";
+      const long t = time_now() * 1e9;
+      output_file << std::to_string(t) << ",";
       output_file << gimbal.camera_angles(0) << ",";
       output_file << gimbal.camera_angles(1) << ",";
       output_file << gimbal.camera_angles(2) << std::endl;
@@ -181,7 +192,8 @@ void imu_thread(const std::string config_file,
     // Record IMU measurements
     recorder_is_ready(state);
     if (state->record) {
-      output_file << time_now() << ",";
+      const long t = time_now() * 1e9;
+      output_file << std::to_string(t) << ",";
       output_file << imu.accel.x << ",";
       output_file << imu.accel.y << ",";
       output_file << imu.accel.z << ",";
@@ -219,6 +231,13 @@ void camera_thread(const int camera_index,
     LOG_ERROR("Failed to create output path [%s]!", output_path.c_str());
   }
 
+  // Create image timestamp file
+  std::string timestamp_path = output_dir + "/image_timestamps.csv";
+  std::ofstream timestamp_file;
+  if (camera_index == 0) {
+    timestamp_file.open(timestamp_path);
+  }
+
   // Loop
   while (halt != 1) {
     // Get camera frame
@@ -230,12 +249,33 @@ void camera_thread(const int camera_index,
     // Record
     recorder_is_ready(state);
     if (state->record) {
-      const double t = time_now();
+      // Get camera counter
+      long counter = 0;
+      switch (camera_index) {
+        case 0: {
+          state->cam0_counter++;
+          counter = state->cam0_counter;
+          const long t = time_now() * 1.0e9;
+          timestamp_file << t << std::endl;
+          break;
+        }
+        case 1:
+          state->cam1_counter++;
+          counter = state->cam1_counter;
+          break;
+        case 2:
+          state->cam2_counter++;
+          counter = state->cam2_counter;
+          break;
+      }
+
+      // Save image
       std::string image_path = output_path + "/";
-      image_path += std::to_string(t) + ".png";
+      image_path += std::to_string(counter) + ".png";
       cv::imwrite(image_path, image);
     }
   }
+  timestamp_file.close();
 }
 
 int main(const int argc, const char *argv[]) {

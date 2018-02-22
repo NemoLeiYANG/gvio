@@ -1,7 +1,7 @@
-pwm_frequency: 40
+pwm_frequency: 30
 cam0_config: ../camera/ueye/cam0.yaml
 cam1_config: ../camera/ueye/cam1.yaml
 cam2_config: ../camera/ueye/cam2.yaml
 gimbal_config: ../gimbal/config.yaml
 imu_config: ../imu/config.yaml
-output_dir: /tmp/gvio_recording
+output_dir: /mnt/sdcard/gvio_recording

@@ -236,6 +236,22 @@ public:
   int getTriggerPrescaler(int &prescaler);
 
   /**
+   * Set trigger delay in microsecond
+   *
+   * @param delay_us Trigger time delay in microseconds
+   * @returns 0 for success, -1 for failure
+   */
+  int setTriggerDelay(const int delay_us);
+
+  /**
+   * Get trigger delay in microsecond
+   *
+   * @param delay_us Trigger time delay in microseconds
+   * @returns 0 for success, -1 for failure
+   */
+  int getTriggerDelay(int &delay_us);
+
+  /**
    * Set HDR mode
    *
    * @param enable Enable HDR mode
@@ -396,22 +412,6 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int getExposureTime(double &exposure_time_ms);
-
-  /**
-   * Set trigger delay in microsecond
-   *
-   * @param delay_us Trigger time delay in microseconds
-   * @returns 0 for success, -1 for failure
-   */
-  int setTriggerDelay(const int delay_us);
-
-  /**
-   * Get trigger delay in microsecond
-   *
-   * @param delay_us Trigger time delay in microseconds
-   * @returns 0 for success, -1 for failure
-   */
-  int getTriggerDelay(int &delay_us);
 
   /**
    * Set HDR mode
