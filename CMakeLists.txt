@@ -59,7 +59,10 @@ ADD_LIBRARY(${PROJECT_NAME}
             src/feature2d/orb_tracker.cpp
             src/feature2d/klt_tracker.cpp
             # gimbal
+            src/gimbal/gmr/gmr.cpp
+            src/gimbal/gmr/slic.cpp
             src/gimbal/gimbal.cpp
+            src/gimbal/saliency.cpp
             src/gimbal/sbgc.cpp
             # imu
             src/imu/imu_base.cpp
@@ -131,7 +134,9 @@ SET(UNITTESTS
     feature2d-gms_matcher_test
     feature2d-klt_tracker_test
     feature2d-orb_tracker_test
+    gimbal-gmr-gmr_test
     gimbal-sbgc_test
+    gimbal-saliency_test
     imu-mpu6050_test
     msckf-camera_state_test
     msckf-feature_estimator_test

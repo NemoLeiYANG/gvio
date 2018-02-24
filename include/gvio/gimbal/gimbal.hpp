@@ -13,6 +13,7 @@
 
 #include "gvio/util/util.hpp"
 #include "gvio/gimbal/sbgc.hpp"
+#include "gvio/gimbal/saliency.hpp"
 
 namespace gvio {
 /**

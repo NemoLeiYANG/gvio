@@ -18,7 +18,7 @@ fi
 
 mkdir -p build && cd build
 
-# cmake .. && time make -j${CPU_COUNT}
+cmake .. && time make -j${CPU_COUNT}
 
 # ./experiments/kitti_runner /data/kitti/raw 2011_09_26 0046 ./experiments/configs/msckf_kitti_raw-2011_09_26-0046.yaml ./experiments
 # python3 tests/scripts/plot_msckf.py ./experiments/msckf
@@ -46,7 +46,9 @@ mkdir -p build && cd build
 # ./tests/feature2d-gms_matcher_test
 # ./tests/feature2d-klt_tracker_test
 # ./tests/feature2d-orb_tracker_test
+./tests/gimbal-gmr-gmr_test
 # ./tests/gimbal-sbgc_test
+# ./tests/gimbal-saliency_test
 # ./tests/imu-mpu6050_test
 # ./tests/kitti-raw-calib_test
 # ./tests/kitti-raw-oxts_test
@@ -78,8 +80,8 @@ mkdir -p build && cd build
 # ./utils/camera configs/camera/ueye/cam1.yaml
 # ./utils/camera configs/camera/ueye/cam2.yaml
 # ./utils/camera configs/camera/ueye/cam3.yaml
-rm -rf /mnt/sdcard/gvio_recording
-./utils/recorder configs/recorder/config.yaml
+# rm -rf /mnt/sdcard/gvio_recording
+# ./utils/recorder configs/recorder/config.yaml
 
 # python3 scripts/plot_msckf.py /tmp/kitti_raw_2011_09_26_0005/run2/msckf
 # python3 scripts/plot_euroc_mav_dataset.py /data/euroc_mav/raw/mav0
