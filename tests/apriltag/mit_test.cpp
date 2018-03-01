@@ -62,7 +62,7 @@ int test_MITDetector_illuminationInvarientTransform() {
   // test and assert
   detector.illuminationInvariantTransform(image);
   // cv::imshow("image", image);
-  // cv::waitKey(1000000);
+  // cv::waitKey();
 
   tags = detector.detector->extractTags(image);
   MU_CHECK(2 == tags.size());

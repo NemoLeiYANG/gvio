@@ -7,22 +7,22 @@ int MITDetector::configure(const std::string &config_file) {
     return -1;
   }
 
-  // tag detector
+  // Tag detector
   this->detector = new AprilTags::TagDetector(AprilTags::tagCodes16h5);
 
   return 0;
 }
 
 int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
-  // change mode based on image size
+  // Change mode based on image size
   this->changeMode(image);
 
-  // tranform illumination invariant tag
+  // Tranform illumination invariant tag
   if (this->illum_invar) {
     this->illuminationInvariantTransform(image);
   }
 
-  // mask image if tag was last detected
+  // Mask image if tag was last detected
   cv::Mat cropped_image;
   if (this->prev_tag.detected && this->windowing) {
     this->cropImage(this->prev_tag, image, cropped_image, this->window_padding);
@@ -35,7 +35,7 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
   }
   this->prev_tag.detected = false; // reset previous tag
 
-  // convert image to gray-scale
+  // Convert image to gray-scale
   cv::Mat image_gray;
   if (image.channels() == 3) {
     cv::cvtColor(cropped_image, image_gray, cv::COLOR_BGR2GRAY);
@@ -43,11 +43,11 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
     image_gray = cropped_image;
   }
 
-  // extract tags
+  // Extract tags
   std::vector<AprilTags::TagDetection> detections;
   detections = this->detector->extractTags(image_gray);
 
-  // calculate tag pose
+  // Calculate tag pose
   for (size_t i = 0; i < detections.size(); i++) {
     TagPose tag_pose;
     tag_pose.id = detections[i].id;
@@ -64,20 +64,20 @@ int MITDetector::extractTags(cv::Mat &image, std::vector<TagPose> &tags) {
     const Vec2 p4{p[3].first, p[3].second};
 
     if (this->getRelativePose(p1, p2, p3, p4, tag_pose) == 0) {
-      // add to tags poses
+      // Add to tags poses
       tags.push_back(tag_pose);
 
-      // keep track of last tag
+      // Keep track of last tag
       this->prev_tag = tag_pose;
       this->prev_tag_image_width = image.cols;
       this->prev_tag_image_height = image.rows;
 
-      // only need 1 tag
+      // Only need 1 tag
       break;
     }
   }
 
-  // imshow
+  // Imshow
   if (this->imshow && image_gray.rows && image_gray.cols) {
     cv::imshow("MITDetector", image_gray);
     cv::waitKey(1);

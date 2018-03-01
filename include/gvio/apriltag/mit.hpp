@@ -19,6 +19,7 @@
 // clang-format off
 #include <apriltags_mit/TagDetector.h>
 #include <apriltags_mit/Tag16h5.h>
+#include <apriltags_mit/Tag36h11.h>
 // clang-format on
 
 #include "gvio/util/util.hpp"

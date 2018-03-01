@@ -62,7 +62,6 @@ int csv2mat(const std::string &file_path, const bool header, MatX &data) {
 
   // load file
   if (infile.good() != true) {
-    printf(E_CSV_DATA_LOAD, file_path.c_str());
     return -1;
   }
 

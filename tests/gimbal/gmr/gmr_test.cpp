@@ -53,9 +53,7 @@ int test_GMR_GetSal() {
 
     // Convert from 32FC1 to 8UC1
     double val_min, val_max;
-    cv::minMaxLoc(saliency_threshold,
-                  &val_min,
-                  &val_max); // find  minimum  and  maximum  intensities
+    cv::minMaxLoc(saliency_threshold, &val_min, &val_max);
     saliency_threshold.convertTo(saliency_threshold,
                                  CV_8U,
                                  255.0 / (val_max - val_min),

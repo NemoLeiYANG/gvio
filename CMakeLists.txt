@@ -61,7 +61,11 @@ ADD_LIBRARY(${PROJECT_NAME}
             # gimbal
             src/gimbal/gmr/gmr.cpp
             src/gimbal/gmr/slic.cpp
+            src/gimbal/calibration/calib_data.cpp
+            src/gimbal/calibration/gimbal_calib.cpp
+            src/gimbal/calibration/residual.cpp
             src/gimbal/gimbal.cpp
+            src/gimbal/gimbal_model.cpp
             src/gimbal/saliency.cpp
             src/gimbal/sbgc.cpp
             # imu
@@ -134,6 +138,7 @@ SET(UNITTESTS
     feature2d-gms_matcher_test
     feature2d-klt_tracker_test
     feature2d-orb_tracker_test
+    gimbal-calibration-calib_data_test
     gimbal-gmr-gmr_test
     gimbal-sbgc_test
     gimbal-saliency_test

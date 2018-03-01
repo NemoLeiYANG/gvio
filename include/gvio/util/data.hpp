@@ -20,7 +20,7 @@ namespace gvio {
  */
 
 // CSV ERROR MESSAGES
-#define E_CSV_DATA_LOAD "Error! failed to load test data [%s]!!\n"
+#define E_CSV_DATA_LOAD "Error! failed to load data [%s]!!\n"
 #define E_CSV_DATA_OPEN "Error! failed to open file for output [%s]!!\n"
 
 /**
