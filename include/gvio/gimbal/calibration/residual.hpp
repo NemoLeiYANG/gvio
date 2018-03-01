@@ -76,22 +76,32 @@ struct GimbalCalibResidual {
   /// Form transform from static to dynamic camera
   template <typename T>
   Eigen::Matrix<T, 4, 4> T_sd(const T *const tau_s,
-                              const T *const Lambda1,
+                              const T *const tau_d,
                               const T *const w1,
-                              const T *const Lambda2,
                               const T *const w2,
-                              const T *const tau_d) const;
+                              const T *const Lambda1,
+                              const T *const Lambda2) const;
 
   /// Calculate residual
   template <typename T>
   bool operator()(const T *const tau_s,
-                  const T *const Lambda1,
-                  const T *const w1,
-                  const T *const Lambda2,
-                  const T *const w2,
                   const T *const tau_d,
+                  const T *const w1,
+                  const T *const w2,
+                  const T *const Lambda1,
+                  const T *const Lambda2,
                   T *residual) const;
 };
+
+/**
+ * GimbalCalibResidual to string
+ */
+std::ostream &operator<<(std::ostream &os, const GimbalCalibResidual &residual);
+
+/**
+ * GimbalCalibResidual to string
+ */
+std::ostream &operator<<(std::ostream &os, const GimbalCalibResidual *residual);
 
 /** @} group gimbal */
 } // namespace gvio

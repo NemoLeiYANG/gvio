@@ -14,6 +14,8 @@ int CalibData::load(const std::string &data_dir) {
   this->nb_measurements = this->joint_data.rows();
   for (int i = 0; i < this->nb_measurements; i++) {
     const std::string set_path = data_dir + "/set" + std::to_string(i);
+    std::cout << "Loading measurement set " << i << " ";
+    std::cout << "[" << set_path << "]" << std::endl;
 
     // P_s_i
     MatX P_s_i;

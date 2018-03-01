@@ -87,11 +87,11 @@ Eigen::Matrix<T, 3, 3> GimbalCalibResidual::K_d() const {
 
 template <typename T>
 Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_sd(const T *const tau_s,
-                                                 const T *const Lambda1,
+                                                 const T *const tau_d,
                                                  const T *const w1,
-                                                 const T *const Lambda2,
                                                  const T *const w2,
-                                                 const T *const tau_d) const {
+                                                 const T *const Lambda1,
+                                                 const T *const Lambda2) const {
   // Form T_sb
   const Eigen::Matrix<T, 3, 1> t_G_sb{tau_s[0], tau_s[1], tau_s[2]};
   const T rpy_bs[3] = {tau_s[3], tau_s[4], tau_s[5]};
@@ -139,11 +139,11 @@ Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_sd(const T *const tau_s,
 
 template <typename T>
 bool GimbalCalibResidual::operator()(const T *const tau_s,
-                                     const T *const Lambda1,
-                                     const T *const w1,
-                                     const T *const Lambda2,
-                                     const T *const w2,
                                      const T *const tau_d,
+                                     const T *const w1,
+                                     const T *const w2,
+                                     const T *const Lambda1,
+                                     const T *const Lambda2,
                                      T *residual) const {
   // Form the transform from static camera to dynamic camera
   const Eigen::Matrix<T, 4, 4> T_sd =

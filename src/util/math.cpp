@@ -10,6 +10,33 @@ void print_shape(const std::string &name, const VecX &v) {
   std::cout << name << ": " << v.rows() << "x" << v.cols() << std::endl;
 }
 
+void print_array(const std::string &name,
+                 const double *array,
+                 const size_t size) {
+  std::cout << name << std::endl;
+  for (size_t i = 0; i < size; i++) {
+    printf("%.4f ", array[i]);
+  }
+  printf("\b\n");
+}
+
+std::string array2str(const double *array, const size_t size) {
+  std::stringstream os;
+  for (size_t i = 0; i < (size - 1); i++) {
+    os << array[i] << " ";
+  }
+  os << array[size - 1];
+
+  return os.str();
+}
+
+void array2vec(const double *x, const size_t size, VecX y) {
+  y.resize(size);
+  for (size_t i = 0; i < size; i++) {
+    y(i) = x[i];
+  }
+}
+
 double *vec2array(const VecX &v) {
   double *array = (double *) malloc(sizeof(double) * v.size());
   for (int i = 0; i < v.size(); i++) {

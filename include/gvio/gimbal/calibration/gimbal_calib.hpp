@@ -5,12 +5,11 @@
 #ifndef GVIO_GIMBAL_CALIBRATION_GIMBAL_CALIB_HPP
 #define GVIO_GIMBAL_CALIBRATION_GIMBAL_CALIB_HPP
 
-#include <string>
-
 #include <ceres/ceres.h>
 
 #include "gvio/util/util.hpp"
 #include "gvio/gimbal/calibration/calib_data.hpp"
+#include "gvio/gimbal/calibration/calib_params.hpp"
 #include "gvio/gimbal/calibration/residual.hpp"
 
 namespace gvio {
@@ -22,16 +21,11 @@ namespace gvio {
 class GimbalCalib {
 public:
   CalibData data;
+  CalibParams params;
+
   ceres::Problem problem;
   ceres::Solver::Options options;
   ceres::Solver::Summary summary;
-
-  double *tau_s;
-  double *Lambda1;
-  double *w1;
-  double *Lambda2;
-  double *w2;
-  double *tau_d;
 
   GimbalCalib();
   virtual ~GimbalCalib();

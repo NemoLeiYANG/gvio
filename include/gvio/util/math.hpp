@@ -7,6 +7,8 @@
 #define GVIO_UTIL_MATH_HPP
 
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
@@ -50,6 +52,35 @@ void print_shape(const std::string &name, const MatX &A);
  * @param v Vector
  */
 void print_shape(const std::string &name, const VecX &v);
+
+/**
+ * Print array
+ *
+ * @param name Name of array
+ * @param array Target array
+ * @param size Size of target array
+ */
+void print_array(const std::string &name,
+                 const double *array,
+                 const size_t size);
+
+/**
+ * Array to string
+ *
+ * @param array Target array
+ * @param size Size of target array
+ * @returns String of array
+ */
+std::string array2str(const double *array, const size_t size);
+
+/**
+ * Convert double array to Eigen::Vector
+ *
+ * @param x Input array
+ * @param size Size of input array
+ * @param y Output vector
+ */
+void array2vec(const double *x, const size_t size, VecX &y);
 
 /**
  * Vector to array

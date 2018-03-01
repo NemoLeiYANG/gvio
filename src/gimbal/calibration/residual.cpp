@@ -41,4 +41,22 @@ GimbalCalibResidual::GimbalCalibResidual(const Vec3 &P_s,
   this->cy_d = K_d(1, 2);
 }
 
+std::ostream &operator<<(std::ostream &os,
+                         const GimbalCalibResidual &residual) {
+  os << "P_s: " << array2str(residual.P_s, 3) << std::endl;
+  os << "P_d: " << array2str(residual.P_d, 3) << std::endl;
+  os << "Q_s: " << array2str(residual.Q_s, 2) << std::endl;
+  os << "Q_d: " << array2str(residual.Q_d, 2) << std::endl;
+  return os;
+}
+
+std::ostream &operator<<(std::ostream &os,
+                         const GimbalCalibResidual *residual) {
+  os << "P_s: " << array2str(residual->P_s, 3) << std::endl;
+  os << "P_d: " << array2str(residual->P_d, 3) << std::endl;
+  os << "Q_s: " << array2str(residual->Q_s, 2) << std::endl;
+  os << "Q_d: " << array2str(residual->Q_d, 2) << std::endl;
+  return os;
+}
+
 } // namespace gvio
