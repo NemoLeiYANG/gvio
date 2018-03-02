@@ -51,9 +51,10 @@ struct Chessboard {
    * Detect chessboard corners
    *
    * @param image Input image
-   * @returns Vector of chessboard corners
+   * @param corners Detected chessboard corners
+   * @returns 0 for success, -1 for failure
    */
-  std::vector<cv::Point2f> detect(const cv::Mat &image);
+  int detect(const cv::Mat &image, std::vector<cv::Point2f> &corners);
 
   /**
    * Draw chessboard corners
@@ -67,13 +68,12 @@ struct Chessboard {
    *
    * @param corners Detected chessboard corners
    * @param K Camera intrinsics matrix K
-   * @param D Camera distortion coefficients D
+   * @param T_c_t Transform from camera to calibration target
    *
    * @returns 0 for success, -1 for failure
    */
   int solvePnP(const std::vector<cv::Point2f> corners,
                const cv::Mat &K,
-               const cv::Mat &D,
                Mat4 &T_c_t);
 
   /**
@@ -81,15 +81,22 @@ struct Chessboard {
    *
    * @param corners Detected chessboard corners
    * @param K Camera intrinsics matrix K
-   * @param D Camera distortion coefficients D
    * @param X Corner positions relative to camera in ideal coordinates
    *
    * @returns 0 for success, -1 for failure
    */
   int calcCornerPositions(const std::vector<cv::Point2f> corners,
                           const cv::Mat &K,
-                          const cv::Mat &D,
                           MatX &X);
+
+  /**
+   * Project 3D points to image
+   *
+   * @param X Corner positions relative to camera in ideal coordinates
+   * @param K Camera intrinsics matrix K
+   * @param image Target image
+   */
+  void project3DPoints(const MatX &X, const cv::Mat &K, cv::Mat &image);
 };
 
 /** @} group gimbal */

@@ -49,24 +49,26 @@ std::vector<cv::Point3f> Chessboard::createObjectPoints() {
   return object_points;
 }
 
-std::vector<cv::Point2f> Chessboard::detect(const cv::Mat &image) {
+int Chessboard::detect(const cv::Mat &image,
+                       std::vector<cv::Point2f> &corners) {
   // Find the chessboard corners
   // -- Convert image to grayscale
   cv::Mat image_gray;
   cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
   // -- Setup
   cv::Size size(this->nb_cols, this->nb_rows);
-  std::vector<cv::Point2f> corners;
   // -- Detect chessboard corners
-  cv::findChessboardCorners(image_gray, size, corners);
+  if (cv::findChessboardCorners(image_gray, size, corners) == false) {
+    return -1;
+  }
 
-  return corners;
+  return 0;
 }
 
 int Chessboard::drawCorners(cv::Mat &image) {
   // Detect corners
-  const std::vector<cv::Point2f> corners = this->detect(image);
-  if (corners.size() == 0) {
+  std::vector<cv::Point2f> corners;
+  if (this->detect(image, corners) != 0) {
     return -1;
   }
 
@@ -79,10 +81,10 @@ int Chessboard::drawCorners(cv::Mat &image) {
 
 int Chessboard::solvePnP(const std::vector<cv::Point2f> corners,
                          const cv::Mat &K,
-                         const cv::Mat &D,
                          Mat4 &T_c_t) {
 
   // Calculate transformation matrix
+  cv::Mat D;
   cv::Mat rvec(3, 1, cv::DataType<double>::type);
   cv::Mat tvec(3, 1, cv::DataType<double>::type);
   cv::solvePnP(this->object_points,
@@ -112,11 +114,10 @@ int Chessboard::solvePnP(const std::vector<cv::Point2f> corners,
 
 int Chessboard::calcCornerPositions(const std::vector<cv::Point2f> corners,
                                     const cv::Mat &K,
-                                    const cv::Mat &D,
                                     MatX &X) {
   // Get transform from camera to chessboard
   Mat4 T_c_t;
-  if (this->solvePnP(corners, K, D, T_c_t) != 0) {
+  if (this->solvePnP(corners, K, T_c_t) != 0) {
     return -1;
   }
 
@@ -137,6 +138,33 @@ int Chessboard::calcCornerPositions(const std::vector<cv::Point2f> corners,
   X = X_homo.block(0, 0, 3, nb_pts);
 
   return 0;
+}
+
+void Chessboard::project3DPoints(const MatX &X,
+                                 const cv::Mat &K,
+                                 cv::Mat &image) {
+  // clang-format off
+  Mat3 K_cam;
+  K_cam << K.at<double>(0, 0), K.at<double>(0, 1), K.at<double>(0, 2),
+           K.at<double>(1, 0), K.at<double>(1, 1), K.at<double>(1, 2),
+           K.at<double>(2, 0), K.at<double>(2, 1), K.at<double>(2, 2);
+  // clang-format on
+
+  // Project 3d point to image plane
+  MatX x = K_cam * X;
+
+  for (int i = 0; i < x.cols(); i++) {
+    const Vec3 p = x.col(i);
+    const double px = p(0) / p(2);
+    const double py = p(1) / p(2);
+
+    cv::circle(image,                 // Target image
+               cv::Point(px, py),     // Center
+               3.0,                   // Radius
+               cv::Scalar(0, 0, 255), // Colour
+               CV_FILLED,             // Thickness
+               8);                    // Line type
+  }
 }
 
 } // namespace gvio

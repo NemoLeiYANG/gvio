@@ -32,7 +32,9 @@ int test_Chessboard_detect() {
 
   cb.load(TEST_CONFIG);
   const cv::Mat image = cv::imread(TEST_IMAGE);
-  const std::vector<cv::Point2f> corners = cb.detect(image);
+  std::vector<cv::Point2f> corners;
+  int retval = cb.detect(image, corners);
+  MU_CHECK_EQ(retval, 0);
   MU_CHECK_EQ((int) corners.size(), cb.nb_rows * cb.nb_cols);
 
   // cv::imshow("Image", image);
@@ -60,7 +62,8 @@ int test_Chessboard_solvePnP() {
 
   cb.load(TEST_CONFIG);
   const cv::Mat image = cv::imread(TEST_IMAGE);
-  const std::vector<cv::Point2f> corners = cb.detect(image);
+  std::vector<cv::Point2f> corners;
+  int retval = cb.detect(image, corners);
 
   // Solve PnP
   // -- Form camera intrinsics K
@@ -74,12 +77,9 @@ int test_Chessboard_solvePnP() {
   K.at<double>(2, 0) = 0.0;
   K.at<double>(2, 1) = 0.0;
   K.at<double>(2, 2) = 1.0;
-  // -- Form camera distortion coefficients D
-  cv::Mat D;
-  // -- Transform
-  Mat4 T_c_t;
   // -- Solve
-  const int retval = cb.solvePnP(corners, K, D, T_c_t);
+  Mat4 T_c_t;
+  retval = cb.solvePnP(corners, K, T_c_t);
   std::cout << T_c_t << std::endl;
 
   MU_CHECK_EQ(retval, 0);
@@ -91,8 +91,9 @@ int test_Chessboard_calcCornerPositions() {
   Chessboard cb;
 
   cb.load(TEST_CONFIG);
-  const cv::Mat image = cv::imread(TEST_IMAGE);
-  const std::vector<cv::Point2f> corners = cb.detect(image);
+  cv::Mat image = cv::imread(TEST_IMAGE);
+  std::vector<cv::Point2f> corners;
+  int retval = cb.detect(image, corners);
 
   // Calculate corner positions
   // -- Form camera intrinsics K
@@ -106,14 +107,17 @@ int test_Chessboard_calcCornerPositions() {
   K.at<double>(2, 0) = 0.0;
   K.at<double>(2, 1) = 0.0;
   K.at<double>(2, 2) = 1.0;
-  // -- Form camera distortion coefficients D
-  cv::Mat D;
   // -- Calculate
   MatX X;
-  const int retval = cb.calcCornerPositions(corners, K, D, X);
+  retval = cb.calcCornerPositions(corners, K, X);
   std::cout << X.transpose() << std::endl;
 
+  cb.project3DPoints(X, K, image);
+
   MU_CHECK_EQ(retval, 0);
+
+  cv::imshow("Image", image);
+  cv::waitKey();
 
   return 0;
 }

@@ -6,6 +6,7 @@
 #define GVIO_GIMBAL_CALIBRATION_CALIB_VALIDATOR_HPP
 
 #include "gvio/util/util.hpp"
+#include "gvio/gimbal/calibration/chessboard.hpp"
 
 namespace gvio {
 /**
@@ -23,6 +24,8 @@ struct CalibValidator {
   VecX intrinsics;
   Vec2 resolution;
 
+  Chessboard chessboard;
+
   CalibValidator();
   virtual ~CalibValidator();
 
@@ -30,9 +33,10 @@ struct CalibValidator {
    * Load initial optimization params
    *
    * @param calib_file Path to calib file
+   * @param target_file Path to target file
    * @returns 0 for success, -1 for failure
    */
-  int load(const std::string &calib_file);
+  int load(const std::string &calib_file, const std::string &target_file);
 
   /**
    * Validate calibration
