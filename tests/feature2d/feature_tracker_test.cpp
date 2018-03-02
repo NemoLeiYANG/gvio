@@ -73,8 +73,8 @@ int test_FeatureTracker_conversions() {
     MU_CHECK(f.kp.pt.x == k1[index].pt.x);
     MU_CHECK(f.kp.pt.y == k1[index].pt.y);
 
-    MU_CHECK(cvMatIsEqual(f.desc, d0.row(index)));
-    MU_CHECK(cvMatIsEqual(f.desc, d1.row(index)));
+    MU_CHECK(is_equal(f.desc, d0.row(index)));
+    MU_CHECK(is_equal(f.desc, d1.row(index)));
 
     MU_CHECK_EQ(f.desc.size(), cv::Size(32, 1));
     index++;

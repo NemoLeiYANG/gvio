@@ -53,7 +53,7 @@ MatX equi_distort(const double k1,
   const Eigen::ArrayXd y_dash = (theta_d / r) * y;
   // clang-format on
 
-  // Project rad-tan distorted points to image plane
+  // Project equi distorted points to image plane
   const int nb_points = points.rows();
   MatX distorted_points{nb_points, 2};
   distorted_points.col(0) = x_dash;

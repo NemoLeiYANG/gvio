@@ -35,28 +35,27 @@ int GimbalCalib::load(const std::string &data_dir) {
 
   // Setup optimization problem
   for (int i = 0; i < this->data.nb_measurements; i++) {
-
     // Form residual
-    // for (int j = 0; j < this->data.P_s[i].rows(); j++) {
-    for (int j = 0; j < 10; j++) {
-      auto residual = new GimbalCalibResidual(this->data.P_s[i].row(j),
-                                              this->data.P_d[i].row(j),
-                                              this->data.Q_s[i].row(j),
-                                              this->data.Q_d[i].row(j),
-                                              K_s,
-                                              K_d);
+    for (int j = 0; j < this->data.P_s[i].rows(); j++) {
+      const Vec3 P_s = this->data.P_s[i].row(j);
+      const Vec3 P_d = this->data.P_d[i].row(j);
+      const Vec2 Q_s = this->data.Q_s[i].row(j);
+      const Vec2 Q_d = this->data.Q_d[i].row(j);
+      auto residual =
+          new GimbalCalibNumericalResidual(P_s, P_d, Q_s, Q_d, K_s, K_d);
 
       // Build cost function
-      auto cost_func =
-          new ceres::AutoDiffCostFunction<GimbalCalibResidual, // Residual type
-                                          4, // Size of residual
-                                          6, // Size of: tau_s
-                                          6, // Size of: tau_d
-                                          3, // Size of: w1
-                                          3, // Size of: w2
-                                          1, // Size of: Lambda1
-                                          1  // Size of: Lambda2
-                                          >(residual);
+      auto cost_func = new ceres::NumericDiffCostFunction<
+          GimbalCalibNumericalResidual, // Residual type
+          ceres::CENTRAL,
+          4, // Size of residual
+          6, // Size of: tau_s
+          6, // Size of: tau_d
+          3, // Size of: w1
+          3, // Size of: w2
+          1, // Size of: Lambda1
+          1  // Size of: Lambda2
+          >(residual);
 
       // Add residual block to problem
       this->problem.AddResidualBlock(cost_func, // Cost function
@@ -70,12 +69,14 @@ int GimbalCalib::load(const std::string &data_dir) {
     }
   }
 
+  this->problem.SetParameterBlockConstant(this->params.w2);
+
   return 0;
 }
 
 int GimbalCalib::calibrate() {
   // Set options
-  this->options.max_num_iterations = 1;
+  this->options.max_num_iterations = 1000;
   // this->options.use_nonmonotonic_steps = false;
   // this->options.use_inner_iterations = true;
   // this->options.preconditioner_type = ceres::SCHUR_JACOBI;
@@ -87,7 +88,7 @@ int GimbalCalib::calibrate() {
 
   // Solve
   ceres::Solve(this->options, &this->problem, &this->summary);
-  // std::cout << summary.FullReport() << "\n";
+  std::cout << summary.FullReport() << std::endl;
 
   return 0;
 }

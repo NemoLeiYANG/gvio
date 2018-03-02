@@ -67,16 +67,16 @@ int test_CameraConfig_load() {
 
   // clang-format off
   cv::Mat expected(3, 3, CV_64F, camera_matrix);
-  MU_CHECK(cvMatIsEqual(expected, config.camera_matrix));
+  MU_CHECK(is_equal(expected, config.camera_matrix));
 
   expected = cv::Mat(1, 5, CV_64F, distortion_coefficients);
-  MU_CHECK(cvMatIsEqual(expected, config.distortion_coefficients));
+  MU_CHECK(is_equal(expected, config.distortion_coefficients));
 
   expected = cv::Mat(3, 3, CV_64F, rectification_matrix);
-  MU_CHECK(cvMatIsEqual(expected, config.rectification_matrix));
+  MU_CHECK(is_equal(expected, config.rectification_matrix));
 
   expected = cv::Mat(3, 4, CV_64F, projection_matrix);
-  MU_CHECK(cvMatIsEqual(expected, config.projection_matrix));
+  MU_CHECK(is_equal(expected, config.projection_matrix));
   // clang-format on
 
   MU_CHECK(config.imshow);

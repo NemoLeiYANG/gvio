@@ -8,6 +8,7 @@
 #include <ceres/ceres.h>
 
 #include "gvio/util/util.hpp"
+#include "gvio/gimbal/gimbal_model.hpp"
 
 namespace gvio {
 /**
@@ -20,16 +21,16 @@ namespace gvio {
  */
 struct GimbalCalibResidual {
   // Observed 3d point in static camera
-  double P_s[3] = {0.0, 0.0, 0.0};
+  double P_s[3] = {0};
 
   // Observed 3d point in dynamic camera
-  double P_d[3] = {0.0, 0.0, 0.0};
+  double P_d[3] = {0};
 
   // Observed pixel in static camera
-  double Q_s[2] = {0.0, 0.0};
+  double Q_s[2] = {0};
 
   // Observed pixel in dynamic camera
-  double Q_d[2] = {0.0, 0.0};
+  double Q_d[2] = {0};
 
   // Static camera intrinsics
   double fx_s = 0.0;
@@ -65,14 +66,6 @@ struct GimbalCalibResidual {
   Eigen::Matrix<T, 3, 3>
   K(const T fx, const T fy, const T cx, const T cy) const;
 
-  /// Form static camera intrinsics matrix K_s
-  template <typename T>
-  Eigen::Matrix<T, 3, 3> K_s() const;
-
-  /// Form dynamic camera intrinsics matrix K_d
-  template <typename T>
-  Eigen::Matrix<T, 3, 3> K_d() const;
-
   /// Form transform from static to dynamic camera
   template <typename T>
   Eigen::Matrix<T, 4, 4> T_sd(const T *const tau_s,
@@ -102,6 +95,44 @@ std::ostream &operator<<(std::ostream &os, const GimbalCalibResidual &residual);
  * GimbalCalibResidual to string
  */
 std::ostream &operator<<(std::ostream &os, const GimbalCalibResidual *residual);
+
+/**
+ * Gimbal calibration numerical residual
+ */
+struct GimbalCalibNumericalResidual {
+  Vec3 P_s = zeros(3, 1); ///< Observed 3d point in static camera
+  Vec3 P_d = zeros(3, 1); ///< Observed 3d point in dynamic camera
+  Vec2 Q_s = zeros(2, 1); ///< Observed pixel in static camera
+  Vec2 Q_d = zeros(2, 1); ///< Observed pixel in dynamic camera
+  Mat3 K_s = zeros(3, 3); ///< Static camera intrinsics
+  Mat3 K_d = zeros(3, 3); ///< Dynamic camera intrinsics
+
+  GimbalCalibNumericalResidual();
+  GimbalCalibNumericalResidual(const Vec3 &P_s,
+                               const Vec3 &P_d,
+                               const Vec2 &Q_s,
+                               const Vec2 &Q_d,
+                               const Mat3 &K_s,
+                               const Mat3 &K_d)
+      : P_s{P_s}, P_d{P_d}, Q_s{Q_s}, Q_d{Q_d}, K_s{K_s}, K_d{K_d} {}
+
+  /// Calculate transform between static and dynamic camera
+  Mat4 T_sd(const Vec3 tau_s,
+            const double Lambda1,
+            const Vec3 w1,
+            const Vec3 tau_d,
+            const double Lambda2,
+            const Vec3 w2) const;
+
+  /// Calculate residual
+  bool operator()(const double *const p0,
+                  const double *const p1,
+                  const double *const p2,
+                  const double *const p3,
+                  const double *const p4,
+                  const double *const p5,
+                  double *residual) const;
+};
 
 /** @} group gimbal */
 } // namespace gvio

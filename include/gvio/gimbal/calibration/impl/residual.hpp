@@ -76,16 +76,6 @@ GimbalCalibResidual::K(const T fx, const T fy, const T cx, const T cy) const {
 }
 
 template <typename T>
-Eigen::Matrix<T, 3, 3> GimbalCalibResidual::K_s() const {
-  return this->K(T(this->fx_s), T(this->fy_s), T(this->cx_s), T(this->cy_s));
-}
-
-template <typename T>
-Eigen::Matrix<T, 3, 3> GimbalCalibResidual::K_d() const {
-  return this->K(T(this->fx_d), T(this->fy_d), T(this->cx_d), T(this->cy_d));
-}
-
-template <typename T>
 Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_sd(const T *const tau_s,
                                                  const T *const tau_d,
                                                  const T *const w1,
@@ -106,12 +96,12 @@ Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_sd(const T *const tau_s,
 
   // Form T_eb
   // -- DH params for first link
-  const T theta1 = *Lambda1;
+  const T theta1 = Lambda1[0];
   const T alpha1 = w1[0];
   const T a1 = w1[1];
   const T d1 = w1[2];
   // -- DH params for second link
-  const T theta2 = *Lambda2;
+  const T theta2 = Lambda2[0];
   const T alpha2 = w2[0];
   const T a2 = w2[1];
   const T d2 = w2[2];
@@ -147,37 +137,38 @@ bool GimbalCalibResidual::operator()(const T *const tau_s,
                                      T *residual) const {
   // Form the transform from static camera to dynamic camera
   const Eigen::Matrix<T, 4, 4> T_sd =
-      this->T_sd(tau_s, Lambda1, w1, Lambda2, w2, tau_d);
+      this->T_sd(tau_s, tau_d, w1, w2, Lambda1, Lambda2);
 
   // Calculate reprojection error by projecting 3D world point observed in
   // dynamic camera to static camera
   // -- Transform 3D world point from dynamic to static camera
-  const Eigen::Matrix<T, 4, 1> P_d_homo{T(this->P_d[0]),
-                                        T(this->P_d[1]),
-                                        T(this->P_d[2]),
-                                        T(1.0)};
-  const Eigen::Matrix<T, 3, 1> P_s_cal = (T_sd * P_d_homo).head(3);
+  const Eigen::Matrix<T, 3, 1> P_d{T(this->P_d[0]),
+                                   T(this->P_d[1]),
+                                   T(this->P_d[2])};
+  const Eigen::Matrix<T, 3, 1> P_s_cal = (T_sd * P_d.homogeneous()).head(3);
   // -- Project 3D world point to image plane
-  const Eigen::Matrix<T, 3, 3> K_s = this->K_s<T>();
+  const Eigen::Matrix<T, 3, 3> K_s =
+      this->K(T(this->fx_s), T(this->fy_s), T(this->cx_s), T(this->cy_s));
   Eigen::Matrix<T, 3, 1> Q_s_cal = K_s * P_s_cal;
   // -- Normalize projected image point
   Q_s_cal(0) = Q_s_cal(0) / Q_s_cal(2);
   Q_s_cal(1) = Q_s_cal(1) / Q_s_cal(2);
-  // -- Calculate reprojection error
+  // // -- Calculate reprojection error
   residual[0] = T(this->Q_s[0]) - Q_s_cal(0);
   residual[1] = T(this->Q_s[1]) - Q_s_cal(1);
 
   // Calculate reprojection error by projecting 3D world point observed in
   // static camera to dynamic camera
   // -- Transform 3D world point from static to dynamic camera
-  const Eigen::Matrix<T, 4, 1> P_s_homo{T(this->P_s[0]),
-                                        T(this->P_s[1]),
-                                        T(this->P_s[2]),
-                                        T(1.0)};
-  const Eigen::Matrix<T, 4, 1> P_d_cal = (T_sd.inverse() * P_s_homo).head(3);
+  const Eigen::Matrix<T, 3, 1> P_s{T(this->P_s[0]),
+                                   T(this->P_s[1]),
+                                   T(this->P_s[2])};
+  const Eigen::Matrix<T, 3, 1> P_d_cal =
+      (T_sd.inverse() * P_s.homogeneous()).head(3);
   // -- Project 3D world point to image plane
-  const Eigen::Matrix<T, 3, 3> K_d = this->K_s<T>();
-  Eigen::Matrix<T, 3, 1> Q_d_cal = K_s * P_s_cal;
+  const Eigen::Matrix<T, 3, 3> K_d =
+      this->K(T(this->fx_d), T(this->fy_d), T(this->cx_d), T(this->cy_d));
+  Eigen::Matrix<T, 3, 1> Q_d_cal = K_d * P_d_cal;
   // -- Normalize projected image point
   Q_d_cal(0) = Q_d_cal(0) / Q_d_cal(2);
   Q_d_cal(1) = Q_d_cal(1) / Q_d_cal(2);

@@ -25,7 +25,23 @@ namespace gvio {
  * @param m2 Second matrix
  * @returns true or false
  */
-bool cvMatIsEqual(const cv::Mat m1, const cv::Mat m2);
+bool is_equal(const cv::Mat &m1, const cv::Mat &m2);
+
+/**
+ * Convert cv::Mat to Eigen::Matrix
+ *
+ * @param x Input matrix
+ * @param y Output matrix
+ */
+void convert(const cv::Mat &x, MatX &y);
+
+/**
+ * Convert Eigen::Matrix to cv::Mat
+ *
+ * @param x Input matrix
+ * @param y Output matrix
+ */
+void convert(const MatX &x, cv::Mat &y);
 
 /**
  * Convert x to homogenous coordinates

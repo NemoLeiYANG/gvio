@@ -2,7 +2,7 @@
 
 namespace gvio {
 
-bool cvMatIsEqual(const cv::Mat m1, const cv::Mat m2) {
+bool is_equal(const cv::Mat &m1, const cv::Mat &m2) {
   cv::Mat diff;
 
   // pre-check
@@ -23,6 +23,26 @@ bool cvMatIsEqual(const cv::Mat m1, const cv::Mat m2) {
   cv::compare(m1, m2, diff, cv::CMP_NE);
 
   return cv::countNonZero(diff) ? false : true;
+}
+
+void convert(const cv::Mat &x, MatX &y) {
+  y.resize(x.rows, x.cols);
+
+  for (int i = 0; i < x.rows; i++) {
+    for (int j = 0; j < x.cols; j++) {
+      y(i, j) = x.at<double>(i, j);
+    }
+  }
+}
+
+void convert(const MatX &x, cv::Mat &y) {
+  y = cv::Mat(x.rows(), x.cols(), cv::DataType<double>::type);
+
+  for (int i = 0; i < x.rows(); i++) {
+    for (int j = 0; j < x.cols(); j++) {
+      y.at<double>(i, j) = x(i, j);
+    }
+  }
 }
 
 Vec3 homogeneous(const Vec2 &x) { return Vec3{x(0), x(1), 1.0}; }
