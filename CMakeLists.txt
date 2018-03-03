@@ -59,14 +59,15 @@ ADD_LIBRARY(${PROJECT_NAME}
             src/feature2d/orb_tracker.cpp
             src/feature2d/klt_tracker.cpp
             # gimbal
-            src/gimbal/gmr/gmr.cpp
-            src/gimbal/gmr/slic.cpp
-            src/gimbal/calibration/chessboard.cpp
+            src/gimbal/calibration/aprilgrid.cpp
             src/gimbal/calibration/calib_data.cpp
             src/gimbal/calibration/calib_params.cpp
             src/gimbal/calibration/calib_validator.cpp
+            src/gimbal/calibration/chessboard.cpp
             src/gimbal/calibration/gimbal_calib.cpp
             src/gimbal/calibration/residual.cpp
+            src/gimbal/gmr/gmr.cpp
+            src/gimbal/gmr/slic.cpp
             src/gimbal/gimbal.cpp
             src/gimbal/gimbal_model.cpp
             src/gimbal/saliency.cpp
@@ -141,10 +142,11 @@ SET(UNITTESTS
     feature2d-gms_matcher_test
     feature2d-klt_tracker_test
     feature2d-orb_tracker_test
-    gimbal-calibration-chessboard_test
+    gimbal-calibration-aprilgrid_test
     gimbal-calibration-calib_data_test
     gimbal-calibration-calib_params_test
     gimbal-calibration-calib_validator_test
+    gimbal-calibration-chessboard_test
     gimbal-calibration-gimbal_calib_test
     gimbal-calibration-residual_test
     gimbal-gmr-gmr_test
