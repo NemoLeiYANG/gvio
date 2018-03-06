@@ -72,6 +72,16 @@ public:
   int loadCamchainFile(const std::string &camcahin_file);
 
   /**
+   * Find image files
+   *
+   * @param search_path Path to image files
+   * @param image_files List of sorted image files
+   * @returns 0 for success, -1 for failure
+   */
+  int findImageFiles(const std::string &search_path,
+                     std::vector<std::string> &image_files);
+
+  /**
    * Undistort image
    *
    * @param K Camera intrinsics matrix K
@@ -100,14 +110,18 @@ public:
                          const cv::Mat &image);
 
   /**
-   * Find image files
+   * Find common tags between detected
    *
-   * @param search_path Path to image files
-   * @param image_files List of sorted image files
-   * @returns 0 for success, -1 for failure
+   * @param tags0 Tags detected from image0
+   * @param tags1 Tags detected from image1
+   * @param tags2 Tags detected from image2
+   *
+   * @returns List of common tag ids detected
    */
-  int findImageFiles(const std::string &search_path,
-                     std::vector<std::string> &image_files);
+  std::vector<int>
+  findCommonTags(const std::map<int, std::vector<Vec2>> &tags0,
+                 const std::map<int, std::vector<Vec2>> &tags1,
+                 const std::map<int, std::vector<Vec2>> &tags2);
 
   /**
    * Preprocess calibration data

@@ -143,6 +143,27 @@ int CalibPreprocessor::findImageFiles(const std::string &search_path,
   return 0;
 }
 
+std::vector<int> CalibPreprocessor::findCommonTags(
+    const std::map<int, std::vector<Vec2>> &tags0,
+    const std::map<int, std::vector<Vec2>> &tags1,
+    const std::map<int, std::vector<Vec2>> &tags2) {
+  std::vector<int> common_tags;
+
+  // Find common tags between the maps
+  for (auto &tag : tags0) {
+    const int tag_id = tag.first;
+    const int in_tags0 = tags0.count(tag_id);
+    const int in_tags1 = tags1.count(tag_id);
+    const int in_tags2 = tags2.count(tag_id);
+
+    if (in_tags0 && in_tags1 && in_tags2) {
+      common_tags.push_back(tag.first);
+    }
+  }
+
+  return common_tags;
+}
+
 int CalibPreprocessor::preprocess(const std::string &dir_path) {
   // Load target file
   const std::string target_file = dir_path + "/target.yaml";
@@ -189,31 +210,67 @@ int CalibPreprocessor::preprocess(const std::string &dir_path) {
   }
 
   // Iterate through images
-  AprilGrid grid;
+  AprilGrid grid{this->target.rows,
+                 this->target.cols,
+                 this->target.square_size,
+                 this->target.spacing};
+
   for (int i = 0; i < this->nb_measurements; i++) {
     // Load images
     cv::Mat img0 = cv::imread(cam0_path + "/" + cam0_files[i]);
     cv::Mat img1 = cv::imread(cam1_path + "/" + cam1_files[i]);
+    cv::Mat img2 = cv::imread(cam2_path + "/" + cam2_files[i]);
 
     // Undistort image 0
     const cv::Mat K0 = this->camera_properties[0].K();
     const cv::Mat D0 = this->camera_properties[0].D();
-    const cv::Mat img0_ud = this->undistortImage(K0, D0, img0);
+    cv::Mat img0_ud = this->undistortImage(K0, D0, img0);
 
     // Undistort image 1
     const cv::Mat K1 = this->camera_properties[1].K();
     const cv::Mat D1 = this->camera_properties[1].D();
-    const cv::Mat img1_ud = this->undistortImage(K1, D1, img1);
+    cv::Mat img1_ud = this->undistortImage(K1, D1, img1);
 
-    grid.extractCorners(img0_ud);
-    grid.extractCorners(img1_ud);
+    // Undistort image 2
+    const cv::Mat K2 = this->camera_properties[2].K();
+    const cv::Mat D2 = this->camera_properties[2].D();
+    cv::Mat img2_ud = this->undistortImage(K2, D2, img2);
 
-    // cv::imshow("cam0", img0);
-    // cv::imshow("cam0 undistorted", img0_ud);
-    // cv::imshow("cam1", img1);
-    // cv::imshow("cam1 undistorted", img1_ud);
+    // Extract tags
+    std::map<int, std::vector<Vec2>> tags0;
+    std::map<int, std::vector<Vec2>> tags1;
+    std::map<int, std::vector<Vec2>> tags2;
+    grid.extractTags(img0_ud, tags0);
+    grid.extractTags(img1_ud, tags1);
+    grid.extractTags(img2_ud, tags2);
 
-    cv::waitKey();
+    // Find common tags between the images
+    std::vector<int> common_ids = this->findCommonTags(tags0, tags1, tags2);
+    // -- Estimated 3d position of tag corners
+    MatX P_c0 = zeros(common_ids.size() * 4, 3);
+    MatX P_c1 = zeros(common_ids.size() * 4, 3);
+    MatX P_c2 = zeros(common_ids.size() * 4, 3);
+    // -- Observed 2d pixel measurements of tag corners
+    MatX Q_c0 = zeros(common_ids.size() * 4, 2);
+    MatX Q_c1 = zeros(common_ids.size() * 4, 2);
+    MatX Q_c2 = zeros(common_ids.size() * 4, 2);
+
+    int index = 0;
+    for (auto &id : common_ids) {
+      for (int i = 0; i < 4; i++) {
+        Q_c0.block(index, 0, 1, 2) = tags0[id][i].transpose();
+        Q_c1.block(index, 0, 1, 2) = tags1[id][i].transpose();
+        Q_c2.block(index, 0, 1, 2) = tags2[id][i].transpose();
+        index++;
+      }
+    }
+
+    // // Visualize detected AprilTags
+    // cv::imshow("img0", img0_ud);
+    // cv::imshow("img1", img1_ud);
+    // cv::imshow("img2", img2_ud);
+    //
+    // cv::waitKey();
   }
 
   return 0;

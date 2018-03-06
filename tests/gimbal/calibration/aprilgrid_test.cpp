@@ -21,7 +21,7 @@ int test_AprilGrid_constructor() {
     cv::Mat image;
     capture.read(image);
 
-    grid.extractCorners(image);
+    grid.detect(image);
     cv::imshow("Image", image);
     if (cv::waitKey(1) == 113) {
       break;
