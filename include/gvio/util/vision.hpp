@@ -44,6 +44,22 @@ void convert(const cv::Mat &x, MatX &y);
 void convert(const MatX &x, cv::Mat &y);
 
 /**
+ * Convert cv::Mat to Eigen::Matrix
+ *
+ * @param x Input matrix
+ * @returns Matrix as Eigen::Matrix
+ */
+MatX convert(const cv::Mat &x);
+
+/**
+ * Convert Eigen::Matrix to cv::Mat
+ *
+ * @param x Input matrix
+ * @returns Matrix as cv::Mat
+ */
+cv::Mat convert(const MatX &x);
+
+/**
  * Convert x to homogenous coordinates
  *
  * @param x Input vector

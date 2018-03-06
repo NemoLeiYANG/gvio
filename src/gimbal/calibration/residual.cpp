@@ -59,12 +59,12 @@ std::ostream &operator<<(std::ostream &os,
   return os;
 }
 
-Mat4 GimbalCalibNumericalResidual::T_sd(const Vec3 tau_s,
+Mat4 GimbalCalibNumericalResidual::T_sd(const VecX &tau_s,
                                         const double Lambda1,
-                                        const Vec3 w1,
-                                        const Vec3 tau_d,
+                                        const Vec3 &w1,
+                                        const VecX &tau_d,
                                         const double Lambda2,
-                                        const Vec3 w2) const {
+                                        const Vec3 &w2) const {
   // Form T_sb
   const Vec3 t_G_sb{tau_s(0), tau_s(1), tau_s(2)};
   const Vec3 rpy_bs{tau_s(3), tau_s(4), tau_s(5)};
@@ -118,10 +118,12 @@ bool GimbalCalibNumericalResidual::operator()(const double *const p0,
                                               const double *const p5,
                                               double *residual) const {
   // Map stacked optimization parameters back to its respective parameter
-  const Vec3 tau_s{p0[0], p0[1], p0[2]};
+  VecX tau_s = zeros(6, 1);
+  tau_s << p0[0], p0[1], p0[2], p0[3], p0[4], p0[5];
   const double Lambda1 = p1[0];
   const Vec3 w1{p2[0], p2[1], p2[2]};
-  const Vec3 tau_d{p3[0], p3[1], p3[2]};
+  VecX tau_d = zeros(6, 1);
+  tau_d << p3[0], p3[1], p3[2], p3[3], p3[4], p3[5];
   const double Lambda2 = p4[0];
   const Vec3 w2{p5[0], p5[1], p5[2]};
 

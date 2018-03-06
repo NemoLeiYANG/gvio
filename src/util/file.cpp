@@ -92,7 +92,6 @@ int list_dir(const std::string &path, std::vector<std::string> &results) {
   // Check directory
   dp = opendir(path.c_str());
   if (dp == NULL) {
-    LOG_ERROR("Failed to list [%s]!", path.c_str());
     return -1;
   }
 

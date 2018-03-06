@@ -7,7 +7,7 @@ MatX radtan_distort(const double k1,
                     const double k3,
                     const double p1,
                     const double p2,
-                    const MatX points) {
+                    const MatX &points) {
   const Eigen::ArrayXd z = points.col(2).array();
   const Eigen::ArrayXd x = points.col(0).array() / z.array();
   const Eigen::ArrayXd y = points.col(1).array() / z.array();
@@ -39,7 +39,7 @@ MatX equi_distort(const double k1,
                   const double k2,
                   const double k3,
                   const double k4,
-                  const MatX points) {
+                  const MatX &points) {
   const Eigen::ArrayXd z = points.col(2).array();
   const Eigen::ArrayXd x = points.col(0).array() / z.array();
   const Eigen::ArrayXd y = points.col(1).array() / z.array();
@@ -59,6 +59,32 @@ MatX equi_distort(const double k1,
   distorted_points.col(0) = x_dash;
   distorted_points.col(1) = y_dash;
   return distorted_points;
+}
+
+Vec2 equi_distort(const double k1,
+                  const double k2,
+                  const double k3,
+                  const double k4,
+                  const Vec3 &point) {
+  const double z = point(2);
+  const double x = point(0) / z;
+  const double y = point(1) / z;
+  const double r = sqrt(pow(x, 2) + pow(y, 2));
+
+  // Apply equi distortion
+  // clang-format off
+  const double theta = atan(r);
+  const double th2 = pow(theta, 2);
+  const double th4 = pow(theta, 4);
+  const double th6 = pow(theta, 6);
+  const double th8 = pow(theta, 8);
+  const double theta_d = theta * (1 + k1 * th2 + k2 * th4 + k3 * th6 + k4 * th8);
+  const double x_dash = (theta_d / r) * x;
+  const double y_dash = (theta_d / r) * y;
+  // clang-format on
+
+  // Project equi distorted point to image plane
+  return Vec2{x_dash, y_dash};
 }
 
 } // namespace gvio

@@ -24,19 +24,25 @@ MatX radtan_distort(const double k1,
                     const double k3,
                     const double p1,
                     const double p2,
-                    const MatX points);
+                    const MatX &points);
 
 /**
  * Distort 3D points with the equi-distant distortion model
- *
- * Source:
- * https://april.eecs.umich.edu/pdfs/richardson2013iros.pdf
  */
 MatX equi_distort(const double k1,
                   const double k2,
                   const double k3,
                   const double k4,
-                  const MatX points);
+                  const MatX &points);
+
+/**
+ * Distort a single 3D point with the equi-distant distortion model
+ */
+Vec2 equi_distort(const double k1,
+                  const double k2,
+                  const double k3,
+                  const double k4,
+                  const Vec3 &point);
 
 /** @} group camera */
 } // namespace gvio

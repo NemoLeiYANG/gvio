@@ -22,7 +22,14 @@ public:
 
   AprilGrid();
   ~AprilGrid();
-  int extractCorners(const cv::Mat &image_gray);
+
+  /**
+   * Extract corners
+   *
+   * @param image Input image
+   * @return 0 for success, -1 for failure
+   */
+  int extractCorners(const cv::Mat &image);
 };
 
 } // namespace gvio

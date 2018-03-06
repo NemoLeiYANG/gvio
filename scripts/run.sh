@@ -47,9 +47,10 @@ cd tests
 # ./feature2d-gms_matcher_test
 # ./feature2d-klt_tracker_test
 # ./feature2d-orb_tracker_test
-./gimbal-calibration-aprilgrid_test
+# ./gimbal-calibration-aprilgrid_test
 # ./gimbal-calibration-chessboard_test
 # ./gimbal-calibration-calib_params_test
+./gimbal-calibration-calib_preprocessor_test
 # ./gimbal-calibration-calib_validator_test
 # ./gimbal-calibration-gimbal_calib_test
 # ./gimbal-calibration-residual_test

@@ -117,12 +117,12 @@ struct GimbalCalibNumericalResidual {
       : P_s{P_s}, P_d{P_d}, Q_s{Q_s}, Q_d{Q_d}, K_s{K_s}, K_d{K_d} {}
 
   /// Calculate transform between static and dynamic camera
-  Mat4 T_sd(const Vec3 tau_s,
+  Mat4 T_sd(const VecX &tau_s,
             const double Lambda1,
-            const Vec3 w1,
-            const Vec3 tau_d,
+            const Vec3 &w1,
+            const VecX &tau_d,
             const double Lambda2,
-            const Vec3 w2) const;
+            const Vec3 &w2) const;
 
   /// Calculate residual
   bool operator()(const double *const p0,

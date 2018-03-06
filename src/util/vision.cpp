@@ -45,6 +45,18 @@ void convert(const MatX &x, cv::Mat &y) {
   }
 }
 
+MatX convert(const cv::Mat &x) {
+  MatX y;
+  convert(x, y);
+  return y;
+}
+
+cv::Mat convert(const MatX &x) {
+  cv::Mat y;
+  convert(x, y);
+  return y;
+}
+
 Vec3 homogeneous(const Vec2 &x) { return Vec3{x(0), x(1), 1.0}; }
 
 Vec4 homogeneous(const Vec3 &x) { return Vec4{x(0), x(1), x(2), 1.0}; }
