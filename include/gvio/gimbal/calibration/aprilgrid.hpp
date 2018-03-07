@@ -19,9 +19,7 @@ public:
   double tag_size = 0.0;    ///< Size of a tag [m]
   double tag_spacing = 0.0; ///< Space between tags [m]
 
-  // Construct an AprilGrid calibration target
-  //
-  // Corner ordering in AprilGrid.object_points:
+  // AprilGrid grid_points:
   //
   //   12-----13  14-----15
   //   | TAG 3 |  | TAG 4 |
@@ -30,7 +28,18 @@ public:
   // y | TAG 1 |  | TAG 2 |
   // ^ 0-------1  2-------3
   // |-->x
-  MatX object_points;
+  MatX grid_points;
+
+  // AprilGrid tag coordinates:
+  //
+  //   12-----13  14-----15
+  //   | (0,1) |  | (1,1) |
+  //   8-------9  10-----11
+  //   4-------5  6-------7
+  // y | (0,0) |  | (1,0) |
+  // ^ 0-------1  2-------3
+  // |-->x
+  std::map<int, std::pair<int, int>> tag_coordinates;
 
   /// AprilGrid detector
   AprilTags::TagDetector detector =
@@ -51,15 +60,41 @@ public:
    */
   int detect(cv::Mat &image);
 
-  int solvePnP(const std::map<int, std::vector<Vec2>> &tags);
-
   /**
    * Extract tags
    *
    * @param image Input image
    * @return 0 for success, -1 for failure
    */
-  int extractTags(cv::Mat &image, std::map<int, std::vector<Vec2>> &tags);
+  int extractTags(cv::Mat &image,
+                  std::map<int, std::vector<cv::Point2f>> &tags);
+
+  /**
+   * Form object points
+   *
+   * @params tags Observed AprilGrid tags
+   * @returns Object points for SolvePnP
+   */
+  std::vector<cv::Point3f>
+  formObjectPoints(const std::map<int, std::vector<cv::Point2f>> &tags);
+
+  /**
+   * Form image points
+   *
+   * @params tags Observed AprilGrid tags
+   * @returns Image points observed for SolvePnP
+   */
+  std::vector<cv::Point2f>
+  formImagePoints(const std::map<int, std::vector<cv::Point2f>> &tags);
+
+  /**
+   * SolvePnP
+   *
+   * @params tags Observed AprilGrid tags
+   */
+  int solvePnP(const std::map<int, std::vector<cv::Point2f>> &tags,
+               const cv::Mat &K,
+               MatX &grid_points);
 };
 
 } // namespace gvio

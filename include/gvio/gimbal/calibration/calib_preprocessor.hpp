@@ -119,9 +119,9 @@ public:
    * @returns List of common tag ids detected
    */
   std::vector<int>
-  findCommonTags(const std::map<int, std::vector<Vec2>> &tags0,
-                 const std::map<int, std::vector<Vec2>> &tags1,
-                 const std::map<int, std::vector<Vec2>> &tags2);
+  findCommonTags(const std::map<int, std::vector<cv::Point2f>> &tags0,
+                 const std::map<int, std::vector<cv::Point2f>> &tags1,
+                 const std::map<int, std::vector<cv::Point2f>> &tags2);
 
   /**
    * Preprocess calibration data

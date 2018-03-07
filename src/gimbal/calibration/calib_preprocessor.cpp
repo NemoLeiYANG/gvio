@@ -8,6 +8,7 @@ cv::Mat CameraProperties::K() {
   K.at<double>(1, 1) = this->intrinsics[1];
   K.at<double>(0, 2) = this->intrinsics[2];
   K.at<double>(1, 2) = this->intrinsics[3];
+  K.at<double>(2, 2) = 1.0;
   return K;
 }
 
@@ -144,9 +145,9 @@ int CalibPreprocessor::findImageFiles(const std::string &search_path,
 }
 
 std::vector<int> CalibPreprocessor::findCommonTags(
-    const std::map<int, std::vector<Vec2>> &tags0,
-    const std::map<int, std::vector<Vec2>> &tags1,
-    const std::map<int, std::vector<Vec2>> &tags2) {
+    const std::map<int, std::vector<cv::Point2f>> &tags0,
+    const std::map<int, std::vector<cv::Point2f>> &tags1,
+    const std::map<int, std::vector<cv::Point2f>> &tags2) {
   std::vector<int> common_tags;
 
   // Find common tags between the maps
@@ -237,10 +238,10 @@ int CalibPreprocessor::preprocess(const std::string &dir_path) {
     cv::Mat img2_ud = this->undistortImage(K2, D2, img2);
 
     // Extract tags
-    std::map<int, std::vector<Vec2>> tags0;
-    std::map<int, std::vector<Vec2>> tags1;
-    std::map<int, std::vector<Vec2>> tags2;
-    grid.extractTags(img0_ud, tags0);
+    std::map<int, std::vector<cv::Point2f>> tags0;
+    std::map<int, std::vector<cv::Point2f>> tags1;
+    std::map<int, std::vector<cv::Point2f>> tags2;
+    grid.extractTags(img0, tags0);
     grid.extractTags(img1_ud, tags1);
     grid.extractTags(img2_ud, tags2);
 
@@ -255,22 +256,41 @@ int CalibPreprocessor::preprocess(const std::string &dir_path) {
     MatX Q_c1 = zeros(common_ids.size() * 4, 2);
     MatX Q_c2 = zeros(common_ids.size() * 4, 2);
 
-    int index = 0;
-    for (auto &id : common_ids) {
-      for (int i = 0; i < 4; i++) {
-        Q_c0.block(index, 0, 1, 2) = tags0[id][i].transpose();
-        Q_c1.block(index, 0, 1, 2) = tags1[id][i].transpose();
-        Q_c2.block(index, 0, 1, 2) = tags2[id][i].transpose();
-        index++;
-      }
+    MatX grid_points;
+    grid.solvePnP(tags0, this->camera_properties[0].K(), grid_points);
+
+    for (long i = 0; i < grid_points.rows(); i++) {
+      const Vec3 pt = grid_points.row(i).transpose();
+      const Mat3 K = convert(this->camera_properties[0].K());
+      Vec3 pixel = K * pt;
+      pixel(0) = pixel(0) / pixel(2);
+      pixel(1) = pixel(1) / pixel(2);
+      std::cout << pixel.transpose() << std::endl;
+
+      cv::circle(img0_ud,
+                 cv::Point(pixel(0), pixel(1)),
+                 5,
+                 cv::Scalar(0, 0, 255),
+                 1,
+                 8);
     }
 
+    // int index = 0;
+    // for (auto &id : common_ids) {
+    //   for (int i = 0; i < 4; i++) {
+    //     // Q_c0.block(index, 0, 1, 2) = tags0[id][i].transpose();
+    //     // Q_c1.block(index, 0, 1, 2) = tags1[id][i].transpose();
+    //     // Q_c2.block(index, 0, 1, 2) = tags2[id][i].transpose();
+    //     index++;
+    //   }
+    // }
+
     // // Visualize detected AprilTags
-    // cv::imshow("img0", img0_ud);
+    cv::imshow("img0", img0_ud);
     // cv::imshow("img1", img1_ud);
     // cv::imshow("img2", img2_ud);
     //
-    // cv::waitKey();
+    cv::waitKey();
   }
 
   return 0;
