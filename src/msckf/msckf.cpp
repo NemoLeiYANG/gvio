@@ -154,6 +154,8 @@ void MSCKF::H(const FeatureTrack &track,
     H_x_j.block(rs, cs_dhdq, 2, 3) = dhdg * skew(p_C_f);
     H_x_j.block(rs, cs_dhdp, 2, 3) = -dhdg * C_CiG;
 
+    // TODO: Modify measurement jacobian according to OC-EKF
+
     // Update pose_idx
     pose_idx++;
   }
@@ -315,6 +317,7 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     H_o_j = H_x_j;
     r_o_j = r_j;
   }
+
 
   // Peform chi squared test
   const int dof = track.trackedLength() - 1;

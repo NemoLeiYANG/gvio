@@ -139,6 +139,8 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   this->P = Phi * this->P * Phi.transpose() + (G * this->Q * G.transpose()) * dt;
   this->P = enforce_psd(P);
   // clang-format on
+
+  // TODO: Modify transition matrix according to OC-EKF
 }
 
 void IMUState::correct(const VecX &dx) {
