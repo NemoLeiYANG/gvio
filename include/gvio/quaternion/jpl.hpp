@@ -174,6 +174,21 @@ Mat3 C(const Vec4 &q);
  */
 Mat4 Omega(const Vec3 &w);
 
+/**
+ * Quaternion Zeroth order integration
+ *
+ * Page 12-13 of Trawny, Nikolas, and Stergios I. Roumeliotis. "Indirect Kalman
+ * filter for 3D attitude estimation." University of Minnesota, Dept. of Comp.
+ * Sci. & Eng., Tech. Rep 2 (2005): 2005.
+ *
+ * @param q Quaternion in (x, y, z, w)
+ * @param w Angular velocity
+ * @param dt Time difference (s)
+ *
+ * @returns Zeroth order integrated quaternion
+ */
+Vec4 quatzoi(const Vec4 &q, const Vec3 &w, const double dt);
+
 /** @} group quaternion */
 } // namespace gvio
 

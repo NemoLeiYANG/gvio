@@ -60,6 +60,8 @@ public:
   MatX Q = 1e-2 * I(12); ///< Noise matrix
   MatX Phi = I(15);      ///< Phi matrix
 
+  bool rk4 = false; ///< Runge-Kutta 4th order integration
+
   IMUState();
   IMUState(const IMUStateConfig &config);
 

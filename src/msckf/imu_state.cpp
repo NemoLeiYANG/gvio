@@ -38,6 +38,7 @@ IMUState::IMUState(const IMUStateConfig &config) {
   // this->Phi = I(this->size);
 }
 
+// TODO: Modify F to reflect new motion model
 MatX IMUState::F(const Vec3 &w_hat,
                  const Vec4 &q_hat,
                  const Vec3 &a_hat,
@@ -57,6 +58,7 @@ MatX IMUState::F(const Vec3 &w_hat,
   return F;
 }
 
+// TODO: Modify G to reflect new motion model
 MatX IMUState::G(const Vec4 &q_hat) {
   MatX G = zeros(15, 12);
   // -- First row block --
@@ -84,23 +86,56 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
 
   // Propagate IMU states
   // clang-format off
-  // -- Orientation
-  this->q_IG += 0.5 * Omega(w_hat) * q_IG * dt;
-  this->q_IG = quatnormalize(this->q_IG);
-  // -- Velocity
-  this->v_G += (C(this->q_IG).transpose() * a_hat - 2 * skew(this->w_G) * this->v_G - skewsq(this->w_G) * this->p_G + this->g_G) * dt;
-  // -- Position
-  this->p_G += v_G * dt;
+  if (this->rk4) {
+    // Quaternion zeroth order integration
+    const Vec4 dq_dt = quatzoi(this->q_IG, w_hat, dt);
+    const Vec4 dq_dt2 = quatzoi(this->q_IG, w_hat, dt);
+    const Mat3 dR_dt_transpose = C(dq_dt).transpose();
+    const Mat3 dR_dt2_transpose = C(dq_dt2).transpose();
+
+    // 4th order Runge-Kutta
+    // -- k1 = f(tn, yn)
+    const Vec3 k1_v_dot = C(this->q_IG).transpose() * a_hat + this->g_G;
+    const Vec3 k1_p_dot = this->v_G;
+    // -- k2 = f(tn + dt / 2, yn + k1 * dt / 2)
+    const Vec3 k1_v = this->v_G + k1_v_dot * dt / 2.0;
+    const Vec3 k2_v_dot = dR_dt2_transpose * a_hat + this->g_G;
+    const Vec3 k2_p_dot = k1_v;
+    // -- k3 = f(tn + dt / 2, yn + k2 * dt / 2)
+    const Vec3 k2_v = this->v_G + k2_v_dot * dt / 2;
+    const Vec3 k3_v_dot = dR_dt2_transpose * a_hat + this->g_G;
+    const Vec3 k3_p_dot = k2_v;
+    // -- k4 = f(tn + dt, yn + k3)
+    const Vec3 k3_v = this->v_G + k3_v_dot * dt;
+    const Vec3 k4_v_dot = dR_dt_transpose * a_hat + this->g_G;
+    const Vec3 k4_p_dot = k3_v;
+    // -- yn + 1 = yn + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+    this->q_IG = quatnormalize(dq_dt);
+    this->v_G = this->v_G + dt / 6 * (k1_v_dot + 2 * k2_v_dot + 2 * k3_v_dot + k4_v_dot);
+    this->p_G = this->p_G + dt / 6 * (k1_p_dot + 2 * k2_p_dot + 2 * k3_p_dot + k4_p_dot);
+
+  } else {
+    // -- Orientation
+    this->q_IG += 0.5 * Omega(w_hat) * this->q_IG * dt;
+    this->q_IG = quatnormalize(this->q_IG);
+    // -- Velocity
+    this->v_G += (C(this->q_IG).transpose() * a_hat - 2 * skew(this->w_G) * this->v_G - skewsq(this->w_G) * this->p_G + this->g_G) * dt;
+    // -- Position
+    this->p_G += v_G * dt;
+
+  }
   // clang-format on
 
   // Update covariance
   // clang-format off
-  // Approximate matrix exponential to the 3rd order, which can be considered
-  // to be accurate enough assuming dt is within 0.01s.
+  // -- Approximate matrix exponential to the 3rd order using the power series,
+  //    which can be considered to be accurate enough assuming dt is within
+  //    0.01s.
   const MatX F_dt = F * dt;
   const MatX F_dt_sq = F_dt * F_dt;
   const MatX F_dt_cube = F_dt_sq * F_dt;
   this->Phi = I(this->size) + F_dt + 0.5 * F_dt_sq + (1.0 / 6.0) * F_dt_cube;
+  // -- Update
   this->P = Phi * this->P * Phi.transpose() + (G * this->Q * G.transpose()) * dt;
   this->P = enforce_psd(P);
   // clang-format on
