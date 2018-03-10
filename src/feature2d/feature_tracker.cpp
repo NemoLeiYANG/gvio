@@ -24,6 +24,12 @@ void FeatureTracker::getKeyPointsAndDescriptors(
     const Features &features,
     std::vector<cv::KeyPoint> &keypoints,
     cv::Mat &descriptors) {
+  // Pre-check
+  if (features.size() == 0) {
+    return;
+  }
+
+  // Fill in keypoints and descriptors
   descriptors = cv::Mat(features.size(), features[0].desc.cols, CV_8UC1);
   for (size_t i = 0; i < features.size(); i++) {
     keypoints.push_back(features[i].kp);

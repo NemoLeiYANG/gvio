@@ -128,7 +128,6 @@ int test_PinholeModel_project() {
 
   MU_CHECK_FLOAT(320.0, x(0));
   MU_CHECK_FLOAT(320.0, x(1));
-  MU_CHECK_FLOAT(1.0, x(2));
 
   return 0;
 }

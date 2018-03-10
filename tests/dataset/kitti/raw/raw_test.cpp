@@ -3,8 +3,10 @@
 
 namespace gvio {
 
+#define TEST_DATA_PATH "test_data/kitti/raw/"
+
 int test_RAW_load() {
-  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  RawDataset raw_dataset(TEST_DATA_PATH, "2011_09_26", "0001");
   MU_CHECK(raw_dataset.load() == 0);
   return 0;
 }

@@ -39,7 +39,11 @@ cd tests
 # ./camera-pinhole_model_test
 # ./control-carrot_controller_test
 # ./control-pid_test
-# ./euroc-mav_dataset_test
+# ./dataset-euroc-mav_dataset_test
+# ./dataset-kitti-raw-calib_test
+# ./dataset-kitti-raw-oxts_test
+# ./dataset-kitti-raw-parse_test
+# ./dataset-kitti-raw-raw_test
 # ./feature2d-feature_container_test
 # ./feature2d-feature_test
 # ./feature2d-feature_track_test
@@ -58,10 +62,6 @@ cd tests
 # ./gimbal-sbgc_test
 # ./gimbal-saliency_test
 # ./imu-mpu6050_test
-# ./kitti-raw-calib_test
-# ./kitti-raw-oxts_test
-# ./kitti-raw-parse_test
-# ./kitti-raw-raw_test
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test

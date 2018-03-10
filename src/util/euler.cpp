@@ -45,15 +45,15 @@ Mat3 euler123ToRot(const Vec3 &euler) {
   const double psi = euler(2);
 
   const double R11 = cos(psi) * cos(theta);
-  const double R12 = sin(psi) * cos(theta);
-  const double R13 = -sin(theta);
-
   const double R21 = cos(psi) * sin(theta) * sin(phi) - sin(psi) * cos(phi);
-  const double R22 = sin(psi) * sin(theta) * sin(phi) + cos(psi) * cos(phi);
-  const double R23 = cos(theta) * sin(phi);
-
   const double R31 = cos(psi) * sin(theta) * cos(phi) + sin(psi) * sin(phi);
+
+  const double R12 = sin(psi) * cos(theta);
+  const double R22 = sin(psi) * sin(theta) * sin(phi) + cos(psi) * cos(phi);
   const double R32 = sin(psi) * sin(theta) * cos(phi) - cos(psi) * sin(phi);
+
+  const double R13 = -sin(theta);
+  const double R23 = cos(theta) * sin(phi);
   const double R33 = cos(theta) * cos(phi);
 
   Mat3 R;
@@ -73,15 +73,15 @@ Mat3 euler321ToRot(const Vec3 &euler) {
   const double psi = euler(2);
 
   const double R11 = cos(psi) * cos(theta);
-  const double R12 = cos(psi) * sin(theta) * sin(phi) - sin(psi) * cos(phi);
-  const double R13 = cos(psi) * sin(theta) * cos(phi) + sin(psi) * sin(phi);
-
   const double R21 = sin(psi) * cos(theta);
-  const double R22 = sin(psi) * sin(theta) * sin(phi) + cos(psi) * cos(phi);
-  const double R23 = sin(psi) * sin(theta) * cos(phi) - cos(psi) * sin(phi);
-
   const double R31 = -sin(theta);
+
+  const double R12 = cos(psi) * sin(theta) * sin(phi) - sin(psi) * cos(phi);
+  const double R22 = sin(psi) * sin(theta) * sin(phi) + cos(psi) * cos(phi);
   const double R32 = cos(theta) * sin(phi);
+
+  const double R13 = cos(psi) * sin(theta) * cos(phi) + sin(psi) * sin(phi);
+  const double R23 = sin(psi) * sin(theta) * cos(phi) - cos(psi) * sin(phi);
   const double R33 = cos(theta) * cos(phi);
 
   Mat3 R;

@@ -318,7 +318,6 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     r_o_j = r_j;
   }
 
-
   // Peform chi squared test
   const int dof = track.trackedLength() - 1;
   if (this->chiSquaredTest(H_o_j, r_o_j, dof) != 0) {

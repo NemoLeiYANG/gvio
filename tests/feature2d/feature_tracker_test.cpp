@@ -87,6 +87,9 @@ int test_FeatureTracker_match() {
   FeatureTracker tracker;
   const cv::Mat img0 = cv::imread(TEST_IMAGE_TOP, CV_LOAD_IMAGE_COLOR);
   const cv::Mat img1 = cv::imread(TEST_IMAGE_BOTTOM, CV_LOAD_IMAGE_COLOR);
+  // cv::imshow("Image0", img0);
+  // cv::imshow("Image1", img1);
+  // cv::waitKey();
 
   // Detect keypoints and descriptors
   cv::Mat mask;
@@ -98,7 +101,7 @@ int test_FeatureTracker_match() {
   std::vector<Feature> f0;
   orb->detectAndCompute(img0, mask, k0, d0);
   tracker.getFeatures(k0, d0, f0);
-  // tracker.fea_ref = f0;
+  tracker.fea_ref = f0;
 
   // Detect features in image 1
   std::vector<cv::KeyPoint> k1;
@@ -114,9 +117,11 @@ int test_FeatureTracker_match() {
 
   // Draw inliers
   cv::Mat matches_img = draw_inliers(img0, img1, k0, k1, matches, 1);
-
   // cv::imshow("Matches", matches_img);
   // cv::waitKey();
+
+  // Asserts
+  MU_CHECK(matches.size() > 0);
 
   return 0;
 }
