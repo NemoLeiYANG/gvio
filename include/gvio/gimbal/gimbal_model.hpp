@@ -20,7 +20,7 @@ namespace gvio {
  */
 
 /**
- * Create DH transform
+ * Create DH transform from link n to link n-1 (end to front)
  *
  * @param theta
  * @param alpha
@@ -61,22 +61,22 @@ public:
   /**
    * Returns transform from static camera to base mechanism
    */
-  Mat4 T_sb();
+  Mat4 T_bs();
 
   /**
    * Returns transform from base mechanism to end-effector
    */
-  Mat4 T_be();
+  Mat4 T_eb();
 
   /**
    * Returns transform from end-effector to dynamic camera
    */
-  Mat4 T_ed();
+  Mat4 T_de();
 
   /**
    * Returns transform from static to dynamic camera
    */
-  Mat4 T_sd();
+  Mat4 T_ds();
 };
 
 /** @} group gimbal */
