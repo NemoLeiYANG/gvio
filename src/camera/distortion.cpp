@@ -8,6 +8,10 @@ MatX radtan_distort(const double k1,
                     const double p1,
                     const double p2,
                     const MatX &points) {
+  // Asserts
+  assert(points.cols() == 3);
+
+  // Setup
   const Eigen::ArrayXd z = points.col(2).array();
   const Eigen::ArrayXd x = points.col(0).array() / z.array();
   const Eigen::ArrayXd y = points.col(1).array() / z.array();
@@ -40,6 +44,10 @@ MatX equi_distort(const double k1,
                   const double k3,
                   const double k4,
                   const MatX &points) {
+  // Asserts
+  assert(points.cols() == 3);
+
+  // Setup
   const Eigen::ArrayXd z = points.col(2).array();
   const Eigen::ArrayXd x = points.col(0).array() / z.array();
   const Eigen::ArrayXd y = points.col(1).array() / z.array();
@@ -85,6 +93,48 @@ Vec2 equi_distort(const double k1,
 
   // Project equi distorted point to image plane
   return Vec2{x_dash, y_dash};
+}
+
+void equi_undistort(const double k1,
+                    const double k2,
+                    const double k3,
+                    const double k4,
+                    Vec2 &p) {
+  const double thetad = sqrt(p(0) * p(0) + p(1) * p(1));
+
+  double theta = thetad; // Initial guess
+  for (int i = 20; i > 0; i--) {
+    const double th2 = theta * theta;
+    const double th4 = th2 * th2;
+    const double th6 = th4 * th2;
+    const double th8 = th4 * th4;
+    theta = thetad / (1 + k1 * th2 + k2 * th4 + k3 * th6 + k4 * th8);
+  }
+
+  const double scaling = tan(theta) / thetad;
+  p(0) *= scaling;
+  p(1) *= scaling;
+}
+
+cv::Mat pinhole_equi_undistort_image(const Mat3 &K,
+                                     const VecX &D,
+                                     const cv::Mat &image,
+                                     cv::Mat &Knew) {
+  // Estimate new camera matrix first
+  const cv::Mat R = cv::Mat::eye(3, 3, CV_64F);
+  const double balance = 0.0;
+  cv::fisheye::estimateNewCameraMatrixForUndistortRectify(convert(K),
+                                                          convert(D),
+                                                          image.size(),
+                                                          R,
+                                                          Knew,
+                                                          balance);
+
+  // Undistort image
+  cv::Mat image_ud;
+  cv::fisheye::undistortImage(image, image_ud, convert(K), convert(D), Knew);
+
+  return image_ud;
 }
 
 } // namespace gvio

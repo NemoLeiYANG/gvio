@@ -6,6 +6,41 @@ CalibValidator::CalibValidator() {}
 
 CalibValidator::~CalibValidator() {}
 
+Mat3 CalibValidator::K() {
+  Mat3 K;
+
+  // First row
+  K(0, 0) = this->intrinsics[0];
+  K(0, 1) = 0.0;
+  K(0, 2) = this->intrinsics[1];
+
+  // Second row
+  K(1, 0) = 0.0;
+  K(1, 1) = this->intrinsics[2];
+  K(1, 2) = this->intrinsics[3];
+
+  // Thrid row
+  K(2, 0) = 0.0;
+  K(2, 1) = 0.0;
+  K(2, 2) = 1.0;
+
+  return K;
+}
+
+VecX CalibValidator::D() {
+  VecX D;
+  D.resize(4);
+
+  // clang-format off
+  D << this->distortion_coeffs(0),
+       this->distortion_coeffs(1),
+       this->distortion_coeffs(2),
+       this->distortion_coeffs(3);
+  // clang-format on
+
+  return D;
+}
+
 int CalibValidator::load(const std::string &calib_file,
                          const std::string &target_file) {
   // Parse calib file
@@ -30,38 +65,50 @@ int CalibValidator::load(const std::string &calib_file,
 }
 
 cv::Mat CalibValidator::validate(const cv::Mat &image) {
-  cv::Mat result = image.clone();
+  // Undistort image
+  cv::Mat Knew;
+  cv::Mat image_ud =
+      pinhole_equi_undistort_image(this->K(), this->D(), image, Knew);
 
-  // Find corners
+  // Find chessboard corners (with undistorted image)
   std::vector<cv::Point2f> corners;
-  if (this->chessboard.detect(image, corners) != 0) {
-    return result;
+  if (this->chessboard.detect(image_ud, corners) != 0) {
+    return image;
   }
 
-  // Form camera matrix K
-  cv::Mat K(3, 3, cv::DataType<double>::type);
-  K.at<double>(0, 0) = this->intrinsics[0];
-  K.at<double>(0, 1) = 0.0;
-  K.at<double>(0, 2) = this->intrinsics[1];
-  K.at<double>(1, 0) = 0.0;
-  K.at<double>(1, 1) = this->intrinsics[2];
-  K.at<double>(1, 2) = this->intrinsics[3];
-  K.at<double>(2, 0) = 0.0;
-  K.at<double>(2, 1) = 0.0;
-  K.at<double>(2, 2) = 1.0;
+  // Solve PnP (with undistorted image)
+  cv::Mat rvec(3, 1, cv::DataType<double>::type);
+  cv::Mat tvec(3, 1, cv::DataType<double>::type);
+  cv::solvePnP(chessboard.object_points,
+               corners,
+               Knew,
+               cv::Mat::zeros(4, 1, CV_64FC1),
+               rvec,
+               tvec,
+               false,
+               cv::SOLVEPNP_ITERATIVE);
 
-  // Calculate corner positions
-  MatX X;
-  int retval = this->chessboard.calcCornerPositions(corners, K, X);
-  if (retval != 0) {
-    LOG_ERROR("Failed to calculate corner positions!");
-    return result;
+  // Project 3D point to image plane
+  std::vector<cv::Point2f> image_points;
+  cv::Mat D = convert(this->D());
+  cv::fisheye::projectPoints(chessboard.object_points, // Object poitns
+                             image_points,             // Image poitns
+                             rvec,                     // Rodrigues vector
+                             tvec,                     // Translation vector
+                             Knew,                     // Camera intrinsics K
+                             D);                       // Distortion vector D
+
+  // Draw projected points
+  for (size_t i = 0; i < image_points.size(); i++) {
+    cv::circle(image_ud,              // Target image
+               image_points[i],       // Center
+               3.0,                   // Radius
+               cv::Scalar(0, 0, 255), // Colour
+               CV_FILLED,             // Thickness
+               8);                    // Line type
   }
 
-  // Project 3D points to image
-  this->chessboard.project3DPoints(X, K, result);
-
-  return result;
+  return image_ud;
 }
 
 } // namespace gvio

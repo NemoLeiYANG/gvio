@@ -3,6 +3,7 @@
 
 namespace gvio {
 
+#define TEST_IMAGE "test_data/calibration2/img_0.jpg"
 #define TEST_CALIB_FILE "test_data/calibration2/intrinsics.yaml"
 #define TEST_TARGET_FILE "test_configs/gimbal/calibration/chessboard.yaml"
 
@@ -18,23 +19,28 @@ int test_CalibValidator_validate() {
   // Load validator
   validator.load(TEST_CALIB_FILE, TEST_TARGET_FILE);
 
-  // Load webcam
-  auto capture = cv::VideoCapture(0);
-  if (capture.isOpened() == false) {
-    return -1;
-  }
+  const cv::Mat image = cv::imread(TEST_IMAGE);
+  const cv::Mat result = validator.validate(image);
+  cv::imshow("Image", result);
+  cv::waitKey();
 
-  // Loop webcam
-  while (true) {
-    cv::Mat image;
-    capture.read(image);
-
-    cv::Mat result = validator.validate(image);
-    cv::imshow("Validation", result);
-    if (cv::waitKey(1) == 113) {
-      break;
-    }
-  }
+  // // Load webcam
+  // auto capture = cv::VideoCapture(0);
+  // if (capture.isOpened() == false) {
+  //   return -1;
+  // }
+  //
+  // // Loop webcam
+  // while (true) {
+  //   cv::Mat image;
+  //   capture.read(image);
+  //
+  //   cv::Mat result = validator.validate(image);
+  //   cv::imshow("Validation", result);
+  //   if (cv::waitKey(1) == 113) {
+  //     break;
+  //   }
+  // }
 
   return 0;
 }

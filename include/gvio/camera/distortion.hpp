@@ -5,6 +5,8 @@
 #ifndef GVIO_CAMERA_DISTORTION_HPP
 #define GVIO_CAMERA_DISTORTION_HPP
 
+#include <opencv2/calib3d/calib3d.hpp>
+
 #include "gvio/util/util.hpp"
 
 namespace gvio {
@@ -43,6 +45,23 @@ Vec2 equi_distort(const double k1,
                   const double k3,
                   const double k4,
                   const Vec3 &point);
+
+/**
+ * Un-distort a 2D point with the equi-distant distortion model
+ */
+void equi_undistort(const double k1,
+                    const double k2,
+                    const double k3,
+                    const double k4,
+                    Vec2 &p);
+
+/**
+ * Pinhole Equidistant undistort image
+ */
+cv::Mat pinhole_equi_undistort_image(const Mat3 &K,
+                                     const VecX &D,
+                                     const cv::Mat &image,
+                                     cv::Mat &K_new);
 
 /** @} group camera */
 } // namespace gvio

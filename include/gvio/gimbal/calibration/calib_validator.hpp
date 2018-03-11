@@ -7,6 +7,7 @@
 
 #include "gvio/util/util.hpp"
 #include "gvio/gimbal/calibration/chessboard.hpp"
+#include "gvio/camera/distortion.hpp"
 
 namespace gvio {
 /**
@@ -28,6 +29,16 @@ struct CalibValidator {
 
   CalibValidator();
   virtual ~CalibValidator();
+
+  /**
+   * @returns Camera intrinsics matrix K
+   */
+  Mat3 K();
+
+  /**
+   * @returns Distortion coefficients D
+   */
+  VecX D();
 
   /**
    * Load initial optimization params

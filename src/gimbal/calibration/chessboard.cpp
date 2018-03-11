@@ -140,18 +140,16 @@ int Chessboard::calcCornerPositions(const std::vector<cv::Point2f> corners,
   return 0;
 }
 
-void Chessboard::project3DPoints(const MatX &X,
-                                 const cv::Mat &K,
-                                 cv::Mat &image) {
-  // clang-format off
-  Mat3 K_cam;
-  K_cam << K.at<double>(0, 0), K.at<double>(0, 1), K.at<double>(0, 2),
-           K.at<double>(1, 0), K.at<double>(1, 1), K.at<double>(1, 2),
-           K.at<double>(2, 0), K.at<double>(2, 1), K.at<double>(2, 2);
-  // clang-format on
+int Chessboard::calcCornerPositions(const std::vector<cv::Point2f> corners,
+                                    const Mat3 &K,
+                                    MatX &X) {
+  const cv::Mat K_cam = convert(K);
+  return this->calcCornerPositions(corners, K_cam, X);
+}
 
+void Chessboard::project3DPoints(const MatX &X, const Mat3 &K, cv::Mat &image) {
   // Project 3d point to image plane
-  MatX x = K_cam * X;
+  MatX x = K * X;
 
   for (int i = 0; i < x.cols(); i++) {
     const Vec3 p = x.col(i);
@@ -165,6 +163,19 @@ void Chessboard::project3DPoints(const MatX &X,
                CV_FILLED,             // Thickness
                8);                    // Line type
   }
+}
+
+void Chessboard::project3DPoints(const MatX &X,
+                                 const cv::Mat &K,
+                                 cv::Mat &image) {
+  // clang-format off
+  Mat3 K_cam;
+  K_cam << K.at<double>(0, 0), K.at<double>(0, 1), K.at<double>(0, 2),
+           K.at<double>(1, 0), K.at<double>(1, 1), K.at<double>(1, 2),
+           K.at<double>(2, 0), K.at<double>(2, 1), K.at<double>(2, 2);
+  // clang-format on
+
+  this->project3DPoints(X, K_cam, image);
 }
 
 } // namespace gvio

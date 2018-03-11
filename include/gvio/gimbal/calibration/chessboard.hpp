@@ -90,6 +90,28 @@ struct Chessboard {
                           MatX &X);
 
   /**
+   * Calculate corner positions
+   *
+   * @param corners Detected chessboard corners
+   * @param K Camera intrinsics matrix K
+   * @param X Corner positions relative to camera in ideal coordinates
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int calcCornerPositions(const std::vector<cv::Point2f> corners,
+                          const Mat3 &K,
+                          MatX &X);
+
+  /**
+   * Project 3D points to image
+   *
+   * @param X Corner positions relative to camera in ideal coordinates
+   * @param K Camera intrinsics matrix K
+   * @param image Target image
+   */
+  void project3DPoints(const MatX &X, const Mat3 &K, cv::Mat &image);
+
+  /**
    * Project 3D points to image
    *
    * @param X Corner positions relative to camera in ideal coordinates
