@@ -133,39 +133,37 @@ Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_ds(const T *const tau_s,
   return T_de * T_eb * T_bs;
 }
 
-Vec2 equi_distort(const double k1,
-                  const double k2,
-                  const double k3,
-                  const double k4,
-                  const Vec3 &point) {
-  const double z = point(2);
-  const double x = point(0) / z;
-  const double y = point(1) / z;
-  const double r = sqrt(pow(x, 2) + pow(y, 2));
-
-  // Apply equi distortion
-  // clang-format off
-  const double theta = atan(r);
-  const double th2 = pow(theta, 2);
-  const double th4 = pow(theta, 4);
-  const double th6 = pow(theta, 6);
-  const double th8 = pow(theta, 8);
-  const double theta_d = theta * (1 + k1 * th2 + k2 * th4 + k3 * th6 + k4 * th8);
-  const double x_dash = (theta_d / r) * x;
-  const double y_dash = (theta_d / r) * y;
-  // clang-format on
-
-  // Project equi distorted point to image plane
-  return Vec2{x_dash, y_dash};
-}
+// Vec2 equi_distort(const double k1,
+//                   const double k2,
+//                   const double k3,
+//                   const double k4,
+//                   const Vec3 &point) {
+//   const double z = point(2);
+//   const double x = point(0) / z;
+//   const double y = point(1) / z;
+//   const double r = sqrt(pow(x, 2) + pow(y, 2));
+//
+//   // Apply equi distortion
+//   // clang-format off
+//   const double theta = atan(r);
+//   const double th2 = pow(theta, 2);
+//   const double th4 = pow(theta, 4);
+//   const double th6 = pow(theta, 6);
+//   const double th8 = pow(theta, 8);
+//   const double theta_d = theta * (1 + k1 * th2 + k2 * th4 + k3 * th6 + k4 *
+//   th8);
+//   const double x_dash = (theta_d / r) * x;
+//   const double y_dash = (theta_d / r) * y;
+//   // clang-format on
+//
+//   // Project equi distorted point to image plane
+//   return Vec2{x_dash, y_dash};
+// }
 
 template <typename T>
 Eigen::Matrix<T, 2, 1> project_pinhole_equi(const Eigen::Matrix<T, 3, 1> &K,
                                             const Eigen::Matrix<T, 4, 1> &D,
-                                            const Eigen::Matrix<T, 3, 1> &X) {
-
-
-}
+                                            const Eigen::Matrix<T, 3, 1> &X) {}
 
 template <typename T>
 bool GimbalCalibResidual::operator()(const T *const tau_s,

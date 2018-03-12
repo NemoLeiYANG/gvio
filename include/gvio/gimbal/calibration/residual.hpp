@@ -83,7 +83,6 @@ struct GimbalCalibResidual {
                                               const Eigen::Matrix<T, 4, 1> &D,
                                               const Eigen::Matrix<T, 3, 1> &X);
 
-
   /// Calculate residual
   template <typename T>
   bool operator()(const T *const tau_s,
