@@ -80,7 +80,7 @@ int CalibValidator::load(const int nb_cameras,
         parser.addParam("cam1.distortion_coeffs", &cam1.distortion_coeffs);
         parser.addParam("cam1.intrinsics", &cam1.intrinsics);
         parser.addParam("cam1.resolution", &cam1.resolution);
-        parser.addParam("cam1.T_cn_cnm1", &this->T_C0_C1);
+        parser.addParam("cam1.T_cn_cnm1", &this->T_C1_C0);
         break;
       case 2:
         parser.addParam("cam2.camera_model", &cam2.camera_model);
@@ -106,32 +106,25 @@ int CalibValidator::load(const int nb_cameras,
   return 0;
 }
 
-cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
-  // Pre-check
-  assert(cam_id >= 0);
-  assert(cam_id < this->cam.size());
-  assert(image.empty() == false);
-
+int CalibValidator::detect(const cv::Mat &image,
+                           const Mat3 &K,
+                           const VecX &D,
+                           cv::Mat &image_ud,
+                           cv::Mat &Knew,
+                           MatX &X) {
   // Undistort image
-  cv::Mat Knew;
-  cv::Mat image_ud = pinhole_equi_undistort_image(this->K(cam_id),
-                                                  this->D(cam_id),
-                                                  image,
-                                                  Knew);
+  image_ud = pinhole_equi_undistort_image(K, D, image, Knew);
 
   // Find chessboard corners (with distorted image)
   std::vector<cv::Point2f> corners;
   if (this->chessboard.detect(image, corners) != 0) {
-    return image;
+    return -1;
   }
 
   // Undistort points
   std::vector<cv::Point2f> corners_ud;
   // -- Note: we are using the original K to undistort the points
-  cv::fisheye::undistortPoints(corners,
-                               corners_ud,
-                               convert(this->K(0)),
-                               convert(this->D(0)));
+  cv::fisheye::undistortPoints(corners, corners_ud, convert(K), convert(D));
   // -- Convert undistorted points from ideal to pixel coordinates to the
   // undistorted image with Knew (calculated when undistorting the image*)
   for (size_t i = 0; i < corners_ud.size(); i++) {
@@ -144,11 +137,11 @@ cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
   // Solve PnP (with undistorted points)
   cv::Mat rvec(3, 1, cv::DataType<double>::type);
   cv::Mat tvec(3, 1, cv::DataType<double>::type);
-  cv::Mat D;
+  cv::Mat D_empty;
   cv::solvePnP(chessboard.object_points,
                corners_ud,
-               Knew, // Because we used Knew to project undistorted points
-               D,    // D is empty because corners are already undistorted
+               Knew,    // Because we used Knew to project undistorted points
+               D_empty, // D is empty because corners are already undistorted
                rvec,
                tvec,
                false,
@@ -156,19 +149,25 @@ cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
 
   // Project 3D point to image plane
   // -- Calculate corner positions in 3D
-  MatX X;
   this->chessboard.calcCornerPositions(corners_ud, Knew, X);
-  // -- Project the 3d point back to 2D image plane
+
+  return 0;
+}
+
+cv::Mat CalibValidator::projectAndDraw(const cv::Mat &image,
+                                       const Mat3 &K,
+                                       const MatX &X) {
+  // Project 3D point to image plane
   std::vector<cv::Point2f> image_points;
   for (int i = 0; i < X.cols(); i++) {
-    Vec3 x = convert(Knew) * X.col(i);
+    Vec3 x = K * X.col(i);
     image_points.emplace_back(x(0) / x(2), x(1) / x(2));
   }
 
   // Make an RGB version of the input image
-  cv::Mat result(image_ud.size(), CV_8UC3);
-  result = image_ud.clone();
-  cv::cvtColor(image_ud, result, CV_GRAY2RGB);
+  cv::Mat result(image.size(), CV_8UC3);
+  result = image.clone();
+  cv::cvtColor(image, result, CV_GRAY2RGB);
 
   // Draw projected points
   for (size_t i = 0; i < image_points.size(); i++) {
@@ -183,31 +182,72 @@ cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
   return result;
 }
 
+cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
+  // Pre-check
+  assert(cam_id >= 0);
+  assert(cam_id < this->cam.size());
+  assert(image.empty() == false);
+
+  // Detect chessboard corners, and return:
+  // - Undistorted image
+  // - Knew
+  // - 3d corner positions
+  cv::Mat image_ud;
+  cv::Mat Knew;
+  MatX X;
+  if (this->detect(image,
+                   this->K(cam_id),
+                   this->D(cam_id),
+                   image_ud,
+                   Knew,
+                   X) != 0) {
+    return image_ud;
+  }
+
+  return this->projectAndDraw(image_ud, convert(Knew), X);
+}
+
 cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
                                        const cv::Mat &img1) {
   // Pre-check
   assert(img0.empty() == false);
   assert(img1.empty() == false);
 
-  // Undistort images
-  cv::Mat Knew;
-  cv::Mat img0_ud =
-      pinhole_equi_undistort_image(this->K(0), this->D(0), img0, Knew);
-  cv::Mat img1_ud =
-      pinhole_equi_undistort_image(this->K(0), this->D(0), img0, Knew);
-
-  // Find chessboard corners (with undistorted image)
-  std::vector<cv::Point2f> corners0, corners1;
-  const bool img0_ok = this->chessboard.detect(img0, corners0);
-  const bool img1_ok = this->chessboard.detect(img1, corners1);
-  if ((img0_ok && img1_ok) == false) {
+  // Detect chessboard corners, and return:
+  // - Undistorted image
+  // - Knew
+  // - 3d corner positions
+  cv::Mat img0_ud, img1_ud;
+  cv::Mat K0_new, K1_new;
+  MatX X0, X1;
+  int retval = 0;
+  retval = this->detect(img0, this->K(0), this->D(0), img0_ud, K0_new, X0);
+  retval += this->detect(img1, this->K(1), this->D(1), img1_ud, K1_new, X1);
+  if (retval != 0) {
     cv::Mat result;
-    cv::hconcat(img0_ud, img1_ud, result);
+    cv::vconcat(img0_ud, img1_ud, result);
     return result;
   }
 
+  // Project points observed from cam1 to cam0 image
+  // -- Make points homogeneous by adding 1's in last row
+  X1.conservativeResize(X1.rows() + 1, X1.cols());
+  X1.row(X1.rows() - 1) = ones(1, X1.cols());
+  // -- Project and draw
+  MatX X0_cal = (this->T_C1_C0.inverse() * X1).block(0, 0, 3, X1.cols());
+  cv::Mat img0_cb = this->projectAndDraw(img0_ud, convert(K0_new), X0_cal);
+
+  // Project points observed from cam0 to cam1 image
+  // -- Make points homogeneous by adding 1's in last row
+  X0.conservativeResize(X0.rows() + 1, X0.cols());
+  X0.row(X0.rows() - 1) = ones(1, X0.cols());
+  // -- Project and draw
+  MatX X1_cal = (this->T_C1_C0 * X0).block(0, 0, 3, X0.cols());
+  cv::Mat img1_cb = this->projectAndDraw(img1_ud, convert(K1_new), X1_cal);
+
+  // Combine cam0 and cam1 images
   cv::Mat result;
-  cv::hconcat(img0_ud, img1_ud, result);
+  cv::vconcat(img0_cb, img1_cb, result);
   return result;
 }
 

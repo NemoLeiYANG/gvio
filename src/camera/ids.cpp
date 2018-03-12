@@ -331,6 +331,8 @@ int raw2cvmat(void *image_data,
   return 0;
 }
 
+IDSCamera::IDSCamera() {}
+
 IDSCamera::~IDSCamera() {
   // Pre-check
   if (this->configured == false) {
@@ -345,6 +347,7 @@ IDSCamera::~IDSCamera() {
   if (retval != IS_SUCCESS) {
     LOG_ERROR("Failed to exit camera!");
   }
+  sleep(2);
 }
 
 int IDSCamera::initialize() {

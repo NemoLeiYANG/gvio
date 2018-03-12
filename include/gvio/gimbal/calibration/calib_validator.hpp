@@ -34,7 +34,7 @@ std::ostream &operator<<(std::ostream &os, const CameraProperty &cam);
 struct CalibValidator {
   std::vector<CameraProperty> cam;
   Chessboard chessboard;
-  Mat4 T_C0_C1;
+  Mat4 T_C1_C0;
 
   CalibValidator();
   virtual ~CalibValidator();
@@ -61,11 +61,42 @@ struct CalibValidator {
    * @param nb_cameras Number of cameras
    * @param calib_file Path to calib file
    * @param target_file Path to target file
+   *
    * @returns 0 for success, -1 for failure
    */
   int load(const int nb_cameras,
            const std::string &calib_file,
            const std::string &target_file);
+
+  /**
+   * Detect chessboard corners
+   *
+   * @param image Input image
+   * @param K Camera intrinsics matrix K
+   * @param D Distortion coefficients vector D
+   * @param image_ud Output undistorted image
+   * @param Knew Output new camera intrinsics matrix K
+   * @param X 3D position of chessboard corners
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int detect(const cv::Mat &image,
+             const Mat3 &K,
+             const VecX &D,
+             cv::Mat &image_ud,
+             cv::Mat &Knew,
+             MatX &X);
+
+  /**
+   * Project 3D points to image plane and draw chessboard corners
+   *
+   * @param image Input image
+   * @param K Camera intrinsics matrix K
+   * @param X 3D position of chessboard corners
+   *
+   * @returns Image with chessboard corners visualized
+   */
+  cv::Mat projectAndDraw(const cv::Mat &image, const Mat3 &K, const MatX &X);
 
   /**
    * Validate calibration
