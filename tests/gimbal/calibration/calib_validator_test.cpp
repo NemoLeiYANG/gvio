@@ -6,7 +6,8 @@ namespace gvio {
 
 #define TEST_CALIB_FILE "test_configs/gimbal/calibration/camchain.yaml"
 #define TEST_TARGET_FILE "test_configs/gimbal/calibration/chessboard.yaml"
-#define TEST_CAMERA_FILE "test_configs/camera/ueye/config.yaml"
+#define TEST_CAM0_CONFIG "test_configs/camera/ueye/cam0.yaml"
+#define TEST_CAM1_CONFIG "test_configs/camera/ueye/cam1.yaml"
 #define TEST_IMAGE "test_data/calibration2/img_0.jpg"
 
 int test_CalibValidator_constructor() {
@@ -49,7 +50,7 @@ int test_CalibValidator_validate_live() {
 
   // Load camera
   IDSCamera camera;
-  camera.configure(TEST_CAMERA_FILE);
+  camera.configure(TEST_CAM0_CONFIG);
 
   // Loop webcam
   while (true) {
@@ -68,11 +69,43 @@ int test_CalibValidator_validate_live() {
   return 0;
 }
 
+int test_CalibValidator_validateStereo_live() {
+  CalibValidator validator;
+
+  // Load validator
+  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
+
+  // Load camera
+  IDSCamera cam0, cam1;
+  cam0.configure(TEST_CAM0_CONFIG);
+  cam1.configure(TEST_CAM1_CONFIG);
+
+  // Loop webcam
+  while (true) {
+    cv::Mat img0, img1;
+    if (cam0.getFrame(img0) != 0) {
+      return -1;
+    }
+    if (cam1.getFrame(img1) != 0) {
+      return -1;
+    }
+
+    cv::Mat result = validator.validateStereo(img0, img1);
+    cv::imshow("Validation", result);
+    if (cv::waitKey(1) == 113) {
+      break;
+    }
+  }
+
+  return 0;
+}
+
 void test_suite() {
   MU_ADD_TEST(test_CalibValidator_constructor);
   MU_ADD_TEST(test_CalibValidator_load);
   // MU_ADD_TEST(test_CalibValidator_validate);
   MU_ADD_TEST(test_CalibValidator_validate_live);
+  // MU_ADD_TEST(test_CalibValidator_validateStereo_live);
 }
 
 } // namespace gvio

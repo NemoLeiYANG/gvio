@@ -127,7 +127,7 @@ cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
 
   // Undistort points
   std::vector<cv::Point2f> corners_ud;
-  // -- Note: we are using the original K to undistort
+  // -- Note: we are using the original K to undistort the points
   cv::fisheye::undistortPoints(corners,
                                corners_ud,
                                convert(this->K(0)),
@@ -136,7 +136,7 @@ cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
   // undistorted image with Knew (calculated when undistorting the image*)
   for (size_t i = 0; i < corners_ud.size(); i++) {
     Vec3 p{corners_ud[i].x, corners_ud[i].y, 1.0};
-    Vec3 x = convert(Knew) * p;
+    Vec3 x = convert(Knew) * p; // Knew - Project to undistorted* image
     corners_ud[i].x = x(0);
     corners_ud[i].y = x(1);
   }
@@ -147,8 +147,8 @@ cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
   cv::Mat D;
   cv::solvePnP(chessboard.object_points,
                corners_ud,
-               Knew,
-               D,
+               Knew, // Because we used Knew to project undistorted points
+               D,    // D is empty because corners are already undistorted
                rvec,
                tvec,
                false,
