@@ -3,7 +3,7 @@
 namespace gvio {
 
 Saliency::Saliency() {
-  this->detector = cv::saliency::StaticSaliencySpectralResidual::create();
+  // this->detector = cv::saliency::StaticSaliencySpectralResidual::create();
   // this->detector = cv::saliency::StaticSaliencyFineGrained::create();
 
   // const std::string training_path = "/usr/local/src/opencv_contrib/modules/"
@@ -16,10 +16,10 @@ Saliency::Saliency() {
 Saliency::~Saliency() {}
 
 int Saliency::detect(const cv::Mat &frame) {
-  cv::Mat saliency_map;
-  if (this->detector->computeSaliency(frame, saliency_map)) {
-    cv::imshow("Saliency", saliency_map);
-  }
+  // cv::Mat saliency_map;
+  // if (this->detector->computeSaliency(frame, saliency_map)) {
+  //   cv::imshow("Saliency", saliency_map);
+  // }
 
   // std::vector<cv::Vec4i> saliency_map;
   // if (this->detector->computeSaliency(frame, saliency_map)) {

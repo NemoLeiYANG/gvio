@@ -9,8 +9,8 @@
 
 #include <opencv2/highgui.hpp>
 #include <opencv2/core/utility.hpp>
-#include <opencv2/saliency/saliencyBaseClasses.hpp>
-#include <opencv2/saliency/saliencySpecializedClasses.hpp>
+// #include <opencv2/saliency/saliencyBaseClasses.hpp>
+// #include <opencv2/saliency/saliencySpecializedClasses.hpp>
 
 namespace gvio {
 /**
@@ -20,7 +20,7 @@ namespace gvio {
 
 class Saliency {
 public:
-  cv::Ptr<cv::saliency::Saliency> detector;
+  // cv::Ptr<cv::saliency::Saliency> detector;
 
   Saliency();
   virtual ~Saliency();

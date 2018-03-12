@@ -16,7 +16,7 @@ CalibValidator::CalibValidator() {}
 CalibValidator::~CalibValidator() {}
 
 Mat3 CalibValidator::K(const int cam_id) {
-  assert(cam_id > 0);
+  assert(cam_id >= 0);
   assert(cam_id < this->cam.size());
 
   Mat3 K;
@@ -39,7 +39,7 @@ Mat3 CalibValidator::K(const int cam_id) {
 }
 
 VecX CalibValidator::D(const int cam_id) {
-  assert(cam_id > 0);
+  assert(cam_id >= 0);
   assert(cam_id < this->cam.size());
 
   VecX D;
@@ -108,7 +108,7 @@ int CalibValidator::load(const int nb_cameras,
 
 cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
   // Pre-check
-  assert(cam_id > 0);
+  assert(cam_id >= 0);
   assert(cam_id < this->cam.size());
   assert(image.empty() == false);
 
@@ -119,45 +119,68 @@ cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
                                                   image,
                                                   Knew);
 
-  // Find chessboard corners (with undistorted image)
+  // Find chessboard corners (with distorted image)
   std::vector<cv::Point2f> corners;
-  if (this->chessboard.detect(image_ud, corners) != 0) {
+  if (this->chessboard.detect(image, corners) != 0) {
     return image;
   }
 
-  // Solve PnP (with undistorted image)
+  // Undistort points
+  std::vector<cv::Point2f> corners_ud;
+  // -- Note: we are using the original K to undistort
+  cv::fisheye::undistortPoints(corners,
+                               corners_ud,
+                               convert(this->K(0)),
+                               convert(this->D(0)));
+  // -- Convert undistorted points from ideal to pixel coordinates to the
+  // undistorted image with Knew (calculated when undistorting the image*)
+  for (size_t i = 0; i < corners_ud.size(); i++) {
+    Vec3 p{corners_ud[i].x, corners_ud[i].y, 1.0};
+    Vec3 x = convert(Knew) * p;
+    corners_ud[i].x = x(0);
+    corners_ud[i].y = x(1);
+  }
+
+  // Solve PnP (with undistorted points)
   cv::Mat rvec(3, 1, cv::DataType<double>::type);
   cv::Mat tvec(3, 1, cv::DataType<double>::type);
+  cv::Mat D;
   cv::solvePnP(chessboard.object_points,
-               corners,
+               corners_ud,
                Knew,
-               cv::Mat::zeros(4, 1, CV_64FC1),
+               D,
                rvec,
                tvec,
                false,
                cv::SOLVEPNP_ITERATIVE);
 
   // Project 3D point to image plane
+  // -- Calculate corner positions in 3D
+  MatX X;
+  this->chessboard.calcCornerPositions(corners_ud, Knew, X);
+  // -- Project the 3d point back to 2D image plane
   std::vector<cv::Point2f> image_points;
-  cv::Mat D = convert(this->D(cam_id));
-  cv::fisheye::projectPoints(chessboard.object_points, // Object points
-                             image_points,             // Image points
-                             rvec,                     // Rodrigues vector
-                             tvec,                     // Translation vector
-                             Knew,                     // Camera intrinsics K
-                             D);                       // Distortion vector D
+  for (int i = 0; i < X.cols(); i++) {
+    Vec3 x = convert(Knew) * X.col(i);
+    image_points.emplace_back(x(0) / x(2), x(1) / x(2));
+  }
+
+  // Make an RGB version of the input image
+  cv::Mat result(image_ud.size(), CV_8UC3);
+  result = image_ud.clone();
+  cv::cvtColor(image_ud, result, CV_GRAY2RGB);
 
   // Draw projected points
   for (size_t i = 0; i < image_points.size(); i++) {
-    cv::circle(image_ud,              // Target image
+    cv::circle(result,                // Target image
                image_points[i],       // Center
-               3.0,                   // Radius
+               2.0,                   // Radius
                cv::Scalar(0, 0, 255), // Colour
                CV_FILLED,             // Thickness
                8);                    // Line type
   }
 
-  return image_ud;
+  return result;
 }
 
 cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
