@@ -71,8 +71,8 @@ int test_CalibValidator_validate_live() {
 void test_suite() {
   MU_ADD_TEST(test_CalibValidator_constructor);
   MU_ADD_TEST(test_CalibValidator_load);
-  // MU_ADD_TEST(test_CalibValidator_validate);
-  MU_ADD_TEST(test_CalibValidator_validate_live);
+  MU_ADD_TEST(test_CalibValidator_validate);
+  // MU_ADD_TEST(test_CalibValidator_validate_live);
 }
 
 } // namespace gvio

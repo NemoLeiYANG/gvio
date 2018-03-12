@@ -80,6 +80,7 @@ int CalibValidator::load(const int nb_cameras,
         parser.addParam("cam1.distortion_coeffs", &cam1.distortion_coeffs);
         parser.addParam("cam1.intrinsics", &cam1.intrinsics);
         parser.addParam("cam1.resolution", &cam1.resolution);
+        parser.addParam("cam1.T_cn_cnm1", &this->T_C0_C1);
         break;
       case 2:
         parser.addParam("cam2.camera_model", &cam2.camera_model);
@@ -106,6 +107,7 @@ int CalibValidator::load(const int nb_cameras,
 }
 
 cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
+  // Pre-check
   assert(cam_id > 0);
   assert(cam_id < this->cam.size());
   assert(image.empty() == false);
@@ -156,6 +158,34 @@ cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
   }
 
   return image_ud;
+}
+
+cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
+                                       const cv::Mat &img1) {
+  // Pre-check
+  assert(img0.empty() == false);
+  assert(img1.empty() == false);
+
+  // Undistort images
+  cv::Mat Knew;
+  cv::Mat img0_ud =
+      pinhole_equi_undistort_image(this->K(0), this->D(0), img0, Knew);
+  cv::Mat img1_ud =
+      pinhole_equi_undistort_image(this->K(0), this->D(0), img0, Knew);
+
+  // Find chessboard corners (with undistorted image)
+  std::vector<cv::Point2f> corners0, corners1;
+  const bool img0_ok = this->chessboard.detect(img0, corners0);
+  const bool img1_ok = this->chessboard.detect(img1, corners1);
+  if ((img0_ok && img1_ok) == false) {
+    cv::Mat result;
+    cv::hconcat(img0_ud, img1_ud, result);
+    return result;
+  }
+
+  cv::Mat result;
+  cv::hconcat(img0_ud, img1_ud, result);
+  return result;
 }
 
 } // namespace gvio

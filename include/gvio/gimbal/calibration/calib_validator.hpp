@@ -34,6 +34,7 @@ std::ostream &operator<<(std::ostream &os, const CameraProperty &cam);
 struct CalibValidator {
   std::vector<CameraProperty> cam;
   Chessboard chessboard;
+  Mat4 T_C0_C1;
 
   CalibValidator();
   virtual ~CalibValidator();
@@ -74,6 +75,15 @@ struct CalibValidator {
    * @returns Validation image for visual inspection
    */
   cv::Mat validate(const int cam_id, const cv::Mat &image);
+
+  /**
+   * Validate stereo calibration
+   *
+   * @param img0 Input image from cam0
+   * @param img1 Input image from cam1
+   * @returns Validation image for visual inspection
+   */
+  cv::Mat validateStereo(const cv::Mat &img0, const cv::Mat &img1);
 };
 
 /**
