@@ -54,7 +54,11 @@ int Chessboard::detect(const cv::Mat &image,
   // Find the chessboard corners
   // -- Convert image to grayscale
   cv::Mat image_gray;
-  cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
+  if (image.channels() != 1) {
+    cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
+  } else {
+    image_gray = image.clone();
+  }
   // -- Setup
   cv::Size size(this->nb_cols, this->nb_rows);
   // -- Detect chessboard corners

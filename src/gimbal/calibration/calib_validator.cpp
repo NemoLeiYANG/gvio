@@ -16,7 +16,7 @@ CalibValidator::CalibValidator() {}
 CalibValidator::~CalibValidator() {}
 
 Mat3 CalibValidator::K(const int cam_id) {
-  assert(cam_id > 0);
+  assert(cam_id >= 0);
   assert(cam_id < this->cam.size());
 
   Mat3 K;
@@ -39,7 +39,7 @@ Mat3 CalibValidator::K(const int cam_id) {
 }
 
 VecX CalibValidator::D(const int cam_id) {
-  assert(cam_id > 0);
+  assert(cam_id >= 0);
   assert(cam_id < this->cam.size());
 
   VecX D;
@@ -106,7 +106,7 @@ int CalibValidator::load(const int nb_cameras,
 }
 
 cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
-  assert(cam_id > 0);
+  assert(cam_id >= 0);
   assert(cam_id < this->cam.size());
   assert(image.empty() == false);
 
@@ -120,7 +120,7 @@ cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
   // Find chessboard corners (with undistorted image)
   std::vector<cv::Point2f> corners;
   if (this->chessboard.detect(image_ud, corners) != 0) {
-    return image;
+    return image_ud;
   }
 
   // Solve PnP (with undistorted image)
