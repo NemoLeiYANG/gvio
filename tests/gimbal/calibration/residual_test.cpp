@@ -17,8 +17,7 @@ int test_GimbalCalibResidual_dhTransform() {
 int test_GimbalCalibResidual_euler321ToRot() {
   GimbalCalibResidual err;
 
-  double rpy[3] = {0.0, 0.0, 0.0};
-  auto result = err.euler321ToRot(rpy);
+  auto result = err.euler321ToRot(0.0, 0.0, 0.0);
   std::cout << result << std::endl;
 
   return 0;
@@ -140,6 +139,7 @@ int test_GimbalCalibResidual_evaluate() {
       std::cout << "residual[1]: " << residual[1] << std::endl;
       std::cout << "residual[2]: " << residual[2] << std::endl;
       std::cout << "residual[3]: " << residual[3] << std::endl;
+      std::cout << std::endl;
     }
   }
 

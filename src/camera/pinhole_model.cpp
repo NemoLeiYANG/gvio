@@ -105,4 +105,9 @@ Vec2 PinholeModel::pixel2image(const cv::KeyPoint &kp) const {
   return this->pixel2image(Vec2{kp.pt.x, kp.pt.y});
 }
 
+Vec2 pinhole_project(const Mat3 &K, const Vec3 &X) {
+  const Vec3 x = K * X;
+  return Vec2{x(0) / x(2), x(1) / x(2)};
+}
+
 } // namespace gvio

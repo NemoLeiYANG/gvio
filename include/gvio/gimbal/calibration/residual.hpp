@@ -59,7 +59,9 @@ struct GimbalCalibResidual {
 
   /// Euler 3-2-1 to rotation matrix
   template <typename T>
-  Eigen::Matrix<T, 3, 3> euler321ToRot(const T *euler) const;
+  Eigen::Matrix<T, 3, 3> euler321ToRot(const T phi,
+                                       const T theta,
+                                       const T psi) const;
 
   /// Form camera intrinsics matrix K
   template <typename T>
@@ -68,12 +70,19 @@ struct GimbalCalibResidual {
 
   /// Form transform from static to dynamic camera
   template <typename T>
-  Eigen::Matrix<T, 4, 4> T_sd(const T *const tau_s,
+  Eigen::Matrix<T, 4, 4> T_ds(const T *const tau_s,
                               const T *const tau_d,
                               const T *const w1,
                               const T *const w2,
                               const T *const Lambda1,
                               const T *const Lambda2) const;
+
+  /// Project 3D point using pinhole-equi
+  template <typename T>
+  Eigen::Matrix<T, 2, 1> project_pinhole_equi(const Eigen::Matrix<T, 3, 1> &K,
+                                              const Eigen::Matrix<T, 4, 1> &D,
+                                              const Eigen::Matrix<T, 3, 1> &X);
+
 
   /// Calculate residual
   template <typename T>
@@ -117,7 +126,7 @@ struct GimbalCalibNumericalResidual {
       : P_s{P_s}, P_d{P_d}, Q_s{Q_s}, Q_d{Q_d}, K_s{K_s}, K_d{K_d} {}
 
   /// Calculate transform between static and dynamic camera
-  Mat4 T_sd(const VecX &tau_s,
+  Mat4 T_ds(const VecX &tau_s,
             const double Lambda1,
             const Vec3 &w1,
             const VecX &tau_d,

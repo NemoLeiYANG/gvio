@@ -41,21 +41,19 @@ int GimbalCalib::load(const std::string &data_dir) {
       const Vec3 P_d = this->data.P_d[i].row(j);
       const Vec2 Q_s = this->data.Q_s[i].row(j);
       const Vec2 Q_d = this->data.Q_d[i].row(j);
-      auto residual =
-          new GimbalCalibNumericalResidual(P_s, P_d, Q_s, Q_d, K_s, K_d);
+      auto residual = new GimbalCalibResidual(P_s, P_d, Q_s, Q_d, K_s, K_d);
 
       // Build cost function
-      auto cost_func = new ceres::NumericDiffCostFunction<
-          GimbalCalibNumericalResidual, // Residual type
-          ceres::CENTRAL,
-          4, // Size of residual
-          6, // Size of: tau_s
-          6, // Size of: tau_d
-          3, // Size of: w1
-          3, // Size of: w2
-          1, // Size of: Lambda1
-          1  // Size of: Lambda2
-          >(residual);
+      auto cost_func =
+          new ceres::AutoDiffCostFunction<GimbalCalibResidual, // Residual type
+                                          4, // Size of residual
+                                          6, // Size of: tau_s
+                                          6, // Size of: tau_d
+                                          3, // Size of: w1
+                                          3, // Size of: w2
+                                          1, // Size of: Lambda1
+                                          1  // Size of: Lambda2
+                                          >(residual);
 
       // Add residual block to problem
       this->problem.AddResidualBlock(cost_func, // Cost function
@@ -81,7 +79,8 @@ int GimbalCalib::calibrate() {
   // this->options.use_inner_iterations = true;
   // this->options.preconditioner_type = ceres::SCHUR_JACOBI;
   // this->options.linear_solver_type = ceres::SPARSE_SCHUR;
-  // this->options.parameter_tolerance = 1e-10;
+  this->options.function_tolerance = 1e-12;
+  this->options.parameter_tolerance = 1e-12;
   this->options.num_threads = 8;
   this->options.num_linear_solver_threads = 8;
   this->options.minimizer_progress_to_stdout = true;

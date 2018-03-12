@@ -21,43 +21,53 @@ Eigen::Matrix<T, 4, 4> GimbalCalibResidual::dhTransform(const T theta,
                                                         const T alpha,
                                                         const T a,
                                                         const T d) const {
-  // clang-format off
-  Eigen::Matrix<T, 4, 4> transform;
-  transform <<
-    cos(theta), -sin(theta) * cos(alpha), sin(theta) * sin(alpha), a * cos(theta),
-    sin(theta), cos(theta) * cos(alpha), -cos(theta) * sin(alpha), a * sin(theta),
-    0.0, sin(alpha), cos(alpha), d,
-    0.0, 0.0, 0.0, 1.0;
-  // clang-format on
+  Eigen::Matrix<T, 4, 4> T_dh;
 
-  return transform;
+  T_dh(0, 0) = cos(theta);
+  T_dh(0, 1) = -sin(theta) * cos(alpha);
+  T_dh(0, 2) = sin(theta) * sin(alpha);
+  T_dh(0, 3) = a * cos(theta);
+
+  T_dh(1, 0) = sin(theta);
+  T_dh(1, 1) = cos(theta) * cos(alpha);
+  T_dh(1, 2) = -cos(theta) * sin(alpha);
+  T_dh(1, 3) = a * sin(theta);
+
+  T_dh(2, 0) = T(0.0);
+  T_dh(2, 1) = sin(alpha);
+  T_dh(2, 2) = cos(alpha);
+  T_dh(2, 3) = d;
+
+  T_dh(3, 0) = T(0.0);
+  T_dh(3, 1) = T(0.0);
+  T_dh(3, 2) = T(0.0);
+  T_dh(3, 3) = T(1.0);
+
+  return T_dh;
 }
 
 template <typename T>
-Eigen::Matrix<T, 3, 3>
-GimbalCalibResidual::euler321ToRot(const T *const euler) const {
+Eigen::Matrix<T, 3, 3> GimbalCalibResidual::euler321ToRot(const T phi,
+                                                          const T theta,
+                                                          const T psi) const {
   // i.e. ZYX rotation sequence (world to body)
-  const T phi = euler[0];
-  const T theta = euler[1];
-  const T psi = euler[2];
-
   const T R11 = cos(psi) * cos(theta);
-  const T R12 = cos(psi) * sin(theta) * sin(phi) - sin(psi) * cos(phi);
-  const T R13 = cos(psi) * sin(theta) * cos(phi) + sin(psi) * sin(phi);
+  const T R12 = sin(psi) * cos(theta);
+  const T R13 = -sin(theta);
 
-  const T R21 = sin(psi) * cos(theta);
+  const T R21 = cos(psi) * sin(theta) * sin(phi) - sin(psi) * cos(phi);
   const T R22 = sin(psi) * sin(theta) * sin(phi) + cos(psi) * cos(phi);
-  const T R23 = sin(psi) * sin(theta) * cos(phi) - cos(psi) * sin(phi);
+  const T R23 = cos(theta) * sin(phi);
 
-  const T R31 = -sin(theta);
-  const T R32 = cos(theta) * sin(phi);
+  const T R31 = cos(psi) * sin(theta) * cos(phi) + sin(psi) * sin(phi);
+  const T R32 = sin(psi) * sin(theta) * cos(phi) - cos(psi) * sin(phi);
   const T R33 = cos(theta) * cos(phi);
 
   Eigen::Matrix<T, 3, 3> R;
   // clang-format off
-  R << R11, R12, R13,
-        R21, R22, R23,
-        R31, R32, R33;
+  R << R11, R21, R31,
+       R12, R22, R32,
+       R13, R23, R33;
   // clang-format on
 
   return R;
@@ -66,37 +76,39 @@ GimbalCalibResidual::euler321ToRot(const T *const euler) const {
 template <typename T>
 Eigen::Matrix<T, 3, 3>
 GimbalCalibResidual::K(const T fx, const T fy, const T cx, const T cy) const {
-  // clang-format off
   Eigen::Matrix<T, 3, 3> K;
-  K << fx, 0.0, cx,
-       0.0, fy, cy,
-       0.0, 0.0, 1.0;
+
+  K(0, 0) = fx;
+  K(0, 1) = T(0.0);
+  K(0, 2) = cx;
+
+  K(1, 0) = T(0.0);
+  K(1, 1) = fy;
+  K(1, 2) = cy;
+
+  K(2, 0) = T(0.0);
+  K(2, 1) = T(0.0);
+  K(2, 2) = T(1.0);
+
   return K;
-  // clang-format on
 }
 
 template <typename T>
-Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_sd(const T *const tau_s,
+Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_ds(const T *const tau_s,
                                                  const T *const tau_d,
                                                  const T *const w1,
                                                  const T *const w2,
                                                  const T *const Lambda1,
                                                  const T *const Lambda2) const {
-  // Form T_sb
-  const Eigen::Matrix<T, 3, 1> t_G_sb{tau_s[0], tau_s[1], tau_s[2]};
-  const T rpy_bs[3] = {tau_s[3], tau_s[4], tau_s[5]};
-  const Eigen::Matrix<T, 3, 3> R_sb = this->euler321ToRot(rpy_bs);
-  // clang-format off
-  Eigen::Matrix<T, 4, 4> T_sb;
-  T_sb << R_sb(0, 0), R_sb(0, 1), R_sb(0, 2), t_G_sb(0),
-          R_sb(1, 0), R_sb(1, 1), R_sb(1, 2), t_G_sb(1),
-          R_sb(2, 0), R_sb(2, 1), R_sb(2, 2), t_G_sb(2),
-          0.0, 0.0, 0.0, 1.0;
-  // clang-format on
+  // Form T_bs
+  Eigen::Matrix<T, 4, 4> T_bs;
+  T_bs.block(0, 0, 3, 3) = this->euler321ToRot(tau_s[3], tau_s[4], tau_s[5]);
+  T_bs.block(0, 3, 3, 1) = Eigen::Matrix<T, 3, 1>{tau_s[0], tau_s[1], tau_s[2]};
+  T_bs(3, 3) = T(1.0);
 
   // Form T_eb
   // -- DH params for first link
-  const T theta1 = Lambda1[0];
+  const T theta1 = Lambda1[0] - T(M_PI / 2.0);
   const T alpha1 = w1[0];
   const T a1 = w1[1];
   const T d1 = w1[2];
@@ -107,24 +119,52 @@ Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_sd(const T *const tau_s,
   const T d2 = w2[2];
   // -- Combine DH transforms to form T_eb
   // clang-format off
-  const Eigen::Matrix<T, 4, 4> T_b1 = this->dhTransform(theta1, alpha1, a1, d1);
-  const Eigen::Matrix<T, 4, 4> T_1e = this->dhTransform(theta2, alpha2, a2, d2);
-  const Eigen::Matrix<T, 4, 4> T_be = T_b1 * T_1e;
+  const Eigen::Matrix<T, 4, 4> T_1b = this->dhTransform(theta1, alpha1, a1, d1).inverse();
+  const Eigen::Matrix<T, 4, 4> T_e1 = this->dhTransform(theta2, alpha2, a2, d2).inverse();
+  const Eigen::Matrix<T, 4, 4> T_eb = T_e1 * T_1b;
   // clang-format on
 
-  // Form T_ed
-  const Eigen::Matrix<T, 3, 1> t_d_ed{tau_d[0], tau_d[1], tau_d[2]};
-  const T rpy_de[3] = {tau_d[3], tau_d[4], tau_d[5]};
-  const Eigen::Matrix<T, 3, 3> R_ed = this->euler321ToRot(rpy_de);
+  // Form T_de
+  Eigen::Matrix<T, 4, 4> T_de;
+  T_de.block(0, 0, 3, 3) = this->euler321ToRot(tau_d[3], tau_d[4], tau_d[5]);
+  T_de.block(0, 3, 3, 1) = Eigen::Matrix<T, 3, 1>{tau_d[0], tau_d[1], tau_d[2]};
+  T_de(3, 3) = T(1.0);
+
+  return T_de * T_eb * T_bs;
+}
+
+Vec2 equi_distort(const double k1,
+                  const double k2,
+                  const double k3,
+                  const double k4,
+                  const Vec3 &point) {
+  const double z = point(2);
+  const double x = point(0) / z;
+  const double y = point(1) / z;
+  const double r = sqrt(pow(x, 2) + pow(y, 2));
+
+  // Apply equi distortion
   // clang-format off
-  Eigen::Matrix<T, 4, 4> T_ed;
-  T_ed << R_ed(0, 0), R_ed(0, 1), R_ed(0, 2), t_d_ed(0),
-          R_ed(1, 0), R_ed(1, 1), R_ed(1, 2), t_d_ed(1),
-          R_ed(2, 0), R_ed(2, 1), R_ed(2, 2), t_d_ed(2),
-          0.0, 0.0, 0.0, 1.0;
+  const double theta = atan(r);
+  const double th2 = pow(theta, 2);
+  const double th4 = pow(theta, 4);
+  const double th6 = pow(theta, 6);
+  const double th8 = pow(theta, 8);
+  const double theta_d = theta * (1 + k1 * th2 + k2 * th4 + k3 * th6 + k4 * th8);
+  const double x_dash = (theta_d / r) * x;
+  const double y_dash = (theta_d / r) * y;
   // clang-format on
 
-  return T_sb * T_be * T_ed;
+  // Project equi distorted point to image plane
+  return Vec2{x_dash, y_dash};
+}
+
+template <typename T>
+Eigen::Matrix<T, 2, 1> project_pinhole_equi(const Eigen::Matrix<T, 3, 1> &K,
+                                            const Eigen::Matrix<T, 4, 1> &D,
+                                            const Eigen::Matrix<T, 3, 1> &X) {
+
+
 }
 
 template <typename T>
@@ -136,8 +176,8 @@ bool GimbalCalibResidual::operator()(const T *const tau_s,
                                      const T *const Lambda2,
                                      T *residual) const {
   // Form the transform from static camera to dynamic camera
-  const Eigen::Matrix<T, 4, 4> T_sd =
-      this->T_sd(tau_s, tau_d, w1, w2, Lambda1, Lambda2);
+  const Eigen::Matrix<T, 4, 4> T_ds =
+      this->T_ds(tau_s, tau_d, w1, w2, Lambda1, Lambda2);
 
   // Calculate reprojection error by projecting 3D world point observed in
   // dynamic camera to static camera
@@ -145,7 +185,8 @@ bool GimbalCalibResidual::operator()(const T *const tau_s,
   const Eigen::Matrix<T, 3, 1> P_d{T(this->P_d[0]),
                                    T(this->P_d[1]),
                                    T(this->P_d[2])};
-  const Eigen::Matrix<T, 3, 1> P_s_cal = (T_sd * P_d.homogeneous()).head(3);
+  const Eigen::Matrix<T, 3, 1> P_s_cal =
+      (T_ds.inverse() * P_d.homogeneous()).head(3);
   // -- Project 3D world point to image plane
   const Eigen::Matrix<T, 3, 3> K_s =
       this->K(T(this->fx_s), T(this->fy_s), T(this->cx_s), T(this->cy_s));
@@ -163,8 +204,7 @@ bool GimbalCalibResidual::operator()(const T *const tau_s,
   const Eigen::Matrix<T, 3, 1> P_s{T(this->P_s[0]),
                                    T(this->P_s[1]),
                                    T(this->P_s[2])};
-  const Eigen::Matrix<T, 3, 1> P_d_cal =
-      (T_sd.inverse() * P_s.homogeneous()).head(3);
+  const Eigen::Matrix<T, 3, 1> P_d_cal = (T_ds * P_s.homogeneous()).head(3);
   // -- Project 3D world point to image plane
   const Eigen::Matrix<T, 3, 3> K_d =
       this->K(T(this->fx_d), T(this->fy_d), T(this->cx_d), T(this->cy_d));

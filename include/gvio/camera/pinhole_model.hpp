@@ -159,6 +159,15 @@ public:
   Vec2 pixel2image(const cv::KeyPoint &pixel) const override;
 };
 
+/**
+ * Project 3D point to image plane using pinhole model
+ *
+ * @param K camera intrinsics matrix K
+ * @param p 3D point
+ * @returns Projected point in image plane
+ */
+Vec2 pinhole_project(const Mat3 &K, const Vec3 &p);
+
 /** @} group camera */
 } // namespace gvio
 #endif // GVIO_CAMERA_PINHOLE_MODEL_HPP
