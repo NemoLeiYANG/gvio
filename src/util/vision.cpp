@@ -61,4 +61,16 @@ Vec3 homogeneous(const Vec2 &x) { return Vec3{x(0), x(1), 1.0}; }
 
 Vec4 homogeneous(const Vec3 &x) { return Vec4{x(0), x(1), x(2), 1.0}; }
 
+Mat4 rvectvec2transform(const cv::Mat &rvec, const cv::Mat &tvec) {
+  cv::Mat R;
+  cv::Rodrigues(rvec, R);
+
+  Mat4 T;
+  T.block(0, 0, 3, 3) = convert(R);
+  T.block(0, 3, 3, 1) = convert(tvec);
+  T(3, 3) = 1.0;
+
+  return T;
+}
+
 } // namespace gvio

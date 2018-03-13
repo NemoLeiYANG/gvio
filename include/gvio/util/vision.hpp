@@ -7,6 +7,7 @@
 #define GVIO_UTIL_VISION_HPP
 
 #include <opencv2/core/core.hpp>
+#include "opencv2/calib3d/calib3d.hpp"
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -71,7 +72,7 @@ Vec3 homogeneous(const Vec2 &x);
  * Convert x to homogenous coordinates
  *
  * @param x Input vector
- * @return Output vector in homogeneous coordinates
+ * @returns Output vector in homogeneous coordinates
  */
 Vec4 homogeneous(const Vec3 &x);
 
@@ -79,6 +80,15 @@ Vec4 homogeneous(const Vec3 &x);
  * Normalize vector of
  */
 Vec2 normalize(const Vec2 &x);
+
+/**
+ * Convert rvec, tvec into transform matrix
+ *
+ * @param rvec Rodrigues rotation vector
+ * @param tvec Translation vector
+ * @returns Transform matrix
+ */
+Mat4 rvectvec2transform(const cv::Mat &rvec, const cv::Mat &tvec);
 
 /** @} group vision */
 } // namespace gvio

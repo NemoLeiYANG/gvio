@@ -211,7 +211,7 @@ cv::Mat CalibValidator::projectAndDraw(const cv::Mat &image,
 
   // Draw projected points
   for (size_t i = 0; i < distorted_points.size(); i++) {
-    cv::circle(image_rgb,              // Target image
+    cv::circle(image_rgb,           // Target image
                distorted_points[i], // Center
                2.0,                 // Radius
                color,               // Colour
@@ -289,6 +289,84 @@ cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
   cv::Mat result;
   cv::vconcat(img0_cb, img1_cb, result);
   return result;
+}
+
+cv::Mat CalibValidator::validateStereo2(const cv::Mat &img0,
+                                        const cv::Mat &img1) {
+  // Pre-check
+  assert(img0.empty() == false);
+  assert(img1.empty() == false);
+
+  // Find chessboard corners (with distorted image)
+  std::vector<cv::Point2f> corners;
+  if (this->chessboard.detect(img0, corners) != 0) {
+    return img1;
+  }
+
+  // Undistort points
+  std::vector<cv::Point2f> corners_ud;
+  // -- Note: we are using the original K to undistort the points
+  cv::fisheye::undistortPoints(corners,
+                               corners_ud,
+                               convert(this->K(0)),
+                               convert(this->D(0)));
+  // -- Convert undistorted points from ideal to pixel coordinates to the
+  // undistorted image with Knew (calculated when undistorting the image*)
+  for (size_t i = 0; i < corners_ud.size(); i++) {
+    const Vec3 p{corners_ud[i].x, corners_ud[i].y, 1.0};
+    const Vec3 x = this->K(0) * p;
+    corners_ud[i].x = x(0);
+    corners_ud[i].y = x(1);
+  }
+
+  // Solve PnP to obtain transform from target to cam0 (with undistorted
+  // points)
+  cv::Mat rvec_cam0_target(3, 1, cv::DataType<double>::type);
+  cv::Mat tvec_cam0_target(3, 1, cv::DataType<double>::type);
+  cv::Mat D_empty;
+  cv::solvePnP(chessboard.object_points,
+               corners_ud,
+               convert(this->K(0)),
+               D_empty, // D is empty because corners are undistorted
+               rvec_cam0_target,
+               tvec_cam0_target,
+               false,
+               cv::SOLVEPNP_ITERATIVE);
+
+  // Combine transforms to obtain target to cam1 transform
+  Mat4 T_C0_T = rvectvec2transform(rvec_cam0_target, tvec_cam0_target);
+  Mat4 T_C1_T = this->T_C1_C0 * T_C0_T;
+
+  // Project points using calculated T_C1_T
+  cv::Mat R = convert(T_C1_T.block(0, 0, 3, 3));
+  cv::Mat rvec(3, 1, cv::DataType<double>::type);
+  cv::Rodrigues(R, rvec);
+  cv::Mat tvec = convert(T_C1_T.block(0, 3, 3, 1));
+
+  std::vector<cv::Point2f> image_points;
+  cv::fisheye::projectPoints(this->chessboard.object_points,
+                             image_points,
+                             rvec_cam0_target,
+                             tvec_cam0_target,
+                             convert(this->K(0)),
+                             convert(this->D(0)));
+
+  // Make an RGB version of the input image
+  cv::Mat image_rgb(img0.size(), CV_8UC3);
+  image_rgb = img0.clone();
+  cv::cvtColor(img0, image_rgb, CV_GRAY2RGB);
+
+  // Draw projected points
+  for (size_t i = 0; i < image_points.size(); i++) {
+    cv::circle(image_rgb,             // Target image
+               image_points[i],       // Center
+               2.0,                   // Radius
+               cv::Scalar(0, 0, 255), // Colour
+               CV_FILLED,             // Thickness
+               8);                    // Line type
+  }
+
+  return image_rgb;
 }
 
 cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,

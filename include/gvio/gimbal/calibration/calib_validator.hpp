@@ -140,6 +140,15 @@ struct CalibValidator {
   cv::Mat validateStereo(const cv::Mat &img0, const cv::Mat &img1);
 
   /**
+   * Validate stereo calibration
+   *
+   * @param img0 Input image from cam0
+   * @param img1 Input image from cam1
+   * @returns Validation image for visual inspection
+   */
+  cv::Mat validateStereo2(const cv::Mat &img0, const cv::Mat &img1);
+
+  /**
    * Validate stereo + gimbal calibration
    *
    * @param img0 Input image from cam0
