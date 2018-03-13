@@ -27,6 +27,7 @@ int test_CalibValidator_load() {
   std::cout << validator.cam[0] << std::endl;
   std::cout << validator.cam[1] << std::endl;
   std::cout << validator.cam[2] << std::endl;
+  std::cout << "T_C1_C0:\n" << validator.T_C1_C0 << std::endl << std::endl;
   std::cout << validator.gimbal_model << std::endl;
 
   return 0;
@@ -147,8 +148,8 @@ int test_CalibValidator_validateTriclops_live() {
     }
 
     gimbal.update();
-    const double roll = gimbal.camera_angles(0);
-    const double pitch = gimbal.camera_angles(1);
+    const double roll = gimbal.frame_angles(0) - gimbal.camera_angles(0);
+    const double pitch = gimbal.frame_angles(1) - gimbal.camera_angles(1);
     cv::Mat result = validator.validateTriclops(img0, img1, img2, roll, pitch);
     cv::imshow("Validation", result);
     if (cv::waitKey(1) == 113) {
@@ -164,8 +165,8 @@ void test_suite() {
   MU_ADD_TEST(test_CalibValidator_load);
   // MU_ADD_TEST(test_CalibValidator_validate);
   // MU_ADD_TEST(test_CalibValidator_validate_live);
-  // MU_ADD_TEST(test_CalibValidator_validateStereo_live);
-  MU_ADD_TEST(test_CalibValidator_validateTriclops_live);
+  MU_ADD_TEST(test_CalibValidator_validateStereo_live);
+  // MU_ADD_TEST(test_CalibValidator_validateTriclops_live);
 }
 
 } // namespace gvio

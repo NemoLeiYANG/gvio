@@ -147,7 +147,7 @@ int CalibValidator::detect(const cv::Mat &image,
   cv::solvePnP(chessboard.object_points,
                corners_ud,
                convert(K),
-               D_empty, // D is empty because corners are already undistorted
+               D_empty, // D is empty because corners are undistorted
                rvec,
                tvec,
                false,
@@ -193,13 +193,33 @@ cv::Mat CalibValidator::projectAndDraw(const cv::Mat &image,
                                        const VecX &D,
                                        const MatX &X,
                                        const cv::Scalar &color) {
-  MatX X_T = X.transpose();
-  MatX points = equi_distort(D(0), D(1), D(2), D(3), X_T);
-  points.transposeInPlace();
-  points.conservativeResize(points.rows() + 1, points.cols());
-  points.row(points.rows() - 1) = ones(1, points.cols());
+  // Convert points from Eigen::Matrix to vector of cv::Point2f
+  std::vector<cv::Point2f> points;
+  for (long i = 0; i < X.cols(); i++) {
+    const Vec3 p = X.col(i);
+    points.emplace_back(p(0) / p(2), p(1) / p(2));
+  }
 
-  return this->projectAndDraw(image, K, points, color);
+  // Undistort points
+  std::vector<cv::Point2f> distorted_points;
+  cv::fisheye::distortPoints(points, distorted_points, convert(K), convert(D));
+
+  // Make an RGB version of the input image
+  cv::Mat image_rgb(image.size(), CV_8UC3);
+  image_rgb = image.clone();
+  cv::cvtColor(image, image_rgb, CV_GRAY2RGB);
+
+  // Draw projected points
+  for (size_t i = 0; i < distorted_points.size(); i++) {
+    cv::circle(image_rgb,              // Target image
+               distorted_points[i], // Center
+               2.0,                 // Radius
+               color,               // Colour
+               CV_FILLED,           // Thickness
+               8);                  // Line type
+  }
+
+  return image_rgb;
 }
 
 cv::Mat CalibValidator::validate(const int cam_id, const cv::Mat &image) {
