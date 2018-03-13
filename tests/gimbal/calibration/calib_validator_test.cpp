@@ -148,9 +148,9 @@ int test_CalibValidator_validateTriclops_live() {
     }
 
     gimbal.update();
-    const double roll = gimbal.frame_angles(0) - gimbal.camera_angles(0);
-    const double pitch = gimbal.frame_angles(1) - gimbal.camera_angles(1);
-    cv::Mat result = validator.validateTriclops(img0, img1, img2, roll, pitch);
+    const double joint_roll = gimbal.camera_angles(0) - gimbal.frame_angles(0);
+    const double joint_pitch = gimbal.camera_angles(1) - gimbal.frame_angles(1);
+    cv::Mat result = validator.validateTriclops(img0, img1, img2, joint_roll, joint_pitch);
     cv::imshow("Validation", result);
     if (cv::waitKey(1) == 113) {
       break;
@@ -165,8 +165,8 @@ void test_suite() {
   MU_ADD_TEST(test_CalibValidator_load);
   // MU_ADD_TEST(test_CalibValidator_validate);
   // MU_ADD_TEST(test_CalibValidator_validate_live);
-  MU_ADD_TEST(test_CalibValidator_validateStereo_live);
-  // MU_ADD_TEST(test_CalibValidator_validateTriclops_live);
+  // MU_ADD_TEST(test_CalibValidator_validateStereo_live);
+  MU_ADD_TEST(test_CalibValidator_validateTriclops_live);
 }
 
 } // namespace gvio

@@ -372,8 +372,8 @@ cv::Mat CalibValidator::validateStereo2(const cv::Mat &img0,
 cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
                                          const cv::Mat &img1,
                                          const cv::Mat &img2,
-                                         const double roll,
-                                         const double pitch) {
+                                         const double joint_roll,
+                                         const double joint_pitch) {
   // Pre-check
   assert(img0.empty() == false);
   assert(img1.empty() == false);
@@ -395,8 +395,8 @@ cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
   }
 
   // Get gimbal roll and pitch agnles then form T_ds transform
-  this->gimbal_model.Lambda1 = roll + this->gimbal_model.link1_offset;
-  this->gimbal_model.Lambda2 = pitch;
+  this->gimbal_model.Lambda1 = joint_roll + this->gimbal_model.link1_offset;
+  this->gimbal_model.Lambda2 = joint_pitch;
   const Mat4 T_ds = this->gimbal_model.T_ds();
 
   // Project points observed from cam0 to cam2 image

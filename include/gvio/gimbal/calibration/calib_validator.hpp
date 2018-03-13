@@ -154,13 +154,15 @@ struct CalibValidator {
    * @param img0 Input image from cam0
    * @param img1 Input image from cam1
    * @param img2 Input image from cam2
+   * @param joint_roll Joint roll angle (radians)
+   * @param joint_pitch Joint pitch angle (radians)
    * @returns Validation image for visual inspection
    */
   cv::Mat validateTriclops(const cv::Mat &img0,
                            const cv::Mat &img1,
                            const cv::Mat &img2,
-                           const double roll,
-                           const double pitch);
+                           const double joint_roll,
+                           const double joint_pitch);
 };
 
 /**
