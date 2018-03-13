@@ -17,6 +17,10 @@ Mat4 dh_transform(const double theta,
   return T;
 }
 
+GimbalModel::GimbalModel() {}
+
+GimbalModel::~GimbalModel() {}
+
 void GimbalModel::setAttitude(const double roll, const double pitch) {
   this->attitude << roll, pitch;
 }
@@ -66,5 +70,17 @@ Mat4 GimbalModel::T_de() {
 }
 
 Mat4 GimbalModel::T_ds() { return this->T_de() * this->T_eb() * this->T_bs(); }
+
+std::ostream &operator<<(std::ostream &os, const GimbalModel &gimbal) {
+  os << "tau_s: " << gimbal.tau_s.transpose() << std::endl;
+  os << "tau_d: " << gimbal.tau_d.transpose() << std::endl;
+  os << "w1: " << gimbal.w1.transpose() << std::endl;
+  os << "w2: " << gimbal.w2.transpose() << std::endl;
+  os << "Lambda1: " << gimbal.Lambda1 << std::endl;
+  os << "Lambda2: " << gimbal.Lambda2 << std::endl;
+  os << "link1_offset: " << gimbal.link1_offset << std::endl;
+  os << "link2_offset: " << gimbal.link2_offset << std::endl;
+  return os;
+}
 
 } // namespace gvio

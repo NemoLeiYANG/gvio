@@ -6,8 +6,9 @@
 #define GVIO_GIMBAL_CALIBRATION_CALIB_VALIDATOR_HPP
 
 #include "gvio/util/util.hpp"
-#include "gvio/gimbal/calibration/chessboard.hpp"
 #include "gvio/camera/distortion.hpp"
+#include "gvio/gimbal/gimbal_model.hpp"
+#include "gvio/gimbal/calibration/chessboard.hpp"
 
 namespace gvio {
 /**
@@ -34,6 +35,7 @@ std::ostream &operator<<(std::ostream &os, const CameraProperty &cam);
 struct CalibValidator {
   std::vector<CameraProperty> cam;
   Chessboard chessboard;
+  GimbalModel gimbal_model;
   Mat4 T_C1_C0;
 
   CalibValidator();
@@ -93,10 +95,31 @@ struct CalibValidator {
    * @param image Input image
    * @param K Camera intrinsics matrix K
    * @param X 3D position of chessboard corners
+   * @param color Color to visualize chessboard corners
    *
    * @returns Image with chessboard corners visualized
    */
-  cv::Mat projectAndDraw(const cv::Mat &image, const Mat3 &K, const MatX &X);
+  cv::Mat projectAndDraw(const cv::Mat &image,
+                         const Mat3 &K,
+                         const MatX &X,
+                         const cv::Scalar &color = cv::Scalar(0, 0, 255));
+
+  /**
+   * Project 3D points to image plane and draw chessboard corners
+   *
+   * @param image Input image
+   * @param K Camera intrinsics matrix K
+   * @param D Distortion coefficients vector D
+   * @param X 3D position of chessboard corners
+   * @param color Color to visualize chessboard corners
+   *
+   * @returns Image with chessboard corners visualized
+   */
+  cv::Mat projectAndDraw(const cv::Mat &image,
+                         const Mat3 &K,
+                         const VecX &D,
+                         const MatX &X,
+                         const cv::Scalar &color = cv::Scalar(0, 0, 255));
 
   /**
    * Validate calibration
@@ -115,6 +138,20 @@ struct CalibValidator {
    * @returns Validation image for visual inspection
    */
   cv::Mat validateStereo(const cv::Mat &img0, const cv::Mat &img1);
+
+  /**
+   * Validate stereo + gimbal calibration
+   *
+   * @param img0 Input image from cam0
+   * @param img1 Input image from cam1
+   * @param img2 Input image from cam2
+   * @returns Validation image for visual inspection
+   */
+  cv::Mat validateTriclops(const cv::Mat &img0,
+                           const cv::Mat &img1,
+                           const cv::Mat &img2,
+                           const double roll,
+                           const double pitch);
 };
 
 /**

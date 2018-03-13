@@ -44,8 +44,8 @@ public:
   VecX tau_d = zeros(6, 1);
 
   Vec2 attitude;
-  double width;
-  double length;
+  double link1_offset = 0.0;
+  double link2_offset = 0.0;
 
   GimbalModel();
   virtual ~GimbalModel();
@@ -78,6 +78,8 @@ public:
    */
   Mat4 T_ds();
 };
+
+std::ostream &operator<<(std::ostream &os, const GimbalModel &gimbal);
 
 /** @} group gimbal */
 } // namespace gvio

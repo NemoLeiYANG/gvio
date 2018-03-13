@@ -61,6 +61,15 @@ void equi_undistort(const double k1,
 cv::Mat pinhole_equi_undistort_image(const Mat3 &K,
                                      const VecX &D,
                                      const cv::Mat &image,
+                                     const double balance,
+                                     cv::Mat &K_new);
+
+/**
+ * Pinhole Equidistant undistort image
+ */
+cv::Mat pinhole_equi_undistort_image(const Mat3 &K,
+                                     const VecX &D,
+                                     const cv::Mat &image,
                                      cv::Mat &K_new);
 
 /** @} group camera */

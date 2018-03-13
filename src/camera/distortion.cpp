@@ -119,10 +119,10 @@ void equi_undistort(const double k1,
 cv::Mat pinhole_equi_undistort_image(const Mat3 &K,
                                      const VecX &D,
                                      const cv::Mat &image,
+                                     const double balance,
                                      cv::Mat &Knew) {
   // Estimate new camera matrix first
   const cv::Mat R = cv::Mat::eye(3, 3, CV_64F);
-  const double balance = 0.0;
   cv::fisheye::estimateNewCameraMatrixForUndistortRectify(convert(K),
                                                           convert(D),
                                                           image.size(),
@@ -135,6 +135,13 @@ cv::Mat pinhole_equi_undistort_image(const Mat3 &K,
   cv::fisheye::undistortImage(image, image_ud, convert(K), convert(D), Knew);
 
   return image_ud;
+}
+
+cv::Mat pinhole_equi_undistort_image(const Mat3 &K,
+                                     const VecX &D,
+                                     const cv::Mat &image,
+                                     cv::Mat &Knew) {
+  return pinhole_equi_undistort_image(K, D, image, 0.0, Knew);
 }
 
 } // namespace gvio
