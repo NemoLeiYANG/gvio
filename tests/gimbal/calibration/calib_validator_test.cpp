@@ -55,7 +55,7 @@ int test_CalibValidator_validate_live() {
 
   // Load camera
   IDSCamera camera;
-  camera.configure(TEST_CAM1_CONFIG);
+  camera.configure(TEST_CAM0_CONFIG);
 
   // Loop webcam
   while (true) {
@@ -64,7 +64,7 @@ int test_CalibValidator_validate_live() {
       return -1;
     }
 
-    cv::Mat result = validator.validate(1, image);
+    cv::Mat result = validator.validate(0, image);
     cv::imshow("Validation", result);
     if (cv::waitKey(1) == 113) {
       break;
@@ -150,7 +150,8 @@ int test_CalibValidator_validateTriclops_live() {
     gimbal.update();
     const double joint_roll = gimbal.camera_angles(0) - gimbal.frame_angles(0);
     const double joint_pitch = gimbal.camera_angles(1) - gimbal.frame_angles(1);
-    cv::Mat result = validator.validateTriclops(img0, img1, img2, joint_roll, joint_pitch);
+    cv::Mat result =
+        validator.validateTriclops(img0, img1, img2, joint_roll, joint_pitch);
     cv::imshow("Validation", result);
     if (cv::waitKey(1) == 113) {
       break;

@@ -121,7 +121,7 @@ int CalibValidator::detect(const cv::Mat &image,
   // Undistort image
   image_ud = pinhole_equi_undistort_image(K, D, image, 0.5, Knew);
 
-  // Find chessboard corners (with distorted image)
+  // Find chessboard corners
   std::vector<cv::Point2f> corners;
   if (this->chessboard.detect(image, corners) != 0) {
     return -1;
@@ -159,6 +159,25 @@ int CalibValidator::detect(const cv::Mat &image,
   return 0;
 }
 
+double CalibValidator::reprojectionError(
+    const cv::Mat &image, const std::vector<cv::Point2f> &image_points) {
+  // Find chessboard corners
+  std::vector<cv::Point2f> corners;
+  if (this->chessboard.detect(image, corners) != 0) {
+    return -1;
+  }
+
+  // Calculate RMSE reprojection errors
+  double sse = 0.0;
+  for (size_t i = 0; i < image_points.size(); i++) {
+    sse += cv::norm(corners[i] - image_points[i]);
+  }
+  const double n = image_points.size();
+  const double rmse = sqrt(sse / n);
+
+  return rmse;
+}
+
 cv::Mat CalibValidator::projectAndDraw(const cv::Mat &image,
                                        const Mat3 &K,
                                        const MatX &X,
@@ -171,21 +190,39 @@ cv::Mat CalibValidator::projectAndDraw(const cv::Mat &image,
   }
 
   // Make an RGB version of the input image
-  cv::Mat result(image.size(), CV_8UC3);
-  result = image.clone();
-  cv::cvtColor(image, result, CV_GRAY2RGB);
+  cv::Mat image_rgb(image.size(), CV_8UC3);
+  image_rgb = image.clone();
+  cv::cvtColor(image, image_rgb, CV_GRAY2RGB);
 
   // Draw projected points
   for (size_t i = 0; i < image_points.size(); i++) {
-    cv::circle(result,          // Target image
+    cv::circle(image_rgb,       // Target image
                image_points[i], // Center
-               2.0,             // Radius
+               1.0,             // Radius
                color,           // Colour
                CV_FILLED,       // Thickness
                8);              // Line type
   }
 
-  return result;
+  // Calculate reprojection error and show in image
+  const double rmse = this->reprojectionError(image_rgb, image_points);
+  if (rmse > 0.0) {
+    // Convert rmse to string
+    std::stringstream stream;
+    stream << fixed << setprecision(2) << rmse;
+    const std::string rmse_str = stream.str();
+
+    // Draw on image
+    cv::putText(image_rgb,
+                "RMSE Reprojection Error: " + rmse_str,
+                cv::Point(0, 18),
+                cv::FONT_HERSHEY_SIMPLEX,
+                0.6,
+                cv::Scalar(0, 0, 255),
+                2);
+  }
+
+  return image_rgb;
 }
 
 cv::Mat CalibValidator::projectAndDraw(const cv::Mat &image,
@@ -217,6 +254,24 @@ cv::Mat CalibValidator::projectAndDraw(const cv::Mat &image,
                color,               // Colour
                CV_FILLED,           // Thickness
                8);                  // Line type
+  }
+
+  // Calculate reprojection error and show in image
+  const double rmse = this->reprojectionError(image_rgb, distorted_points);
+  if (rmse > 0.0) {
+    // Convert rmse to string
+    std::stringstream stream;
+    stream << fixed << setprecision(2) << rmse;
+    const std::string rmse_str = stream.str();
+
+    // Draw on image
+    cv::putText(image_rgb,
+                "RMSE Reprojection Error: " + rmse_str,
+                cv::Point(0, 18),
+                cv::FONT_HERSHEY_SIMPLEX,
+                0.6,
+                cv::Scalar(0, 0, 255),
+                2);
   }
 
   return image_rgb;

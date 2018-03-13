@@ -90,6 +90,16 @@ struct CalibValidator {
              MatX &X);
 
   /**
+   * Calculate reprojection error
+   *
+   * @param image Image
+   * @param image_points Image points
+   * @returns Reprojection error
+   */
+  double reprojectionError(const cv::Mat &image,
+                           const std::vector<cv::Point2f> &image_points);
+
+  /**
    * Project 3D points to image plane and draw chessboard corners
    *
    * @param image Input image
