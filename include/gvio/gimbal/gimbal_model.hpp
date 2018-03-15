@@ -23,16 +23,16 @@ namespace gvio {
  * Create DH transform from link n to link n-1 (end to front)
  *
  * @param theta
- * @param alpha
- * @param a
  * @param d
+ * @param a
+ * @param alpha
  *
  * @returns DH transform
  */
 Mat4 dh_transform(const double theta,
-                  const double alpha,
+                  const double d,
                   const double a,
-                  const double d);
+                  const double alpha);
 
 class GimbalModel {
 public:
@@ -44,8 +44,8 @@ public:
   VecX tau_d = zeros(6, 1);
 
   Vec2 attitude;
-  double link1_offset = 0.0;
-  double link2_offset = 0.0;
+  double theta1_offset = 0.0;
+  double theta2_offset = 0.0;
 
   GimbalModel();
   virtual ~GimbalModel();

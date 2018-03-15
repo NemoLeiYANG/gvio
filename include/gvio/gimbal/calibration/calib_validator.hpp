@@ -90,6 +90,15 @@ struct CalibValidator {
              MatX &X);
 
   /**
+   * Draw detected chessboard corners
+   *
+   * @param image Image
+   * @returns Detected chessboard image
+   */
+  cv::Mat drawDetected(const cv::Mat &image,
+                       const cv::Scalar &color = cv::Scalar{0, 255, 0});
+
+  /**
    * Calculate reprojection error
    *
    * @param image Image

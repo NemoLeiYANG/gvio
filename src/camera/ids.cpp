@@ -430,6 +430,7 @@ int IDSCamera::configure(const std::string &config_file) {
   parser.addParam("frame_rate", &this->frame_rate);
   parser.addParam("exposure_time", &this->exposure_time);
   parser.addParam("gain", &this->gain);
+  parser.addParam("edge_enhancement", &this->edge_enhancement, true);
   if (parser.load(config_file) != 0) {
     LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
     return -1;
@@ -530,6 +531,13 @@ int IDSCamera::configure(const std::string &config_file) {
     return -1;
   }
 
+  // Set edge enhancement
+  retval = this->setEdgeEnhancement(this->edge_enhancement);
+  if (retval != 0) {
+    LOG_ERROR("Failed to set edge enhancement!");
+    return -1;
+  }
+
   // Set ROI
   retval = this->setROI(this->offset_x,
                         this->offset_y,
@@ -596,7 +604,7 @@ void IDSCamera::listImageFormats() {
   }
 
   // List image formats
-  for (int i = 0; i < count; i++) {
+  for (size_t i = 0; i < count; i++) {
     // clang-format off
     std::cout << "format id: " << format_list->FormatInfo[i].nFormatID << std::endl;
     std::cout << "AOI width: " << format_list->FormatInfo[i].nWidth << std::endl;
@@ -749,8 +757,8 @@ int IDSCamera::setTriggerPrescaler(const int prescaler) {
     LOG_ERROR("Failed to obtain trigger prescaler range!");
     return -1;
   }
-  const UINT prescaler_min = range.u32Minimum;
-  const UINT prescaler_max = range.u32Maximum;
+  const int prescaler_min = range.u32Minimum;
+  const int prescaler_max = range.u32Maximum;
 
   // Double check desired trigger prescaler is supported
   if (prescaler < prescaler_min || prescaler > prescaler_max) {
@@ -1103,12 +1111,78 @@ int IDSCamera::getExposureTime(double &exposure_time_ms) {
   return 0;
 }
 
-int IDSCamera::getFrame(cv::Mat &image) {
-  // Pre-check
-  if (this->configured = false) {
-    LOG_ERROR("Camera is not configured!");
+int IDSCamera::setEdgeEnhancement(const int param) {
+  // Get range
+  int min = 0;
+  int max = 0;
+  int inc = 0;
+  if (this->getEdgeEnhancementRange(min, max, inc) != 0) {
+    LOG_ERROR("Failed to obtain edge enhancement range!");
     return -1;
   }
+
+  // Check range
+  bool param_ok = false;
+  for (int i = min; i <= max; i++) {
+    if (param == i) {
+      param_ok = true;
+      break;
+    }
+  }
+  if (param_ok == false) {
+    LOG_ERROR("Edge enchancement setting must be between %d and %d"
+              " in increments of %d!",
+              min,
+              max,
+              inc);
+    return -1;
+  }
+
+  // Set edge enhancement
+  int retval = is_EdgeEnhancement(this->camera_handle,
+                                  IS_EDGE_ENHANCEMENT_CMD_SET,
+                                  (void *) &param,
+                                  sizeof(param));
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::getEdgeEnhancement(int &param) {
+  int retval = is_EdgeEnhancement(this->camera_handle,
+                                  IS_EDGE_ENHANCEMENT_CMD_GET,
+                                  (void *) &param,
+                                  sizeof(param));
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int IDSCamera::getEdgeEnhancementRange(int &min, int &max, int &inc) {
+  UINT range[3];
+  ZeroMemory(range, sizeof(range));
+
+  int retval = is_EdgeEnhancement(this->camera_handle,
+                                  IS_EDGE_ENHANCEMENT_CMD_GET_RANGE,
+                                  (void *) range,
+                                  sizeof(range));
+  if (retval != IS_SUCCESS) {
+    return -1;
+  }
+
+  min = range[0];
+  max = range[1];
+  inc = range[2];
+
+  return 0;
+}
+
+int IDSCamera::getFrame(cv::Mat &image) {
+  assert(this->configured);
 
   // Query camera's current resolution settings
   int image_width = 0;

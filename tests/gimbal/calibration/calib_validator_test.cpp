@@ -71,6 +71,9 @@ int test_CalibValidator_validate_live() {
     }
   }
 
+  // Needed to exit cleanly
+  cv::destroyAllWindows();
+
   return 0;
 }
 
@@ -100,6 +103,9 @@ int test_CalibValidator_validateStereo_live() {
       break;
     }
   }
+
+  // Needed to exit cleanly
+  cv::destroyAllWindows();
 
   return 0;
 }
@@ -158,6 +164,9 @@ int test_CalibValidator_validateTriclops_live() {
     }
   }
 
+  // Needed to exit cleanly
+  cv::destroyAllWindows();
+
   return 0;
 }
 
@@ -166,7 +175,7 @@ void test_suite() {
   MU_ADD_TEST(test_CalibValidator_load);
   // MU_ADD_TEST(test_CalibValidator_validate);
   // MU_ADD_TEST(test_CalibValidator_validate_live);
-  // MU_ADD_TEST(test_CalibValidator_validateStereo_live);
+  MU_ADD_TEST(test_CalibValidator_validateStereo_live);
   // MU_ADD_TEST(test_CalibValidator_validateTriclops_live);
 }
 

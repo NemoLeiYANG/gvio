@@ -162,7 +162,8 @@ public:
   int pixel_clock = 0;
   double frame_rate = 0.0;
   double exposure_time = 0.0;
-  int gain = 0.0;
+  int gain = 0;
+  int edge_enhancement = 0;
 
   // Buffers
   int nb_buffers = 0;
@@ -426,6 +427,32 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int getHDRMode();
+
+  /**
+   * Set edge enhancement
+   *
+   * @param param Edge enchancement setting
+   * @returns 0 for success, -1 for failure
+   */
+  int setEdgeEnhancement(const int param);
+
+  /**
+   * Get edge enhancement
+   *
+   * @param param Edge enchancement setting
+   * @returns 0 for success, -1 for failure
+   */
+  int getEdgeEnhancement(int &param);
+
+  /**
+   * Get edge enhancement range
+   *
+   * @param min Min edge enchancement setting
+   * @param max Max edge enchancement setting
+   * @param inc Increment edge enchancement setting
+   * @returns 0 for success, -1 for failure
+   */
+  int getEdgeEnhancementRange(int &min, int &max, int &inc);
 
   /**
    * Get camera frame

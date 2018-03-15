@@ -95,8 +95,8 @@ int CalibValidator::load(const int nb_cameras,
   parser.addParam("T_C2_C0.tau_d", &this->gimbal_model.tau_d);
   parser.addParam("T_C2_C0.w1", &this->gimbal_model.w1);
   parser.addParam("T_C2_C0.w2", &this->gimbal_model.w2);
-  parser.addParam("T_C2_C0.link1_offset", &this->gimbal_model.link1_offset);
-  parser.addParam("T_C2_C0.link2_offset", &this->gimbal_model.link2_offset);
+  parser.addParam("T_C2_C0.theta1_offset", &this->gimbal_model.theta1_offset);
+  parser.addParam("T_C2_C0.theta2_offset", &this->gimbal_model.theta2_offset);
   if (parser.load(calib_file) != 0) {
     LOG_ERROR("Failed to load calib file [%s]!", calib_file.c_str());
     return -1;
@@ -129,34 +129,33 @@ int CalibValidator::detect(const cv::Mat &image,
 
   // Undistort points
   std::vector<cv::Point2f> corners_ud;
-  // -- Note: we are using the original K to undistort the points
   cv::fisheye::undistortPoints(corners, corners_ud, convert(K), convert(D));
-  // -- Convert undistorted points from ideal to pixel coordinates to the
-  // undistorted image with Knew (calculated when undistorting the image*)
-  for (size_t i = 0; i < corners_ud.size(); i++) {
-    const Vec3 p{corners_ud[i].x, corners_ud[i].y, 1.0};
-    const Vec3 x = K * p;
-    corners_ud[i].x = x(0);
-    corners_ud[i].y = x(1);
-  }
-
-  // Solve PnP (with undistorted points)
-  cv::Mat rvec(3, 1, cv::DataType<double>::type);
-  cv::Mat tvec(3, 1, cv::DataType<double>::type);
-  cv::Mat D_empty;
-  cv::solvePnP(chessboard.object_points,
-               corners_ud,
-               convert(K),
-               D_empty, // D is empty because corners are undistorted
-               rvec,
-               tvec,
-               false,
-               cv::SOLVEPNP_ITERATIVE);
 
   // Calculate corner positions in 3D
-  this->chessboard.calcCornerPositions(corners_ud, K, X);
+  this->chessboard.calcCornerPositions(corners_ud, I(3), X);
 
   return 0;
+}
+
+cv::Mat CalibValidator::drawDetected(const cv::Mat &image,
+                                     const cv::Scalar &color) {
+  // Find chessboard corners
+  std::vector<cv::Point2f> corners;
+  if (this->chessboard.detect(image, corners) != 0) {
+    return image;
+  }
+
+  // Draw projected points
+  for (size_t i = 0; i < corners.size(); i++) {
+    cv::circle(image,      // Target image
+               corners[i], // Center
+               1.0,        // Radius
+               color,      // Colour
+               CV_FILLED,  // Thickness
+               8);         // Line type
+  }
+
+  return image;
 }
 
 double CalibValidator::reprojectionError(
@@ -324,13 +323,19 @@ cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
     return result;
   }
 
+  // Colors
+  const cv::Scalar red{0, 0, 255};
+  const cv::Scalar green{0, 255, 0};
+
   // Project points observed from cam1 to cam0 image
   // -- Make points homogeneous by adding 1's in last row
   X1.conservativeResize(X1.rows() + 1, X1.cols());
   X1.row(X1.rows() - 1) = ones(1, X1.cols());
   // -- Project and draw
   MatX X0_cal = (this->T_C1_C0.inverse() * X1).block(0, 0, 3, X1.cols());
-  cv::Mat img0_cb = this->projectAndDraw(img0, this->K(0), this->D(0), X0_cal);
+  cv::Mat img0_cb =
+      this->projectAndDraw(img0, this->K(0), this->D(0), X0_cal, red);
+  img0_cb = this->drawDetected(img0_cb, green);
 
   // Project points observed from cam0 to cam1 image
   // -- Make points homogeneous by adding 1's in last row
@@ -338,7 +343,9 @@ cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
   X0.row(X0.rows() - 1) = ones(1, X0.cols());
   // -- Project and draw
   MatX X1_cal = (this->T_C1_C0 * X0).block(0, 0, 3, X0.cols());
-  cv::Mat img1_cb = this->projectAndDraw(img1, this->K(1), this->D(1), X1_cal);
+  cv::Mat img1_cb =
+      this->projectAndDraw(img1, this->K(1), this->D(1), X1_cal, green);
+  img1_cb = this->drawDetected(img1_cb, red);
 
   // Combine cam0 and cam1 images
   cv::Mat result;
@@ -446,11 +453,17 @@ cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
   retval += this->detect(img1, this->K(1), this->D(1), img1_ud, K1_new, X1);
   retval += this->detect(img2, this->K(2), this->D(2), img2_ud, K2_new, X2);
   if (retval != 0) {
-    return img2;
+    cv::Mat img02;
+    cv::vconcat(img0, img2, img02);
+    return img02;
   }
 
-  // Get gimbal roll and pitch agnles then form T_ds transform
-  this->gimbal_model.Lambda1 = joint_roll + this->gimbal_model.link1_offset;
+  // Project points observed from cam0 to cam0 image
+  cv::Mat img0_cb = this->projectAndDraw(img0, this->K(0), this->D(0), X0);
+  img0_cb = this->drawDetected(img0_cb);
+
+  // Get gimbal roll and pitch angles then form T_ds transform
+  this->gimbal_model.Lambda1 = joint_roll;
   this->gimbal_model.Lambda2 = joint_pitch;
   const Mat4 T_ds = this->gimbal_model.T_ds();
 
@@ -461,9 +474,12 @@ cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
   // -- Project and draw
   MatX X2_cal = (T_ds * X0).block(0, 0, 3, X0.cols());
   cv::Mat img2_cb = this->projectAndDraw(img2, this->K(2), this->D(2), X2_cal);
+  img2_cb = this->drawDetected(img2_cb);
 
   // Combine images
-  return img2_cb;
+  cv::Mat img02_cb;
+  cv::vconcat(img0_cb, img2_cb, img02_cb);
+  return img02_cb;
 }
 
 } // namespace gvio

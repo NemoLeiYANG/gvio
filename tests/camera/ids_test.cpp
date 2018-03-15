@@ -258,6 +258,34 @@ int test_IDSCamera_setTriggerDelay_and_getTriggerDelay() {
   return 0;
 }
 
+int test_IDSCamera_setEdgeEnhancement_and_getEdgeEnhancement() {
+  int retval = 0;
+  IDSCamera camera;
+  camera.configure(TEST_CONFIG);
+
+  int param = 0;
+  retval = camera.getEdgeEnhancement(param);
+  MU_CHECK_EQ(0, retval);
+
+  int min = 0;
+  int max = 0;
+  int inc = 0;
+  retval = camera.getEdgeEnhancementRange(min, max, inc);
+  std::cout << "min: " << min << std::endl;
+  std::cout << "max: " << max << std::endl;
+  std::cout << "inc: " << inc << std::endl;
+  MU_CHECK_EQ(0, retval);
+
+  retval = camera.setEdgeEnhancement(1);
+  MU_CHECK_EQ(0, retval);
+
+  retval = camera.getEdgeEnhancement(param);
+  MU_CHECK_EQ(param, 1);
+  MU_CHECK_EQ(0, retval);
+
+  return 0;
+}
+
 int test_IDSCamera_getFrame() {
   IDSCamera camera;
   camera.configure(TEST_CONFIG);
@@ -307,6 +335,7 @@ void test_suite() {
   MU_ADD_TEST(test_IDSCamera_getImageSize);
   MU_ADD_TEST(test_IDSCamera_setExposureTime_and_getExposureTime);
   MU_ADD_TEST(test_IDSCamera_setTriggerDelay_and_getTriggerDelay);
+  MU_ADD_TEST(test_IDSCamera_setEdgeEnhancement_and_getEdgeEnhancement);
   MU_ADD_TEST(test_IDSCamera_getFrame);
 }
 

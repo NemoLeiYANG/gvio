@@ -127,7 +127,7 @@ SET(UNITTESTS
     # apriltag-mit_test
     # camera-camera_test
     # camera-camera_config_test
-    # camera-ids_test
+    camera-ids_test
     # camera-pinhole_model_test
     # control-carrot_controller_test
     # control-pid_test
