@@ -73,30 +73,24 @@ struct CalibValidator {
   /**
    * Detect chessboard corners
    *
-   * @param image Input image
+   * @param image Image
    * @param K Camera intrinsics matrix K
    * @param D Distortion coefficients vector D
-   * @param image_ud Output undistorted image
-   * @param Knew Output new camera intrinsics matrix K
    * @param X 3D position of chessboard corners
    *
    * @returns 0 for success, -1 for failure
    */
-  int detect(const cv::Mat &image,
-             const Mat3 &K,
-             const VecX &D,
-             cv::Mat &image_ud,
-             cv::Mat &Knew,
-             MatX &X);
+  int detect(const cv::Mat &image, const Mat3 &K, const VecX &D, MatX &X);
 
   /**
-   * Draw detected chessboard corners
+   * Draw detected
    *
    * @param image Image
-   * @returns Detected chessboard image
+   * @param color Color to visualize chessboard corners
+   *
+   * @returns Image with chessboard corners visualized
    */
-  cv::Mat drawDetected(const cv::Mat &image,
-                       const cv::Scalar &color = cv::Scalar{0, 255, 0});
+  cv::Mat drawDetected(const cv::Mat &image, const cv::Scalar &color);
 
   /**
    * Calculate reprojection error
@@ -118,10 +112,10 @@ struct CalibValidator {
    *
    * @returns Image with chessboard corners visualized
    */
-  cv::Mat projectAndDraw(const cv::Mat &image,
-                         const Mat3 &K,
-                         const MatX &X,
-                         const cv::Scalar &color = cv::Scalar(0, 0, 255));
+  cv::Mat project(const cv::Mat &image,
+                  const Mat3 &K,
+                  const MatX &X,
+                  const cv::Scalar &color = cv::Scalar(0, 0, 255));
 
   /**
    * Project 3D points to image plane and draw chessboard corners
@@ -134,11 +128,11 @@ struct CalibValidator {
    *
    * @returns Image with chessboard corners visualized
    */
-  cv::Mat projectAndDraw(const cv::Mat &image,
-                         const Mat3 &K,
-                         const VecX &D,
-                         const MatX &X,
-                         const cv::Scalar &color = cv::Scalar(0, 0, 255));
+  cv::Mat project(const cv::Mat &image,
+                  const Mat3 &K,
+                  const VecX &D,
+                  const MatX &X,
+                  const cv::Scalar &color = cv::Scalar(0, 0, 255));
 
   /**
    * Validate calibration
@@ -147,7 +141,7 @@ struct CalibValidator {
    * @param image Input image
    * @returns Validation image for visual inspection
    */
-  cv::Mat validate(const int cam_id, const cv::Mat &image);
+  cv::Mat validate(const int cam_id, cv::Mat &image);
 
   /**
    * Validate stereo calibration

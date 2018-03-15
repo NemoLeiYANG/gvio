@@ -16,4 +16,4 @@ pixel_clock: 10
 frame_rate: 10.0
 exposure_time: 20
 gain: 50
-edge_enhancement: 9
+edge_enhancement: 0

@@ -39,8 +39,8 @@ int test_CalibValidator_validate() {
   // Load validator
   validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
 
-  const cv::Mat image = cv::imread(TEST_IMAGE);
-  const cv::Mat result = validator.validate(0, image);
+  cv::Mat image = cv::imread(TEST_IMAGE);
+  cv::Mat result = validator.validate(0, image);
   cv::imshow("Image", result);
   cv::waitKey();
 
