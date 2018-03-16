@@ -1,10 +1,11 @@
+import argparse
 from math import cos
 from math import sin
 from math import pi
 
+import yaml
 import numpy as np
 from numpy import dot
-
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  # NOQA
 
@@ -124,8 +125,6 @@ def dh_transform(theta, d, a, alpha):
 
 class GimbalModel:
     def __init__(self, **kwargs):
-        self.attitude = np.array([0.0, 0.0])
-
         # 6-dof transform from static camera to base mechanism frame
         self.tau_s = kwargs.get(
             "tau_s",
@@ -139,13 +138,29 @@ class GimbalModel:
         )
 
         # DH-params (theta, alpha, a, d)
-        self.link1 = kwargs.get("link1", np.array([0.0, 0.1, 0.0, pi / 2.0]))
-        self.link2 = kwargs.get("link2", np.array([0.0, 0.0, 0.0, 0.0]))
+        # -- Lambda1 and Lambda2 are joint angles (a.k.a theta in DH)
+        self.Lambda1 = kwargs.get("Lambda1", 0.0)
+        self.Lambda2 = kwargs.get("Lambda2", 0.0)
+        # -- w1, w2 (represents alpha, a, d)
+        self.w1 = kwargs.get("w1", np.array([0.1, 0.0, pi / 2.0]))
+        self.w2 = kwargs.get("w2", np.array([0.0, 0.0, 0.0]))
+        # -- theta1 and theta2 offsets
+        self.theta1_offset = kwargs.get("theta1_offset", 0.0)
+        self.theta2_offset = kwargs.get("theta2_offset", 0.0)
 
     def set_attitude(self, attitude):
-        self.attitude = attitude
+        """ Set gimbal joint angles
 
-    def T_bs(self, tau_s):
+        Parameters
+        ----------
+        attitude : np.array
+            Roll, pitch in radians
+
+        """
+        self.Lambda1 = attitude[0]
+        self.Lambda2 = attitude[1]
+
+    def T_bs(self):
         """ Form transform matrix from static camera to base mechanism
 
         Parameters
@@ -163,8 +178,8 @@ class GimbalModel:
 
         """
         # Setup
-        t = tau_s[0:3]
-        rpy = tau_s[3:6]
+        t = self.tau_s[0:3]
+        rpy = self.tau_s[3:6]
         R = euler321ToRot(rpy)
 
         # Create base frame
@@ -175,16 +190,8 @@ class GimbalModel:
 
         return T_bs
 
-    def T_de(self, tau_d):
+    def T_de(self):
         """ Form transform matrix from end-effector to dynamic camera
-
-        Parameters
-        ----------
-        tau_s : np.array
-            Parameterization of the transform matrix where the first 3 elements
-            in the vector is the translation from end effector to dynamic
-            camera frame. Second 3 elements is rpy, which is the roll pitch yaw
-            from from end effector to dynamic camera frame.
 
         Returns
         -------
@@ -193,8 +200,8 @@ class GimbalModel:
 
         """
         # Setup
-        t = tau_d[0:3]
-        R = euler321ToRot(tau_d[3:6])
+        t = self.tau_d[0:3]
+        R = euler321ToRot(self.tau_d[3:6])
 
         # Create transform
         T_de = np.array([[R[0, 0], R[0, 1], R[0, 2], t[0]],
@@ -204,15 +211,8 @@ class GimbalModel:
 
         return T_de
 
-    def T_eb(self, link1, link2):
+    def T_eb(self):
         """ Form transform matrix from base_frame to end-effector
-
-        Parameters
-        ----------
-        link1 : np.array
-            DH parameters (theta, alpha, a, d) for the first link
-        link2 : np.array
-            DH parameters (theta, alpha, a, d) for the second link
 
         Returns
         -------
@@ -220,21 +220,33 @@ class GimbalModel:
             Transform matrix from base frame to end-effector
 
         """
-        theta1, d1, a1, alpha1 = link1
-        theta2, d2, a2, alpha2 = link2
+        theta1 = self.Lambda1 + self.theta1_offset
+        d1, a1, alpha1 = self.w1
+        theta2 = self.Lambda2 + self.theta2_offset
+        d2, a2, alpha2 = self.w2
+
         T_1b = np.linalg.inv(dh_transform(theta1, d1, a1, alpha1))
         T_e1 = np.linalg.inv(dh_transform(theta2, d2, a2, alpha2))
+
         return np.dot(T_e1, T_1b)
 
     def T_ds(self):
+        """ Form transformation matrix from static to dynamic camera
+
+        Returns
+        -------
+        T_ds : np.array
+            Transform matrix from static to dynamic camera
+
+        """
         # Transform from static camera to base frame
-        T_bs = self.T_bs(self.tau_s)
+        T_bs = self.T_bs()
 
         # Transform from base frame to end-effector
-        T_eb = self.T_eb(self.link1, self.link2)
+        T_eb = self.T_eb()
 
         # Transform from end-effector to dynamic camera
-        T_de = self.T_de(self.tau_d)
+        T_de = self.T_de()
 
         # Create transforms
         T_es = dot(T_eb, T_bs)  # Transform static camera to end effector
@@ -243,14 +255,26 @@ class GimbalModel:
         return T_ds
 
     def calc_transforms(self):
+        """ Form 3 transformation matrix:
+
+        - T_bs: Static camera to base mechanism
+        - T_eb: Base mechanism to end-effector
+        - T_de: End-effector to dynamic camera
+
+        Returns
+        -------
+        links : list of np.array
+            [T_bs, T_eb, T_de]
+
+        """
         # Transform from static camera to base frame
-        T_bs = self.T_bs(self.tau_s)
+        T_bs = self.T_bs()
 
         # Transform from base frame to end-effector
-        T_eb = self.T_eb(self.link1, self.link2)
+        T_eb = self.T_eb()
 
         # Transform from end-effector to dynamic camera
-        T_de = self.T_de(self.tau_d)
+        T_de = self.T_de()
 
         # Create links
         links = [T_bs, T_eb, T_de]
@@ -296,6 +320,14 @@ class PlotGimbal:
         self.show_dynamic_frame = kwargs.get("show_dynamic_frame", True)
 
     def set_attitude(self, attitude):
+        """ Set gimbal joint angles
+
+        Parameters
+        ----------
+        attitude : np.array
+            Roll, pitch in radians
+
+        """
         self.gimbal.set_attitude(attitude)
 
     def plot_coord_frame(self, ax, T, frame, length=0.1):
@@ -404,24 +436,33 @@ class PlotGimbal:
         return ax
 
 
-if __name__ == "__main__":
-    # Optimized gimbal params
-    offset = -pi / 2.0
-    roll = 0.0
-    pitch = 0.0
+def parse_gvio_camchain(camchain_file):
+    stream = open(camchain_file, "r")
+    camchain = yaml.load(stream)
 
-    tau_s = np.array([-0.0419, -0.0908, 0.0843, 0.0189, -0.0317, -0.0368])
-    tau_d = np.array([0.0032, 0.0007, -0.0302, 1.5800, 0.0123, -1.5695])
-    link1 = np.array([offset + roll, 0.0404, -0.0012, 1.5731])
-    link2 = np.array([pitch, 0.0, 0.0, 0.0])
+    params = {
+        "tau_s": camchain["T_C2_C0"]["tau_s"],
+        "tau_d": camchain["T_C2_C0"]["tau_d"],
+        "Lambda1": 0.0,
+        "Lambda2": 0.0,
+        "w1": camchain["T_C2_C0"]["w1"],
+        "w2": camchain["T_C2_C0"]["w2"],
+        "theta1_offset": camchain["T_C2_C0"]["theta1_offset"],
+        "theta2_offset": camchain["T_C2_C0"]["theta2_offset"]
+    }
+
+    return params
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Gimbal visualizer')
+    parser.add_argument('--camchain', required=True,
+                        type=str, help="GVIO camchain file")
+    args = parser.parse_args()
 
     # Gimbal model
-    gimbal_model = GimbalModel(
-        tau_s=tau_s,
-        tau_d=tau_d,
-        link1=link1,
-        link2=link2
-    )
+    params = parse_gvio_camchain(args.camchain)
+    gimbal_model = GimbalModel(**params)
 
     # Plot gimbal model
     plot = PlotGimbal(gimbal=gimbal_model,

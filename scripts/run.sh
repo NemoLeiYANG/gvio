@@ -16,7 +16,7 @@ fi
 
 # doxygen Doxyfile
 
-python3 scripts/calibration/plot_gimbal.py
+python3 scripts/calibration/plot_gimbal.py --camchain tests/test_configs/gimbal/calibration/gvio_camchain.yaml
 
 # mkdir -p build && cd build
 
