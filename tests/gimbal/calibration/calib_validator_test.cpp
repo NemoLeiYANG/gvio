@@ -5,7 +5,7 @@
 
 namespace gvio {
 
-#define TEST_CALIB_FILE "test_configs/gimbal/calibration/camchain.yaml"
+#define TEST_CALIB_FILE "test_configs/gimbal/calibration/gvio_camchain.yaml"
 #define TEST_TARGET_FILE "test_configs/gimbal/calibration/chessboard.yaml"
 #define TEST_CAM0_CONFIG "test_configs/camera/ueye/cam0.yaml"
 #define TEST_CAM1_CONFIG "test_configs/camera/ueye/cam1.yaml"
@@ -124,6 +124,7 @@ int test_CalibValidator_validateTriclops_live() {
     LOG_ERROR("Failed to load gimbal!");
     return -1;
   }
+  gimbal.off();
 
   // Load camera
   IDSCamera cam0, cam1, cam2;
@@ -175,8 +176,8 @@ void test_suite() {
   MU_ADD_TEST(test_CalibValidator_load);
   // MU_ADD_TEST(test_CalibValidator_validate);
   // MU_ADD_TEST(test_CalibValidator_validate_live);
-  MU_ADD_TEST(test_CalibValidator_validateStereo_live);
-  // MU_ADD_TEST(test_CalibValidator_validateTriclops_live);
+  // MU_ADD_TEST(test_CalibValidator_validateStereo_live);
+  MU_ADD_TEST(test_CalibValidator_validateTriclops_live);
 }
 
 } // namespace gvio

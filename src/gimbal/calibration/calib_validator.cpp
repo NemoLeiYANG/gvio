@@ -23,11 +23,11 @@ Mat3 CalibValidator::K(const int cam_id) {
   // First row
   K(0, 0) = this->cam[cam_id].intrinsics[0];
   K(0, 1) = 0.0;
-  K(0, 2) = this->cam[cam_id].intrinsics[1];
+  K(0, 2) = this->cam[cam_id].intrinsics[2];
 
   // Second row
   K(1, 0) = 0.0;
-  K(1, 1) = this->cam[cam_id].intrinsics[2];
+  K(1, 1) = this->cam[cam_id].intrinsics[1];
   K(1, 2) = this->cam[cam_id].intrinsics[3];
 
   // Thrid row
@@ -463,12 +463,15 @@ cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
   retval += this->detect(img2, this->K(2), this->D(2), X2);
   if (retval != 0) {
     cv::Mat img02;
-    cv::vconcat(img0, img2, img02);
-    return img02;
+    cv::hconcat(img0, img2, img02);
+    cv::Mat img021;
+    cv::hconcat(img02, img1, img021);
+    return img021;
   }
 
-  // Project points observed from cam0 to cam0 image
-  cv::Mat img0_cb = this->project(img0, this->K(0), this->D(0), X0);
+  // Visualize cam0 and cam1 intrinsics
+  cv::Mat img0_cb = this->project(img0, this->K(0), this->D(0), X0, red);
+  cv::Mat img1_cb = this->project(img1, this->K(1), this->D(1), X1, green);
 
   // Get gimbal roll and pitch angles then form T_ds transform
   this->gimbal_model.Lambda1 = joint_roll;
@@ -483,10 +486,20 @@ cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
   MatX X2_cal = (T_ds * X0).block(0, 0, 3, X0.cols());
   cv::Mat img2_cb = this->project(img2, this->K(2), this->D(2), X2_cal, red);
 
+  // Project points observed from cam1 to cam2 image
+  // -- Make points homogeneous by adding 1's in last row
+  X1.conservativeResize(X1.rows() + 1, X1.cols());
+  X1.row(X1.rows() - 1) = ones(1, X1.cols());
+  // -- Project and draw
+  X2_cal = (T_ds * this->T_C1_C0.inverse() * X1).block(0, 0, 3, X1.cols());
+  img2_cb = this->project(img2_cb, this->K(2), this->D(2), X2_cal, green);
+
   // Combine images
-  cv::Mat img02_cb;
-  cv::vconcat(img0_cb, img2_cb, img02_cb);
-  return img02_cb;
+  cv::Mat img02;
+  cv::hconcat(img0_cb, img2_cb, img02);
+  cv::Mat img021;
+  cv::hconcat(img02, img1_cb, img021);
+  return img021;
 }
 
 } // namespace gvio
