@@ -16,9 +16,11 @@ fi
 
 # doxygen Doxyfile
 
-mkdir -p build && cd build
+python3 scripts/calibration/plot_gimbal.py
 
-cmake .. && time make -j${CPU_COUNT}
+# mkdir -p build && cd build
+
+# cmake .. && time make -j${CPU_COUNT}
 
 # ./experiments/kitti_runner /data/kitti/raw 2011_09_26 0046 ./experiments/configs/msckf_kitti_raw-2011_09_26-0046.yaml ./experiments
 # python3 tests/scripts/plot_msckf.py ./experiments/msckf
@@ -55,7 +57,7 @@ cd tests
 # ./gimbal-calibration-chessboard_test
 # ./gimbal-calibration-calib_params_test
 # ./gimbal-calibration-calib_preprocessor_test
-./gimbal-calibration-calib_validator_test
+# ./gimbal-calibration-calib_validator_test
 # ./gimbal-calibration-gimbal_calib_test
 # ./gimbal-calibration-residual_test
 # ./gimbal-gmr-gmr_test
