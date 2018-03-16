@@ -17,7 +17,7 @@ DATASETS=("MH_01_easy"
 cd ${DOWNLOAD_PATH}
 for DATASET in "${DATASETS[@]}"; do
   echo "Downloading [${DATASET}]"
-  # wget "${BASE_URL}/${DATASET}/${DATASET}.zip"
-  # unzip ${DATASET}.zip
-  # mv mav0 ${DATASET}
+  wget "${BASE_URL}/${DATASET}/${DATASET}.zip"
+  unzip ${DATASET}.zip
+  mv mav0 ${DATASET}
 done

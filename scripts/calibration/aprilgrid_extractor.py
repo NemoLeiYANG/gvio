@@ -175,7 +175,7 @@ class AprilGridExtractor(object):
         self.camera_config = cam_chain.getCameraParameters(cam_index)
         self.cam_index = cam_index
         self.mono_validator = MonoCameraValidator(self.camera_config, target)
-        self.imu_angles = np.loadtxt(imu_angles_path, delimiter=',', usecols=(0,1,2))
+        self.imu_angles = np.loadtxt(imu_angles_path, delimiter=',', usecols=(0,1))
 
     def extract(self):
         # Load image paths
@@ -211,29 +211,14 @@ class AprilGridExtractor(object):
                 T_t_c = observation.T_t_c()
                 T_c_t = np.linalg.inv(T_t_c.T())
 
-                if self.cam_index is 0:
-                    file_name = str(filename_num) \
-                                + "_" \
-                                + "gimbal"\
-                                + str(".txt")
-                elif self.cam_index is 1:
-                    file_name = str(filename_num) \
-                                + "_" \
-                                + "gimbal" \
-                                + str(".txt")
-                else:
-                    file_name = str(filename_num) \
-                                + "_" \
-                                + "static" \
-                                + str(".txt")
-
                 # Create output directory
-                write_path = self.cam_path +"/parsed_data"
-                create_directory(write_path)
+                output_path = self.cam_path + "/points_data"
+                create_directory(output_path)
 
                 # Create output file
-                write_path = os.path.join(write_path,file_name)
-                outfile = open(write_path,"w")
+                file_name = str(filename_num) + ".txt"
+                output_path = os.path.join(output_path, file_name)
+                outfile = open(output_path,"w")
                 # -- Output Gridpoints
                 outfile.write("gridpoints:\n")
                 for corner, pixel in zip(target_corners,image_corners):
@@ -246,7 +231,7 @@ class AprilGridExtractor(object):
                 # -- Ouput Transform
                 outfile.write("tmatrix:\n")
                 tmatrix = np.array(T_c_t)
-                tmatrix_str = '\n'.join(" ".join('%0.5f' %x for x in y) for y in tmatrix)
+                tmatrix_str = '\n'.join(" ".join('%0.5f' % (x) for x in y) for y in tmatrix)
                 outfile.write(tmatrix_str)
                 # -- Output Gimbal angles
                 outfile.write("\ngimbalangles:\n")

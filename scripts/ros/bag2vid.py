@@ -73,13 +73,15 @@ def bag2vid(bag_path, topic, output_path, preview=False):
 
         # Print progress
         p = int((index / index_end) * 100.0)
-        print("Converting bag [%s] to video - progress: %.0f%%" % (bag_path, p))
+        print("Converting topic [%s] in bag [%s] to video - progress: %.0f%%"
+              % (topic, bag_path, p))
         sys.stdout.write("\033[F")  # Move cursor up one line
         sys.stdout.flush()
         index += 1.0
 
     #  Print final progress
-    print("Converting bag [%s] to video - progress: 100%%" % (bag_path))
+    print("Converting topic [%s] in bag [%s] to video - progress: %.0f%%"
+          % (topic, bag_path, p))
     video.release()
 
 
