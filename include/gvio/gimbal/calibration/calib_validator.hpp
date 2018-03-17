@@ -8,6 +8,7 @@
 #include "gvio/util/util.hpp"
 #include "gvio/camera/distortion.hpp"
 #include "gvio/gimbal/gimbal_model.hpp"
+#include "gvio/gimbal/calibration/camchain.hpp"
 #include "gvio/gimbal/calibration/chessboard.hpp"
 
 namespace gvio {
@@ -16,27 +17,14 @@ namespace gvio {
  * @{
  */
 
-struct CameraProperty {
-  std::string camera_model;
-  std::string distortion_model;
-  VecX distortion_coeffs;
-  VecX intrinsics;
-  Vec2 resolution;
-};
-
-/**
- * CameraProperty to string
- */
-std::ostream &operator<<(std::ostream &os, const CameraProperty &cam);
-
 /**
  * Calibration validator
  */
-struct CalibValidator {
-  std::vector<CameraProperty> cam;
+class CalibValidator {
+public:
+  Camchain camchain;
   Chessboard chessboard;
   GimbalModel gimbal_model;
-  Mat4 T_C1_C0;
 
   CalibValidator();
   virtual ~CalibValidator();
@@ -61,13 +49,13 @@ struct CalibValidator {
    * Load initial optimization params
    *
    * @param nb_cameras Number of cameras
-   * @param calib_file Path to calib file
+   * @param camchain_file Path to camchain file
    * @param target_file Path to target file
    *
    * @returns 0 for success, -1 for failure
    */
   int load(const int nb_cameras,
-           const std::string &calib_file,
+           const std::string &camchain_file,
            const std::string &target_file);
 
   /**

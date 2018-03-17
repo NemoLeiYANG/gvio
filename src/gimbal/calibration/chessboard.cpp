@@ -59,12 +59,18 @@ int Chessboard::detect(const cv::Mat &image,
   } else {
     image_gray = image.clone();
   }
-  // -- Setup
-  cv::Size size(this->nb_cols, this->nb_rows);
   // -- Detect chessboard corners
+  cv::Size size(this->nb_cols, this->nb_rows);
   if (cv::findChessboardCorners(image_gray, size, corners) == false) {
     return -1;
   }
+  // -- Refine corner locations
+  cv::Size win_size(11, 11);
+  cv::Size zero_zone(-1, -1);
+  cv::TermCriteria criteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT,
+                            100,
+                            0.0001);
+  cv::cornerSubPix(image_gray, corners, win_size, zero_zone, criteria);
 
   return 0;
 }
@@ -172,13 +178,7 @@ void Chessboard::project3DPoints(const MatX &X, const Mat3 &K, cv::Mat &image) {
 void Chessboard::project3DPoints(const MatX &X,
                                  const cv::Mat &K,
                                  cv::Mat &image) {
-  // clang-format off
-  Mat3 K_cam;
-  K_cam << K.at<double>(0, 0), K.at<double>(0, 1), K.at<double>(0, 2),
-           K.at<double>(1, 0), K.at<double>(1, 1), K.at<double>(1, 2),
-           K.at<double>(2, 0), K.at<double>(2, 1), K.at<double>(2, 2);
-  // clang-format on
-
+  const Mat3 K_cam = convert(K);
   this->project3DPoints(X, K_cam, image);
 }
 

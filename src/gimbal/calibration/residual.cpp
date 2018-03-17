@@ -74,17 +74,17 @@ Mat4 GimbalCalibNumericalResidual::T_ds(const VecX &tau_s,
   // Form T_eb
   // -- DH params for first link
   const double theta1 = Lambda1 - M_PI / 2.0;
-  const double alpha1 = w1(0);
+  const double d1 = w1(0);
   const double a1 = w1(1);
-  const double d1 = w1(2);
+  const double alpha1 = w1(2);
   // -- DH params for second link
   const double theta2 = Lambda2;
-  const double alpha2 = w2(0);
+  const double d2 = w2(0);
   const double a2 = w2(1);
-  const double d2 = w2(2);
+  const double alpha2 = w2(2);
   // -- Combine DH transforms to form T_eb
-  const Mat4 T_1b = dh_transform(theta1, alpha1, a1, d1).inverse();
-  const Mat4 T_e1 = dh_transform(theta2, alpha2, a2, d2).inverse();
+  const Mat4 T_1b = dh_transform(theta1, d1, a1, alpha1).inverse();
+  const Mat4 T_e1 = dh_transform(theta2, d2, a2, alpha2).inverse();
   const Mat4 T_eb = T_e1 * T_1b;
 
   // Form T_ed

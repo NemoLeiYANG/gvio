@@ -2,33 +2,46 @@
 
 namespace gvio {
 
-std::ostream &operator<<(std::ostream &os, const CameraProperty &cam) {
-  os << "camera_model: " << cam.camera_model << std::endl;
-  os << "distortion_model: " << cam.distortion_model << std::endl;
-  os << "distortion_coeffs: " << cam.distortion_coeffs.transpose() << std::endl;
-  os << "intrinsics: " << cam.intrinsics.transpose() << std::endl;
-  os << "resolution: " << cam.resolution.transpose() << std::endl;
-  return os;
-}
-
 CalibValidator::CalibValidator() {}
 
 CalibValidator::~CalibValidator() {}
 
+int CalibValidator::load(const int nb_cameras,
+                         const std::string &camchain_file,
+                         const std::string &target_file) {
+  assert(nb_cameras > 0);
+  assert(camchain_file.empty() == false);
+  assert(target_file.empty() == false);
+
+  // Parse calib file
+  if (this->camchain.load(nb_cameras, camchain_file) != 0) {
+    LOG_ERROR("Failed to load camchain file [%s]!", camchain_file.c_str());
+    return -1;
+  }
+
+  // Chessboard
+  if (this->chessboard.load(target_file) != 0) {
+    LOG_ERROR("Failed to load chessboard config!");
+    return -1;
+  }
+
+  return 0;
+}
+
 Mat3 CalibValidator::K(const int cam_id) {
   assert(cam_id >= 0);
-  assert(cam_id < this->cam.size());
+  assert(cam_id < this->camchain.cam.size());
 
   Mat3 K;
   // First row
-  K(0, 0) = this->cam[cam_id].intrinsics[0];
+  K(0, 0) = this->camchain.cam[cam_id].intrinsics[0];
   K(0, 1) = 0.0;
-  K(0, 2) = this->cam[cam_id].intrinsics[2];
+  K(0, 2) = this->camchain.cam[cam_id].intrinsics[2];
 
   // Second row
   K(1, 0) = 0.0;
-  K(1, 1) = this->cam[cam_id].intrinsics[1];
-  K(1, 2) = this->cam[cam_id].intrinsics[3];
+  K(1, 1) = this->camchain.cam[cam_id].intrinsics[1];
+  K(1, 2) = this->camchain.cam[cam_id].intrinsics[3];
 
   // Thrid row
   K(2, 0) = 0.0;
@@ -40,76 +53,19 @@ Mat3 CalibValidator::K(const int cam_id) {
 
 VecX CalibValidator::D(const int cam_id) {
   assert(cam_id >= 0);
-  assert(cam_id < this->cam.size());
+  assert(cam_id < this->camchain.cam.size());
 
   VecX D;
   D.resize(4);
 
   // clang-format off
-  D << this->cam[cam_id].distortion_coeffs(0),
-       this->cam[cam_id].distortion_coeffs(1),
-       this->cam[cam_id].distortion_coeffs(2),
-       this->cam[cam_id].distortion_coeffs(3);
+  D << this->camchain.cam[cam_id].distortion_coeffs(0),
+       this->camchain.cam[cam_id].distortion_coeffs(1),
+       this->camchain.cam[cam_id].distortion_coeffs(2),
+       this->camchain.cam[cam_id].distortion_coeffs(3);
   // clang-format on
 
   return D;
-}
-
-int CalibValidator::load(const int nb_cameras,
-                         const std::string &calib_file,
-                         const std::string &target_file) {
-  assert(nb_cameras > 0);
-  assert(calib_file.empty() == false);
-  assert(target_file.empty() == false);
-
-  // Parse calib file
-  ConfigParser parser;
-  CameraProperty cam0, cam1, cam2;
-  for (int i = 0; i < nb_cameras; i++) {
-    switch (i) {
-      case 0:
-        parser.addParam("cam0.camera_model", &cam0.camera_model);
-        parser.addParam("cam0.distortion_model", &cam0.distortion_model);
-        parser.addParam("cam0.distortion_coeffs", &cam0.distortion_coeffs);
-        parser.addParam("cam0.intrinsics", &cam0.intrinsics);
-        parser.addParam("cam0.resolution", &cam0.resolution);
-        break;
-      case 1:
-        parser.addParam("cam1.camera_model", &cam1.camera_model);
-        parser.addParam("cam1.distortion_model", &cam1.distortion_model);
-        parser.addParam("cam1.distortion_coeffs", &cam1.distortion_coeffs);
-        parser.addParam("cam1.intrinsics", &cam1.intrinsics);
-        parser.addParam("cam1.resolution", &cam1.resolution);
-        break;
-      case 2:
-        parser.addParam("cam2.camera_model", &cam2.camera_model);
-        parser.addParam("cam2.distortion_model", &cam2.distortion_model);
-        parser.addParam("cam2.distortion_coeffs", &cam2.distortion_coeffs);
-        parser.addParam("cam2.intrinsics", &cam2.intrinsics);
-        parser.addParam("cam2.resolution", &cam2.resolution);
-        break;
-    }
-  }
-  parser.addParam("T_C1_C0", &this->T_C1_C0);
-  parser.addParam("T_C2_C0.tau_s", &this->gimbal_model.tau_s);
-  parser.addParam("T_C2_C0.tau_d", &this->gimbal_model.tau_d);
-  parser.addParam("T_C2_C0.w1", &this->gimbal_model.w1);
-  parser.addParam("T_C2_C0.w2", &this->gimbal_model.w2);
-  parser.addParam("T_C2_C0.theta1_offset", &this->gimbal_model.theta1_offset);
-  parser.addParam("T_C2_C0.theta2_offset", &this->gimbal_model.theta2_offset);
-  if (parser.load(calib_file) != 0) {
-    LOG_ERROR("Failed to load calib file [%s]!", calib_file.c_str());
-    return -1;
-  }
-  this->cam = {cam0, cam1, cam2};
-
-  // Chessboard
-  if (this->chessboard.load(target_file) != 0) {
-    LOG_ERROR("Failed to load chessboard config!");
-    return -1;
-  }
-
-  return 0;
 }
 
 int CalibValidator::detect(const cv::Mat &image,
@@ -288,8 +244,12 @@ cv::Mat CalibValidator::project(const cv::Mat &image,
 cv::Mat CalibValidator::validate(const int cam_id, cv::Mat &image) {
   // Pre-check
   assert(cam_id >= 0);
-  assert(cam_id < this->cam.size());
+  assert(cam_id < this->camchain.cam.size());
   assert(image.empty() == false);
+
+  // Colors
+  const cv::Scalar red{0, 0, 255};
+  const cv::Scalar green{0, 255, 0};
 
   // Undistort image
   cv::Mat Knew;
@@ -306,8 +266,13 @@ cv::Mat CalibValidator::validate(const int cam_id, cv::Mat &image) {
     return image_ud;
   }
 
+  // Draw detected chessboard corners
+  // image_ud = this->drawDetected(image_ud, red);
+  cv::Mat result = this->drawDetected(image, red);
+
   // Project 3D point to undistorted image
-  return this->project(image_ud, convert(Knew), X);
+  // return this->project(image_ud, convert(Knew), X, green);
+  return this->project(result, this->K(0), this->D(0), X, green);
 }
 
 cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
@@ -316,7 +281,6 @@ cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
   assert(img0.empty() == false);
   assert(img1.empty() == false);
 
-  // Colors
   const cv::Scalar red{0, 0, 255};
   const cv::Scalar green{0, 255, 0};
   const Mat3 K0 = this->K(0);
@@ -342,7 +306,8 @@ cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
   X1.conservativeResize(X1.rows() + 1, X1.cols());
   X1.row(X1.rows() - 1) = ones(1, X1.cols());
   // -- Project and draw
-  const MatX X0_cal = (this->T_C1_C0.inverse() * X1).block(0, 0, 3, X1.cols());
+  const MatX X0_cal =
+      (this->camchain.T_C1_C0.inverse() * X1).block(0, 0, 3, X1.cols());
   const cv::Mat img0_cb = this->project(img0_det, K0, D0, X0_cal, green);
 
   // Project points observed from cam0 to cam1 image
@@ -350,7 +315,7 @@ cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
   X0.conservativeResize(X0.rows() + 1, X0.cols());
   X0.row(X0.rows() - 1) = ones(1, X0.cols());
   // -- Project and draw
-  const MatX X1_cal = (this->T_C1_C0 * X0).block(0, 0, 3, X0.cols());
+  const MatX X1_cal = (this->camchain.T_C1_C0 * X0).block(0, 0, 3, X0.cols());
   const cv::Mat img1_cb = this->project(img1_det, K1, D1, X1_cal, red);
 
   // Combine cam0 and cam1 images
@@ -403,7 +368,7 @@ cv::Mat CalibValidator::validateStereo2(const cv::Mat &img0,
 
   // Combine transforms to obtain target to cam1 transform
   Mat4 T_C0_T = rvectvec2transform(rvec_cam0_target, tvec_cam0_target);
-  Mat4 T_C1_T = this->T_C1_C0 * T_C0_T;
+  Mat4 T_C1_T = this->camchain.T_C1_C0 * T_C0_T;
 
   // Project points using calculated T_C1_T
   cv::Mat R = convert(T_C1_T.block(0, 0, 3, 3));
@@ -414,15 +379,20 @@ cv::Mat CalibValidator::validateStereo2(const cv::Mat &img0,
   std::vector<cv::Point2f> image_points;
   cv::fisheye::projectPoints(this->chessboard.object_points,
                              image_points,
-                             rvec_cam0_target,
-                             tvec_cam0_target,
-                             convert(this->K(0)),
-                             convert(this->D(0)));
+                             rvec,
+                             tvec,
+                             convert(this->K(1)),
+                             convert(this->D(1)));
 
   // Make an RGB version of the input image
-  cv::Mat image_rgb(img0.size(), CV_8UC3);
-  image_rgb = img0.clone();
-  cv::cvtColor(img0, image_rgb, CV_GRAY2RGB);
+  cv::Mat image_rgb;
+  if (img0.channels() == 1) {
+    image_rgb = cv::Mat(img1.size(), CV_8UC3);
+    image_rgb = img1.clone();
+    cv::cvtColor(img1, image_rgb, CV_GRAY2RGB);
+  } else {
+    image_rgb = img1.clone();
+  }
 
   // Draw projected points
   for (size_t i = 0; i < image_points.size(); i++) {
@@ -432,6 +402,24 @@ cv::Mat CalibValidator::validateStereo2(const cv::Mat &img0,
                cv::Scalar(0, 0, 255), // Colour
                CV_FILLED,             // Thickness
                8);                    // Line type
+  }
+
+  // Calculate reprojection error and show in image
+  const double rmse = this->reprojectionError(image_rgb, image_points);
+  if (rmse > 0.0) {
+    // Convert rmse to string
+    std::stringstream stream;
+    stream << fixed << setprecision(2) << rmse;
+    const std::string rmse_str = stream.str();
+
+    // Draw on image
+    cv::putText(image_rgb,
+                "RMSE Reprojection Error: " + rmse_str,
+                cv::Point(0, 18),
+                cv::FONT_HERSHEY_SIMPLEX,
+                0.6,
+                cv::Scalar(0, 0, 255),
+                2);
   }
 
   return image_rgb;
@@ -491,7 +479,8 @@ cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
   X1.conservativeResize(X1.rows() + 1, X1.cols());
   X1.row(X1.rows() - 1) = ones(1, X1.cols());
   // -- Project and draw
-  X2_cal = (T_ds * this->T_C1_C0.inverse() * X1).block(0, 0, 3, X1.cols());
+  X2_cal =
+      (T_ds * this->camchain.T_C1_C0.inverse() * X1).block(0, 0, 3, X1.cols());
   img2_cb = this->project(img2_cb, this->K(2), this->D(2), X2_cal, green);
 
   // Combine images

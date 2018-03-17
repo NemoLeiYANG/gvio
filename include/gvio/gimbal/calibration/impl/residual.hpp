@@ -18,9 +18,9 @@ namespace gvio {
 
 template <typename T>
 Eigen::Matrix<T, 4, 4> GimbalCalibResidual::dhTransform(const T theta,
-                                                        const T alpha,
+                                                        const T d,
                                                         const T a,
-                                                        const T d) const {
+                                                        const T alpha) const {
   Eigen::Matrix<T, 4, 4> T_dh;
 
   T_dh(0, 0) = cos(theta);
@@ -109,18 +109,18 @@ Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_ds(const T *const tau_s,
   // Form T_eb
   // -- DH params for first link
   const T theta1 = Lambda1[0] - T(M_PI / 2.0);
-  const T alpha1 = w1[0];
+  const T d1 = w1[0];
   const T a1 = w1[1];
-  const T d1 = w1[2];
+  const T alpha1 = w1[2];
   // -- DH params for second link
   const T theta2 = Lambda2[0];
-  const T alpha2 = w2[0];
+  const T d2 = w2[0];
   const T a2 = w2[1];
-  const T d2 = w2[2];
+  const T alpha2 = w2[2];
   // -- Combine DH transforms to form T_eb
   // clang-format off
-  const Eigen::Matrix<T, 4, 4> T_1b = this->dhTransform(theta1, alpha1, a1, d1).inverse();
-  const Eigen::Matrix<T, 4, 4> T_e1 = this->dhTransform(theta2, alpha2, a2, d2).inverse();
+  const Eigen::Matrix<T, 4, 4> T_1b = this->dhTransform(theta1, d1, a1, alpha1).inverse();
+  const Eigen::Matrix<T, 4, 4> T_e1 = this->dhTransform(theta2, d2, a2, alpha2).inverse();
   const Eigen::Matrix<T, 4, 4> T_eb = T_e1 * T_1b;
   // clang-format on
 
@@ -163,7 +163,33 @@ Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_ds(const T *const tau_s,
 template <typename T>
 Eigen::Matrix<T, 2, 1> project_pinhole_equi(const Eigen::Matrix<T, 3, 1> &K,
                                             const Eigen::Matrix<T, 4, 1> &D,
-                                            const Eigen::Matrix<T, 3, 1> &X) {}
+                                            const Eigen::Matrix<T, 3, 1> &X) {
+  const double z = X(2);
+  const double x = X(0) / z;
+  const double y = X(1) / z;
+  const double r = sqrt(pow(x, 2) + pow(y, 2));
+
+  // Apply equi distortion
+  const double theta = atan(r);
+  const double th2 = pow(theta, 2);
+  const double th4 = pow(theta, 4);
+  const double th6 = pow(theta, 6);
+  const double th8 = pow(theta, 8);
+  const double k1 = D(0);
+  const double k2 = D(1);
+  const double k3 = D(2);
+  const double k4 = D(3);
+  const double thetad = theta * (1 + k1 * th2 + k2 * th4 + k3 * th6 + k4 * th8);
+  const double x_dash = (thetad / r) * x;
+  const double y_dash = (thetad / r) * y;
+
+  // Project equi distorted point to image plane
+  const double fx = K(0, 0);
+  const double fy = K(1, 1);
+  const double cx = K(0, 2);
+  const double cy = K(1, 2);
+  return Vec2{fx * x_dash + cx, fy * y_dash + cy};
+}
 
 template <typename T>
 bool GimbalCalibResidual::operator()(const T *const tau_s,
@@ -188,6 +214,7 @@ bool GimbalCalibResidual::operator()(const T *const tau_s,
   // -- Project 3D world point to image plane
   const Eigen::Matrix<T, 3, 3> K_s =
       this->K(T(this->fx_s), T(this->fy_s), T(this->cx_s), T(this->cy_s));
+  // project_pinhole_equi(K_s,
   Eigen::Matrix<T, 3, 1> Q_s_cal = K_s * P_s_cal;
   // -- Normalize projected image point
   Q_s_cal(0) = Q_s_cal(0) / Q_s_cal(2);

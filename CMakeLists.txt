@@ -64,6 +64,7 @@ ADD_LIBRARY(${PROJECT_NAME}
             src/gimbal/calibration/calib_params.cpp
             src/gimbal/calibration/calib_preprocessor.cpp
             src/gimbal/calibration/calib_validator.cpp
+            src/gimbal/calibration/camchain.cpp
             src/gimbal/calibration/chessboard.cpp
             src/gimbal/calibration/gimbal_calib.cpp
             src/gimbal/calibration/residual.cpp
@@ -149,7 +150,7 @@ SET(UNITTESTS
     # gimbal-calibration-calib_preprocessor_test
     gimbal-calibration-calib_validator_test
     # gimbal-calibration-chessboard_test
-    # gimbal-calibration-gimbal_calib_test
+    gimbal-calibration-gimbal_calib_test
     # gimbal-calibration-residual_test
     # gimbal-gmr-gmr_test
     # gimbal-sbgc_test
