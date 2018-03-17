@@ -17,6 +17,12 @@ CalibParams::~CalibParams() {
   if (this->w2 != nullptr)
     free(this->w2);
 
+  if (this->theta1_offset != nullptr)
+    free(this->theta1_offset);
+
+  if (this->theta2_offset != nullptr)
+    free(this->theta2_offset);
+
   if (this->Lambda1 != nullptr)
     free(this->Lambda1);
 
@@ -24,18 +30,11 @@ CalibParams::~CalibParams() {
     free(this->Lambda2);
 }
 
-int CalibParams::load(const std::string &config_file,
+int CalibParams::load(const std::string &camchain_file,
                       const std::string &joint_file) {
-  // Parse config file
-  ConfigParser parser;
-  VecX tau_s, tau_d;
-  Vec3 w1, w2;
-  parser.addParam("tau_s", &tau_s);
-  parser.addParam("tau_d", &tau_d);
-  parser.addParam("w1", &w1);
-  parser.addParam("w2", &w2);
-  if (parser.load(config_file) != 0) {
-    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
+  // Parse camchain file
+  if (this->camchain.load(3, camchain_file) != 0) {
+    LOG_ERROR("Failed to load camchain file [%s]!", camchain_file.c_str());
     return -1;
   }
 
@@ -48,10 +47,16 @@ int CalibParams::load(const std::string &config_file,
   this->nb_measurements = joint_data.rows();
 
   // Initialize optimization params
-  this->tau_s = vec2array(tau_s);
-  this->tau_d = vec2array(tau_d);
-  this->w1 = vec2array(w1);
-  this->w2 = vec2array(w2);
+  this->tau_s = vec2array(this->camchain.tau_s);
+  this->tau_d = vec2array(this->camchain.tau_d);
+  this->w1 = vec2array(this->camchain.w1);
+  this->w2 = vec2array(this->camchain.w2);
+
+  this->theta1_offset = (double *) malloc(sizeof(double) * 1);
+  this->theta2_offset = (double *) malloc(sizeof(double) * 1);
+  *this->theta1_offset = this->camchain.theta1_offset;
+  *this->theta2_offset = this->camchain.theta2_offset;
+
   this->Lambda1 = vec2array(joint_data.col(0));
   this->Lambda2 = vec2array(joint_data.col(1));
 

@@ -44,13 +44,27 @@ struct GimbalCalibResidual {
   double cx_d = 0.0;
   double cy_d = 0.0;
 
+  // Static camera distortion coefficients
+  double k1_s = 0.0;
+  double k2_s = 0.0;
+  double k3_s = 0.0;
+  double k4_s = 0.0;
+
+  // Dynamic camera distortion coefficients
+  double k1_d = 0.0;
+  double k2_d = 0.0;
+  double k3_d = 0.0;
+  double k4_d = 0.0;
+
   GimbalCalibResidual();
   GimbalCalibResidual(const Vec3 &P_s,
                       const Vec3 &P_d,
                       const Vec2 &Q_s,
                       const Vec2 &Q_d,
                       const Mat3 &K_s,
-                      const Mat3 &K_d);
+                      const Mat3 &K_d,
+                      const Vec4 &D_s,
+                      const Vec4 &D_d);
 
   /// Form DH-Transform
   template <typename T>
@@ -68,6 +82,11 @@ struct GimbalCalibResidual {
   Eigen::Matrix<T, 3, 3>
   K(const T fx, const T fy, const T cx, const T cy) const;
 
+  /// Form camera distortion vector D
+  template <typename T>
+  Eigen::Matrix<T, 4, 1>
+  D(const T k1, const T k2, const T k3, const T k4) const;
+
   /// Form transform from static to dynamic camera
   template <typename T>
   Eigen::Matrix<T, 4, 4> T_ds(const T *const tau_s,
@@ -79,9 +98,10 @@ struct GimbalCalibResidual {
 
   /// Project 3D point using pinhole-equi
   template <typename T>
-  Eigen::Matrix<T, 2, 1> project_pinhole_equi(const Eigen::Matrix<T, 3, 1> &K,
-                                              const Eigen::Matrix<T, 4, 1> &D,
-                                              const Eigen::Matrix<T, 3, 1> &X);
+  Eigen::Matrix<T, 2, 1>
+  project_pinhole_equi(const Eigen::Matrix<T, 3, 3> &K,
+                       const Eigen::Matrix<T, 4, 1> &D,
+                       const Eigen::Matrix<T, 3, 1> &X) const;
 
   /// Calculate residual
   template <typename T>

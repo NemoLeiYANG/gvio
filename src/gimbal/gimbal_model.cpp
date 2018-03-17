@@ -22,7 +22,8 @@ GimbalModel::GimbalModel() {}
 GimbalModel::~GimbalModel() {}
 
 void GimbalModel::setAttitude(const double roll, const double pitch) {
-  this->attitude << roll, pitch;
+  this->Lambda1 = roll;
+  this->Lambda2 = pitch;
 }
 
 Mat4 GimbalModel::T_bs() {

@@ -94,6 +94,19 @@ GimbalCalibResidual::K(const T fx, const T fy, const T cx, const T cy) const {
 }
 
 template <typename T>
+Eigen::Matrix<T, 4, 1>
+GimbalCalibResidual::D(const T k1, const T k2, const T k3, const T k4) const {
+  Eigen::Matrix<T, 4, 1> D;
+
+  D(0) = k1;
+  D(1) = k2;
+  D(2) = k3;
+  D(3) = k4;
+
+  return D;
+}
+
+template <typename T>
 Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_ds(const T *const tau_s,
                                                  const T *const tau_d,
                                                  const T *const w1,
@@ -133,62 +146,38 @@ Eigen::Matrix<T, 4, 4> GimbalCalibResidual::T_ds(const T *const tau_s,
   return T_de * T_eb * T_bs;
 }
 
-// Vec2 equi_distort(const double k1,
-//                   const double k2,
-//                   const double k3,
-//                   const double k4,
-//                   const Vec3 &point) {
-//   const double z = point(2);
-//   const double x = point(0) / z;
-//   const double y = point(1) / z;
-//   const double r = sqrt(pow(x, 2) + pow(y, 2));
-//
-//   // Apply equi distortion
-//   // clang-format off
-//   const double theta = atan(r);
-//   const double th2 = pow(theta, 2);
-//   const double th4 = pow(theta, 4);
-//   const double th6 = pow(theta, 6);
-//   const double th8 = pow(theta, 8);
-//   const double theta_d = theta * (1 + k1 * th2 + k2 * th4 + k3 * th6 + k4 *
-//   th8);
-//   const double x_dash = (theta_d / r) * x;
-//   const double y_dash = (theta_d / r) * y;
-//   // clang-format on
-//
-//   // Project equi distorted point to image plane
-//   return Vec2{x_dash, y_dash};
-// }
-
 template <typename T>
-Eigen::Matrix<T, 2, 1> project_pinhole_equi(const Eigen::Matrix<T, 3, 1> &K,
-                                            const Eigen::Matrix<T, 4, 1> &D,
-                                            const Eigen::Matrix<T, 3, 1> &X) {
-  const double z = X(2);
-  const double x = X(0) / z;
-  const double y = X(1) / z;
-  const double r = sqrt(pow(x, 2) + pow(y, 2));
+Eigen::Matrix<T, 2, 1> GimbalCalibResidual::project_pinhole_equi(
+    const Eigen::Matrix<T, 3, 3> &K,
+    const Eigen::Matrix<T, 4, 1> &D,
+    const Eigen::Matrix<T, 3, 1> &X) const {
+  const T z = X(2);
+  const T x = X(0) / z;
+  const T y = X(1) / z;
+  const T r = sqrt(pow(x, 2) + pow(y, 2));
 
   // Apply equi distortion
-  const double theta = atan(r);
-  const double th2 = pow(theta, 2);
-  const double th4 = pow(theta, 4);
-  const double th6 = pow(theta, 6);
-  const double th8 = pow(theta, 8);
-  const double k1 = D(0);
-  const double k2 = D(1);
-  const double k3 = D(2);
-  const double k4 = D(3);
-  const double thetad = theta * (1 + k1 * th2 + k2 * th4 + k3 * th6 + k4 * th8);
-  const double x_dash = (thetad / r) * x;
-  const double y_dash = (thetad / r) * y;
+  const T theta = atan(r);
+  const T th2 = pow(theta, 2);
+  const T th4 = pow(theta, 4);
+  const T th6 = pow(theta, 6);
+  const T th8 = pow(theta, 8);
+  const T k1 = D(0);
+  const T k2 = D(1);
+  const T k3 = D(2);
+  const T k4 = D(3);
+  const T thetad = theta * (T(1) + k1 * th2 + k2 * th4 + k3 * th6 + k4 * th8);
+  const T x_dash = (thetad / r) * x;
+  const T y_dash = (thetad / r) * y;
 
   // Project equi distorted point to image plane
-  const double fx = K(0, 0);
-  const double fy = K(1, 1);
-  const double cx = K(0, 2);
-  const double cy = K(1, 2);
-  return Vec2{fx * x_dash + cx, fy * y_dash + cy};
+  const T fx = K(0, 0);
+  const T fy = K(1, 1);
+  const T cx = K(0, 2);
+  const T cy = K(1, 2);
+  const Eigen::Matrix<T, 2, 1> pixel{fx * x_dash + cx, fy * y_dash + cy};
+
+  return pixel;
 }
 
 template <typename T>
@@ -214,11 +203,15 @@ bool GimbalCalibResidual::operator()(const T *const tau_s,
   // -- Project 3D world point to image plane
   const Eigen::Matrix<T, 3, 3> K_s =
       this->K(T(this->fx_s), T(this->fy_s), T(this->cx_s), T(this->cy_s));
-  // project_pinhole_equi(K_s,
-  Eigen::Matrix<T, 3, 1> Q_s_cal = K_s * P_s_cal;
-  // -- Normalize projected image point
-  Q_s_cal(0) = Q_s_cal(0) / Q_s_cal(2);
-  Q_s_cal(1) = Q_s_cal(1) / Q_s_cal(2);
+  const Eigen::Matrix<T, 4, 1> D_s =
+      this->D(T(this->k1_s), T(this->k2_s), T(this->k3_s), T(this->k4_s));
+  const Eigen::Matrix<T, 2, 1> Q_s_cal =
+      this->project_pinhole_equi(K_s, D_s, P_s_cal);
+  // // project_pinhole_equi(K_s,
+  // Eigen::Matrix<T, 3, 1> Q_s_cal = K_s * P_s_cal;
+  // // -- Normalize projected image point
+  // Q_s_cal(0) = Q_s_cal(0) / Q_s_cal(2);
+  // Q_s_cal(1) = Q_s_cal(1) / Q_s_cal(2);
   // // -- Calculate reprojection error
   residual[0] = T(this->Q_s[0]) - Q_s_cal(0);
   residual[1] = T(this->Q_s[1]) - Q_s_cal(1);
@@ -233,10 +226,14 @@ bool GimbalCalibResidual::operator()(const T *const tau_s,
   // -- Project 3D world point to image plane
   const Eigen::Matrix<T, 3, 3> K_d =
       this->K(T(this->fx_d), T(this->fy_d), T(this->cx_d), T(this->cy_d));
-  Eigen::Matrix<T, 3, 1> Q_d_cal = K_d * P_d_cal;
-  // -- Normalize projected image point
-  Q_d_cal(0) = Q_d_cal(0) / Q_d_cal(2);
-  Q_d_cal(1) = Q_d_cal(1) / Q_d_cal(2);
+  const Eigen::Matrix<T, 4, 1> D_d =
+      this->D(T(this->k1_d), T(this->k2_d), T(this->k3_d), T(this->k4_d));
+  const Eigen::Matrix<T, 2, 1> Q_d_cal =
+      this->project_pinhole_equi(K_d, D_d, P_d_cal);
+  // Eigen::Matrix<T, 3, 1> Q_d_cal = K_d * P_d_cal;
+  // // -- Normalize projected image point
+  // Q_d_cal(0) = Q_d_cal(0) / Q_d_cal(2);
+  // Q_d_cal(1) = Q_d_cal(1) / Q_d_cal(2);
   // -- Calculate reprojection error
   residual[2] = T(this->Q_d[0]) - Q_d_cal(0);
   residual[3] = T(this->Q_d[1]) - Q_d_cal(1);

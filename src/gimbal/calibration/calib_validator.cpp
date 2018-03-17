@@ -13,7 +13,7 @@ int CalibValidator::load(const int nb_cameras,
   assert(camchain_file.empty() == false);
   assert(target_file.empty() == false);
 
-  // Parse calib file
+  // Parse camchain file
   if (this->camchain.load(nb_cameras, camchain_file) != 0) {
     LOG_ERROR("Failed to load camchain file [%s]!", camchain_file.c_str());
     return -1;
@@ -25,6 +25,14 @@ int CalibValidator::load(const int nb_cameras,
     return -1;
   }
 
+  // Gimbal model
+  this->gimbal_model.tau_s = this->camchain.tau_s;
+  this->gimbal_model.tau_d = this->camchain.tau_d;
+  this->gimbal_model.w1 = this->camchain.w1;
+  this->gimbal_model.w2 = this->camchain.w2;
+  this->gimbal_model.theta1_offset = this->camchain.theta1_offset;
+  this->gimbal_model.theta2_offset = this->camchain.theta2_offset;
+
   return 0;
 }
 
@@ -34,14 +42,14 @@ Mat3 CalibValidator::K(const int cam_id) {
 
   Mat3 K;
   // First row
-  K(0, 0) = this->camchain.cam[cam_id].intrinsics[0];
+  K(0, 0) = this->camchain.cam[cam_id].intrinsics(0);
   K(0, 1) = 0.0;
-  K(0, 2) = this->camchain.cam[cam_id].intrinsics[2];
+  K(0, 2) = this->camchain.cam[cam_id].intrinsics(2);
 
   // Second row
   K(1, 0) = 0.0;
-  K(1, 1) = this->camchain.cam[cam_id].intrinsics[1];
-  K(1, 2) = this->camchain.cam[cam_id].intrinsics[3];
+  K(1, 1) = this->camchain.cam[cam_id].intrinsics(1);
+  K(1, 2) = this->camchain.cam[cam_id].intrinsics(3);
 
   // Thrid row
   K(2, 0) = 0.0;

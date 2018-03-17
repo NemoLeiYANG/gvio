@@ -19,6 +19,9 @@ struct CameraProperty {
   VecX distortion_coeffs;
   VecX intrinsics;
   Vec2 resolution;
+
+  Mat3 K();
+  VecX D();
 };
 
 /**

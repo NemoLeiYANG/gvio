@@ -43,7 +43,6 @@ public:
   Vec3 w2 = zeros(3, 1);
   VecX tau_d = zeros(6, 1);
 
-  Vec2 attitude;
   double theta1_offset = 0.0;
   double theta2_offset = 0.0;
 

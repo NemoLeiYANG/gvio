@@ -6,6 +6,7 @@
 #define GVIO_GIMBAL_CALIBRATION_CALIB_PARAMS_HPP
 
 #include "gvio/util/util.hpp"
+#include "gvio/gimbal/calibration/camchain.hpp"
 
 namespace gvio {
 /**
@@ -17,10 +18,14 @@ namespace gvio {
  * Calibration parameters
  */
 struct CalibParams {
+  Camchain camchain;
+
   double *tau_s = nullptr;
   double *tau_d = nullptr;
   double *w1 = nullptr;
   double *w2 = nullptr;
+  double *theta1_offset = nullptr;
+  double *theta2_offset = nullptr;
   double *Lambda1 = nullptr;
   double *Lambda2 = nullptr;
   int nb_measurements = 0;
@@ -31,11 +36,11 @@ struct CalibParams {
   /**
    * Load initial optimization params
    *
-   * @param config_file Path to config file
+   * @param camchain_file Path to camchain file
    * @param joint_file Path to joint angles file
    * @returns 0 for success, -1 for failure
    */
-  int load(const std::string &config_file, const std::string &joint_file);
+  int load(const std::string &camchain_file, const std::string &joint_file);
 };
 
 /**

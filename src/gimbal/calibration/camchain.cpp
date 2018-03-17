@@ -2,6 +2,29 @@
 
 namespace gvio {
 
+Mat3 CameraProperty::K() {
+  const double fx = this->intrinsics(0);
+  const double fy = this->intrinsics(1);
+  const double cx = this->intrinsics(2);
+  const double cy = this->intrinsics(3);
+
+  Mat3 K;
+  // clang-format off
+  K << fx, 0.0, cx,
+       0.0, fy, cy,
+       0.0, 0.0, 1.0;
+  // clang-format on
+
+  return K;
+}
+
+VecX CameraProperty::D() {
+  Vec4 D;
+  D << this->distortion_coeffs(0), this->distortion_coeffs(1),
+      this->distortion_coeffs(2), this->distortion_coeffs(3);
+  return D;
+}
+
 std::ostream &operator<<(std::ostream &os, const CameraProperty &cam) {
   os << "camera_model: " << cam.camera_model << std::endl;
   os << "distortion_model: " << cam.distortion_model << std::endl;

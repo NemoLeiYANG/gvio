@@ -9,7 +9,9 @@ GimbalCalibResidual::GimbalCalibResidual(const Vec3 &P_s,
                                          const Vec2 &Q_s,
                                          const Vec2 &Q_d,
                                          const Mat3 &K_s,
-                                         const Mat3 &K_d) {
+                                         const Mat3 &K_d,
+                                         const Vec4 &D_s,
+                                         const Vec4 &D_d) {
   // Observed 3d point in static camera
   this->P_s[0] = P_s(0);
   this->P_s[1] = P_s(1);
@@ -39,6 +41,18 @@ GimbalCalibResidual::GimbalCalibResidual(const Vec3 &P_s,
   this->fy_d = K_d(1, 1);
   this->cx_d = K_d(0, 2);
   this->cy_d = K_d(1, 2);
+
+  // Static camera distortion coefficients
+  this->k1_s = D_s(0);
+  this->k2_s = D_s(1);
+  this->k3_s = D_s(2);
+  this->k4_s = D_s(2);
+
+  // Dynamic camera distortion coefficients
+  this->k1_d = D_d(0);
+  this->k2_d = D_d(1);
+  this->k3_d = D_d(2);
+  this->k4_d = D_d(2);
 }
 
 std::ostream &operator<<(std::ostream &os,
