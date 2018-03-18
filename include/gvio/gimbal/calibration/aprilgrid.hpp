@@ -9,6 +9,7 @@
 #include <apriltags_mit/Tag36h11.h>
 
 #include "gvio/util/util.hpp"
+#include "gvio/camera/distortion.hpp"
 
 namespace gvio {
 
@@ -64,6 +65,7 @@ public:
    * Extract tags
    *
    * @param image Input image
+   * @param tags Observed AprilGrid tags
    * @return 0 for success, -1 for failure
    */
   int extractTags(cv::Mat &image,
@@ -72,7 +74,7 @@ public:
   /**
    * Form object points
    *
-   * @params tags Observed AprilGrid tags
+   * @param tags Observed AprilGrid tags
    * @returns Object points for SolvePnP
    */
   std::vector<cv::Point3f>
@@ -81,7 +83,7 @@ public:
   /**
    * Form image points
    *
-   * @params tags Observed AprilGrid tags
+   * @param tags Observed AprilGrid tags
    * @returns Image points observed for SolvePnP
    */
   std::vector<cv::Point2f>
@@ -90,7 +92,11 @@ public:
   /**
    * SolvePnP
    *
-   * @params tags Observed AprilGrid tags
+   * @param tags Observed AprilGrid tags
+   * @param K Camera intrinsics matrix K
+   * @param grid_points AprilGrid tag corners in 3D
+   *
+   * @return 0 for success, -1 for failure
    */
   int solvePnP(const std::map<int, std::vector<cv::Point2f>> &tags,
                const cv::Mat &K,

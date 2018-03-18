@@ -29,7 +29,6 @@ public:
    * Detect
    *
    * @param frame Image frame
-   * @param map Saliency map
    * @returns 0 for success, -1 for failure
    */
   int detect(const cv::Mat &frame);

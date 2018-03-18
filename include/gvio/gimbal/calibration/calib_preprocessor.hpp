@@ -69,7 +69,7 @@ public:
    * @param camchain_file Path to camchain file
    * @returns 0 for success, -1 for failure
    */
-  int loadCamchainFile(const std::string &camcahin_file);
+  int loadCamchainFile(const std::string &camchain_file);
 
   /**
    * Find image files

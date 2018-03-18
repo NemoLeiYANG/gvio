@@ -6,6 +6,7 @@
 namespace gvio {
 
 #define TEST_CALIB_FILE "test_configs/gimbal/calibration/gvio_camchain.yaml"
+#define TEST_CALIB_2_FILE "test_configs/gimbal/calibration/gvio_camchain2.yaml"
 #define TEST_TARGET_FILE "test_configs/gimbal/calibration/chessboard.yaml"
 #define TEST_CAM0_CONFIG "test_configs/camera/ueye/cam0.yaml"
 #define TEST_CAM1_CONFIG "test_configs/camera/ueye/cam1.yaml"
@@ -63,9 +64,9 @@ int test_CalibValidator_validate() {
   CalibValidator validator;
 
   // Load validator
-  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
+  validator.load(3, TEST_CALIB_2_FILE, TEST_TARGET_FILE);
 
-  cv::Mat image = cv::imread(TEST_IMAGE);
+  cv::Mat image = cv::imread("test_data/chessboard/cam0/image_1.jpg");
   cv::Mat result = validator.validate(0, image);
   cv::imshow("Image", result);
   cv::waitKey();

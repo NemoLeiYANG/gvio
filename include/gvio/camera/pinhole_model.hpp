@@ -168,6 +168,32 @@ public:
  */
 Vec2 pinhole_project(const Mat3 &K, const Vec3 &p);
 
+/**
+ * Convert pixel to ideal coordinates
+ *
+ * @param fx Focal length in x-axis
+ * @param fy Focal length in y-axis
+ * @param cx Principle center in x-axis
+ * @param cy Principle center in y-axis
+ * @param pixel Pixel measurement
+ *
+ * @returns Pixel in ideal coordinates
+ */
+Vec2 pixel2ideal(const double fx,
+                 const double fy,
+                 const double cx,
+                 const double cy,
+                 const Vec2 &pixel);
+
+/**
+ * Convert pixel to ideal coordinates
+ *
+ * @param K camera intrinsics matrix K
+ * @param pixel Pixel measurement
+ * @returns Pixel in ideal coordinates
+ */
+Vec2 pixel2ideal(const Mat3 &K, const Vec2 &pixel);
+
 /** @} group camera */
 } // namespace gvio
 #endif // GVIO_CAMERA_PINHOLE_MODEL_HPP

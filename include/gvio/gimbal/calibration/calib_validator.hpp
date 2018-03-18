@@ -64,11 +64,19 @@ public:
    * @param image Image
    * @param K Camera intrinsics matrix K
    * @param D Distortion coefficients vector D
+   * @param distortion_model Distortion model
    * @param X 3D position of chessboard corners
    *
-   * @returns 0 for success, -1 for failure
+   * @returns
+   * - 0 for no chessboard detected
+   * - 1 for chessboard detected
+   * - -1 for failure
    */
-  int detect(const cv::Mat &image, const Mat3 &K, const VecX &D, MatX &X);
+  int detect(const cv::Mat &image,
+             const Mat3 &K,
+             const VecX &D,
+             const std::string &distortion_model,
+             MatX &X);
 
   /**
    * Draw detected
@@ -111,6 +119,7 @@ public:
    * @param image Input image
    * @param K Camera intrinsics matrix K
    * @param D Distortion coefficients vector D
+   * @param distortion_model Distortion model
    * @param X 3D position of chessboard corners
    * @param color Color to visualize chessboard corners
    *
@@ -119,6 +128,7 @@ public:
   cv::Mat project(const cv::Mat &image,
                   const Mat3 &K,
                   const VecX &D,
+                  const std::string &distortion_model,
                   const MatX &X,
                   const cv::Scalar &color = cv::Scalar(0, 0, 255));
 

@@ -68,10 +68,10 @@ std::ostream &operator<<(std::ostream &os, const CalibParams &params) {
   os << "tau_d: " << array2str(params.tau_d, 6) << std::endl;
   os << "w1: " << array2str(params.w1, 3) << std::endl;
   os << "w2: " << array2str(params.w2, 3) << std::endl;
-  os << "Lamba 1 and 2: " << std::endl;
-  for (int i = 0; i < params.nb_measurements; i++) {
-    os << params.Lambda1[i] << " " << params.Lambda2[i] << std::endl;
-  }
+  // os << "Lamba 1 and 2: " << std::endl;
+  // for (int i = 0; i < params.nb_measurements; i++) {
+  //   os << params.Lambda1[i] << " " << params.Lambda2[i] << std::endl;
+  // }
 
   return os;
 }

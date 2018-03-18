@@ -29,6 +29,19 @@ MatX radtan_distort(const double k1,
                     const MatX &points);
 
 /**
+ * Distort 3D points with the radial-tangential distortion model
+ *
+ * Source:
+ * http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
+ */
+Vec2 radtan_distort(const double k1,
+                    const double k2,
+                    const double k3,
+                    const double p1,
+                    const double p2,
+                    const Vec3 &point);
+
+/**
  * Distort 3D points with the equi-distant distortion model
  */
 MatX equi_distort(const double k1,
@@ -71,6 +84,16 @@ cv::Mat pinhole_equi_undistort_image(const Mat3 &K,
                                      const VecX &D,
                                      const cv::Mat &image,
                                      cv::Mat &K_new);
+
+/**
+ * Project pinhole radial-tangential
+ */
+Vec2 project_pinhole_radtan(const Mat3 &K, const VecX &D, const Vec3 &X);
+
+/**
+ * Project pinhole equidistant
+ */
+Vec2 project_pinhole_equi(const Mat3 &K, const Vec4 &D, const Vec3 &X);
 
 /** @} group camera */
 } // namespace gvio

@@ -128,7 +128,7 @@ SET(UNITTESTS
     # apriltag-mit_test
     # camera-camera_test
     # camera-camera_config_test
-    camera-ids_test
+    # camera-ids_test
     # camera-pinhole_model_test
     # control-carrot_controller_test
     # control-pid_test
@@ -150,7 +150,7 @@ SET(UNITTESTS
     # gimbal-calibration-calib_preprocessor_test
     gimbal-calibration-calib_validator_test
     # gimbal-calibration-chessboard_test
-    gimbal-calibration-gimbal_calib_test
+    # gimbal-calibration-gimbal_calib_test
     # gimbal-calibration-residual_test
     # gimbal-gmr-gmr_test
     # gimbal-sbgc_test

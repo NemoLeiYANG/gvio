@@ -14,14 +14,10 @@ else
   CPU_COUNT=1
 fi
 
-# doxygen Doxyfile
+doxygen Doxyfile
 
+# python3 scripts/calibration/
 # python3 scripts/calibration/plot_gimbal.py --camchain tests/test_configs/gimbal/calibration/gvio_camchain.yaml
-
-mkdir -p build && cd build
-
-cmake .. && time make -j${CPU_COUNT}
-
 # ./experiments/kitti_runner /data/kitti/raw 2011_09_26 0046 ./experiments/configs/msckf_kitti_raw-2011_09_26-0046.yaml ./experiments
 # python3 tests/scripts/plot_msckf.py ./experiments/msckf
 
@@ -29,9 +25,8 @@ cmake .. && time make -j${CPU_COUNT}
 # python3 scripts/msckf_tuner.py experiments/configs/kitti_raw_2011_09_26_0009.yaml
 # cd ../ && bash scripts/test_runner.sh
 
-# VALGRIND="valgrind --leak-check=full \
-# 									 --show-leak-kinds=all \
-# 									 --suppressions=../../.valgrind-suppression"
+mkdir -p build && cd build
+cmake .. && time make -j${CPU_COUNT}
 
 cd tests
 # ./apriltag-mit_test
@@ -57,8 +52,8 @@ cd tests
 # ./gimbal-calibration-chessboard_test
 # ./gimbal-calibration-calib_params_test
 # ./gimbal-calibration-calib_preprocessor_test
-# ./gimbal-calibration-calib_validator_test
-./gimbal-calibration-gimbal_calib_test
+./gimbal-calibration-calib_validator_test
+# ./gimbal-calibration-gimbal_calib_test
 # ./gimbal-calibration-residual_test
 # ./gimbal-gmr-gmr_test
 # ./gimbal-sbgc_test

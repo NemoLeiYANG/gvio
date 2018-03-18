@@ -39,6 +39,33 @@ MatX radtan_distort(const double k1,
   return distorted_points;
 }
 
+Vec2 radtan_distort(const double k1,
+                    const double k2,
+                    const double k3,
+                    const double p1,
+                    const double p2,
+                    const Vec3 &point) {
+  // Setup
+  const double x_dash = point(0) / point(2);
+  const double y_dash = point(1) / point(2);
+
+  // Radial distortion factor
+  const double r2 = (x_dash * x_dash) + (y_dash * y_dash);
+  const double r4 = r2 * r2;
+  const double r6 = r2 * r4;
+  const double temp = 1 + (k1 * r2) + (k2 * r4) + (k3 * r6);
+
+  // Tangential distortion factor
+  // clang-format off
+  const double x_ddash = x_dash * temp + (2 * p1 * x_dash * y_dash + p2 * (r2 + 2 * (x_dash * x_dash)));
+  const double y_ddash = y_dash * temp + (p1 * (r2 + 2 * (y_dash * y_dash)) + 2 * p2 * x_dash * y_dash);
+  // clang-format on
+
+  // Project rad-tan distorted point to image plane
+  Vec2 distorted_point{x_ddash, y_ddash};
+  return distorted_point;
+}
+
 MatX equi_distort(const double k1,
                   const double k2,
                   const double k3,
@@ -82,10 +109,10 @@ Vec2 equi_distort(const double k1,
   // Apply equi distortion
   // clang-format off
   const double theta = atan(r);
-  const double th2 = pow(theta, 2);
-  const double th4 = pow(theta, 4);
-  const double th6 = pow(theta, 6);
-  const double th8 = pow(theta, 8);
+  const double th2 = theta * theta;
+  const double th4 = th2 * th2;
+  const double th6 = th4 * th2;
+  const double th8 = th4 * th4;
   const double theta_d = theta * (1 + k1 * th2 + k2 * th4 + k3 * th6 + k4 * th8);
   const double x_dash = (theta_d / r) * x;
   const double y_dash = (theta_d / r) * y;
@@ -142,6 +169,34 @@ cv::Mat pinhole_equi_undistort_image(const Mat3 &K,
                                      const cv::Mat &image,
                                      cv::Mat &Knew) {
   return pinhole_equi_undistort_image(K, D, image, 0.0, Knew);
+}
+
+Vec2 project_pinhole_radtan(const Mat3 &K, const VecX &D, const Vec3 &X) {
+  // Apply equi distortion
+  const Vec2 x_distorted = radtan_distort(D(0), D(1), D(2), D(3), D(4), X);
+
+  // Project equi distorted point to image plane
+  const double fx = K(0, 0);
+  const double fy = K(1, 1);
+  const double cx = K(0, 2);
+  const double cy = K(1, 2);
+  const Vec2 pixel{fx * x_distorted(0) + cx, fy * x_distorted(1) + cy};
+
+  return pixel;
+}
+
+Vec2 project_pinhole_equi(const Mat3 &K, const Vec4 &D, const Vec3 &X) {
+  // Distort point
+  const Vec2 x_distorted = equi_distort(D(0), D(1), D(2), D(3), X);
+
+  // Project equi distorted point to image plane
+  const double fx = K(0, 0);
+  const double fy = K(1, 1);
+  const double cx = K(0, 2);
+  const double cy = K(1, 2);
+  const Vec2 pixel{fx * x_distorted(0) + cx, fy * x_distorted(1) + cy};
+
+  return pixel;
 }
 
 } // namespace gvio

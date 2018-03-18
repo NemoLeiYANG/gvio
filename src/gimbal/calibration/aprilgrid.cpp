@@ -120,7 +120,7 @@ int AprilGrid::extractTags(cv::Mat &image,
     const std::vector<cv::Point2f> corners = {p0, p1, p2, p3};
     tags.emplace(det.id, corners);
 
-    det.draw(image_rgb);
+    // det.draw(image_rgb);
   }
   image = image_rgb.clone();
 
@@ -134,6 +134,7 @@ std::vector<cv::Point3f> AprilGrid::formObjectPoints(
   const int cols = this->tag_cols * 2;
   MatX corners = zeros(rows * cols, 3);
 
+  int i = 0;
   for (auto &tag : tags) {
     // Get tag coordinate
     const int tag_id = tag.first;
@@ -164,10 +165,16 @@ std::vector<cv::Point3f> AprilGrid::formObjectPoints(
     const Vec3 p2 = this->grid_points.row(top_right).transpose();
     const Vec3 p3 = this->grid_points.row(top_left).transpose();
 
-    corners.block(bottom_left, 0, 1, 3) = p0.transpose();
-    corners.block(bottom_right, 0, 1, 3) = p1.transpose();
-    corners.block(top_right, 0, 1, 3) = p2.transpose();
-    corners.block(top_left, 0, 1, 3) = p3.transpose();
+    corners.block(i, 0, 1, 3) = p0.transpose();
+    corners.block(i + 1, 0, 1, 3) = p1.transpose();
+    corners.block(i + 2, 0, 1, 3) = p2.transpose();
+    corners.block(i + 3, 0, 1, 3) = p3.transpose();
+    i += 4;
+
+    // corners.block(bottom_left, 0, 1, 3) = p0.transpose();
+    // corners.block(bottom_right, 0, 1, 3) = p1.transpose();
+    // corners.block(top_right, 0, 1, 3) = p2.transpose();
+    // corners.block(top_left, 0, 1, 3) = p3.transpose();
   }
 
   // Form object points for SolvePnP
@@ -200,10 +207,24 @@ int AprilGrid::solvePnP(const std::map<int, std::vector<cv::Point2f>> &tags,
   // SolvePnP
   const std::vector<cv::Point3f> object_points = this->formObjectPoints(tags);
   const std::vector<cv::Point2f> image_points = this->formImagePoints(tags);
-  const cv::Vec4d D(0.0f, 0.0f, 0.0f, 0.0f);
+
+  std::vector<cv::Point2f> image_points_ud;
+  cv::Mat D(4, 1, cv::DataType<double>::type);
+  D.at<double>(0) = 0.0678890809361792;
+  D.at<double>(1) = 0.007709008000713503;
+  D.at<double>(2) = -0.010307689056822753;
+  D.at<double>(3) = 0.003975705353253985;
+  cv::fisheye::undistortPoints(image_points, image_points_ud, K, D);
+  for (size_t i = 0; i < image_points_ud.size(); i++) {
+    cv::Point2f &p = image_points_ud[i];
+    p.x = K.at<double>(0, 0) * p.x + K.at<double>(0, 2);
+    p.y = K.at<double>(1, 1) * p.y + K.at<double>(1, 2);
+  }
+
+  cv::Mat D_empty;
   cv::Mat rvec(3, 1, cv::DataType<double>::type);
   cv::Mat tvec(3, 1, cv::DataType<double>::type);
-  cv::solvePnP(object_points, image_points, K, D, rvec, tvec);
+  cv::solvePnP(object_points, image_points_ud, K, D_empty, rvec, tvec);
 
   // Convert Rodrigues rvec to rotation matrix
   cv::Mat R(3, 3, cv::DataType<double>::type);

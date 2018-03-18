@@ -62,38 +62,35 @@ Mat3 CalibValidator::K(const int cam_id) {
 VecX CalibValidator::D(const int cam_id) {
   assert(cam_id >= 0);
   assert(cam_id < this->camchain.cam.size());
-
-  VecX D;
-  D.resize(4);
-
-  // clang-format off
-  D << this->camchain.cam[cam_id].distortion_coeffs(0),
-       this->camchain.cam[cam_id].distortion_coeffs(1),
-       this->camchain.cam[cam_id].distortion_coeffs(2),
-       this->camchain.cam[cam_id].distortion_coeffs(3);
-  // clang-format on
-
-  return D;
+  return this->camchain.cam[cam_id].distortion_coeffs;
 }
 
 int CalibValidator::detect(const cv::Mat &image,
                            const Mat3 &K,
                            const VecX &D,
+                           const std::string &distortion_model,
                            MatX &X) {
   // Find chessboard corners
   std::vector<cv::Point2f> corners;
   if (this->chessboard.detect(image, corners) != 0) {
-    return -1;
+    return 0;
   }
 
   // Undistort points
   std::vector<cv::Point2f> corners_ud;
-  cv::fisheye::undistortPoints(corners, corners_ud, convert(K), convert(D));
+  if (distortion_model == "equidistant") {
+    cv::fisheye::undistortPoints(corners, corners_ud, convert(K), convert(D));
+  } else if (distortion_model == "radial-tangential") {
+    cv::undistortPoints(corners, corners_ud, convert(K), convert(D));
+  } else {
+    LOG_ERROR("Unsupported distortion model [%s]!", distortion_model.c_str());
+    return -1;
+  }
 
   // Calculate corner positions in 3D
   this->chessboard.calcCornerPositions(corners_ud, I(3), X);
 
-  return 0;
+  return 1;
 }
 
 cv::Mat CalibValidator::drawDetected(const cv::Mat &image,
@@ -105,11 +102,13 @@ cv::Mat CalibValidator::drawDetected(const cv::Mat &image,
   }
 
   // Make an RGB version of the input image
-  cv::Mat image_rgb = image.clone();
+  cv::Mat image_rgb;
   if (image.channels() == 1) {
     image_rgb = cv::Mat(image.size(), CV_8UC3);
     image_rgb = image.clone();
     cv::cvtColor(image, image_rgb, CV_GRAY2RGB);
+  } else {
+    image_rgb = image.clone();
   }
 
   // Draw detected points
@@ -197,6 +196,7 @@ cv::Mat CalibValidator::project(const cv::Mat &image,
 cv::Mat CalibValidator::project(const cv::Mat &image,
                                 const Mat3 &K,
                                 const VecX &D,
+                                const std::string &distortion_model,
                                 const MatX &X,
                                 const cv::Scalar &color) {
   // Convert points from Eigen::Matrix to vector of cv::Point2f
@@ -206,9 +206,25 @@ cv::Mat CalibValidator::project(const cv::Mat &image,
     points.emplace_back(p(0) / p(2), p(1) / p(2));
   }
 
-  // Undistort points
+  // Distort points
   std::vector<cv::Point2f> distorted_points;
-  cv::fisheye::distortPoints(points, distorted_points, convert(K), convert(D));
+  if (distortion_model == "equidistant") {
+    cv::fisheye::distortPoints(points,
+                               distorted_points,
+                               convert(K),
+                               convert(D));
+
+  } else if (distortion_model == "radial-tangential") {
+    for (long i = 0; i < X.cols(); i++) {
+      const Vec3 p = X.col(i);
+      const Vec2 pixel = project_pinhole_radtan(K, D, p);
+      distorted_points.emplace_back(pixel(0), pixel(1));
+    }
+
+  } else {
+    LOG_ERROR("Unsupported distortion model [%s]!", distortion_model.c_str());
+    return image;
+  }
 
   // Make an RGB version of the input image
   cv::Mat image_rgb = image.clone();
@@ -259,19 +275,16 @@ cv::Mat CalibValidator::validate(const int cam_id, cv::Mat &image) {
   const cv::Scalar red{0, 0, 255};
   const cv::Scalar green{0, 255, 0};
 
-  // Undistort image
-  cv::Mat Knew;
-  cv::Mat image_ud = pinhole_equi_undistort_image(this->K(cam_id),
-                                                  this->D(cam_id),
-                                                  image,
-                                                  0.5,
-                                                  Knew);
-
   // Detect chessboard corners and output 3d positions
   const cv::Mat D;
   MatX X;
-  if (this->detect(image, this->K(cam_id), this->D(cam_id), X) != 0) {
-    return image_ud;
+  int retval = this->detect(image,
+                            this->K(cam_id),
+                            this->D(cam_id),
+                            this->camchain.cam[cam_id].distortion_model,
+                            X);
+  if (retval != 1) {
+    return image;
   }
 
   // Draw detected chessboard corners
@@ -280,7 +293,12 @@ cv::Mat CalibValidator::validate(const int cam_id, cv::Mat &image) {
 
   // Project 3D point to undistorted image
   // return this->project(image_ud, convert(Knew), X, green);
-  return this->project(result, this->K(0), this->D(0), X, green);
+  return this->project(result,
+                       this->K(0),
+                       this->D(0),
+                       this->camchain.cam[cam_id].distortion_model,
+                       X,
+                       green);
 }
 
 cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
@@ -295,12 +313,14 @@ cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
   const Mat3 K1 = this->K(1);
   const Vec4 D0 = this->D(0);
   const Vec4 D1 = this->D(1);
+  const std::string dist_model0 = this->camchain.cam[0].distortion_model;
+  const std::string dist_model1 = this->camchain.cam[1].distortion_model;
 
   // Detect chessboard corners and output 3d positions
   MatX X0, X1;
   int retval = 0;
-  retval = this->detect(img0, K0, D0, X0);
-  retval += this->detect(img1, K1, D1, X1);
+  retval = this->detect(img0, K0, D0, dist_model0, X0);
+  retval += this->detect(img1, K1, D1, dist_model1, X1);
   if (retval != 0) {
     cv::Mat result;
     cv::vconcat(img0, img1, result);
@@ -316,7 +336,8 @@ cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
   // -- Project and draw
   const MatX X0_cal =
       (this->camchain.T_C1_C0.inverse() * X1).block(0, 0, 3, X1.cols());
-  const cv::Mat img0_cb = this->project(img0_det, K0, D0, X0_cal, green);
+  const cv::Mat img0_cb =
+      this->project(img0_det, K0, D0, dist_model0, X0_cal, green);
 
   // Project points observed from cam0 to cam1 image
   // -- Make points homogeneous by adding 1's in last row
@@ -324,7 +345,8 @@ cv::Mat CalibValidator::validateStereo(const cv::Mat &img0,
   X0.row(X0.rows() - 1) = ones(1, X0.cols());
   // -- Project and draw
   const MatX X1_cal = (this->camchain.T_C1_C0 * X0).block(0, 0, 3, X0.cols());
-  const cv::Mat img1_cb = this->project(img1_det, K1, D1, X1_cal, red);
+  const cv::Mat img1_cb =
+      this->project(img1_det, K1, D1, dist_model1, X1_cal, red);
 
   // Combine cam0 and cam1 images
   cv::Mat result;
@@ -453,10 +475,13 @@ cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
   // - Knew
   // - 3d corner positions
   MatX X0, X1, X2;
+  const std::string dist_model0 = this->camchain.cam[0].distortion_model;
+  const std::string dist_model1 = this->camchain.cam[1].distortion_model;
+  const std::string dist_model2 = this->camchain.cam[2].distortion_model;
   int retval = 0;
-  retval = this->detect(img0, this->K(0), this->D(0), X0);
-  retval += this->detect(img1, this->K(1), this->D(1), X1);
-  retval += this->detect(img2, this->K(2), this->D(2), X2);
+  retval = this->detect(img0, this->K(0), this->D(0), dist_model0, X0);
+  retval += this->detect(img1, this->K(1), this->D(1), dist_model1, X1);
+  retval += this->detect(img2, this->K(2), this->D(2), dist_model2, X2);
   if (retval != 0) {
     cv::Mat img02;
     cv::hconcat(img0, img2, img02);
@@ -466,8 +491,10 @@ cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
   }
 
   // Visualize cam0 and cam1 intrinsics
-  cv::Mat img0_cb = this->project(img0, this->K(0), this->D(0), X0, red);
-  cv::Mat img1_cb = this->project(img1, this->K(1), this->D(1), X1, green);
+  cv::Mat img0_cb =
+      this->project(img0, this->K(0), this->D(0), dist_model0, X0, red);
+  cv::Mat img1_cb =
+      this->project(img1, this->K(1), this->D(1), dist_model1, X1, green);
 
   // Get gimbal roll and pitch angles then form T_ds transform
   this->gimbal_model.Lambda1 = joint_roll;
@@ -480,7 +507,8 @@ cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
   X0.row(X0.rows() - 1) = ones(1, X0.cols());
   // -- Project and draw
   MatX X2_cal = (T_ds * X0).block(0, 0, 3, X0.cols());
-  cv::Mat img2_cb = this->project(img2, this->K(2), this->D(2), X2_cal, red);
+  cv::Mat img2_cb =
+      this->project(img2, this->K(2), this->D(2), dist_model2, X2_cal, red);
 
   // Project points observed from cam1 to cam2 image
   // -- Make points homogeneous by adding 1's in last row
@@ -489,7 +517,12 @@ cv::Mat CalibValidator::validateTriclops(const cv::Mat &img0,
   // -- Project and draw
   X2_cal =
       (T_ds * this->camchain.T_C1_C0.inverse() * X1).block(0, 0, 3, X1.cols());
-  img2_cb = this->project(img2_cb, this->K(2), this->D(2), X2_cal, green);
+  img2_cb = this->project(img2_cb,
+                          this->K(2),
+                          this->D(2),
+                          dist_model2,
+                          X2_cal,
+                          green);
 
   // Combine images
   cv::Mat img02;

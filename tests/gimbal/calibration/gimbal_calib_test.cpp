@@ -5,7 +5,7 @@ namespace gvio {
 
 // #define TEST_CONFIG_FILE "test_configs/gimbal/calibration/params.yaml"
 // #define TEST_JOINT_DATA "test_data/calibration/joint.csv"
-#define TEST_DATA "/home/chutsu/Dropbox/measurements"
+#define TEST_DATA "/home/chutsu/Dropbox/measurements2"
 
 int test_GimbalCalib_constructor() {
   GimbalCalib calib;

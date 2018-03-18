@@ -110,4 +110,21 @@ Vec2 pinhole_project(const Mat3 &K, const Vec3 &X) {
   return Vec2{x(0) / x(2), x(1) / x(2)};
 }
 
+Vec2 pixel2ideal(const double fx,
+                 const double fy,
+                 const double cx,
+                 const double cy,
+                 const Vec2 &pixel) {
+  Vec2 pt((pixel(0) - cx) / fx, (pixel(1) - cy) / fy);
+  return pt;
+}
+
+Vec2 pixel2ideal(const Mat3 &K, const Vec2 &pixel) {
+  const double fx = K(0, 0);
+  const double fy = K(1, 1);
+  const double cx = K(0, 2);
+  const double cy = K(1, 2);
+  return pixel2ideal(fx, fy, cx, cy, pixel);
+}
+
 } // namespace gvio

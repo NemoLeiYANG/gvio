@@ -73,7 +73,7 @@ int GimbalCalib::calibrate() {
   // this->options.use_inner_iterations = true;
   // this->options.preconditioner_type = ceres::SCHUR_JACOBI;
   // this->options.linear_solver_type = ceres::SPARSE_SCHUR;
-  this->options.minimizer_type = ceres::LINE_SEARCH;
+  // this->options.minimizer_type = ceres::LINE_SEARCH;
   this->options.function_tolerance = 1e-12;
   this->options.parameter_tolerance = 1e-12;
   this->options.num_threads = 8;
@@ -81,8 +81,10 @@ int GimbalCalib::calibrate() {
   this->options.minimizer_progress_to_stdout = true;
 
   // Solve
+  std::cout << this->params << std::endl;
   ceres::Solve(this->options, &this->problem, &this->summary);
   std::cout << summary.FullReport() << std::endl;
+  std::cout << this->params << std::endl;
 
   return 0;
 }
