@@ -23,10 +23,13 @@ int test_CalibValidator_constructor() {
 }
 
 int test_CalibValidator_load() {
-  CalibValidator validator;
-
   // Load validator
-  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
+  CalibValidator validator;
+  if (validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE) != 0) {
+    LOG_ERROR("Failed to load validator!");
+    return -1;
+  }
+
   std::cout << validator.camchain.cam[0] << std::endl;
   std::cout << validator.camchain.cam[1] << std::endl;
   std::cout << validator.camchain.cam[2] << std::endl;
@@ -39,10 +42,12 @@ int test_CalibValidator_load() {
 }
 
 int test_CalibValidator_validate() {
-  CalibValidator validator;
-
   // Load validator
-  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
+  CalibValidator validator;
+  if (validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE) != 0) {
+    LOG_ERROR("Failed to load validator!");
+    return -1;
+  }
 
   cv::Mat image = cv::imread("test_data/chessboard/cam0/image_0.jpg");
   cv::Mat result = validator.validate(0, image);
@@ -53,10 +58,12 @@ int test_CalibValidator_validate() {
 }
 
 int test_CalibValidator_validateStereo() {
-  CalibValidator validator;
-
   // Load validator
-  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
+  CalibValidator validator;
+  if (validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE) != 0) {
+    LOG_ERROR("Failed to load validator!");
+    return -1;
+  }
 
   std::cout << validator.camchain.cam[0] << std::endl;
   std::cout << validator.camchain.cam[1] << std::endl;
@@ -71,10 +78,12 @@ int test_CalibValidator_validateStereo() {
 }
 
 int test_CalibValidator_validate_live() {
-  CalibValidator validator;
-
   // Load validator
-  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
+  CalibValidator validator;
+  if (validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE) != 0) {
+    LOG_ERROR("Failed to load validator!");
+    return -1;
+  }
 
   // Load camera
   IDSCamera camera;
@@ -103,7 +112,10 @@ int test_CalibValidator_validate_live() {
 int test_CalibValidator_validateStereo_live() {
   // Load validator
   CalibValidator validator;
-  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
+  if (validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE) != 0) {
+    LOG_ERROR("Failed to load validator!");
+    return -1;
+  }
 
   // Load camera
   IDSCamera cam0, cam1;
