@@ -18,11 +18,56 @@ Mat3 CameraProperty::K() {
   return K;
 }
 
-VecX CameraProperty::D() {
-  Vec4 D;
-  D << this->distortion_coeffs(0), this->distortion_coeffs(1),
-      this->distortion_coeffs(2), this->distortion_coeffs(3);
-  return D;
+VecX CameraProperty::D() { return this->distortion_coeffs; }
+
+int CameraProperty::undistortPoints(
+    const std::vector<cv::Point2f> &image_points,
+    std::vector<cv::Point2f> &image_points_ud) {
+  std::vector<cv::Point2f> points_ud;
+
+  if (distortion_model == "equidistant") {
+    cv::fisheye::undistortPoints(image_points,
+                                 image_points_ud,
+                                 convert(this->K()),
+                                 convert(this->D()));
+
+  } else if (distortion_model == "radial-tangential") {
+    cv::undistortPoints(image_points,
+                        image_points_ud,
+                        convert(this->K()),
+                        convert(this->D()));
+
+  } else {
+    LOG_ERROR("Unsupported distortion model [%s]!", distortion_model.c_str());
+    return -1;
+  }
+
+  return 0;
+}
+
+int CameraProperty::project(const MatX &X, MatX &pixels) {
+  pixels.resize(2, X.cols());
+
+  if (this->distortion_model == "equidistant") {
+    for (long i = 0; i < X.cols(); i++) {
+      const Vec3 p = X.col(i);
+      const Vec2 pixel = project_pinhole_equi(this->K(), this->D(), p);
+      pixels.col(i) = pixel;
+    }
+
+  } else if (distortion_model == "radial-tangential") {
+    for (long i = 0; i < X.cols(); i++) {
+      const Vec3 p = X.col(i);
+      const Vec2 pixel = project_pinhole_radtan(this->K(), this->D(), p);
+      pixels.col(i) = pixel;
+    }
+
+  } else {
+    LOG_ERROR("Unsupported distortion model [%s]!", distortion_model.c_str());
+    return -1;
+  }
+
+  return 0;
 }
 
 std::ostream &operator<<(std::ostream &os, const CameraProperty &cam) {

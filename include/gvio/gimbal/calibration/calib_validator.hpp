@@ -30,22 +30,6 @@ public:
   virtual ~CalibValidator();
 
   /**
-   * Form camera intrinsics matrix K
-   *
-   * @param cam_id Camera ID
-   * @returns Camera intrinsics matrix K
-   */
-  Mat3 K(const int cam_id);
-
-  /**
-   * Form distortion vector D
-   *
-   * @param cam_id Camera ID
-   * @returns Distortion coefficients D
-   */
-  VecX D(const int cam_id);
-
-  /**
    * Load initial optimization params
    *
    * @param nb_cameras Number of cameras
@@ -61,10 +45,8 @@ public:
   /**
    * Detect chessboard corners
    *
+   * @param camera_index Camera index
    * @param image Image
-   * @param K Camera intrinsics matrix K
-   * @param D Distortion coefficients vector D
-   * @param distortion_model Distortion model
    * @param X 3D position of chessboard corners
    *
    * @returns
@@ -72,11 +54,7 @@ public:
    * - 1 for chessboard detected
    * - -1 for failure
    */
-  int detect(const cv::Mat &image,
-             const Mat3 &K,
-             const VecX &D,
-             const std::string &distortion_model,
-             MatX &X);
+  int detect(const int camera_index, const cv::Mat &image, MatX &X);
 
   /**
    * Draw detected
@@ -101,45 +79,26 @@ public:
   /**
    * Project 3D points to image plane and draw chessboard corners
    *
+   * @param camera_index Camera index
    * @param image Input image
-   * @param K Camera intrinsics matrix K
    * @param X 3D position of chessboard corners
    * @param color Color to visualize chessboard corners
    *
    * @returns Image with chessboard corners visualized
    */
-  cv::Mat project(const cv::Mat &image,
-                  const Mat3 &K,
-                  const MatX &X,
-                  const cv::Scalar &color = cv::Scalar(0, 0, 255));
-
-  /**
-   * Project 3D points to image plane and draw chessboard corners
-   *
-   * @param image Input image
-   * @param K Camera intrinsics matrix K
-   * @param D Distortion coefficients vector D
-   * @param distortion_model Distortion model
-   * @param X 3D position of chessboard corners
-   * @param color Color to visualize chessboard corners
-   *
-   * @returns Image with chessboard corners visualized
-   */
-  cv::Mat project(const cv::Mat &image,
-                  const Mat3 &K,
-                  const VecX &D,
-                  const std::string &distortion_model,
+  cv::Mat project(const int camera_index,
+                  const cv::Mat &image,
                   const MatX &X,
                   const cv::Scalar &color = cv::Scalar(0, 0, 255));
 
   /**
    * Validate calibration
    *
-   * @param cam_id Camera ID
+   * @param camera_index Camera index
    * @param image Input image
    * @returns Validation image for visual inspection
    */
-  cv::Mat validate(const int cam_id, cv::Mat &image);
+  cv::Mat validate(const int camera_index, cv::Mat &image);
 
   /**
    * Validate stereo calibration
@@ -149,15 +108,6 @@ public:
    * @returns Validation image for visual inspection
    */
   cv::Mat validateStereo(const cv::Mat &img0, const cv::Mat &img1);
-
-  /**
-   * Validate stereo calibration
-   *
-   * @param img0 Input image from cam0
-   * @param img1 Input image from cam1
-   * @returns Validation image for visual inspection
-   */
-  cv::Mat validateStereo2(const cv::Mat &img0, const cv::Mat &img1);
 
   /**
    * Validate stereo + gimbal calibration

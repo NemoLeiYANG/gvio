@@ -6,6 +6,7 @@
 #define GVIO_GIMBAL_CALIBRATION_CAMCHAIN_HPP
 
 #include "gvio/util/util.hpp"
+#include "gvio/camera/distortion.hpp"
 
 namespace gvio {
 /**
@@ -20,8 +21,36 @@ struct CameraProperty {
   VecX intrinsics;
   Vec2 resolution;
 
+  /**
+   * Camera intrinsics matrix K
+   * @returns Camera intrinsics matrix K
+   */
   Mat3 K();
+
+  /**
+   * Distortion coefficients D
+   * @returns Distortion coefficients D
+   */
   VecX D();
+
+  /**
+   * Undistort points
+   *
+   * @param image_points Image points
+   * @param image_points_ud Undistorted image points
+   * @return 0 for success, -1 for failure
+   */
+  int undistortPoints(const std::vector<cv::Point2f> &image_points,
+                      std::vector<cv::Point2f> &image_points_ud);
+
+  /**
+   * Project 3D point to image plane
+   *
+   * @param X 3D points
+   * @param pixels Points in image plane
+   * @return 0 for success, -1 for failure
+   */
+  int project(const MatX &X, MatX &pixels);
 };
 
 /**

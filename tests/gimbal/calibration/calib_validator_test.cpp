@@ -38,35 +38,13 @@ int test_CalibValidator_load() {
   return 0;
 }
 
-int test_CalibValidator_K() {
-  CalibValidator validator;
-
-  // Load validator
-  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
-  std::cout << validator.K(0) << std::endl;
-  std::cout << convert(validator.K(0)) << std::endl;
-
-  return 0;
-}
-
-int test_CalibValidator_D() {
-  CalibValidator validator;
-
-  // Load validator
-  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
-  std::cout << validator.D(0) << std::endl;
-  std::cout << convert(validator.D(0)) << std::endl;
-
-  return 0;
-}
-
 int test_CalibValidator_validate() {
   CalibValidator validator;
 
   // Load validator
-  validator.load(3, TEST_CALIB_2_FILE, TEST_TARGET_FILE);
+  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
 
-  cv::Mat image = cv::imread("test_data/chessboard/cam0/image_1.jpg");
+  cv::Mat image = cv::imread("test_data/chessboard/cam0/image_0.jpg");
   cv::Mat result = validator.validate(0, image);
   cv::imshow("Image", result);
   cv::waitKey();
@@ -80,24 +58,12 @@ int test_CalibValidator_validateStereo() {
   // Load validator
   validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
 
+  std::cout << validator.camchain.cam[0] << std::endl;
+  std::cout << validator.camchain.cam[1] << std::endl;
+
   const cv::Mat img0 = cv::imread(TEST_CHESSBOARD_CAM0 "image_0.jpg");
   const cv::Mat img1 = cv::imread(TEST_CHESSBOARD_CAM1 "image_0.jpg");
   const cv::Mat result = validator.validateStereo(img0, img1);
-  cv::imshow("Image", result);
-  cv::waitKey();
-
-  return 0;
-}
-
-int test_CalibValidator_validateStereo2() {
-  CalibValidator validator;
-
-  // Load validator
-  validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE);
-
-  const cv::Mat img0 = cv::imread(TEST_CHESSBOARD_CAM0 "image_0.jpg");
-  const cv::Mat img1 = cv::imread(TEST_CHESSBOARD_CAM1 "image_0.jpg");
-  const cv::Mat result = validator.validateStereo2(img0, img1);
   cv::imshow("Image", result);
   cv::waitKey();
 
@@ -231,11 +197,8 @@ int test_CalibValidator_validateTriclops_live() {
 void test_suite() {
   MU_ADD_TEST(test_CalibValidator_constructor);
   MU_ADD_TEST(test_CalibValidator_load);
-  MU_ADD_TEST(test_CalibValidator_K);
-  MU_ADD_TEST(test_CalibValidator_D);
-  MU_ADD_TEST(test_CalibValidator_validate);
-  // MU_ADD_TEST(test_CalibValidator_validateStereo);
-  // MU_ADD_TEST(test_CalibValidator_validateStereo2);
+  // MU_ADD_TEST(test_CalibValidator_validate);
+  MU_ADD_TEST(test_CalibValidator_validateStereo);
   // MU_ADD_TEST(test_CalibValidator_validate_live);
   // MU_ADD_TEST(test_CalibValidator_validateStereo_live);
   // MU_ADD_TEST(test_CalibValidator_validateTriclops_live);

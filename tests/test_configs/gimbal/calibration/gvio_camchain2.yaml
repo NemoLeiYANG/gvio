@@ -8,17 +8,17 @@ cam0:
         
 cam1:
   camera_model: pinhole
-  distortion_coeffs: [-0.0658404259251678, 0.003081171049227224, -0.004493863430556307, 0.001097707477325051]
-  distortion_model: equidistant
-  intrinsics: [390.04316114278265, 391.78659099713224, 372.81266393927774, 227.2992327622048]
+  distortion_coeffs: [-0.311102, 0.065303, 0.005488, 0.000310, 0.000000]
+  distortion_model: radial-tangential
+  intrinsics: [420.645570, 420.001800, 373.660150, 208.776083]
   resolution: [752, 480]
   rostopic: /gvio/cam1/image
         
 cam2:
   camera_model: pinhole
-  distortion_coeffs: [-0.11175399755160273, 0.006660995340753397, 0.02668405418703251, -0.034837898527287206]
-  distortion_model: equidistant
-  intrinsics: [524.9162413300063, 526.7772489140208, 364.9123198868755, 238.15760650709848]
+  distortion_coeffs: [-0.387128, 0.125949, 0.000299, 0.000789, 0.000000]
+  distortion_model: radial-tangential
+  intrinsics: [527.867302, 528.413501, 362.341344, 239.547818]
   resolution: [752, 480]
   rostopic: /gvio/cam2/image
         
