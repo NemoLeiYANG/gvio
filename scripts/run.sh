@@ -14,7 +14,7 @@ else
   CPU_COUNT=1
 fi
 
-doxygen Doxyfile
+# doxygen Doxyfile
 
 # python3 scripts/calibration/
 # python3 scripts/calibration/plot_gimbal.py --camchain tests/test_configs/gimbal/calibration/gvio_camchain.yaml
@@ -52,7 +52,8 @@ cd tests
 # ./gimbal-calibration-chessboard_test
 # ./gimbal-calibration-calib_params_test
 # ./gimbal-calibration-calib_preprocessor_test
-./gimbal-calibration-calib_validator_test
+# ./gimbal-calibration-calib_validator_test
+./gimbal-calibration-stereo_calib_test
 # ./gimbal-calibration-gimbal_calib_test
 # ./gimbal-calibration-residual_test
 # ./gimbal-gmr-gmr_test

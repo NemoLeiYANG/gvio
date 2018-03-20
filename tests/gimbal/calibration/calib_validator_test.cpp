@@ -44,7 +44,7 @@ int test_CalibValidator_load() {
 int test_CalibValidator_validate() {
   // Load validator
   CalibValidator validator;
-  if (validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE) != 0) {
+  if (validator.load(3, TEST_CALIB_2_FILE, TEST_TARGET_FILE) != 0) {
     LOG_ERROR("Failed to load validator!");
     return -1;
   }
@@ -65,8 +65,10 @@ int test_CalibValidator_validateStereo() {
     return -1;
   }
 
+  std::cout << TEST_CALIB_2_FILE << std::endl;
   std::cout << validator.camchain.cam[0] << std::endl;
   std::cout << validator.camchain.cam[1] << std::endl;
+  std::cout << validator.camchain.T_C1_C0 << std::endl;
 
   const cv::Mat img0 = cv::imread(TEST_CHESSBOARD_CAM0 "image_0.jpg");
   const cv::Mat img1 = cv::imread(TEST_CHESSBOARD_CAM1 "image_0.jpg");

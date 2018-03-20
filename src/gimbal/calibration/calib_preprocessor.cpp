@@ -2,35 +2,6 @@
 
 namespace gvio {
 
-cv::Mat CameraProperties::K() {
-  cv::Mat K = cv::Mat::zeros(3, 3, CV_64F);
-  K.at<double>(0, 0) = this->intrinsics[0];
-  K.at<double>(1, 1) = this->intrinsics[1];
-  K.at<double>(0, 2) = this->intrinsics[2];
-  K.at<double>(1, 2) = this->intrinsics[3];
-  K.at<double>(2, 2) = 1.0;
-  return K;
-}
-
-cv::Mat CameraProperties::D() {
-  cv::Mat D = cv::Mat::zeros(4, 1, CV_64F);
-  D.at<double>(0, 0) = this->distortion_coeffs[0];
-  D.at<double>(1, 0) = this->distortion_coeffs[1];
-  D.at<double>(2, 0) = this->distortion_coeffs[2];
-  D.at<double>(3, 0) = this->distortion_coeffs[3];
-  return D;
-}
-
-std::ostream &operator<<(std::ostream &os, const CameraProperties &cam) {
-  os << "Camera ID: " << cam.camera_id << std::endl;
-  os << "Camera model: " << cam.camera_model << std::endl;
-  os << "Intrinsics: " << cam.intrinsics.transpose() << std::endl;
-  os << "Distortion model: " << cam.distortion_model << std::endl;
-  os << "Distortion coeffs: " << cam.distortion_coeffs.transpose() << std::endl;
-  os << "Resolution: " << cam.resolution.transpose() << std::endl;
-  return os;
-}
-
 std::ostream &operator<<(std::ostream &os, const CalibTarget &target) {
   os << "Target type: " << target.type << std::endl;
   os << "Rows: " << target.rows << std::endl;
@@ -69,10 +40,10 @@ int CalibPreprocessor::loadJointFile(const std::string &joint_file) {
 
 int CalibPreprocessor::loadCamchainFile(const std::string &camchain_file) {
   ConfigParser camchain_parser;
-  CameraProperties cam0, cam1, cam2;
+  CameraProperty cam0, cam1, cam2;
 
   // Camera 0
-  cam0.camera_id = 0;
+  cam0.camera_index = 0;
   camchain_parser.addParam("cam0.camera_model", &cam0.camera_model);
   camchain_parser.addParam("cam0.intrinsics", &cam0.intrinsics);
   camchain_parser.addParam("cam0.distortion_model", &cam0.distortion_model);
@@ -80,7 +51,7 @@ int CalibPreprocessor::loadCamchainFile(const std::string &camchain_file) {
   camchain_parser.addParam("cam0.resolution", &cam0.resolution);
 
   // Camera 1
-  cam1.camera_id = 1;
+  cam1.camera_index = 1;
   camchain_parser.addParam("cam1.camera_model", &cam1.camera_model);
   camchain_parser.addParam("cam1.intrinsics", &cam1.intrinsics);
   camchain_parser.addParam("cam1.distortion_model", &cam1.distortion_model);
@@ -88,7 +59,7 @@ int CalibPreprocessor::loadCamchainFile(const std::string &camchain_file) {
   camchain_parser.addParam("cam1.resolution", &cam1.resolution);
 
   // Camera 2
-  cam2.camera_id = 2;
+  cam2.camera_index = 2;
   camchain_parser.addParam("cam2.camera_model", &cam2.camera_model);
   camchain_parser.addParam("cam2.intrinsics", &cam2.intrinsics);
   camchain_parser.addParam("cam2.distortion_model", &cam2.distortion_model);
@@ -102,36 +73,6 @@ int CalibPreprocessor::loadCamchainFile(const std::string &camchain_file) {
   this->camera_properties = {cam0, cam1, cam2};
 
   return 0;
-}
-
-cv::Mat CalibPreprocessor::undistortImage(const cv::Mat &K,
-                                          const cv::Mat &D,
-                                          const cv::Mat &image,
-                                          cv::Mat &Knew) {
-  const cv::Size img_size = {image.cols, image.rows};
-  const cv::Mat R = cv::Mat::eye(3, 3, CV_64F);
-  const double balance = 0.0;
-
-  // Estimate new camera matrix first
-  cv::fisheye::estimateNewCameraMatrixForUndistortRectify(K,
-                                                          D,
-                                                          img_size,
-                                                          R,
-                                                          Knew,
-                                                          balance);
-
-  // Undistort image
-  cv::Mat image_ud;
-  cv::fisheye::undistortImage(image, image_ud, K, D, Knew);
-
-  return image_ud;
-}
-
-cv::Mat CalibPreprocessor::undistortImage(const cv::Mat &K,
-                                          const cv::Mat &D,
-                                          const cv::Mat &image) {
-  cv::Mat Knew;
-  return this->undistortImage(K, D, image, Knew);
 }
 
 int CalibPreprocessor::findImageFiles(const std::string &search_path,
@@ -223,19 +164,22 @@ int CalibPreprocessor::preprocess(const std::string &dir_path) {
     cv::Mat img2 = cv::imread(cam2_path + "/" + cam2_files[i]);
 
     // Undistort image 0
-    const cv::Mat K0 = this->camera_properties[0].K();
-    const cv::Mat D0 = this->camera_properties[0].D();
-    cv::Mat img0_ud = this->undistortImage(K0, D0, img0);
+    const cv::Mat K0 = convert(this->camera_properties[0].K());
+    const cv::Mat D0 = convert(this->camera_properties[0].D());
+    cv::Mat img0_ud;
+    this->camera_properties[0].undistortImage(img0, 0.0, img0_ud);
 
     // Undistort image 1
-    const cv::Mat K1 = this->camera_properties[1].K();
-    const cv::Mat D1 = this->camera_properties[1].D();
-    cv::Mat img1_ud = this->undistortImage(K1, D1, img1);
+    const cv::Mat K1 = convert(this->camera_properties[1].K());
+    const cv::Mat D1 = convert(this->camera_properties[1].D());
+    cv::Mat img1_ud;
+    this->camera_properties[1].undistortImage(img1, 0.0, img1_ud);
 
     // Undistort image 2
-    const cv::Mat K2 = this->camera_properties[2].K();
-    const cv::Mat D2 = this->camera_properties[2].D();
-    cv::Mat img2_ud = this->undistortImage(K2, D2, img2);
+    const cv::Mat K2 = convert(this->camera_properties[2].K());
+    const cv::Mat D2 = convert(this->camera_properties[2].D());
+    cv::Mat img2_ud;
+    this->camera_properties[2].undistortImage(img2, 0.0, img2_ud);
 
     // Extract tags
     std::map<int, std::vector<cv::Point2f>> tags0;
@@ -257,11 +201,11 @@ int CalibPreprocessor::preprocess(const std::string &dir_path) {
     MatX Q_c2 = zeros(common_ids.size() * 4, 2);
 
     MatX grid_points;
-    grid.solvePnP(tags0, this->camera_properties[0].K(), grid_points);
+    grid.solvePnP(tags0, K0, grid_points);
 
     for (long i = 0; i < grid_points.rows(); i++) {
       const Vec3 pt = grid_points.row(i).transpose();
-      const Mat3 K = convert(this->camera_properties[0].K());
+      const Mat3 K = this->camera_properties[0].K();
       Vec3 pixel = K * pt;
       pixel(0) = pixel(0) / pixel(2);
       pixel(1) = pixel(1) / pixel(2);

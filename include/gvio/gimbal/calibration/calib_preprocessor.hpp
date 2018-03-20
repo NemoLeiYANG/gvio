@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup gimbal
+ */
 #ifndef GVIO_GIMBAL_CALIBRATION_CALIB_PREPROCESSOR_HPP
 #define GVIO_GIMBAL_CALIBRATION_CALIB_PREPROCESSOR_HPP
 
@@ -7,26 +11,17 @@
 
 #include "gvio/util/util.hpp"
 #include "gvio/gimbal/calibration/aprilgrid.hpp"
+#include "gvio/gimbal/calibration/camera_property.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup gimbal
+ * @{
+ */
 
-struct CameraProperties {
-  int camera_id = 0;            ///< Camera id
-  std::string camera_model;     ///< Camera model
-  Vec4 intrinsics;              ///< Camera intrinsics (fx, fy, cx, fy)
-  std::string distortion_model; ///< Distortion model
-  VecX distortion_coeffs;       ///< Distortion coefficients (k1, k2, k3, k4)
-  Vec2 resolution;              ///< Resolution
-
-  /// Form camera intrinsics matrix K
-  cv::Mat K();
-
-  /// Form distortion coefficients vector D
-  cv::Mat D();
-};
-
-std::ostream &operator<<(std::ostream &os, const CameraProperties &property);
-
+/**
+ * Calibration target
+ */
 struct CalibTarget {
   std::string type;
   int rows = 0;
@@ -35,12 +30,18 @@ struct CalibTarget {
   double spacing = 0.0;
 };
 
+/**
+ * CalibTarget to string
+ */
 std::ostream &operator<<(std::ostream &os, const CalibTarget &target);
 
+/**
+ * Preprocess calibration data
+ */
 class CalibPreprocessor {
 public:
   CalibTarget target;
-  std::vector<CameraProperties> camera_properties;
+  std::vector<CameraProperty> camera_properties;
   int nb_measurements = 0;
   MatX joint_data;
 
@@ -82,34 +83,6 @@ public:
                      std::vector<std::string> &image_files);
 
   /**
-   * Undistort image
-   *
-   * @param K Camera intrinsics matrix K
-   * @param D Distortion coefficients D
-   * @param image Input image
-   * @param Knew New camera matrix K for undistorted image
-   *
-   * @returns Undistorted image
-   */
-  cv::Mat undistortImage(const cv::Mat &K,
-                         const cv::Mat &D,
-                         const cv::Mat &image,
-                         cv::Mat &Knew);
-
-  /**
-   * Undistort image
-   *
-   * @param K Camera intrinsics matrix K
-   * @param D Distortion coefficients D
-   * @param image Input image
-   *
-   * @returns Undistorted image
-   */
-  cv::Mat undistortImage(const cv::Mat &K,
-                         const cv::Mat &D,
-                         const cv::Mat &image);
-
-  /**
    * Find common tags between detected
    *
    * @param tags0 Tags detected from image0
@@ -132,5 +105,6 @@ public:
   int preprocess(const std::string &dir_path);
 };
 
+/** @} group gimbal */
 } // namespace gvio
-#endif
+#endif // GVIO_GIMBAL_CALIBRATION_CALIB_PREPROCESSOR_HPP

@@ -4,8 +4,8 @@ PROJECT(gvio)
 # C++ COMPILER SETTINGS
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
-# SET(CMAKE_BUILD_TYPE RELEASE)
-SET(CMAKE_BUILD_TYPE DEBUG)
+SET(CMAKE_BUILD_TYPE RELEASE)
+# SET(CMAKE_BUILD_TYPE DEBUG)
 # SET(CMAKE_IGNORE_PATH `catkin locate`)
 
 # DEPENDENCIES
@@ -65,9 +65,11 @@ ADD_LIBRARY(${PROJECT_NAME}
             src/gimbal/calibration/calib_preprocessor.cpp
             src/gimbal/calibration/calib_validator.cpp
             src/gimbal/calibration/camchain.cpp
+            src/gimbal/calibration/camera_property.cpp
             src/gimbal/calibration/chessboard.cpp
             src/gimbal/calibration/gimbal_calib.cpp
             src/gimbal/calibration/residual.cpp
+            src/gimbal/calibration/stereo_calib.cpp
             src/gimbal/gmr/gmr.cpp
             src/gimbal/gmr/slic.cpp
             src/gimbal/gimbal.cpp
@@ -148,10 +150,11 @@ SET(UNITTESTS
     # gimbal-calibration-calib_data_test
     # gimbal-calibration-calib_params_test
     # gimbal-calibration-calib_preprocessor_test
-    gimbal-calibration-calib_validator_test
+    # gimbal-calibration-calib_validator_test
     # gimbal-calibration-chessboard_test
     # gimbal-calibration-gimbal_calib_test
     # gimbal-calibration-residual_test
+    gimbal-calibration-stereo_calib_test
     # gimbal-gmr-gmr_test
     # gimbal-sbgc_test
     # gimbal-saliency_test

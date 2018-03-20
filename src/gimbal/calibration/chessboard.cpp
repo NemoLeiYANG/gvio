@@ -68,8 +68,8 @@ int Chessboard::detect(const cv::Mat &image,
   cv::Size win_size(11, 11);
   cv::Size zero_zone(-1, -1);
   cv::TermCriteria criteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT,
-                            100,
-                            0.0001);
+                            (int) 1.0e10,
+                            1.0e-10);
   cv::cornerSubPix(image_gray, corners, win_size, zero_zone, criteria);
 
   return 0;

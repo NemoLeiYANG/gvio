@@ -173,7 +173,12 @@ cv::Mat pinhole_equi_undistort_image(const Mat3 &K,
 
 Vec2 project_pinhole_radtan(const Mat3 &K, const VecX &D, const Vec3 &X) {
   // Apply equi distortion
-  const Vec2 x_distorted = radtan_distort(D(0), D(1), D(2), D(3), D(4), X);
+  const double k1 = D(0);
+  const double k2 = D(1);
+  const double p1 = D(2);
+  const double p2 = D(3);
+  const double k3 = D(4);
+  const Vec2 x_distorted = radtan_distort(k1, k2, k3, p1, p2, X);
 
   // Project equi distorted point to image plane
   const double fx = K(0, 0);
