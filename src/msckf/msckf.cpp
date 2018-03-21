@@ -352,9 +352,8 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
   if (r_o.rows() == 0) {
     return -1;
   }
-
   if (r_o.maxCoeff() > 0.1) {
-    std::cout << "Opps! max residual: " << r_o.maxCoeff() << std::endl;
+    LOG_INFO("Opps! max residual: %.4f", r_o.maxCoeff());
     return -1;
   }
 

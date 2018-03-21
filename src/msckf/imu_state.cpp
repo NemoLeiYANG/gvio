@@ -38,27 +38,20 @@ IMUState::IMUState(const IMUStateConfig &config) {
   // this->Phi = I(this->size);
 }
 
-// TODO: Modify F to reflect new motion model
-MatX IMUState::F(const Vec3 &w_hat,
-                 const Vec4 &q_hat,
-                 const Vec3 &a_hat,
-                 const Vec3 &w_G) {
+MatX IMUState::F(const Vec3 &w_hat, const Vec4 &q_hat, const Vec3 &a_hat) {
   MatX F = zeros(15);
   // -- First row block --
   F.block(0, 0, 3, 3) = -skew(w_hat);
   F.block(0, 3, 3, 3) = -I(3);
   // -- Third Row block --
   F.block(6, 0, 3, 3) = -C(q_hat).transpose() * skew(a_hat);
-  F.block(6, 6, 3, 3) = -2.0 * skew(w_G);
   F.block(6, 9, 3, 3) = -C(q_hat).transpose();
-  F.block(6, 12, 3, 3) = -skewsq(w_G);
   // -- Fifth Row block --
   F.block(12, 6, 3, 3) = I(3);
 
   return F;
 }
 
-// TODO: Modify G to reflect new motion model
 MatX IMUState::G(const Vec4 &q_hat) {
   MatX G = zeros(15, 12);
   // -- First row block --
@@ -76,12 +69,10 @@ MatX IMUState::G(const Vec4 &q_hat) {
 void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   // Calculate new accel and gyro estimates
   const Vec3 a_hat = a_m - this->b_a;
-  const Vec3 w_hat = w_m - this->b_g - C(this->q_IG) * this->w_G;
-  // const Vec3 a_hat = a_m;
-  // const Vec3 w_hat = w_m;
+  const Vec3 w_hat = w_m - this->b_g;
 
   // Build the transition F and input G matrices
-  const MatX F = this->F(w_hat, this->q_IG, a_hat, this->w_G);
+  const MatX F = this->F(w_hat, this->q_IG, a_hat);
   const MatX G = this->G(this->q_IG);
 
   // Propagate IMU states
@@ -119,7 +110,7 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
     this->q_IG += 0.5 * Omega(w_hat) * this->q_IG * dt;
     this->q_IG = quatnormalize(this->q_IG);
     // -- Velocity
-    this->v_G += (C(this->q_IG).transpose() * a_hat - 2 * skew(this->w_G) * this->v_G - skewsq(this->w_G) * this->p_G + this->g_G) * dt;
+    this->v_G += (C(this->q_IG).transpose() * a_hat + this->g_G) * dt;
     // -- Position
     this->p_G += v_G * dt;
 

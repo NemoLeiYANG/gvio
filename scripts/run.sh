@@ -53,7 +53,7 @@ cd tests
 # ./gimbal-calibration-calib_params_test
 # ./gimbal-calibration-calib_preprocessor_test
 # ./gimbal-calibration-calib_validator_test
-./gimbal-calibration-stereo_calib_test
+# ./gimbal-calibration-stereo_calib_test
 # ./gimbal-calibration-gimbal_calib_test
 # ./gimbal-calibration-residual_test
 # ./gimbal-gmr-gmr_test
@@ -63,7 +63,7 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-# ./msckf-msckf_test
+./msckf-msckf_test
 # ./msckf-profiler_test
 # ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test
@@ -89,7 +89,7 @@ cd tests
 # rm -rf /mnt/sdcard/gvio_recording
 # ./utils/recorder configs/recorder/config.yaml
 
-# python3 scripts/plot_msckf.py /tmp/kitti_raw_2011_09_26_0005/run2/msckf
+# python3 scripts/plot_msckf.py /tmp/msckf/msckf
 # python3 scripts/plot_euroc_mav_dataset.py /data/euroc_mav/raw/mav0
 # python3 scripts/plot_feature_track.py /tmp/track.dat 1242 375
 # python3 scripts/plot_feature_tracks.py /tmp/feature_tracks 1242 375

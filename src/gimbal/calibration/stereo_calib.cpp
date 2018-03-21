@@ -109,14 +109,15 @@ int StereoCalib::calibrateExtrinsics() {
   cv::Mat D1 = convert(this->camchain.cam[1].D());
   cv::Mat R, T, E, F;
   cv::TermCriteria criteria =
-      cv::TermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 1000000, 1e-10);
-  int flags = CV_CALIB_FIX_ASPECT_RATIO;
-  flags += CV_CALIB_ZERO_TANGENT_DIST;
-  flags += CV_CALIB_SAME_FOCAL_LENGTH;
-  flags += CV_CALIB_RATIONAL_MODEL;
-  flags += CV_CALIB_FIX_K3;
-  flags += CV_CALIB_FIX_K4;
-  flags += CV_CALIB_FIX_K5;
+      cv::TermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 1000, 1e-5);
+  int flags = 0;
+  // int flags = CV_CALIB_FIX_ASPECT_RATIO;
+  // flags += CV_CALIB_ZERO_TANGENT_DIST;
+  // flags += CV_CALIB_SAME_FOCAL_LENGTH;
+  // flags += CV_CALIB_RATIONAL_MODEL;
+  // flags += CV_CALIB_FIX_K3;
+  // flags += CV_CALIB_FIX_K4;
+  // flags += CV_CALIB_FIX_K5;
 
   double rms = cv::stereoCalibrate(object_points,    // Object points
                                    imgpts0,          // Cam0 image points
@@ -134,6 +135,10 @@ int StereoCalib::calibrateExtrinsics() {
                                    criteria);        // Criteria
   std::cout << "done with RMS error=" << rms << std::endl;
 
+  std::cout << "K0: " << K0 << std::endl;
+  std::cout << "D0: " << D0 << std::endl;
+  std::cout << "K1: " << K1 << std::endl;
+  std::cout << "D1: " << D1 << std::endl;
   std::cout << "R: " << R << std::endl;
   std::cout << "T: " << T << std::endl;
 

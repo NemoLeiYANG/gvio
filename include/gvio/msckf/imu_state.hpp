@@ -53,14 +53,13 @@ public:
   Vec3 b_a = zeros(3, 1);               ///< Bias of accelerometer
   Vec3 p_G = zeros(3, 1);               ///< Position in Global frame
 
-  Vec3 w_G = zeros(3, 1);           ///< Earth's angular velocity
   Vec3 g_G = Vec3{0.0, 0.0, -9.81}; ///< Gravitational acceleration
 
   MatX P = 1e-5 * I(15); ///< Covariance matrix
   MatX Q = 1e-2 * I(12); ///< Noise matrix
   MatX Phi = I(15);      ///< Phi matrix
 
-  bool rk4 = false; ///< Runge-Kutta 4th order integration
+  bool rk4 = true; ///< Runge-Kutta 4th order integration
 
   IMUState();
   IMUState(const IMUStateConfig &config);
@@ -71,11 +70,9 @@ public:
    * @param w_hat Estimated angular velocity
    * @param q_hat Estimated quaternion (x, y, z, w)
    * @param a_hat Estimated acceleration
-   * @param w_G Earth's angular velocity (i.e. Earth's rotation)
    * @returns Transition jacobian matrix F
    */
-  MatX
-  F(const Vec3 &w_hat, const Vec4 &q_hat, const Vec3 &a_hat, const Vec3 &w_G);
+  MatX F(const Vec3 &w_hat, const Vec4 &q_hat, const Vec3 &a_hat);
 
   /**
    * Input G matrix

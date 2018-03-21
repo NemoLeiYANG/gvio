@@ -154,7 +154,7 @@ SET(UNITTESTS
     # gimbal-calibration-chessboard_test
     # gimbal-calibration-gimbal_calib_test
     # gimbal-calibration-residual_test
-    gimbal-calibration-stereo_calib_test
+    # gimbal-calibration-stereo_calib_test
     # gimbal-gmr-gmr_test
     # gimbal-sbgc_test
     # gimbal-saliency_test
@@ -162,7 +162,7 @@ SET(UNITTESTS
     # msckf-camera_state_test
     # msckf-feature_estimator_test
     # msckf-imu_state_test
-    # msckf-msckf_test
+    msckf-msckf_test
     # pwm-pca9685_test
     # quadrotor-quadrotor_model_test
     # quadrotor-mission_test
