@@ -16,6 +16,12 @@ fi
 
 # doxygen Doxyfile
 
+
+python scripts/plot/plot_rosbag.py /data/euroc_mav/bags/V1_01_easy.bag
+# python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/Lab-small-loop-1.bag
+# python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/Lab-small-loop-2.bag
+# python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/stationary-1.bag
+
 # python3 scripts/calibration/
 # python3 scripts/calibration/plot_gimbal.py --camchain tests/test_configs/gimbal/calibration/gvio_camchain.yaml
 # ./experiments/kitti_runner /data/kitti/raw 2011_09_26 0046 ./experiments/configs/msckf_kitti_raw-2011_09_26-0046.yaml ./experiments
@@ -25,10 +31,10 @@ fi
 # python3 scripts/msckf_tuner.py experiments/configs/kitti_raw_2011_09_26_0009.yaml
 # cd ../ && bash scripts/test_runner.sh
 
-mkdir -p build && cd build
-cmake .. && time make -j${CPU_COUNT}
-
-cd tests
+# mkdir -p build && cd build
+# cmake .. && time make -j${CPU_COUNT}
+#
+# cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test
@@ -63,7 +69,7 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-./msckf-msckf_test
+# ./msckf-msckf_test
 # ./msckf-profiler_test
 # ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test

@@ -198,12 +198,14 @@ void MSCKF::augmentState() {
 
   // Augment MSCKF covariance matrix (with new camera state)
   const MatX P = X * this->P() * X.transpose();
+  const MatX P_fixed =
+      (P + P.transpose()) / 2.0; // Fix covariance to be symmetric
 
   // Decompose covariance into its own constituents
   // clang-format off
-  this->imu_state.P = P.block(0, 0, x_imu_size, x_imu_size);
-  this->P_cam = P.block(x_imu_size, x_imu_size, P.rows() - x_imu_size, P.cols() - x_imu_size);
-  this->P_imu_cam = P.block(0, x_imu_size, x_imu_size, P.cols() - x_imu_size);
+  this->imu_state.P = P_fixed.block(0, 0, x_imu_size, x_imu_size);
+  this->P_cam = P_fixed.block(x_imu_size, x_imu_size, P.rows() - x_imu_size, P.cols() - x_imu_size);
+  this->P_imu_cam = P_fixed.block(0, x_imu_size, x_imu_size, P.cols() - x_imu_size);
   // clang-format on
 
   // Add new camera state to sliding window by using current IMU pose
@@ -473,6 +475,9 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   // Update covariance matrices
   const MatX I_KH = I(K.rows(), T_H.cols()) - K * T_H;
   const MatX P_new = ((I_KH * P) + (I_KH * P).transpose()) / 2.0;
+  // -- Simplest, most unstable form
+  // const MatX P_new = I_KH * P;
+  // -- Symmetric and positive Joseph form
   // const MatX P_new = I_KH * P * I_KH.transpose() + K * R_n * K.transpose();
 
   // Update covariance matrix
