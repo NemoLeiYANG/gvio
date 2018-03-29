@@ -61,7 +61,7 @@ int test_CalibValidator_validate() {
 int test_CalibValidator_validateStereo() {
   // Load validator
   CalibValidator validator;
-  if (validator.load(3, TEST_CALIB_3_FILE, TEST_TARGET_FILE) != 0) {
+  if (validator.load(3, TEST_CALIB_FILE, TEST_TARGET_FILE) != 0) {
     LOG_ERROR("Failed to load validator!");
     return -1;
   }

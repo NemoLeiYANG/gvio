@@ -75,26 +75,19 @@ int test_GimbalCalibResidual_evaluate() {
     return -1;
   }
 
-  // clang-format off
-  Mat3 K_s;
-  K_s << 393.05958542802006, 0.0, 369.5410032157271,
-      0.0, 392.7958587055595, 241.34514001589662,
-      0.0, 0.0, 1.0;
-
-  Mat3 K_d;
-  K_d << 524.2644080937374, 0.0, 358.2750466868412,
-      0.0, 524.2498715777907, 238.4992907044288,
-      0.0, 0.0, 1.0;
-  // clang-format on
-
   // Params
   CalibParams params;
-  const std::string config_file = TEST_DATA "/params.yaml";
+  const std::string camchain_file = TEST_DATA "/camchain.yaml";
   const std::string joint_file = TEST_DATA "/joint.csv";
-  if (params.load(config_file, joint_file) != 0) {
+  if (params.load(camchain_file, joint_file) != 0) {
     LOG_ERROR("Failed to load optimization params!");
     return -1;
   }
+
+  const Mat3 K_s = params.camchain.cam[0].K();
+  const Mat3 K_d = params.camchain.cam[2].K();
+  const Vec4 D_s = params.camchain.cam[0].D();
+  const Vec4 D_d = params.camchain.cam[2].D();
 
   // Residuals
   for (int i = 0; i < data.nb_measurements; i++) {
@@ -106,7 +99,9 @@ int test_GimbalCalibResidual_evaluate() {
                                          data.Q_s[i].row(j),
                                          data.Q_d[i].row(j),
                                          K_s,
-                                         K_d);
+                                         K_d,
+                                         D_s,
+                                         D_d);
 
       err->operator()(params.tau_s,
                       params.tau_d,

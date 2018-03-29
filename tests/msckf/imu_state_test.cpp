@@ -14,7 +14,6 @@ int test_IMUState_constructor() {
   MU_CHECK(zeros(3, 1).isApprox(imu_state.b_a));
   MU_CHECK(zeros(3, 1).isApprox(imu_state.p_G));
 
-  MU_CHECK(zeros(3, 1).isApprox(imu_state.w_G));
   MU_CHECK(Vec3(0.0, 0.0, -9.81).isApprox(imu_state.g_G));
 
   // MU_CHECK(zeros(1, 1).isApprox(imu_state.P));
@@ -30,9 +29,8 @@ int test_IMUState_F() {
   const Vec3 w_hat = Vec3{1.0, 2.0, 3.0};
   const Vec4 q_hat = Vec4{0.0, 0.0, 0.0, 1.0};
   const Vec3 a_hat = Vec3{1.0, 2.0, 3.0};
-  const Vec3 w_G = Vec3{0.1, 0.1, 0.1};
 
-  const MatX F = imu_state.F(w_hat, q_hat, a_hat, w_G);
+  const MatX F = imu_state.F(w_hat, q_hat, a_hat);
   std::cout << F << std::endl;
 
   return 0;

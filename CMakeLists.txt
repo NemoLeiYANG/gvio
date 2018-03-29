@@ -128,55 +128,55 @@ FILE(COPY tests/scripts DESTINATION ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_data DESTINATION ${PROJECT_BINARY_DIR}/tests)
 FILE(COPY tests/test_configs DESTINATION ${PROJECT_BINARY_DIR}/tests)
 SET(UNITTESTS
-    # apriltag-mit_test
-    # camera-camera_test
-    # camera-camera_config_test
-    # camera-ids_test
-    # camera-pinhole_model_test
-    # control-carrot_controller_test
-    # control-pid_test
-    # dataset-euroc-mav_dataset_test
-    # dataset-kitti-raw-calib_test
-    # dataset-kitti-raw-oxts_test
-    # dataset-kitti-raw-parse_test
-    # dataset-kitti-raw-raw_test
-    # feature2d-feature_container_test
-    # feature2d-feature_test
-    # feature2d-feature_track_test
-    # feature2d-feature_tracker_test
-    # feature2d-gms_matcher_test
-    # feature2d-klt_tracker_test
-    # feature2d-orb_tracker_test
-    # gimbal-calibration-aprilgrid_test
-    # gimbal-calibration-calib_data_test
-    # gimbal-calibration-calib_params_test
-    # gimbal-calibration-calib_preprocessor_test
-    # gimbal-calibration-calib_validator_test
-    # gimbal-calibration-chessboard_test
-    # gimbal-calibration-gimbal_calib_test
-    # gimbal-calibration-residual_test
-    # gimbal-calibration-stereo_calib_test
-    # gimbal-gmr-gmr_test
-    # gimbal-sbgc_test
+    apriltag-mit_test
+    camera-camera_test
+    camera-camera_config_test
+    camera-ids_test
+    camera-pinhole_model_test
+    control-carrot_controller_test
+    control-pid_test
+    dataset-euroc-mav_dataset_test
+    dataset-kitti-raw-calib_test
+    dataset-kitti-raw-oxts_test
+    dataset-kitti-raw-parse_test
+    dataset-kitti-raw-raw_test
+    feature2d-feature_container_test
+    feature2d-feature_test
+    feature2d-feature_track_test
+    feature2d-feature_tracker_test
+    feature2d-gms_matcher_test
+    feature2d-klt_tracker_test
+    feature2d-orb_tracker_test
+    gimbal-calibration-aprilgrid_test
+    gimbal-calibration-calib_data_test
+    gimbal-calibration-calib_params_test
+    gimbal-calibration-calib_preprocessor_test
+    gimbal-calibration-calib_validator_test
+    gimbal-calibration-chessboard_test
+    gimbal-calibration-gimbal_calib_test
+    gimbal-calibration-residual_test
+    gimbal-calibration-stereo_calib_test
+    gimbal-gmr-gmr_test
+    gimbal-sbgc_test
     # gimbal-saliency_test
-    # imu-mpu6050_test
-    # msckf-camera_state_test
-    # msckf-feature_estimator_test
-    # msckf-imu_state_test
+    imu-mpu6050_test
+    msckf-camera_state_test
+    msckf-feature_estimator_test
+    msckf-imu_state_test
     msckf-msckf_test
-    # pwm-pca9685_test
-    # quadrotor-quadrotor_model_test
-    # quadrotor-mission_test
-    # sim-camera_test
-    # sim-twowheel_test
-    # sim-world_test
-    # util-config_test
-    # util-data_test
-    # util-file_test
-    # util-gps_test
-    # util-linalg_test
-    # util-math_test
-    # util-stats_test
+    pwm-pca9685_test
+    quadrotor-quadrotor_model_test
+    quadrotor-mission_test
+    sim-camera_test
+    sim-twowheel_test
+    sim-world_test
+    util-config_test
+    util-data_test
+    util-file_test
+    util-gps_test
+    util-linalg_test
+    util-math_test
+    util-stats_test
     util-time_test)
 FOREACH(TEST ${UNITTESTS})
   STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})

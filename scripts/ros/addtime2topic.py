@@ -20,14 +20,14 @@ if __name__ == "__main__":
     target_topic = sys.argv[2]
     repair_path = bag_path.replace(".bag", "-repaired.bag")
 
+    # Open bag
+    bag = rosbag.Bag(bag_path, 'r')
+    fix_bag = rosbag.Bag(repair_path, "w")
+
     # Check if topic is in bag
     info = bag.get_type_and_topic_info()
     if target_topic not in info.topics:
         raise RuntimeError("Opps! topic not in bag!")
-
-    # Open bag
-    bag = rosbag.Bag(bag_path, 'r')
-    fix_bag = rosbag.Bag(repair_path, "w")
 
     # Iterate through bag
     for topic, msg, t in bag.read_messages():

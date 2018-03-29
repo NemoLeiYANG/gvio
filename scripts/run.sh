@@ -17,7 +17,10 @@ fi
 # doxygen Doxyfile
 
 
-python scripts/plot/plot_rosbag.py /data/euroc_mav/bags/V1_01_easy.bag
+python scripts/calibration/allan_variance.py \
+  --bag "/home/chutsu/gvio_datasets/calibration/imu_calibration/2018-03-11-14-42-05.bag" \
+  --imu_topic "/gvio/imu"
+# python scripts/plot/plot_rosbag.py /data/euroc_mav/bags/V1_01_easy.bag
 # python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/Lab-small-loop-1.bag
 # python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/Lab-small-loop-2.bag
 # python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/stationary-1.bag
@@ -33,7 +36,6 @@ python scripts/plot/plot_rosbag.py /data/euroc_mav/bags/V1_01_easy.bag
 
 # mkdir -p build && cd build
 # cmake .. && time make -j${CPU_COUNT}
-#
 # cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
