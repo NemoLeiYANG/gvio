@@ -129,10 +129,10 @@ int test_QuadrotorModel_update() {
   std::vector<Vec3> waypoints;
   waypoints.emplace_back(0.0, 0.0, 5.0);
   waypoints.emplace_back(5.0, 0.0, 5.0);
-  waypoints.emplace_back(5.0, 5.0, 5.0);
-  waypoints.emplace_back(0.0, 5.0, 5.0);
-  waypoints.emplace_back(0.0, 0.0, 5.0);
-  controller.configure(waypoints, 0.1);
+  waypoints.emplace_back(10.0, 1.0, 5.0);
+  // waypoints.emplace_back(0.0, 5.0, 5.0);
+  // waypoints.emplace_back(0.0, 0.0, 5.0);
+  controller.configure(waypoints, 0.5);
 
   // Setup IMU state
   IMUState imu;
@@ -143,20 +143,20 @@ int test_QuadrotorModel_update() {
   // Record initial quadrotor state
   record_timestep(0.0, quad, imu, gnd_file, mea_file, est_file);
 
+  quad.setPosition(Vec3{10, 10, 5.0});
+
   // Simulate
   double imu_dt = 0.01;
   const double dt = 0.001;
-  for (double t = 0.0; t <= 20.0; t += dt) {
+  for (double t = 0.0; t <= 30.0; t += dt) {
     // Calculate carrot point
-    Vec3 carrot_pt;
-    controller.update(quad.p_G, carrot_pt);
+    // Vec3 carrot_pt;
+    // controller.update(quad.p_G, carrot_pt);
 
     // Update quadrotor model
-    quad.setPosition(carrot_pt);
     quad.update(dt);
 
     // Update imu
-    const Vec3 g_G{0.0, 0.0, 10.0};
     const Vec3 a_m = quad.a_B;
     const Vec3 w_m = quad.w_B;
 

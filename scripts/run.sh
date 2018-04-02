@@ -17,9 +17,9 @@ fi
 # doxygen Doxyfile
 
 
-python scripts/calibration/allan_variance.py \
-  --bag "/home/chutsu/gvio_datasets/calibration/imu_calibration/2018-03-11-14-42-05.bag" \
-  --imu_topic "/gvio/imu"
+# python scripts/calibration/allan_variance.py \
+#   --bag "/home/chutsu/gvio_datasets/calibration/imu_calibration/2018-03-11-14-42-05.bag" \
+#   --imu_topic "/gvio/imu"
 # python scripts/plot/plot_rosbag.py /data/euroc_mav/bags/V1_01_easy.bag
 # python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/Lab-small-loop-1.bag
 # python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/Lab-small-loop-2.bag
@@ -34,9 +34,9 @@ python scripts/calibration/allan_variance.py \
 # python3 scripts/msckf_tuner.py experiments/configs/kitti_raw_2011_09_26_0009.yaml
 # cd ../ && bash scripts/test_runner.sh
 
-# mkdir -p build && cd build
-# cmake .. && time make -j${CPU_COUNT}
-# cd tests
+mkdir -p build && cd build
+cmake .. && time make -j${CPU_COUNT}
+cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test
@@ -77,6 +77,7 @@ python scripts/calibration/allan_variance.py \
 # ./quadrotor-quadrotor_model_test
 # ./quadrotor-mission_test
 # ./sim-carrot_controller_test
+./sim-bezier_test
 # ./sim-camera_test
 # ./sim-twowheel_test
 # ./sim-world_test

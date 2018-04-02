@@ -201,6 +201,15 @@ void load_matrix(const std::vector<double> &x,
 void load_matrix(const MatX A, std::vector<double> &x);
 
 /**
+ * Calculate binomial coefficient
+ *
+ * @param n
+ * @param k
+ * @returns Binomial coefficient
+ */
+double binomial(const double n, const double k);
+
+/**
  * Wrap angle in degrees to 180
  *
  * @param d Degrees

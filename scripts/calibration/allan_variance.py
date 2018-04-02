@@ -1,13 +1,15 @@
 import argparse
 from collections import OrderedDict
 
+import yaml
 import rosbag
 import numpy as np
 from scipy.optimize import nnls
+import matplotlib.pylab as plt
 
 
 def allan_variance(x, dt=1, min_cluster_size=1, min_cluster_count='auto',
-                   n_clusters=100, input_type="increment"):
+                   n_clusters=1000, input_type="increment"):
     """Compute Allan variance (AVAR).
 
     Consider an underlying measurement y(t). Our sensors output integrals of
@@ -170,6 +172,18 @@ def parse_bag(bag, imu_topic):
         Time difference
 
     """
+    # Check if topic is in bag
+    info = bag.get_type_and_topic_info()
+    if imu_topic not in info.topics:
+        raise RuntimeError("Opps! topic not in bag!")
+
+    # Get time start
+    bag_info = yaml.load(bag._get_yaml_info())
+    time_start = bag_info["start"]
+    time_end = bag_info["end"]
+    time_end = time_start + (time_end - time_start) * 0.5
+
+    # Get gyro and accel data
     dt = 1.0 / info.topics[imu_topic].frequency
     imu_data = {"accel": [], "gyro": []}
     for topic, msg, t in bag.read_messages(topics=[imu_topic]):
@@ -179,6 +193,10 @@ def parse_bag(bag, imu_topic):
         imu_data["gyro"].append([msg.angular_velocity.x,
                                  msg.angular_velocity.y,
                                  msg.angular_velocity.z])
+        if t == time_end:
+            break
+
+    # Convert list to np.array
     imu_data["gyro"] = np.array(imu_data["gyro"])
     imu_data["accel"] = np.array(imu_data["accel"])
 
@@ -207,12 +225,25 @@ def analyze_imu_noise(imu_data, dt):
 
     """
     # Angular velocity Allan Variance Analysis
+    print("gyro shape", imu_data["gyro"].shape)
     gx_tau, gx_av = allan_variance(imu_data["gyro"][:, 0], dt)
     gy_tau, gy_av = allan_variance(imu_data["gyro"][:, 1], dt)
     gz_tau, gz_av = allan_variance(imu_data["gyro"][:, 2], dt)
-    gx_params, av_pred = params_from_avar(gx_tau, gx_av, output_type='dict')
-    gy_params, av_pred = params_from_avar(gy_tau, gy_av, output_type='dict')
-    gz_params, av_pred = params_from_avar(gz_tau, gz_av, output_type='dict')
+    gx_params, gx_av_pred = params_from_avar(gx_tau, gx_av, output_type='dict')
+    gy_params, gy_av_pred = params_from_avar(gy_tau, gy_av, output_type='dict')
+    gz_params, gz_av_pred = params_from_avar(gz_tau, gz_av, output_type='dict')
+
+    plt.loglog(gx_tau, gx_av, '.')
+    plt.loglog(gx_tau, gx_av_pred)
+    plt.show()
+
+    plt.loglog(gy_tau, gy_av, '.')
+    plt.loglog(gy_tau, gy_av_pred)
+    plt.show()
+
+    plt.loglog(gz_tau, gz_av, '.')
+    plt.loglog(gz_tau, gz_av_pred)
+    plt.show()
 
     # Acceleration Allan Variance Analysis
     ax_tau, ax_av = allan_variance(imu_data["accel"][:, 0], dt)
@@ -330,11 +361,6 @@ if __name__ == "__main__":
     imu_topic = args.imu_topic
     print("Opening ROS bag [%s] ..." % bag_path)
     bag = rosbag.Bag(bag_path, 'r')
-
-    # Check if topic is in bag
-    info = bag.get_type_and_topic_info()
-    if imu_topic not in info.topics:
-        raise RuntimeError("Opps! topic not in bag!")
 
     # Parse ROS bag
     print("Parsing ROS bag ...")

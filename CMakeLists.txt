@@ -4,9 +4,9 @@ PROJECT(gvio)
 # C++ COMPILER SETTINGS
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
-SET(CMAKE_BUILD_TYPE RELEASE)
 SET(BUILD_SHARED_LIBS ON)
-# SET(CMAKE_BUILD_TYPE DEBUG)
+# SET(CMAKE_BUILD_TYPE RELEASE)
+SET(CMAKE_BUILD_TYPE DEBUG)
 # SET(CMAKE_IGNORE_PATH `catkin locate`)
 
 # DEPENDENCIES
@@ -167,6 +167,7 @@ SET(UNITTESTS
     pwm-pca9685_test
     quadrotor-quadrotor_model_test
     quadrotor-mission_test
+    sim-bezier_test
     sim-camera_test
     sim-twowheel_test
     sim-world_test

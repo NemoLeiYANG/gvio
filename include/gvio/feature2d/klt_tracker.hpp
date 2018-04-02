@@ -48,14 +48,6 @@ public:
         min_distance{min_distance}, camera_model{camera_model} {}
 
   /**
-   * Configure
-   *
-   * @param config_file Path to config file
-   * @returns 0 for success, -1 for failure
-   */
-  int configure(const std::string &config_file);
-
-  /**
    * Get lost feature tracks
    */
   std::vector<FeatureTrack> getLostTracks();

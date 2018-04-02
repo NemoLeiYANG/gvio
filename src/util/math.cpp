@@ -149,6 +149,14 @@ void load_matrix(const MatX &A, std::vector<double> &x) {
   }
 }
 
+double binomial(const double n, const double k) {
+  if (k == 0 || k == n) {
+    return 1.0;
+  }
+
+  return binomial(n - 1, k - 1) + binomial(n - 1, k);
+}
+
 double wrapTo180(const double euler_angle) {
   return fmod((euler_angle + 180.0), 360.0) - 180.0;
 }

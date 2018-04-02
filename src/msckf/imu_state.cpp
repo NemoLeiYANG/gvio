@@ -80,7 +80,7 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   if (this->rk4) {
     // Quaternion zeroth order integration
     const Vec4 dq_dt = quatzoi(this->q_IG, w_hat, dt);
-    const Vec4 dq_dt2 = quatzoi(this->q_IG, w_hat, dt);
+    const Vec4 dq_dt2 = quatzoi(this->q_IG, w_hat, dt * 0.5);
     const Mat3 dR_dt_transpose = C(dq_dt).transpose();
     const Mat3 dR_dt2_transpose = C(dq_dt2).transpose();
 

@@ -755,13 +755,13 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_H);
   // MU_ADD_TEST(test_MSCKF_augmentState);
   // MU_ADD_TEST(test_MSCKF_getTrackCameraStates);
-  // MU_ADD_TEST(test_MSCKF_predictionUpdate);
+  MU_ADD_TEST(test_MSCKF_predictionUpdate);
   // MU_ADD_TEST(test_MSCKF_residualizeTrack);
   // MU_ADD_TEST(test_MSCKF_calcResiduals);
   // MU_ADD_TEST(test_MSCKF_correctIMUState);
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_pruneCameraStates);
-  MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  // MU_ADD_TEST(test_MSCKF_measurementUpdate);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate2);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate3);
 }

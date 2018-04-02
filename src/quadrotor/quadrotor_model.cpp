@@ -83,7 +83,7 @@ int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
   const Mat3 R_BG = euler321ToRot(this->rpy_G);
   const Vec3 g_B = euler321ToRot(this->rpy_G) * Vec3{0.0, 0.0, this->g};
   this->w_B = R_BG * this->w_G;
-  this->a_B = R_BG * this->a_G + g_B;
+  this->a_B = (R_BG * this->a_G) + g_B;
 
   return 0;
 }

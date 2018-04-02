@@ -44,7 +44,7 @@ public:
   double d = 1.0; ///< drag constant
 
   double m = 1.0;  ///< Mass
-  double g = 10.0; ///< Gravity
+  double g = 9.81; ///< Gravity
 
   std::string ctrl_mode = "POS_CTRL_MODE";
   Vec4 attitude_setpoints{0.0, 0.0, 0.0, 0.5}; ///< Attitude setpoints

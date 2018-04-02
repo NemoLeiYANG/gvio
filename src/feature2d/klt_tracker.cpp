@@ -2,49 +2,46 @@
 
 namespace gvio {
 
-int KLTTracker::configure(const std::string &config_file) {
-  std::string camera_model;
-  int image_width = 0;
-  int image_height = 0;
-  double fx = 0.0;
-  double fy = 0.0;
-  double cx = 0.0;
-  double cy = 0.0;
-
-  // Load config file
-  ConfigParser parser;
-  // -- Load feature detector settings
-  parser.addParam("max_corners", &this->max_corners);
-  parser.addParam("quality_level", &this->quality_level);
-  parser.addParam("min_distance", &this->min_distance);
-  parser.addParam("show_matches", &this->show_matches);
-  // -- Load camera model settings
-  parser.addParam("camera_model.type", &camera_model, true);
-  parser.addParam("camera_model.image_width", &image_width, true);
-  parser.addParam("camera_model.image_height", &image_height, true);
-  parser.addParam("camera_model.fx", &fx, true);
-  parser.addParam("camera_model.fy", &fy, true);
-  parser.addParam("camera_model.cx", &cx, true);
-  parser.addParam("camera_model.cy", &cy, true);
-  if (parser.load(config_file) != 0) {
-    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
-    return -1;
-  }
-
-  // Load camera model
-  if (camera_model == "pinhole") {
-    auto *pinhole_model =
-        new PinholeModel{image_width, image_height, fx, fy, cx, cy};
-    this->camera_model = pinhole_model;
-  } else if (camera_model == "none") {
-    LOG_INFO("Not loading any camera model!");
-  } else {
-    LOG_ERROR("Invalid camera model [%s]!", camera_model.c_str());
-    return -1;
-  }
-
-  return 0;
-}
+// int KLTTracker::configure(const std::string &config_file) {
+//   std::string camera_model;
+//   int image_width = 0;
+//   int image_height = 0;
+//   double fx = 0.0;
+//   double fy = 0.0;
+//   double cx = 0.0;
+//   double cy = 0.0;
+//
+//   // Load config file
+//   ConfigParser parser;
+//   // -- Load feature detector settings
+//   parser.addParam("max_corners", &this->max_corners);
+//   parser.addParam("quality_level", &this->quality_level);
+//   parser.addParam("min_distance", &this->min_distance);
+//   parser.addParam("show_matches", &this->show_matches);
+//   // -- Load camera model settings
+//   parser.addParam("camera_model.type", &camera_model, true);
+//   parser.addParam("camera_model.image_width", &image_width, true);
+//   parser.addParam("camera_model.image_height", &image_height, true);
+//   parser.addParam("camera_model.fx", &fx, true);
+//   parser.addParam("camera_model.fy", &fy, true);
+//   parser.addParam("camera_model.cx", &cx, true);
+//   parser.addParam("camera_model.cy", &cy, true);
+//   if (parser.load(config_file) != 0) {
+//     LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
+//     return -1;
+//   }
+//
+//   // Load camera model
+//   if (camera_model == "pinhole") {
+//     this->camera_model =
+//         new PinholeModel{image_width, image_height, fx, fy, cx, cy};
+//   } else {
+//     LOG_ERROR("Invalid camera model [%s]!", camera_model.c_str());
+//     return -1;
+//   }
+//
+//   return 0;
+// }
 
 std::vector<FeatureTrack> KLTTracker::getLostTracks() {
   // Get lost tracks
@@ -93,15 +90,6 @@ int KLTTracker::detect(const cv::Mat &image, Features &features) {
   for (auto corner : corners) {
     features.emplace_back(corner);
   }
-
-  // // std::vector<cv::KeyPoint> keypoints;
-  // // cv::FAST(gray_image, keypoints, 100, false);
-  //
-  // // Create features
-  // features.clear();
-  // for (auto kp : keypoints) {
-  //   features.emplace_back(kp);
-  // }
 
   return 0;
 }

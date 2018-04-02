@@ -51,6 +51,6 @@ public:
                         std::vector<int> &feature_ids);
 };
 
-/** @} group camera */
+/** @} group sim */
 } // namespace gvio
-#endif // GVIO_SIM_SIM_CAMERA_HPP
+#endif // GVIO_SIM_CAMERA_HPP
