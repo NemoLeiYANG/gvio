@@ -40,6 +40,16 @@ T bezier_derivative(const std::vector<T> &points,
                     const int order);
 
 /**
+ * Bezier curve tangent at t
+ *
+ * @param points Bezier curve control points in order
+ * @param t Parameter
+ * @returns Unit direction vector at t
+ */
+template <typename T>
+T bezier_tangent(const std::vector<T> &points, const float t);
+
+/**
  * De Casteljau's algorithm
  * Source: https://pomax.github.io/bezierinfo/
  *

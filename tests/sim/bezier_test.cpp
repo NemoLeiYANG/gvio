@@ -112,6 +112,52 @@ int test_bezier_derivative2() {
   return 0;
 }
 
+int test_bezier_tangent() {
+  // Setup
+  std::vector<Vec3> points;
+  points.emplace_back(0, 0, 0);
+  points.emplace_back(1, 2, 0);
+  points.emplace_back(2, 0, 0);
+  points.emplace_back(3, 3, 0);
+
+  // Create bezier curve
+  double t = 0.0;
+  double dt = 0.1;
+  MatX pos_data;
+  pos_data.resize((1.0 / dt) + 1, 4);
+  MatX tangent_data;
+  tangent_data.resize((1.0 / dt) + 1, 4);
+
+  int i = 0;
+  while (t < 1.0) {
+    const Vec3 p = bezier(points, t);
+    const Vec3 tangent = bezier_tangent(points, t);
+    pos_data.row(i) << t, p.transpose();
+    tangent_data.row(i) << t, tangent.transpose();
+    i++;
+    t += dt;
+  }
+
+  // Points data
+  MatX points_data;
+  points_data.resize(points.size(), 3);
+  for (size_t i = 0; i < points.size(); i++) {
+    points_data.row(i) = points[i];
+  }
+
+  // Save and plot
+  mat2csv("/tmp/bezier_pos.dat", pos_data);
+  mat2csv("/tmp/bezier_points.dat", points_data);
+  mat2csv("/tmp/bezier_tangent.dat", tangent_data);
+
+  PYTHON_SCRIPT("scripts/plot_bezier.py "
+                "--pos_file /tmp/bezier_pos.dat "
+                "--points_file /tmp/bezier_points.dat "
+                "--tangent_file /tmp/bezier_tangent.dat");
+
+  return 0;
+}
+
 int test_decasteljau() {
   // Setup
   std::vector<Vec3> points;
@@ -135,10 +181,11 @@ int test_decasteljau() {
 }
 
 void test_suite() {
-  MU_ADD_TEST(test_bezier);
-  MU_ADD_TEST(test_bezier_derivative);
-  MU_ADD_TEST(test_bezier_derivative2);
-  MU_ADD_TEST(test_decasteljau);
+  // MU_ADD_TEST(test_bezier);
+  // MU_ADD_TEST(test_bezier_derivative);
+  // MU_ADD_TEST(test_bezier_derivative2);
+  MU_ADD_TEST(test_bezier_tangent);
+  // MU_ADD_TEST(test_decasteljau);
 }
 
 } // namespace gvio

@@ -8,8 +8,8 @@ T bezier(const std::vector<T> &points, const float t) {
   T result = zeros(3, 1);
 
   for (int i = 0; i <= n; i++) {
-    const float binomial_term = binomial(n, i);
-    const float polynomial_term = pow(1 - t, n - i) * pow(t, i);
+    const double binomial_term = binomial(n, i);
+    const double polynomial_term = pow(1 - t, n - i) * pow(t, i);
     const T weight = points[i];
     result = result + binomial_term * polynomial_term * weight;
   }
@@ -35,6 +35,15 @@ T bezier_derivative(const std::vector<T> &points,
   }
 
   return bezier_derivative(new_points, t, order - 1);
+}
+
+template <typename T>
+T bezier_tangent(const std::vector<T> &points, const float t) {
+  const T point = bezier_derivative(points, t, 1);
+  const double d = point.norm();
+  const T tangent = point / d;
+
+  return tangent;
 }
 
 template <typename T>
