@@ -1,12 +1,20 @@
 # GVIO
 
-**G**imbal **V**isual **I**nertial **O**dometry (GVIO)
+
+## Build Instructions
+
+    git clone https://github.com/chutsu/gvio
+    cd gvio
+    mkdir -p build
+    cmake ..
+    make
 
 
 ## Generate Documentation
 
     # At the root of gvio
     doxygen Doxyfile
+
 
 ## LICENCE
 
