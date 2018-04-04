@@ -3,6 +3,23 @@
 
 namespace gvio {
 
+#define TEST_DATA "/data/euroc_mav/raw/V1_01_easy"
+
+int mono_camera_cb(const cv::Mat &frame, const long ts) {
+  cv::imshow("Camera 0", frame);
+  cv::waitKey(1);
+  return 0;
+}
+
+int stereo_camera_cb(const cv::Mat &frame0,
+                     const cv::Mat &frame1,
+                     const long ts) {
+  cv::imshow("Camera 0", frame0);
+  cv::imshow("Camera 1", frame1);
+  cv::waitKey(1);
+  return 0;
+}
+
 int test_MAVDataset_constructor() {
   MAVDataset mav_data("/tmp");
 
@@ -13,7 +30,7 @@ int test_MAVDataset_constructor() {
 }
 
 int test_MAVDataset_loadIMUData() {
-  MAVDataset mav_data("/data/euroc_mav/raw/mav0");
+  MAVDataset mav_data(TEST_DATA);
   int retval = mav_data.loadIMUData();
 
   MU_CHECK_EQ(0, retval);
@@ -22,16 +39,32 @@ int test_MAVDataset_loadIMUData() {
 }
 
 int test_MAVDataset_loadCameraData() {
-  MAVDataset mav_data("/data/euroc_mav/raw/mav0");
+  MAVDataset mav_data(TEST_DATA);
   int retval = mav_data.loadCameraData();
 
+  // Get timestamps and calculate relative time
+  auto it = mav_data.timeline.begin();
+  auto it_end = mav_data.timeline.end();
+  while (it != it_end) {
+    const long ts = it->first;
+    mav_data.timestamps.push_back(ts);
+
+    // Advance to next non-duplicate entry.
+    do {
+      ++it;
+    } while (ts == it->first);
+  }
+
   MU_CHECK_EQ(0, retval);
+  MU_CHECK_EQ(2912, mav_data.cam0_data.timestamps.size());
+  MU_CHECK_EQ(2912, mav_data.cam1_data.timestamps.size());
+  MU_CHECK_EQ(2912, mav_data.timestamps.size());
 
   return 0;
 }
 
 int test_MAVDataset_loadGroundTruthData() {
-  MAVDataset mav_data("/data/euroc_mav/raw/mav0");
+  MAVDataset mav_data(TEST_DATA);
   int retval = mav_data.loadGroundTruthData();
 
   MU_CHECK_EQ(0, retval);
@@ -40,32 +73,12 @@ int test_MAVDataset_loadGroundTruthData() {
 }
 
 int test_MAVDataset_load() {
-  MAVDataset mav_data("/data/euroc_mav/raw/mav0");
-  int retval = mav_data.load();
+  MAVDataset mav_data(TEST_DATA);
 
-  // // Get timestamps
-  // std::vector<long> timestamps;
-  // auto it = mav_data.timeline.begin();
-  // auto it_end = mav_data.timeline.end();
-  // while (it != it_end) {
-  //   timestamps.push_back(it->first);
-  //   it = mav_data.timeline.upper_bound(it->first);
-  // }
-  //
-  // // Iterate through timestamps
-  // long time_index = 0;
-  // for (auto ts : timestamps) {
-  //   std::cout << "time index: " << time_index << std::endl;
-  //
-  //   auto it = mav_data.timeline.lower_bound(ts);
-  //   auto it_end = mav_data.timeline.upper_bound(ts);
-  //   while (it != it_end) {
-  //     std::cout << it->second << std::endl;
-  //     it++;
-  //   }
-  //   std::cout << std::endl;
-  //   time_index++;
-  // }
+  int retval = mav_data.load();
+  // mav_data.mono_camera_cb = mono_camera_cb;
+  // mav_data.stereo_camera_cb = stereo_camera_cb;
+  mav_data.run();
 
   MU_CHECK_EQ(0, retval);
 

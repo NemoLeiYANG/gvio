@@ -2,18 +2,21 @@
 
 namespace gvio {
 
+GMSMatcher::GMSMatcher() {
+#ifdef USG_CUDA
+  bf_matcher = cv::cuda::DescriptorMatcher::createBFMatcher(cv::NORM_HAMMING);
+#else
+  bf_matcher = cv::BFMatcher::create(cv::NORM_HAMMING);
+#endif
+}
+
+GMSMatcher::~GMSMatcher() {}
+
 std::vector<cv::Point2f> GMSMatcher::normalizePoints(
     const std::vector<cv::KeyPoint> &kp, const cv::Size &size) {
-  const size_t numP = kp.size();
-  const int width = size.width;
-  const int height = size.height;
-
   std::vector<cv::Point2f> npts;
-  npts.resize(numP);
-
-  for (size_t i = 0; i < numP; i++) {
-    npts[i].x = kp[i].pt.x / width;
-    npts[i].y = kp[i].pt.y / height;
+  for (size_t i = 0; i < kp.size(); i++) {
+    npts.emplace_back(kp[i].pt.x / size.width, kp[i].pt.y / size.height);
   }
 
   return npts;
@@ -21,8 +24,8 @@ std::vector<cv::Point2f> GMSMatcher::normalizePoints(
 
 void GMSMatcher::convertMatches(const std::vector<cv::DMatch> &vDMatches,
                                 std::vector<std::pair<int, int>> &vMatches) {
-  vMatches.resize(mNumberMatches);
-  for (size_t i = 0; i < mNumberMatches; i++) {
+  vMatches.resize(this->nb_matches);
+  for (size_t i = 0; i < this->nb_matches; i++) {
     vMatches[i] =
         std::pair<int, int>(vDMatches[i].queryIdx, vDMatches[i].trainIdx);
   }
@@ -32,81 +35,82 @@ int GMSMatcher::getGridIndexLeft(const cv::Point2f &pt, const int type) {
   int x = 0, y = 0;
 
   if (type == 1) {
-    x = floor(pt.x * mGridSizeLeft.width);
-    y = floor(pt.y * mGridSizeLeft.height);
+    x = floor(pt.x * this->grid_size_left.width);
+    y = floor(pt.y * this->grid_size_left.height);
   }
 
   if (type == 2) {
-    x = floor(pt.x * mGridSizeLeft.width + 0.5);
-    y = floor(pt.y * mGridSizeLeft.height);
+    x = floor(pt.x * this->grid_size_left.width + 0.5);
+    y = floor(pt.y * this->grid_size_left.height);
   }
 
   if (type == 3) {
-    x = floor(pt.x * mGridSizeLeft.width);
-    y = floor(pt.y * mGridSizeLeft.height + 0.5);
+    x = floor(pt.x * this->grid_size_left.width);
+    y = floor(pt.y * this->grid_size_left.height + 0.5);
   }
 
   if (type == 4) {
-    x = floor(pt.x * mGridSizeLeft.width + 0.5);
-    y = floor(pt.y * mGridSizeLeft.height + 0.5);
+    x = floor(pt.x * this->grid_size_left.width + 0.5);
+    y = floor(pt.y * this->grid_size_left.height + 0.5);
   }
 
-  if (x >= mGridSizeLeft.width || y >= mGridSizeLeft.height) {
+  if (x >= this->grid_size_left.width || y >= this->grid_size_left.height) {
     return -1;
   }
 
-  return x + y * mGridSizeLeft.width;
+  return x + y * this->grid_size_left.width;
 }
 
 int GMSMatcher::getGridIndexRight(const cv::Point2f &pt) {
-  int x = floor(pt.x * mGridSizeRight.width);
-  int y = floor(pt.y * mGridSizeRight.height);
-  return x + y * mGridSizeRight.width;
+  const int x = floor(pt.x * this->grid_size_right.width);
+  const int y = floor(pt.y * this->grid_size_right.height);
+  return x + y * this->grid_size_right.width;
 }
 
-void GMSMatcher::assignMatchPairs(const int GridType) {
-  for (size_t i = 0; i < mNumberMatches; i++) {
-    cv::Point2f &lp = mvP1[mvMatches[i].first];
-    cv::Point2f &rp = mvP2[mvMatches[i].second];
+void GMSMatcher::assignMatchPairs(const int grid_type) {
+  for (size_t i = 0; i < this->nb_matches; i++) {
+    const cv::Point2f &lp = this->points1[this->matches[i].first];
+    const cv::Point2f &rp = this->points2[this->matches[i].second];
 
-    int lgidx = mvMatchPairs[i].first = getGridIndexLeft(lp, GridType);
+    const int lgidx = this->match_pairs[i].first =
+        getGridIndexLeft(lp, grid_type);
     int rgidx = -1;
 
-    if (GridType == 1) {
-      rgidx = mvMatchPairs[i].second = getGridIndexRight(rp);
+    if (grid_type == 1) {
+      rgidx = this->match_pairs[i].second = this->getGridIndexRight(rp);
     } else {
-      rgidx = mvMatchPairs[i].second;
+      rgidx = this->match_pairs[i].second;
     }
 
     if (lgidx < 0 || rgidx < 0)
       continue;
 
-    mMotionStatistics.at<int>(lgidx, rgidx)++;
-    mNumberPointsInPerCellLeft[lgidx]++;
+    this->motion_statistics.at<int>(lgidx, rgidx)++;
+    this->nb_points_per_cell[lgidx]++;
   }
 }
 
-void GMSMatcher::verifyCellPairs(const int RotationType) {
-  const int *currentRP = mRotationPatterns[RotationType - 1];
+void GMSMatcher::verifyCellPairs(const int rotation_type) {
+  const int *current_rp = rotation_patterns[rotation_type - 1];
 
-  for (int i = 0; i < mGridNumberLeft; i++) {
-    if (cv::sum(mMotionStatistics.row(i))[0] == 0) {
-      mCellPairs[i] = -1;
+  for (int i = 0; i < this->grid_number_left; i++) {
+    if (cv::sum(this->motion_statistics.row(i))[0] == 0) {
+      this->cell_pairs[i] = -1;
       continue;
     }
 
     int max_number = 0;
-    for (int j = 0; j < mGridNumberRight; j++) {
-      int *value = mMotionStatistics.ptr<int>(i);
+    for (int j = 0; j < this->grid_number_right; j++) {
+      int *value = this->motion_statistics.ptr<int>(i);
       if (value[j] > max_number) {
-        mCellPairs[i] = j;
+        this->cell_pairs[i] = j;
         max_number = value[j];
       }
     }
 
-    int idx_grid_rt = mCellPairs[i];
-    const int *NB9_lt = mGridNeighborLeft.ptr<int>(i);
-    const int *NB9_rt = mGridNeighborRight.ptr<int>(idx_grid_rt);
+    int idx_grid_rt = this->cell_pairs[i];
+    const int *NB9_lt = this->grid_neighbor_left.ptr<int>(i);
+    const int *NB9_rt = this->grid_neighbor_right.ptr<int>(idx_grid_rt);
 
     int score = 0;
     double thresh = 0;
@@ -114,114 +118,118 @@ void GMSMatcher::verifyCellPairs(const int RotationType) {
 
     for (size_t j = 0; j < 9; j++) {
       int ll = NB9_lt[j];
-      int rr = NB9_rt[currentRP[j] - 1];
+      int rr = NB9_rt[current_rp[j] - 1];
       if (ll == -1 || rr == -1)
         continue;
 
-      score += mMotionStatistics.at<int>(ll, rr);
-      thresh += mNumberPointsInPerCellLeft[ll];
+      score += this->motion_statistics.at<int>(ll, rr);
+      thresh += this->nb_points_per_cell[ll];
       numpair++;
     }
 
-    thresh = THRESH_FACTOR * sqrt(thresh / numpair);
+    thresh = this->threshold_factor * sqrt(thresh / numpair);
 
     if (score < thresh) {
-      mCellPairs[i] = -2;
+      this->cell_pairs[i] = -2;
     }
   }
 }
 
-std::vector<int> GMSMatcher::getNB9(const int idx, const cv::Size &GridSize) {
+std::vector<int> GMSMatcher::getNB9(const int idx, const cv::Size &grid_size) {
   std::vector<int> NB9(9, -1);
-
-  int idx_x = idx % GridSize.width;
-  int idx_y = idx / GridSize.width;
+  const int idx_x = idx % grid_size.width;
+  const int idx_y = idx / grid_size.width;
 
   for (int yi = -1; yi <= 1; yi++) {
     for (int xi = -1; xi <= 1; xi++) {
       int idx_xx = idx_x + xi;
       int idx_yy = idx_y + yi;
 
-      if (idx_xx < 0 || idx_xx >= GridSize.width || idx_yy < 0 ||
-          idx_yy >= GridSize.height)
+      if (idx_xx < 0 || idx_xx >= grid_size.width || idx_yy < 0 ||
+          idx_yy >= grid_size.height)
         continue;
 
-      NB9[xi + 4 + yi * 3] = idx_xx + idx_yy * GridSize.width;
+      NB9[xi + 4 + yi * 3] = idx_xx + idx_yy * grid_size.width;
     }
   }
 
   return NB9;
 }
 
-void GMSMatcher::initNeighbors(cv::Mat &neighbor, const cv::Size &GridSize) {
+void GMSMatcher::initNeighbors(cv::Mat &neighbor, const cv::Size &grid_size) {
   for (int i = 0; i < neighbor.rows; i++) {
-    std::vector<int> NB9 = this->getNB9(i, GridSize);
+    std::vector<int> NB9 = this->getNB9(i, grid_size);
     int *data = neighbor.ptr<int>(i);
     memcpy(data, &NB9[0], sizeof(int) * 9);
   }
 }
 
-void GMSMatcher::setScale(const int Scale) {
-  // Set Scale
-  mGridSizeRight.width = mGridSizeLeft.width * mScaleRatios[Scale];
-  mGridSizeRight.height = mGridSizeLeft.height * mScaleRatios[Scale];
-  mGridNumberRight = mGridSizeRight.width * mGridSizeRight.height;
+void GMSMatcher::setScale(const int scale) {
+  // Set scale
+  this->grid_size_right.width =
+      this->grid_size_left.width * this->scale_ratios[scale];
+  this->grid_size_right.height =
+      this->grid_size_left.height * this->scale_ratios[scale];
+  this->grid_number_right =
+      this->grid_size_right.width * this->grid_size_right.height;
 
   // Initialize the neihbor of right grid
-  mGridNeighborRight = cv::Mat::zeros(mGridNumberRight, 9, CV_32SC1);
-  initNeighbors(mGridNeighborRight, mGridSizeRight);
+  this->grid_neighbor_right =
+      cv::Mat::zeros(this->grid_number_right, 9, CV_32SC1);
+  this->initNeighbors(this->grid_neighbor_right, this->grid_size_right);
 }
 
-int GMSMatcher::run(const int rotationType) {
-  mvbInlierMask.assign(mNumberMatches, false);
+int GMSMatcher::run(const int rotation_type) {
+  this->inliers_mask.assign(this->nb_matches, false);
 
   // Initialize Motion Statisctics
-  mMotionStatistics =
-      cv::Mat::zeros(mGridNumberLeft, mGridNumberRight, CV_32SC1);
-  mvMatchPairs.assign(mNumberMatches, std::pair<int, int>(0, 0));
+  this->motion_statistics =
+      cv::Mat::zeros(this->grid_number_left, this->grid_number_right, CV_32SC1);
+  this->match_pairs.assign(this->nb_matches, std::pair<int, int>(0, 0));
 
-  for (int GridType = 1; GridType <= 4; GridType++) {
+  for (int grid_type = 1; grid_type <= 4; grid_type++) {
     // initialize
-    mMotionStatistics.setTo(0);
-    mCellPairs.assign(mGridNumberLeft, -1);
-    mNumberPointsInPerCellLeft.assign(mGridNumberLeft, 0);
+    this->motion_statistics.setTo(0);
+    this->cell_pairs.assign(this->grid_number_left, -1);
+    this->nb_points_per_cell.assign(this->grid_number_left, 0);
 
-    this->assignMatchPairs(GridType);
-    this->verifyCellPairs(rotationType);
+    this->assignMatchPairs(grid_type);
+    this->verifyCellPairs(rotation_type);
 
     // Mark inliers
-    for (size_t i = 0; i < mNumberMatches; i++) {
-      if (mCellPairs[mvMatchPairs[i].first] == mvMatchPairs[i].second) {
-        mvbInlierMask[i] = true;
+    for (size_t i = 0; i < this->nb_matches; i++) {
+      if (this->cell_pairs[this->match_pairs[i].first] ==
+          this->match_pairs[i].second) {
+        this->inliers_mask[i] = true;
       }
     }
   }
 
-  int num_inlier = cv::sum(mvbInlierMask)[0];
+  const int num_inlier = cv::sum(this->inliers_mask)[0];
   return num_inlier;
 }
 
-std::vector<bool> GMSMatcher::getInlierMask(const bool withScale,
-                                            const bool withRotation) {
+std::vector<bool> GMSMatcher::getInlierMask(const bool with_scale,
+                                            const bool with_rotation) {
   int max_inlier = 0;
   std::vector<bool> inliers;
 
   // With no rotation and no scale
-  if (!withScale && !withRotation) {
+  if (!with_scale && !with_rotation) {
     this->setScale(0);
     max_inlier = run(1);
-    inliers = mvbInlierMask;
+    inliers = this->inliers_mask;
   }
 
   // With rotation and scale
-  if (withRotation && withScale) {
-    for (int Scale = 0; Scale < 5; Scale++) {
-      this->setScale(Scale);
-      for (int RotationType = 1; RotationType <= 8; RotationType++) {
-        int num_inlier = run(RotationType);
+  if (with_rotation && with_scale) {
+    for (int scale = 0; scale < 5; scale++) {
+      this->setScale(scale);
+      for (int rotation_type = 1; rotation_type <= 8; rotation_type++) {
+        int num_inlier = run(rotation_type);
 
         if (num_inlier > max_inlier) {
-          inliers = mvbInlierMask;
+          inliers = this->inliers_mask;
           max_inlier = num_inlier;
         }
       }
@@ -229,25 +237,25 @@ std::vector<bool> GMSMatcher::getInlierMask(const bool withScale,
   }
 
   // With rotation
-  if (withRotation && !withScale) {
-    for (int RotationType = 1; RotationType <= 8; RotationType++) {
-      int num_inlier = run(RotationType);
+  if (with_rotation && !with_scale) {
+    for (int rotation_type = 1; rotation_type <= 8; rotation_type++) {
+      int num_inlier = run(rotation_type);
 
       if (num_inlier > max_inlier) {
-        inliers = mvbInlierMask;
+        inliers = this->inliers_mask;
         max_inlier = num_inlier;
       }
     }
   }
 
   // With scale
-  if (!withRotation && withScale) {
-    for (int Scale = 0; Scale < 5; Scale++) {
-      this->setScale(Scale);
+  if (!with_rotation && with_scale) {
+    for (int scale = 0; scale < 5; scale++) {
+      this->setScale(scale);
       int num_inlier = run(1);
 
       if (num_inlier > max_inlier) {
-        inliers = mvbInlierMask;
+        inliers = this->inliers_mask;
         max_inlier = num_inlier;
       }
     }
@@ -276,19 +284,20 @@ int GMSMatcher::match(const std::vector<cv::KeyPoint> &k1,
 #endif
 
   // Initialize input
-  this->mvP1 = this->normalizePoints(k1, img_size);
-  this->mvP2 = this->normalizePoints(k2, img_size);
-  this->mNumberMatches = matches_bf.size();
-  this->convertMatches(matches_bf, this->mvMatches);
+  this->points1 = this->normalizePoints(k1, img_size);
+  this->points2 = this->normalizePoints(k2, img_size);
+  this->nb_matches = matches_bf.size();
+  this->convertMatches(matches_bf, this->matches);
 
   // Initialize Grid
-  this->mGridSizeLeft = cv::Size(20, 20);
-  this->mGridNumberLeft =
-      this->mGridSizeLeft.width * this->mGridSizeLeft.height;
+  this->grid_size_left = cv::Size(20, 20);
+  this->grid_number_left =
+      this->grid_size_left.width * this->grid_size_left.height;
 
   // Initialize the neihbor of left grid
-  this->mGridNeighborLeft = cv::Mat::zeros(mGridNumberLeft, 9, CV_32SC1);
-  this->initNeighbors(mGridNeighborLeft, mGridSizeLeft);
+  this->grid_neighbor_left =
+      cv::Mat::zeros(this->grid_number_left, 9, CV_32SC1);
+  this->initNeighbors(this->grid_neighbor_left, this->grid_size_left);
 
   // Matching using GMS matcher (Second pass)
   const std::vector<bool> inliers = this->getInlierMask(false, false);

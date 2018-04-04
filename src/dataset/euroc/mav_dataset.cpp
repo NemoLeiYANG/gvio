@@ -18,8 +18,8 @@ int IMUData::load(const std::string &data_dir) {
     const long ts = data(i, 0);
     this->timestamps.push_back(ts);
     this->time.push_back((ts - t0) * 1e-9);
-    this->w_B.emplace_back(data(i, 1), data(i, 2), data(i, 3));
-    this->a_B.emplace_back(data(i, 4), data(i, 5), data(i, 6));
+    this->w_B.emplace_back(data.block(i, 1, 1, 3));
+    this->a_B.emplace_back(data.block(i, 4, 1, 3));
   }
 
   // Load calibration data
@@ -65,6 +65,7 @@ int CameraData::load(const std::string &data_dir) {
     LOG_ERROR("Failed to load camera data [%s]!", cam_data_path.c_str());
     return -1;
   }
+
   const long t0 = data(0, 0);
   for (long i = 0; i < data.rows(); i++) {
     const std::string image_file = std::to_string((long) data(i, 0)) + ".png";
@@ -212,9 +213,8 @@ int MAVDataset::loadGroundTruthData() {
 long MAVDataset::minTimestamp() {
   const long cam0_first_ts = this->cam0_data.timestamps.front();
   const long imu_first_ts = this->imu_data.timestamps.front();
-  const long gnd_first_ts = this->ground_truth.timestamps.front();
 
-  std::vector<long> first_ts{cam0_first_ts, imu_first_ts, gnd_first_ts};
+  std::vector<long> first_ts{cam0_first_ts, imu_first_ts};
   auto first_result = std::min_element(first_ts.begin(), first_ts.end());
   const long first_ts_index = std::distance(first_ts.begin(), first_result);
   const long min_ts = first_ts[first_ts_index];
@@ -225,9 +225,8 @@ long MAVDataset::minTimestamp() {
 long MAVDataset::maxTimestamp() {
   const long cam0_last_ts = this->cam0_data.timestamps.back();
   const long imu_last_ts = this->imu_data.timestamps.back();
-  const long gnd_last_ts = this->ground_truth.timestamps.back();
 
-  std::vector<long> last_ts{cam0_last_ts, imu_last_ts, gnd_last_ts};
+  std::vector<long> last_ts{cam0_last_ts, imu_last_ts};
   auto last_result = std::max_element(last_ts.begin(), last_ts.end());
   const long last_ts_index = std::distance(last_ts.begin(), last_result);
   const long max_ts = last_ts[last_ts_index];
@@ -262,7 +261,11 @@ int MAVDataset::load() {
     const long ts = it->first;
     this->timestamps.push_back(ts);
     this->time[ts] = ((double) ts - this->ts_start) * 1e-9;
-    it = this->timeline.upper_bound(it->first);
+
+    // Advance to next non-duplicate entry.
+    do {
+      ++it;
+    } while (ts == it->first);
   }
 
   this->ok = true;
@@ -322,6 +325,7 @@ int MAVDataset::step() {
   // Trigger camera callback
   if (cam0_event && cam1_event) {
     if (this->mono_camera_cb != nullptr) {
+      std::cout << cam0_image_path << std::endl;
       const cv::Mat frame = cv::imread(cam0_image_path);
       if (this->mono_camera_cb(frame, this->ts_now) != 0) {
         LOG_ERROR("Mono camera callback failed! Stopping MAVDataset!");
@@ -356,8 +360,7 @@ int MAVDataset::step() {
 }
 
 int MAVDataset::run() {
-  // for (size_t i = 0; i < this->timestamps.size(); i++) {
-  for (size_t i = 0; i < 20; i++) {
+  for (size_t i = 0; i < this->timestamps.size(); i++) {
     const int retval = this->step();
     if (retval != 0) {
       return retval;

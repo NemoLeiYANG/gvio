@@ -25,6 +25,9 @@ public:
   KLTTracker tracker0;
   KLTTracker tracker1;
 
+  StereoTracker();
+  virtual ~StereoTracker();
+
   /**
    * Update feature tracker
    *

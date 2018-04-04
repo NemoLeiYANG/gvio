@@ -47,8 +47,8 @@ int test_bezier_derivative() {
   // Setup
   std::vector<Vec3> points;
   points.emplace_back(0, 0, 0);
-  points.emplace_back(1, 1, 1);
-  points.emplace_back(2, 2, 2);
+  points.emplace_back(1, 3, 1);
+  points.emplace_back(2, 0, 2);
   points.emplace_back(3, 3, 3);
 
   const Vec3 v = bezier_derivative(points, 0.5, 1);
@@ -64,8 +64,8 @@ int test_bezier_derivative2() {
   // Setup
   std::vector<Vec3> points;
   points.emplace_back(0, 0, 0);
-  points.emplace_back(1, 1, 1);
-  points.emplace_back(2, 2, 2);
+  points.emplace_back(1, 2, 1);
+  points.emplace_back(2, 1, 2);
   points.emplace_back(3, 3, 3);
 
   // Create bezier curve and its derivatives
@@ -181,11 +181,11 @@ int test_decasteljau() {
 }
 
 void test_suite() {
-  // MU_ADD_TEST(test_bezier);
-  // MU_ADD_TEST(test_bezier_derivative);
-  // MU_ADD_TEST(test_bezier_derivative2);
+  MU_ADD_TEST(test_bezier);
+  MU_ADD_TEST(test_bezier_derivative);
+  MU_ADD_TEST(test_bezier_derivative2);
   MU_ADD_TEST(test_bezier_tangent);
-  // MU_ADD_TEST(test_decasteljau);
+  MU_ADD_TEST(test_decasteljau);
 }
 
 } // namespace gvio

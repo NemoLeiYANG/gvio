@@ -36,6 +36,8 @@ fi
 
 mkdir -p build && cd build
 cmake .. && time make -j${CPU_COUNT}
+# cd experiments
+# ./euroc_runner /data/euroc_mav/raw/V1_01_easy /tmp/msckf.yaml /tmp/msckf
 cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
@@ -44,7 +46,7 @@ cd tests
 # ./camera-pinhole_model_test
 # ./control-carrot_controller_test
 # ./control-pid_test
-# ./dataset-euroc-mav_dataset_test
+./dataset-euroc-mav_dataset_test
 # ./dataset-kitti-raw-calib_test
 # ./dataset-kitti-raw-oxts_test
 # ./dataset-kitti-raw-parse_test
@@ -77,7 +79,7 @@ cd tests
 # ./quadrotor-quadrotor_model_test
 # ./quadrotor-mission_test
 # ./sim-carrot_controller_test
-./sim-bezier_test
+# ./sim-bezier_test
 # ./sim-camera_test
 # ./sim-twowheel_test
 # ./sim-world_test

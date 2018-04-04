@@ -53,49 +53,6 @@ namespace gvio {
 using cv::cuda::GpuMat;
 #endif
 
-/* GMS Matcher threshold */
-#define THRESH_FACTOR 6
-
-// 8 possible rotation and each one is 3 X 3
-// clang-format off
-const int mRotationPatterns[8][9] = {
-  1, 2, 3,
-  4, 5, 6,
-  7, 8, 9,
-
-  4, 1, 2,
-  7, 5, 3,
-  8, 9, 6,
-
-  7, 4, 1,
-  8, 5, 2,
-  9, 6, 3,
-
-  8, 7, 4,
-  9, 5, 1,
-  6, 3, 2,
-
-  9, 8, 7,
-  6, 5, 4,
-  3, 2, 1,
-
-  6, 9, 8,
-  3, 5, 7,
-  2, 1, 4,
-
-  3, 6, 9,
-  2, 5, 8,
-  1, 4, 7,
-
-  2, 3, 6,
-  1, 5, 9,
-  4, 7, 8
-};
-// clang-format on
-
-// 5 level scales
-const double mScaleRatios[5] = {1.0, 1.0 / 2, 1.0 / sqrt(2.0), sqrt(2.0), 2.0};
-
 inline cv::Mat draw_inliers(const cv::Mat &src1,
                             const cv::Mat &src2,
                             const std::vector<cv::KeyPoint> &kpt1,
@@ -137,45 +94,61 @@ inline cv::Mat draw_inliers(const cv::Mat &src1,
 
 class GMSMatcher {
 public:
-  cv::Ptr<cv::DescriptorMatcher> bf_matcher;  ///< Brute-force Matcher
-  std::vector<cv::Point2f> mvP1, mvP2;        ///< Normalized points
-  std::vector<std::pair<int, int>> mvMatches; ///< Matches
-  size_t mNumberMatches = 0;                  ///< Number of Matches
-  cv::Size mGridSizeLeft, mGridSizeRight;     ///< Grid sizes
-  int mGridNumberLeft, mGridNumberRight;
+  int threshold_factor = 20; ///< Threshold factor
+
+  cv::Ptr<cv::DescriptorMatcher> bf_matcher; ///< Brute-force Matcher
+  std::vector<cv::Point2f> points1;          ///< Normalized points 1
+  std::vector<cv::Point2f> points2;          ///< Normalized points 2
+  std::vector<std::pair<int, int>> matches;  ///< Matches
+  size_t nb_matches = 0;                     ///< Number of Matches
+  cv::Size grid_size_left;                   ///< Grid size left
+  cv::Size grid_size_right;                  ///< Grid size right
+  int grid_number_left;                      ///< Grid number left
+  int grid_number_right;                     ///< Grid number right
 
   // x : left grid idx
   // y : right grid idx
   // value : how many matches from idx_left to idx_right
-  cv::Mat mMotionStatistics;
+  cv::Mat motion_statistics;
 
-  std::vector<int>
-      mNumberPointsInPerCellLeft; ///< Number of points left per cell
+  ///< Number of points left per cell
+  std::vector<int> nb_points_per_cell;
 
-  // Inldex  : grid_idx_left
+  // Index  : grid_idx_left
   // Value   : grid_idx_right
-  std::vector<int> mCellPairs;
+  std::vector<int> cell_pairs;
 
   // Every Matches has a cell-pair
   // first  : grid_idx_left
   // second : grid_idx_right
-  std::vector<std::pair<int, int>> mvMatchPairs;
+  std::vector<std::pair<int, int>> match_pairs;
 
   // Inlier Mask for output
-  std::vector<bool> mvbInlierMask;
+  std::vector<bool> inliers_mask;
 
   // Grid neighbor
-  cv::Mat mGridNeighborLeft;
-  cv::Mat mGridNeighborRight;
+  cv::Mat grid_neighbor_left;
+  cv::Mat grid_neighbor_right;
 
-  GMSMatcher() {
-#ifdef USG_CUDA
-    bf_matcher = cv::cuda::DescriptorMatcher::createBFMatcher(cv::NORM_HAMMING);
-#else
-    bf_matcher = cv::BFMatcher::create(cv::NORM_HAMMING);
-#endif
-  }
-  ~GMSMatcher() {}
+  // 8 possible rotation and each one is 3 X 3
+  const int rotation_patterns[8][9] = {{1, 2, 3, 4, 5, 6, 7, 8, 9},
+                                       {4, 1, 2, 7, 5, 3, 8, 9, 6},
+                                       {7, 4, 1, 8, 5, 2, 9, 6, 3},
+                                       {8, 7, 4, 9, 5, 1, 6, 3, 2},
+                                       {9, 8, 7, 6, 5, 4, 3, 2, 1},
+                                       {6, 9, 8, 3, 5, 7, 2, 1, 4},
+                                       {3, 6, 9, 2, 5, 8, 1, 4, 7},
+                                       {2, 3, 6, 1, 5, 9, 4, 7, 8}};
+
+  // 5 level scales
+  const double scale_ratios[5] = {1.0,
+                                  1.0 / 2,
+                                  1.0 / sqrt(2.0),
+                                  sqrt(2.0),
+                                  2.0};
+
+  GMSMatcher();
+  ~GMSMatcher();
 
   /**
    * Normalize Key Points to Range(0 - 1)
@@ -202,38 +175,38 @@ public:
   /**
    * Assign match pairs
    */
-  void assignMatchPairs(const int GridType);
+  void assignMatchPairs(const int grid_type);
 
   /**
    * Verify cell pairs
    */
-  void verifyCellPairs(const int RotationType);
+  void verifyCellPairs(const int rotation_type);
 
   /**
    * Get neighbor 9
    */
-  std::vector<int> getNB9(const int idx, const cv::Size &GridSize);
+  std::vector<int> getNB9(const int idx, const cv::Size &grid_size);
 
   /**
    * Initialize neighbors
    */
-  void initNeighbors(cv::Mat &neighbor, const cv::Size &GridSize);
+  void initNeighbors(cv::Mat &neighbor, const cv::Size &grid_size);
 
   /**
    * Set scale
    */
-  void setScale(const int Scale);
+  void setScale(const int scale);
 
   /**
    * Run
    */
-  int run(const int RotationType);
+  int run(const int rotation_type);
 
   /**
    * Get inlier mask
    */
-  std::vector<bool> getInlierMask(const bool WithScale = false,
-                                  const bool WithRotation = false);
+  std::vector<bool> getInlierMask(const bool with_scale = false,
+                                  const bool with_rotation = false);
 
   /**
    * Match
