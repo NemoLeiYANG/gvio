@@ -16,31 +16,23 @@ fi
 
 # doxygen Doxyfile
 
-
 # python scripts/calibration/allan_variance.py \
 #   --bag "/home/chutsu/gvio_datasets/calibration/imu_calibration/2018-03-11-14-42-05.bag" \
 #   --imu_topic "/gvio/imu"
-# python scripts/plot/plot_rosbag.py /data/euroc_mav/bags/V1_01_easy.bag
-# python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/Lab-small-loop-1.bag
-# python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/Lab-small-loop-2.bag
-# python scripts/plot/plot_rosbag.py /data/gvio_datasets/bags/stationary-1.bag
 
-# python3 scripts/calibration/
-# python3 scripts/calibration/plot_gimbal.py --camchain tests/test_configs/gimbal/calibration/gvio_camchain.yaml
-# ./experiments/kitti_runner /data/kitti/raw 2011_09_26 0046 ./experiments/configs/msckf_kitti_raw-2011_09_26-0046.yaml ./experiments
-# python3 tests/scripts/plot_msckf.py ./experiments/msckf
-
-# cd ../
-# python3 scripts/msckf_tuner.py experiments/configs/kitti_raw_2011_09_26_0009.yaml
-# cd ../ && bash scripts/test_runner.sh
-
+# BUILD
 mkdir -p build && cd build
 cmake .. && time make -j${CPU_COUNT}
-cd experiments
-./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
-python3 scripts/plot_msckf.py /tmp/msckf/msckf
+
+# EXPERIMENTS
+# cd experiments
+# ./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
+# ./kitti_runner /data/kitti/raw 2011_09_26 0046 ./configs/msckf_kitti_raw-2011_09_26-0046.yaml /tmp/msckf
+# python3 scripts/plot_msckf.py /tmp/msckf/msckf
 # ./euroc_runner /data/euroc_mav/raw/V1_01_easy ./configs/msckf_euroc_V01_01_easy.yaml /tmp/msckf
 # python3 scripts/plot_msckf.py /tmp/msckf/msckf
+
+# TESTS
 # cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
@@ -98,16 +90,18 @@ python3 scripts/plot_msckf.py /tmp/msckf/msckf
 # ./util-stats_test
 # ./util-time_test
 
-# ./utils/pwm 40
-# ./utils/imu configs/imu/config.yaml
-# ./utils/camera configs/camera/ueye/cam1.yaml
-# ./utils/camera configs/camera/ueye/cam2.yaml
-# ./utils/camera configs/camera/ueye/cam3.yaml
-# rm -rf /mnt/sdcard/gvio_recording
-# ./utils/recorder configs/recorder/config.yaml
-
+# TEST SCRIPTS
 # python3 scripts/plot_msckf.py /tmp/msckf/msckf
 # python3 scripts/plot_euroc_mav_dataset.py /data/euroc_mav/raw/mav0
 # python3 scripts/plot_feature_track.py /tmp/track.dat 1242 375
 # python3 scripts/plot_feature_tracks.py /tmp/feature_tracks 1242 375
 # python3 scripts/plot_twowheel.py /tmp/twowheel.dat
+
+# TOOLS
+# ./tools/pwm 40
+# ./tools/imu configs/imu/config.yaml
+# ./tools/camera configs/camera/ueye/cam1.yaml
+# ./tools/camera configs/camera/ueye/cam2.yaml
+# ./tools/camera configs/camera/ueye/cam3.yaml
+# rm -rf /mnt/sdcard/gvio_recording
+# ./tools/recorder configs/recorder/config.yaml

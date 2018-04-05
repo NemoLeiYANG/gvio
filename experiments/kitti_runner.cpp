@@ -2,6 +2,7 @@
 #include "gvio/msckf/msckf.hpp"
 #include "gvio/msckf/blackbox.hpp"
 #include "gvio/feature2d/klt_tracker.hpp"
+#include "gvio/feature2d/orb_tracker.hpp"
 
 using namespace gvio;
 

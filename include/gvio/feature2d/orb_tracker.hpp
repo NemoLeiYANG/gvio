@@ -30,7 +30,7 @@ public:
    * @param config_file Path to config file
    * @returns 0 for success, -1 for failure
    */
-  int configure(const std::string &config_file);
+  int configure(const std::string &config_file) override;
 
   /**
    * Detect features

@@ -33,7 +33,6 @@ int MSCKF::configure(const std::string &config_file) {
   parser.addParam("imu.process_noise.dbg_var", &imu_config.dbg_var);
   parser.addParam("imu.process_noise.a_var", &imu_config.a_var);
   parser.addParam("imu.process_noise.dba_var", &imu_config.dba_var);
-  parser.addParam("imu.constants.angular_constant", &imu_config.w_G);
   parser.addParam("imu.constants.gravity_constant", &imu_config.g_G);
   // -- Camera Settings
   parser.addParam("camera.extrinsics.p_IC", &this->ext_p_IC);

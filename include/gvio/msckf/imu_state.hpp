@@ -34,7 +34,6 @@ struct IMUStateConfig {
   Vec3 dba_var = zeros(3, 1);
 
   // Constants
-  Vec3 w_G = zeros(3, 1);
   Vec3 g_G = zeros(3, 1);
 };
 
@@ -59,7 +58,7 @@ public:
   MatX Q = 1e-2 * I(12); ///< Noise matrix
   MatX Phi = I(15);      ///< Phi matrix
 
-  bool rk4 = false; ///< Runge-Kutta 4th order integration
+  bool rk4 = true; ///< Runge-Kutta 4th order integration
 
   IMUState();
   IMUState(const IMUStateConfig &config);
