@@ -572,7 +572,6 @@ int test_MSCKF_measurementUpdate() {
     // // Cheat by loading the robot ground truth to MSCKF's imu state
     // msckf.imu_state.p_G = raw_dataset.oxts.p_G[i];
     // msckf.imu_state.q_IG = euler2quat(raw_dataset.oxts.rpy[i]);
-
     msckf.measurementUpdate(tracks);
 
     // Record

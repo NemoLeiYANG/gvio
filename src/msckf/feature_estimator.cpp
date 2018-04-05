@@ -392,7 +392,6 @@ int CeresFeatureEstimator::setupProblem() {
   if (this->initialEstimate(p_C0_f) != 0) {
     return -1;
   }
-  // std::cout << "init:" << p_C0_f.transpose() << std::endl;
 
   // // Cheat by forming p_C0_f using ground truth data
   // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {

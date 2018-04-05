@@ -447,7 +447,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   // Filter feature tracks
   FeatureTracks filtered_tracks = this->filterTracks(tracks);
   if (filtered_tracks.size() == 0) {
-    return -1;
+    return 0;
   }
 
   // Calculate residuals
@@ -468,6 +468,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   //     P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
 
   // Correct states
+  std::cout << "correction!" << std::endl;
   const VecX dx = K * r_n;
   this->correctIMUState(dx);
   this->correctCameraStates(dx);

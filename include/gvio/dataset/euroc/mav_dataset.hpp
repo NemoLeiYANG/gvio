@@ -16,96 +16,15 @@
 
 #include "gvio/util/util.hpp"
 #include "gvio/msckf/msckf.hpp"
+#include "gvio/dataset/euroc/imu_data.hpp"
+#include "gvio/dataset/euroc/camera_data.hpp"
+#include "gvio/dataset/euroc/ground_truth.hpp"
 
 namespace gvio {
 /**
  * @addtogroup euroc
  * @{
  */
-
-/**
- * IMU data
- */
-struct IMUData {
-  // Data
-  std::vector<long> timestamps;
-  std::vector<double> time;
-  std::vector<Vec3> w_B;
-  std::vector<Vec3> a_B;
-
-  // Sensor properties
-  std::string sensor_type;
-  std::string comment;
-  Mat4 T_BS = I(4);
-  double rate_hz = 0.0;
-  double gyro_noise_density = 0.0;
-  double gyro_random_walk = 0.0;
-  double accel_noise_density = 0.0;
-  double accel_random_walk = 0.0;
-
-  /**
-   * Load IMU data
-   *
-   * @param data_dir IMU data directory
-   * @returns 0 for success, -1 for failure
-   */
-  int load(const std::string &data_dir);
-};
-
-/**
- * IMUData to output stream
- */
-std::ostream &operator<<(std::ostream &os, const IMUData &data);
-
-struct CameraData {
-  // Data
-  std::vector<long> timestamps;
-  std::vector<double> time;
-  std::vector<std::string> image_paths;
-
-  // Sensor properties
-  std::string sensor_type;
-  std::string comment;
-  Mat4 T_BS = I(4);
-  double rate_hz = 0.0;
-  Vec2 resolution;
-  std::string camera_model;
-  Vec4 intrinsics;
-  std::string distortion_model;
-  Vec4 distortion_coefficients;
-
-  /**
-   * Load Camera data
-   *
-   * @param data_dir Camera data directory
-   * @returns 0 for success, -1 for failure
-   */
-  int load(const std::string &data_dir);
-};
-
-/**
- * CameraData to output stream
- */
-std::ostream &operator<<(std::ostream &os, const CameraData &data);
-
-struct GroundTruthData {
-  // Data
-  std::vector<long> timestamps;
-  std::vector<double> time;
-  std::vector<Vec3> p_RS_R;
-  std::vector<Vec4> q_RS;
-  std::vector<Vec3> v_RS_R;
-  std::vector<Vec3> b_w_RS_S;
-  std::vector<Vec3> b_a_RS_S;
-
-  /**
-   * Load ground truth data
-   *
-   * @param data_dir Ground truth data directory
-   * @returns 0 for success, -1 for failure
-   */
-  int load(const std::string &data_dir);
-};
 
 enum DatasetEventType { NOT_SET, IMU_EVENT, CAMERA_EVENT };
 
@@ -144,7 +63,7 @@ public:
   IMUData imu_data;
   CameraData cam0_data;
   CameraData cam1_data;
-  GroundTruthData ground_truth;
+  GroundTruth ground_truth;
 
   long ts_start = 0;
   long ts_end = 0;
@@ -159,14 +78,15 @@ public:
 
   // clang-format off
   std::function<VecX()> get_state;
-  std::function<int(const Vec3 &a_m, const Vec3 &w_m, const long ts)> imu_cb;
   std::function<int(const cv::Mat &frame, const long ts)> mono_camera_cb;
   std::function<int(const cv::Mat &frame0, const cv::Mat &frame1, const long ts)> stereo_camera_cb;
+  std::function<std::vector<FeatureTrack>()> get_tracks_cb;
+  std::function<int(const Vec3 &a_m, const Vec3 &w_m, const long ts)> imu_cb;
+  std::function<int(const FeatureTracks &tracks)> mea_cb;
   std::function<int(const double time, const Vec3 &p_G, const Vec3 &v_G, const Vec3 &rpy_G)> record_cb;
   // clang-format on
 
-  MAVDataset(const std::string &data_path)
-      : data_path{strip_end(data_path, "/")} {}
+  MAVDataset(const std::string &data_path);
 
   /**
    * Load imu data
@@ -181,10 +101,10 @@ public:
   int loadCameraData();
 
   /**
-   * Load ground truth data
+   * Load ground truth
    * @returns 0 for success, -1 for failure
    */
-  int loadGroundTruthData();
+  int loadGroundTruth();
 
   /**
    * Return min timestamp

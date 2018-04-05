@@ -228,4 +228,9 @@ int KLTTracker::update(const cv::Mat &img_cur) {
   return 0;
 }
 
+int KLTTracker::update2(const cv::Mat &img_cur, const long ts) {
+  UNUSED(ts);
+  return this->update(img_cur);
+}
+
 } // namespace gvio

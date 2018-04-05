@@ -101,7 +101,7 @@ public:
    *
    * @param image Image
    * @param features Features
-* @returns 0 for success, -1 for failure
+   * @returns 0 for success, -1 for failure
    */
   int replenishFeatures(const cv::Mat &image, Features &features);
 
@@ -112,6 +112,15 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int update(const cv::Mat &img_cur);
+
+  /**
+   * Update feature tracker
+   *
+   * @param img_cur Current image frame
+   * @param ts Current timestamp
+   * @returns 0 for success, -1 for failure
+   */
+  int update2(const cv::Mat &img_cur, const long ts);
 };
 
 /** @} group feature2d */

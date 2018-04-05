@@ -43,4 +43,11 @@ int save_camera_states(const CameraStates &states,
   return 0;
 }
 
+std::ostream &operator<<(std::ostream &os, const CameraState &state) {
+  os << "camera_state.frame_id: " << state.frame_id << std::endl;
+  os << "camera_state.p_G: " << state.p_G.transpose() << std::endl;
+  os << "camera_state.q_CG: " << state.q_CG.transpose() << std::endl;
+  return os;
+}
+
 } // namespace gvio

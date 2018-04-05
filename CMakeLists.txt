@@ -5,8 +5,8 @@ PROJECT(gvio)
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(BUILD_SHARED_LIBS ON)
-SET(CMAKE_BUILD_TYPE RELEASE)
-# SET(CMAKE_BUILD_TYPE DEBUG)
+# SET(CMAKE_BUILD_TYPE RELEASE)
+SET(CMAKE_BUILD_TYPE DEBUG)
 # SET(CMAKE_IGNORE_PATH `catkin locate`)
 
 # DEPENDENCIES
@@ -37,6 +37,9 @@ ADD_LIBRARY(${PROJECT_NAME}
             src/camera/distortion.cpp
             src/camera/pinhole_model.cpp
             # dataset
+            src/dataset/euroc/camera_data.cpp
+            src/dataset/euroc/ground_truth.cpp
+            src/dataset/euroc/imu_data.cpp
             src/dataset/euroc/mav_dataset.cpp
             src/dataset/kitti/raw/calib.cpp
             src/dataset/kitti/raw/oxts.cpp
@@ -53,6 +56,7 @@ ADD_LIBRARY(${PROJECT_NAME}
             src/msckf/msckf.cpp
             # feature
             src/feature2d/draw.cpp
+            src/feature2d/feature.cpp
             src/feature2d/feature_container.cpp
             src/feature2d/feature_track.cpp
             src/feature2d/feature_tracker.cpp
@@ -135,6 +139,9 @@ SET(UNITTESTS
     # camera-pinhole_model_test
     # control-carrot_controller_test
     # control-pid_test
+    # dataset-euroc-camera_data_test
+    dataset-euroc-ground_truth_test
+    dataset-euroc-imu_data_test
     dataset-euroc-mav_dataset_test
     # dataset-kitti-raw-calib_test
     # dataset-kitti-raw-oxts_test
@@ -187,6 +194,7 @@ ENDFOREACH(TEST)
 
 # EXPERIMENTS
 FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
+FILE(COPY experiments/scripts DESTINATION ${PROJECT_BINARY_DIR}/experiments)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
 SET(EXPERIMENTS kitti_runner euroc_runner)
 FOREACH(TEST ${EXPERIMENTS})

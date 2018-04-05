@@ -59,17 +59,12 @@ struct Feature {
    * Return feature as Vec2
    */
   Vec2 getKeyPoint() const { return Vec2{this->kp.pt.x, this->kp.pt.y}; }
-
-  /**
-   * Feature to string
-   */
-  friend std::ostream &operator<<(std::ostream &os, const Feature &f) {
-    os << "track_id: " << f.track_id << std::endl;
-    os << "kp: (" << f.kp.pt.x << ", " << f.kp.pt.y << ")" << std::endl;
-    os << "desc: " << f.desc.size() << std::endl;
-    return os;
-  }
 };
+
+/**
+  * Feature to string
+  */
+std::ostream &operator<<(std::ostream &os, const Feature &f);
 
 /**
  * Features

@@ -2,145 +2,6 @@
 
 namespace gvio {
 
-int IMUData::load(const std::string &data_dir) {
-  const std::string imu_data_path = data_dir + "/data.csv";
-  const std::string imu_calib_path = data_dir + "/sensor.yaml";
-
-  // Load IMU data
-  MatX data;
-  if (csv2mat(imu_data_path, true, data) != 0) {
-    LOG_ERROR("Failed to load IMU data [%s]!", imu_data_path.c_str());
-    return -1;
-  }
-
-  const long t0 = data(0, 0);
-  for (long i = 0; i < data.rows(); i++) {
-    const long ts = data(i, 0);
-    this->timestamps.push_back(ts);
-    this->time.push_back((ts - t0) * 1e-9);
-    this->w_B.emplace_back(data.block(i, 1, 1, 3));
-    this->a_B.emplace_back(data.block(i, 4, 1, 3));
-  }
-
-  // Load calibration data
-  ConfigParser parser;
-  parser.addParam("sensor_type", &this->sensor_type);
-  parser.addParam("comment", &this->comment);
-  parser.addParam("T_BS", &this->T_BS);
-  parser.addParam("rate_hz", &this->rate_hz);
-  parser.addParam("gyroscope_noise_density", &this->gyro_noise_density);
-  parser.addParam("gyroscope_random_walk", &this->gyro_random_walk);
-  parser.addParam("accelerometer_noise_density", &this->accel_noise_density);
-  parser.addParam("accelerometer_random_walk", &this->accel_random_walk);
-  if (parser.load(imu_calib_path) != 0) {
-    LOG_ERROR("Failed to load sensor file [%s]!", imu_calib_path.c_str());
-    return -1;
-  }
-
-  return 0;
-}
-
-std::ostream &operator<<(std::ostream &os, const IMUData &data) {
-  // clang-format off
-  os << "sensor_type: " << data.sensor_type << std::endl;
-  os << "comment: " << data.comment << std::endl;
-  os << "T_BS:\n" << data.T_BS << std::endl;
-  os << "rate_hz: " << data.rate_hz << std::endl;
-  os << "gyroscope_noise_density: " << data.gyro_noise_density << std::endl;
-  os << "gyroscope_random_walk: " << data.gyro_random_walk << std::endl;
-  os << "accelerometer_noise_density: " << data.accel_noise_density << std::endl;
-  os << "accelerometer_random_walk: " << data.accel_random_walk << std::endl;
-  // clang-format on
-
-  return os;
-}
-
-int CameraData::load(const std::string &data_dir) {
-  const std::string cam_data_path = data_dir + "/data.csv";
-  const std::string cam_calib_path = data_dir + "/sensor.yaml";
-
-  // Load camera data
-  MatX data;
-  if (csv2mat(cam_data_path, true, data) != 0) {
-    LOG_ERROR("Failed to load camera data [%s]!", cam_data_path.c_str());
-    return -1;
-  }
-
-  const long t0 = data(0, 0);
-  for (long i = 0; i < data.rows(); i++) {
-    const std::string image_file = std::to_string((long) data(i, 0)) + ".png";
-    const std::string image_path = data_dir + "/data/" + image_file;
-    const long ts = data(i, 0);
-
-    if (file_exists(image_path) == false) {
-      LOG_ERROR("File [%s] does not exist!", image_path.c_str());
-      return -1;
-    }
-
-    this->timestamps.emplace_back(ts);
-    this->time.emplace_back((ts - t0) * 1e-9);
-    this->image_paths.emplace_back(image_path);
-  }
-
-  // Load calibration data
-  ConfigParser parser;
-  parser.addParam("sensor_type", &this->sensor_type);
-  parser.addParam("comment", &this->comment);
-  parser.addParam("T_BS", &this->T_BS);
-  parser.addParam("rate_hz", &this->rate_hz);
-  parser.addParam("resolution", &this->resolution);
-  parser.addParam("camera_model", &this->camera_model);
-  parser.addParam("intrinsics", &this->intrinsics);
-  parser.addParam("distortion_model", &this->distortion_model);
-  parser.addParam("distortion_coefficients", &this->distortion_coefficients);
-  if (parser.load(cam_calib_path) != 0) {
-    LOG_ERROR("Failed to load senor file [%s]!", cam_calib_path.c_str());
-    return -1;
-  }
-
-  return 0;
-}
-
-std::ostream &operator<<(std::ostream &os, const CameraData &data) {
-  // clang-format off
-  os << "sensor_type: " << data.sensor_type << std::endl;
-  os << "comment: " << data.comment << std::endl;
-  os << "T_BS:\n" << data.T_BS << std::endl;
-  os << "rate_hz: " << data.rate_hz << std::endl;
-  os << "resolution: " << data.resolution.transpose() << std::endl;
-  os << "camera_model: " << data.camera_model << std::endl;
-  os << "intrinsics: " << data.intrinsics.transpose() << std::endl;
-  os << "distortion_model: " << data.distortion_model << std::endl;
-  os << "distortion_coefficients: " << data.distortion_coefficients.transpose() << std::endl;
-  // clang-format on
-
-  return os;
-}
-
-int GroundTruthData::load(const std::string &data_dir) {
-  // Load ground truth data
-  const std::string gnd_data_path = data_dir + "/data.csv";
-  MatX data;
-  if (csv2mat(gnd_data_path, true, data) != 0) {
-    LOG_ERROR("Failed to load ground truth data [%s]!", gnd_data_path.c_str());
-    return -1;
-  }
-
-  const double t0 = data(0, 0);
-  for (long i = 0; i < data.rows(); i++) {
-    const long ts = data(i, 0);
-    this->timestamps.push_back(ts);
-    this->time.push_back(((double) ts - t0) * 1e-9);
-    this->p_RS_R.emplace_back(data(i, 1), data(i, 2), data(i, 3));
-    this->q_RS.emplace_back(data(i, 5), data(i, 6), data(i, 7), data(i, 4));
-    this->v_RS_R.emplace_back(data(i, 8), data(i, 9), data(i, 10));
-    this->b_w_RS_S.emplace_back(data(i, 11), data(i, 12), data(i, 13));
-    this->b_a_RS_S.emplace_back(data(i, 14), data(i, 15), data(i, 16));
-  }
-
-  return 0;
-}
-
 std::ostream &operator<<(std::ostream &os, const DatasetEvent &data) {
   if (data.type == IMU_EVENT) {
     os << "event_type: imu" << std::endl;
@@ -154,6 +15,9 @@ std::ostream &operator<<(std::ostream &os, const DatasetEvent &data) {
 
   return os;
 }
+
+MAVDataset::MAVDataset(const std::string &data_path)
+    : data_path{strip_end(data_path, "/")} {}
 
 int MAVDataset::loadIMUData() {
   const std::string imu_data_dir = this->data_path + "/imu0";
@@ -200,10 +64,10 @@ int MAVDataset::loadCameraData() {
   return 0;
 }
 
-int MAVDataset::loadGroundTruthData() {
+int MAVDataset::loadGroundTruth() {
   const std::string gnd_dir = this->data_path + "/state_groundtruth_estimate0";
   if (this->ground_truth.load(gnd_dir) != 0) {
-    LOG_ERROR("Failed to load ground truth data !");
+    LOG_ERROR("Failed to load ground truth!");
     return -1;
   }
 
@@ -244,7 +108,7 @@ int MAVDataset::load() {
     LOG_ERROR("Failed to load imu data!");
     return -1;
   }
-  if (this->loadGroundTruthData() != 0) {
+  if (this->loadGroundTruth() != 0) {
     LOG_ERROR("Failed to load ground truth data!");
     return -1;
   }
@@ -322,10 +186,10 @@ int MAVDataset::step() {
     this->imu_index++;
   }
 
-  // Trigger camera callback
+  // Trigger camera and measurement callback
   if (cam0_event && cam1_event) {
+    // Camera callback
     if (this->mono_camera_cb != nullptr) {
-      std::cout << cam0_image_path << std::endl;
       const cv::Mat frame = cv::imread(cam0_image_path);
       if (this->mono_camera_cb(frame, this->ts_now) != 0) {
         LOG_ERROR("Mono camera callback failed! Stopping MAVDataset!");
@@ -337,6 +201,17 @@ int MAVDataset::step() {
       if (this->stereo_camera_cb(frame0, frame1, this->ts_now) != 0) {
         LOG_ERROR("Stereo camera callback failed! Stopping MAVDataset!");
         return -3;
+      }
+    }
+
+    // Measurement callback
+    if (this->get_tracks_cb != nullptr) {
+      FeatureTracks tracks = this->get_tracks_cb();
+      if (this->mea_cb != nullptr) {
+        if (this->mea_cb(tracks) != 0) {
+          LOG_ERROR("Measurement callback failed! Stopping MAVDataset!");
+          return -2;
+        }
       }
     }
 

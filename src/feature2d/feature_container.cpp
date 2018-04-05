@@ -45,7 +45,22 @@ int FeatureContainer::removeTrack(const TrackID &track_id, const bool lost) {
 void FeatureContainer::removeLostTracks(std::vector<FeatureTrack> &tracks) {
   tracks.clear();
   auto lost_ids = this->lost;
+  auto tracking_ids = this->tracking;
 
+  // Remove tracks that are too old (assume lost)
+  std::vector<TrackID> tracking_new;
+  for (size_t i = 0; i < tracking_ids.size(); i++) {
+    TrackID track_id = tracking_ids[i];
+    if (this->buffer[track_id].trackedLength() > this->max_track_length) {
+      tracks.emplace_back(this->buffer[track_id]);
+      this->buffer.erase(this->buffer.find(track_id));
+    } else {
+      tracking_new.push_back(track_id);
+    }
+  }
+  this->tracking = tracking_new;
+
+  // Remove lost tracks from buffer
   for (size_t i = 0; i < lost_ids.size(); i++) {
     TrackID track_id = lost_ids[i];
     tracks.emplace_back(this->buffer[track_id]);

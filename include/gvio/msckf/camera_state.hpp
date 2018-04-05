@@ -61,6 +61,11 @@ using CameraStates = std::vector<CameraState>;
 int save_camera_states(const CameraStates &states,
                        const std::string &output_path);
 
+/**
+  * CameraState to string
+  */
+std::ostream &operator<<(std::ostream &os, const CameraState &state);
+
 /** @} group msckf */
 } // namespace gvio
 #endif // GVIO_MSCKF_CAMERA_STATE_HPP

@@ -2,6 +2,18 @@
 
 namespace gvio {
 
+std::ostream &operator<<(std::ostream &os, const FeatureTrack &track) {
+  os << "track_id: " << track.track_id << std::endl;
+  os << "frame_start: " << track.frame_start << std::endl;
+  os << "frame_end: " << track.frame_end << std::endl;
+  os << "length: " << track.track.size() << std::endl;
+  for (auto f : track.track) {
+    os << f << std::endl;
+  }
+  os << std::endl;
+  return os;
+}
+
 int save_feature_track(const FeatureTrack &track,
                        const std::string &output_path) {
   // Setup output file

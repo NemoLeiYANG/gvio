@@ -76,18 +76,12 @@ struct FeatureTrack {
    * @returns Size of feature track
    */
   size_t trackedLength() const { return this->track.size(); }
-
-  /**
-   * FeatureTrack to string
-   */
-  friend std::ostream &operator<<(std::ostream &os, const FeatureTrack &track) {
-    os << "track_id: " << track.track_id << std::endl;
-    os << "frame_start: " << track.frame_start << std::endl;
-    os << "frame_end: " << track.frame_end << std::endl;
-    os << "length: " << track.track.size() << std::endl;
-    return os;
-  }
 };
+
+/**
+  * FeatureTrack to string
+  */
+std::ostream &operator<<(std::ostream &os, const FeatureTrack &track);
 
 /**
  * Feature tracks

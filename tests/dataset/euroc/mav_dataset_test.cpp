@@ -3,19 +3,24 @@
 
 namespace gvio {
 
-#define TEST_DATA "/data/euroc_mav/raw/V1_01_easy"
+#define TEST_DATA "test_data/euroc"
 
 int mono_camera_cb(const cv::Mat &frame, const long ts) {
-  cv::imshow("Camera 0", frame);
-  cv::waitKey(1);
+  UNUSED(ts);
+  UNUSED(frame);
+  // cv::imshow("Mono camera", frame);
+  // cv::waitKey(1);
   return 0;
 }
 
 int stereo_camera_cb(const cv::Mat &frame0,
                      const cv::Mat &frame1,
                      const long ts) {
-  cv::imshow("Camera 0", frame0);
-  cv::imshow("Camera 1", frame1);
+  cv::Mat stereo_img;
+  cv::hconcat(frame0, frame1, stereo_img);
+
+  UNUSED(ts);
+  cv::imshow("Stereo", stereo_img);
   cv::waitKey(1);
   return 0;
 }
@@ -56,16 +61,16 @@ int test_MAVDataset_loadCameraData() {
   }
 
   MU_CHECK_EQ(0, retval);
-  MU_CHECK_EQ(2912, mav_data.cam0_data.timestamps.size());
-  MU_CHECK_EQ(2912, mav_data.cam1_data.timestamps.size());
-  MU_CHECK_EQ(2912, mav_data.timestamps.size());
+  MU_CHECK_EQ(10, mav_data.cam0_data.timestamps.size());
+  MU_CHECK_EQ(10, mav_data.cam1_data.timestamps.size());
+  MU_CHECK_EQ(10, mav_data.timestamps.size());
 
   return 0;
 }
 
 int test_MAVDataset_loadGroundTruthData() {
   MAVDataset mav_data(TEST_DATA);
-  int retval = mav_data.loadGroundTruthData();
+  int retval = mav_data.loadGroundTruth();
 
   MU_CHECK_EQ(0, retval);
 
@@ -76,7 +81,7 @@ int test_MAVDataset_load() {
   MAVDataset mav_data(TEST_DATA);
 
   int retval = mav_data.load();
-  // mav_data.mono_camera_cb = mono_camera_cb;
+  mav_data.mono_camera_cb = mono_camera_cb;
   // mav_data.stereo_camera_cb = stereo_camera_cb;
   mav_data.run();
 
