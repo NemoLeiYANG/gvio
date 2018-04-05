@@ -5,8 +5,8 @@ PROJECT(gvio)
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(BUILD_SHARED_LIBS ON)
-# SET(CMAKE_BUILD_TYPE RELEASE)
-SET(CMAKE_BUILD_TYPE DEBUG)
+SET(CMAKE_BUILD_TYPE RELEASE)
+# SET(CMAKE_BUILD_TYPE DEBUG)
 # SET(CMAKE_IGNORE_PATH `catkin locate`)
 
 # DEPENDENCIES
@@ -143,7 +143,7 @@ SET(UNITTESTS
     dataset-euroc-ground_truth_test
     dataset-euroc-imu_data_test
     dataset-euroc-mav_dataset_test
-    # dataset-kitti-raw-calib_test
+    dataset-kitti-raw-calib_test
     # dataset-kitti-raw-oxts_test
     # dataset-kitti-raw-parse_test
     # dataset-kitti-raw-raw_test

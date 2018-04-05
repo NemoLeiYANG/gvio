@@ -36,10 +36,12 @@ fi
 
 mkdir -p build && cd build
 cmake .. && time make -j${CPU_COUNT}
-# cd experiments
+cd experiments
+./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
+python3 scripts/plot_msckf.py /tmp/msckf/msckf
 # ./euroc_runner /data/euroc_mav/raw/V1_01_easy ./configs/msckf_euroc_V01_01_easy.yaml /tmp/msckf
 # python3 scripts/plot_msckf.py /tmp/msckf/msckf
-cd tests
+# cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test
@@ -47,7 +49,7 @@ cd tests
 # ./camera-pinhole_model_test
 # ./control-carrot_controller_test
 # ./control-pid_test
-./dataset-euroc-mav_dataset_test
+# ./dataset-euroc-mav_dataset_test
 # ./dataset-euroc-camera_data_test
 # ./dataset-euroc-imu_data_test
 # ./dataset-euroc-ground_truth_test

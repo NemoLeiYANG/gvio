@@ -354,10 +354,10 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
   if (r_o.rows() == 0) {
     return -1;
   }
-  if (r_o.maxCoeff() > 0.1) {
-    LOG_INFO("Opps! max residual: %.4f", r_o.maxCoeff());
-    return -1;
-  }
+  // if (r_o.maxCoeff() > 0.1) {
+  //   LOG_INFO("Opps! max residual: %.4f", r_o.maxCoeff());
+  //   return -1;
+  // }
 
   // Reduce EKF measurement update computation with QR decomposition
   if (H_o.rows() > H_o.cols() && this->enable_qr_trick) {
@@ -468,7 +468,6 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   //     P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
 
   // Correct states
-  std::cout << "correction!" << std::endl;
   const VecX dx = K * r_n;
   this->correctIMUState(dx);
   this->correctCameraStates(dx);

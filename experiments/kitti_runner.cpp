@@ -17,7 +17,24 @@ void print_usage() {
   std::cout << "/tmp/msckf.yaml /tmp/msckf" << std::endl;
 }
 
+void get_imu_cam_extrinsics(const RawDataset &dataset, Vec4 &q_CI, Vec3 &p_IC) {
+  const Mat4 T_cam_velo = dataset.calib_velo_to_cam.T_cam_velo;
+  const Mat4 T_velo_imu = dataset.calib_imu_to_velo.T_velo_imu;
+  const Mat4 T_cam_imu = T_cam_velo * T_velo_imu;
+  const Mat4 T_imu_cam = T_cam_imu.inverse();
+
+  q_CI = rot2quat(T_cam_imu.block(0, 0, 3, 3));
+  p_IC = T_imu_cam.block(0, 3, 3, 1);
+
+  std::cout << "Camera-IMU Extrinsics:" << std::endl;
+  std::cout << "q_CI: " << q_CI.transpose() << std::endl;
+  std::cout << "p_IC: " << p_IC.transpose() << std::endl;
+}
+
 int main(const int argc, const char *argv[]) {
+  // Seed random
+  std::srand(1);
+
   // Parse cli args
   if (argc != 6) {
     print_usage();
@@ -35,6 +52,9 @@ int main(const int argc, const char *argv[]) {
     LOG_ERROR("Failed to load KITTI raw dataset [%s]!", dataset_path.c_str());
     return -1;
   }
+  Vec4 q_CI;
+  Vec3 p_IC;
+  get_imu_cam_extrinsics(raw_dataset, q_CI, p_IC);
 
   // Setup blackbox
   BlackBox blackbox;

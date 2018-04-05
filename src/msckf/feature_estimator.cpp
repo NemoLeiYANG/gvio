@@ -361,29 +361,28 @@ void CeresFeatureEstimator::addResidualBlock(const Vec2 &kp,
                                              const Mat3 &C_CiC0,
                                              const Vec3 &t_Ci_CiC0,
                                              double *x) {
-  // Build residual
-  auto cost_func = new AnalyticalReprojectionError(C_CiC0, t_Ci_CiC0, kp);
-
-  // Add residual block to problem
-  this->problem.AddResidualBlock(cost_func, // Cost function
-                                 NULL,      // Loss function
-                                 x);        // Optimization parameters
-
   // // Build residual
-  // auto residual = new AutoDiffReprojectionError(C_CiC0, t_Ci_CiC0, kp);
-  //
-  // // Build cost and loss function
-  // auto cost_func =
-  //     new ceres::AutoDiffCostFunction<AutoDiffReprojectionError, // Residual
-  //                                     2, // Size of residual
-  //                                     3 // Size of 1st parameter - inverse
-  //                                     depth
-  //                                     >(residual);
+  // auto cost_func = new AnalyticalReprojectionError(C_CiC0, t_Ci_CiC0, kp);
   //
   // // Add residual block to problem
   // this->problem.AddResidualBlock(cost_func, // Cost function
-  //                                nullptr,   // Loss function
+  //                                NULL,      // Loss function
   //                                x);        // Optimization parameters
+
+  // Build residual
+  auto residual = new AutoDiffReprojectionError(C_CiC0, t_Ci_CiC0, kp);
+
+  // Build cost and loss function
+  auto cost_func =
+      new ceres::AutoDiffCostFunction<AutoDiffReprojectionError, // Residual
+                                      2, // Size of residual
+                                      3 // Size of 1st parameter - inverse depth
+                                      >(residual);
+
+  // Add residual block to problem
+  this->problem.AddResidualBlock(cost_func, // Cost function
+                                 nullptr,   // Loss function
+                                 x);        // Optimization parameters
 }
 
 int CeresFeatureEstimator::setupProblem() {
@@ -433,7 +432,7 @@ int CeresFeatureEstimator::setupProblem() {
 
 int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // Set options
-  this->options.max_num_iterations = 50;
+  this->options.max_num_iterations = 100;
   this->options.num_threads = 1;
   this->options.num_linear_solver_threads = 1;
   this->options.minimizer_progress_to_stdout = false;

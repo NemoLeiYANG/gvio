@@ -78,4 +78,13 @@ MatX nullspace(const MatX &A) {
   return A_null_space;
 }
 
+Mat4 transformation_matrix(const Mat3 R, const Vec3 t) {
+  Mat4 T = zeros(4, 4);
+  T.block(0, 0, 3, 3) = R;
+  T.block(0, 3, 3, 1) = t;
+  T(3, 3) = 1.0;
+
+  return T;
+}
+
 } // namepsace gvio

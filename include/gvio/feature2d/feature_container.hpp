@@ -16,7 +16,7 @@ namespace gvio {
 
 struct FeatureContainer {
   TrackID counter_track_id = 0;
-  size_t max_track_length = 5;
+  size_t max_track_length = 30;
 
   std::vector<TrackID> tracking;
   std::vector<TrackID> lost;

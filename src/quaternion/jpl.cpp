@@ -171,10 +171,11 @@ Vec4 rot2quat(const Mat3 &R) {
     q(1) = (1.0 / (4.0 * q(3))) * (R(2, 0) - R(0, 2));
     q(2) = (1.0 / (4.0 * q(3))) * (R(0, 1) - R(1, 0));
   }
-  if (q(3) < 0.0) {
-    q = -q;
-  }
-  q.normalize();
+  // if (q(3) < 0.0) {
+  //   q = -q;
+  // }
+  q = quatnormalize(q);
+  // q.normalize();
 
   return q;
 }

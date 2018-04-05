@@ -93,6 +93,7 @@ int CalibIMUToVelo::load(const std::string &file_path) {
     }
   }
 
+  this->T_velo_imu = transformation_matrix(this->R, this->t);
   this->ok = true;
   return 0;
 }
@@ -132,6 +133,7 @@ int CalibVeloToCam::load(const std::string &file_path) {
     }
   }
 
+  this->T_cam_velo = transformation_matrix(this->R, this->t);
   this->ok = true;
   return 0;
 }

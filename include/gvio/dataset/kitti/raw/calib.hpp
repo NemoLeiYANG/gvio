@@ -50,6 +50,7 @@ struct CalibIMUToVelo {
   std::string calib_time;
   Mat3 R;
   Vec3 t;
+  Mat4 T_velo_imu;
 
   CalibIMUToVelo() {}
 
@@ -70,6 +71,7 @@ struct CalibVeloToCam {
   Vec3 t;
   Vec2 df;
   Vec2 dc;
+  Mat4 T_cam_velo;
 
   CalibVeloToCam() {}
 

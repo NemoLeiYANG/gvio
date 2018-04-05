@@ -124,6 +124,16 @@ MatX enforce_psd(const MatX &A);
  */
 MatX nullspace(const MatX &A);
 
+/**
+ * Form a 4x4 homogeneous transformation matrix from a
+ * rotation matrix R and translation vector t.
+ *
+ * @param R Rotation matrix
+ * @param t Translation vector
+ * @return T Transformation matrix
+ */
+Mat4 transformation_matrix(const Mat3 R, const Vec3 t);
+
 /** @} group linalg */
 } // namepsace gvio
 #endif // GVIO_UTIL_LINALG_HPP
