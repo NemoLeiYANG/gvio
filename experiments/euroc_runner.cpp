@@ -78,30 +78,15 @@ int main(const int argc, const char *argv[]) {
   tracker.initialize(cam0_img0);
 
   // Bind MSCKF to MAV dataset runner
-  mav_data.imu_cb = std::bind(&MSCKF::predictionUpdate,
-                              &msckf,
-                              std::placeholders::_1,
-                              std::placeholders::_2,
-                              std::placeholders::_3);
-
-  mav_data.mono_camera_cb = std::bind(&KLTTracker::update2,
-                                      &tracker,
-                                      std::placeholders::_1,
-                                      std::placeholders::_2);
-
-  mav_data.get_tracks_cb = std::bind(&KLTTracker::getLostTracks, &tracker);
-
-  mav_data.mea_cb =
-      std::bind(&MSCKF::measurementUpdate, &msckf, std::placeholders::_1);
-
-  mav_data.get_state = std::bind(&MSCKF::getState, &msckf);
-  mav_data.record_cb = std::bind(&BlackBox::recordEstimate,
-                                 &blackbox,
-                                 std::placeholders::_1,
-                                 std::placeholders::_2,
-                                 std::placeholders::_3,
-                                 std::placeholders::_4);
+  // clang-format off
+  mav_data.imu_cb = BIND_IMU_CALLBACK(MSCKF::predictionUpdate, msckf);
+  mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(KLTTracker::update2, tracker);
+  mav_data.get_tracks_cb = BIND_GET_TRACKS_CALLBACK(KLTTracker::getLostTracks, tracker);
+  mav_data.mea_cb = BIND_MEASUREMENT_CALLBACK(MSCKF::measurementUpdate, msckf);
+  mav_data.get_state = BIND_GET_STATE_CALLBACK(MSCKF::getState, msckf);
+  mav_data.record_cb = BIND_RECORD_CALLBACK(BlackBox::recordEstimate, blackbox);
   mav_data.run();
+  // clang-format on
 
   return 0;
 }

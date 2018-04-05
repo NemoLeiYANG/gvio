@@ -26,6 +26,36 @@ namespace gvio {
  * @{
  */
 
+#define BIND_IMU_CALLBACK(CLASS_METHOD, INSTANCE)                              \
+  std::bind(&CLASS_METHOD,                                                     \
+            &INSTANCE,                                                         \
+            std::placeholders::_1,                                             \
+            std::placeholders::_2,                                             \
+            std::placeholders::_3);
+
+#define BIND_MONO_CAMERA_CALLBACK(CLASS_METHOD, INSTANCE)                      \
+  std::bind(&CLASS_METHOD,                                                     \
+            &INSTANCE,                                                         \
+            std::placeholders::_1,                                             \
+            std::placeholders::_2);
+
+#define BIND_GET_TRACKS_CALLBACK(CLASS_METHOD, INSTANCE)                       \
+  std::bind(&CLASS_METHOD, &INSTANCE);
+
+#define BIND_MEASUREMENT_CALLBACK(CLASS_METHOD, INSTANCE)                      \
+  std::bind(&CLASS_METHOD, &INSTANCE, std::placeholders::_1);
+
+#define BIND_GET_STATE_CALLBACK(CLASS_METHOD, INSTANCE)                        \
+  std::bind(&CLASS_METHOD, &INSTANCE);
+
+#define BIND_RECORD_CALLBACK(CLASS_METHOD, INSTANCE)                           \
+  std::bind(&CLASS_METHOD,                                                     \
+            &INSTANCE,                                                         \
+            std::placeholders::_1,                                             \
+            std::placeholders::_2,                                             \
+            std::placeholders::_3,                                             \
+            std::placeholders::_4);
+
 enum DatasetEventType { NOT_SET, IMU_EVENT, CAMERA_EVENT };
 
 struct DatasetEvent {

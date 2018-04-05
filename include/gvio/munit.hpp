@@ -1,5 +1,5 @@
-#ifndef MUNIT_H
-#define MUNIT_H
+#ifndef MUNIT_HPP
+#define MUNIT_HPP
 
 #include <stdio.h>
 
@@ -19,28 +19,28 @@ static int failed = 0;
 #define KWHT "\x1B[1;37m"
 
 /* MUNIT */
-#define MU_ASSERT(test, message)                                               \
+#define MU_ASSERT(TEST, MESSAGE)                                               \
   do {                                                                         \
-    if (!(test)) {                                                             \
+    if (!(TEST)) {                                                             \
       printf("%sERROR!%s [%s:%d] %s\n",                                        \
              KRED,                                                             \
              KNRM,                                                             \
              __func__,                                                         \
              __LINE__,                                                         \
-             message);                                                         \
+             MESSAGE);                                                         \
       return -1;                                                               \
     }                                                                          \
   } while (0)
 
-#define MU_CHECK(test)                                                         \
+#define MU_CHECK(TEST)                                                         \
   do {                                                                         \
-    if ((test) == false) {                                                     \
+    if ((TEST) == false) {                                                     \
       printf("%sERROR!%s [%s:%d] %s %sFAILED!%s\n",                            \
              KRED,                                                             \
              KNRM,                                                             \
              __func__,                                                         \
              __LINE__,                                                         \
-             #test,                                                            \
+             #TEST,                                                            \
              KRED,                                                             \
              KNRM);                                                            \
       return -1;                                                               \
@@ -63,15 +63,15 @@ static int failed = 0;
     }                                                                          \
   } while (0)
 
-#define MU_FALSE(test)                                                         \
+#define MU_FALSE(TEST)                                                         \
   do {                                                                         \
-    if (test != false) {                                                       \
+    if (TEST != false) {                                                       \
       printf("%sERROR!%s [%s:%d] %s != false %sFAILED!%s\n",                   \
              KRED,                                                             \
              KNRM,                                                             \
              __func__,                                                         \
              __LINE__,                                                         \
-             #test,                                                            \
+             #TEST,                                                            \
              KRED,                                                             \
              KNRM);                                                            \
       return -1;                                                               \
@@ -106,12 +106,12 @@ static int failed = 0;
     }                                                                          \
   } while (0)
 
-#define MU_ADD_TEST(test)                                                      \
+#define MU_ADD_TEST(TEST)                                                      \
   do {                                                                         \
     tests++;                                                                   \
-    printf("%s-> %s %s\n", KBLU, #test, KNRM);                                 \
+    printf("%s-> %s %s\n", KBLU, #TEST, KNRM);                                 \
     fflush(stdout);                                                            \
-    if (test() == -1) {                                                        \
+    if (TEST() == -1) {                                                        \
       printf("%sTEST FAILED!%s\n\n", KRED, KNRM);                              \
       failed++;                                                                \
     } else {                                                                   \
@@ -122,12 +122,12 @@ static int failed = 0;
 
 #if defined(MU_PRINT)
 #if MU_PRINT == 1
-#define MU_PRINT(message, ...) printf(message, ##__VA_ARGS__)
+#define MU_PRINT(MESSAGE, ...) printf(MESSAGE, ##__VA_ARGS__)
 #elif MU_PRINT == 0
-#define MU_PRINT(message, ...)
+#define MU_PRINT(MESSAGE, ...)
 #endif
 #else
-#define MU_PRINT(message, ...) printf(message, ##__VA_ARGS__)
+#define MU_PRINT(MESSAGE, ...) printf(MESSAGE, ##__VA_ARGS__)
 #endif
 
 #define MU_REPORT()                                                            \
@@ -157,4 +157,4 @@ static int failed = 0;
     return -1;                                                                 \
   }
 
-#endif // MUNIT_H
+#endif // MUNIT_HPP
