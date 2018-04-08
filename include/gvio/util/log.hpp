@@ -17,12 +17,14 @@ namespace gvio {
 
 #define LOG_ERROR(M, ...)                                                      \
   fprintf(stderr,                                                              \
-          "[ERROR] [%s:%d] " M "\n",                                           \
+          "\033[31m[ERROR] [%s:%d] " M "\033[0m\n",                            \
           __FILENAME__,                                                        \
           __LINE__,                                                            \
           ##__VA_ARGS__)
 
 #define LOG_INFO(M, ...) fprintf(stdout, "[INFO] " M "\n", ##__VA_ARGS__)
+#define LOG_WARN(M, ...)                                                       \
+  fprintf(stdout, "\033[33m[WARN] " M "\033[0m\n", ##__VA_ARGS__)
 
 #ifdef NDEBUG
 #define DEBUG(M, ...)

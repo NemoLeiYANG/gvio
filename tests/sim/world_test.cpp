@@ -16,7 +16,7 @@ int test_SimWorld_constructor() {
 int test_SimWorld_configure() {
   SimWorld world;
 
-  world.configure(0.1);
+  world.configure(10.0, 0.1);
   MU_CHECK_FLOAT(0.0, world.t);
   MU_CHECK_FLOAT(0.1, world.dt);
 
@@ -49,12 +49,14 @@ int test_SimWorld_create3DFeatures() {
 }
 
 int test_SimWorld_create3DFeaturePerimeter() {
+  // Test SimWorld.create3DFeaturePerimeter()
   SimWorld world;
   Vec3 origin{0.0, 0.0, 0.0};
   Vec3 dimensions{10.0, 10.0, 10.0};
   const MatX features =
       world.create3DFeaturePerimeter(origin, dimensions, 1000);
 
+  // Assert
   for (int i = 0; i < features.rows(); i++) {
     const Vec3 feature = features.block(i, 0, 1, 3).transpose();
     MU_CHECK(feature(0) >= origin(0) - dimensions(0) / 2.0);
@@ -74,13 +76,15 @@ int test_SimWorld_create3DFeaturePerimeter() {
 int test_SimWorld_detectFeatures() {
   SimWorld world;
 
-  world.configure(0.1);
+  // Test SimWorld.detectFeatures()
+  world.configure(10.0, 0.1);
   world.detectFeatures();
   for (int i = 0; i < 100; i++) {
     world.step();
   }
   world.detectFeatures();
 
+  // Assert
   MU_CHECK(world.features_tracking.size() > 0);
   MU_CHECK(world.tracks_tracking.size() > 0);
   MU_CHECK(world.tracks_lost.size() > 0);
@@ -91,7 +95,8 @@ int test_SimWorld_detectFeatures() {
 int test_SimWorld_removeLostTracks() {
   SimWorld world;
 
-  world.configure(0.1);
+  // Test SimWorld.removeLostTracks()
+  world.configure(10.0, 0.1);
   world.detectFeatures();
   for (int i = 0; i < 10; i++) {
     std::cout << "frame: " << i << std::endl;
@@ -99,6 +104,7 @@ int test_SimWorld_removeLostTracks() {
   }
   FeatureTracks tracks = world.removeLostTracks();
 
+  // Assert
   MU_CHECK(tracks.size() > 0);
   MU_CHECK_EQ(0, world.tracks_lost.size());
 
@@ -108,15 +114,19 @@ int test_SimWorld_removeLostTracks() {
 int test_SimWorld_step() {
   SimWorld world;
 
-  world.configure(0.1);
-  for (int i = 0; i < 10; i++) {
-    std::cout << "frame: " << i << std::endl;
+  // Test step
+  world.configure(10.0, 0.1);
+  while (world.t <= 10.0) {
     world.step();
   }
   FeatureTracks tracks = world.removeLostTracks();
 
+  // Assert
   MU_CHECK(tracks.size() > 0);
   MU_CHECK_EQ(0, world.tracks_lost.size());
+
+  // Plot
+  PYTHON_SCRIPT("scripts/plot_sim.py /tmp/sim");
 
   return 0;
 }

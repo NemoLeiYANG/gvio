@@ -74,8 +74,11 @@ int main(const int argc, const char *argv[]) {
   PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
   // -- Setup feature tracker
   KLTTracker tracker{&pinhole_model};
+  // tracker.max_corners = 500;
+  // tracker.min_distance = 5.0;
+  // tracker.quality_level = 0.001;
+  tracker.show_matches = true;
   cv::Mat cam0_img0 = cv::imread(mav_data.cam0_data.image_paths[0]);
-  tracker.initialize(cam0_img0);
 
   // Bind MSCKF to MAV dataset runner
   // clang-format off
@@ -87,6 +90,13 @@ int main(const int argc, const char *argv[]) {
   mav_data.record_cb = BIND_RECORD_CALLBACK(BlackBox::recordEstimate, blackbox);
   mav_data.run();
   // clang-format on
+
+  const long nb_images = mav_data.frame_index;
+  const long nb_imu_measurements = mav_data.imu_index;
+  LOG_INFO("EuroC MAV dataset summary");
+  LOG_INFO("-----------------------------");
+  LOG_INFO("Processed %ld images", nb_images);
+  LOG_INFO("Processed %ld measurements", nb_imu_measurements);
 
   return 0;
 }

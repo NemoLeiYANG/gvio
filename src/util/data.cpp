@@ -120,4 +120,16 @@ int mat2csv(const std::string &file_path, const MatX &data) {
   return 0;
 }
 
+void print_progress(const double percentage) {
+  const char *PBSTR =
+      "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||";
+  const int PBWIDTH = 60;
+
+  int val = (int) (percentage * 100);
+  int lpad = (int) (percentage * PBWIDTH);
+  int rpad = PBWIDTH - lpad;
+  printf("\r%3d%% [%.*s%*s]", val, lpad, PBSTR, rpad, "");
+  fflush(stdout);
+}
+
 } // namespace gvio

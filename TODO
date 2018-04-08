@@ -1,5 +1,4 @@
 # In-progress
-- Make Mono MSCKF work with Euroc mav dataset
 - Simulate 3D camera with bezier curve
 - Add Stereo KLT tracker
 - Modify MSCK for Stero KLT tracker and test with Kitti
@@ -11,3 +10,4 @@
 - Test GroundTruth
 - Test DatasetEvent
 - Test MavDataset
+- Make Mono MSCKF work with Euroc mav dataset

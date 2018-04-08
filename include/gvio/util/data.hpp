@@ -58,6 +58,13 @@ int csv2mat(const std::string &file_path, const bool header, MatX &data);
  */
 int mat2csv(const std::string &file_path, const MatX &data);
 
+/**
+ * Print progress to screen
+ *
+ * @param percentage Percentage
+ */
+void print_progress(const double percentage);
+
 /** @} group data */
 } // namespace gvio
 #endif // GVIO_UTIL_DATA_HPP

@@ -8,7 +8,7 @@ std::ostream &operator<<(std::ostream &os, const FeatureTrack &track) {
   os << "frame_end: " << track.frame_end << std::endl;
   os << "length: " << track.track.size() << std::endl;
   for (auto f : track.track) {
-    os << f << std::endl;
+    os << f;
   }
   os << std::endl;
   return os;

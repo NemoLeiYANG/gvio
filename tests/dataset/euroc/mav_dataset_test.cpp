@@ -1,5 +1,6 @@
 #include "gvio/munit.hpp"
 #include "gvio/dataset/euroc/mav_dataset.hpp"
+#include "gvio/quaternion/jpl.hpp"
 
 namespace gvio {
 
@@ -90,12 +91,47 @@ int test_MAVDataset_load() {
   return 0;
 }
 
+int test_MAVDataset_sandbox() {
+  MAVDataset mav_data(TEST_DATA);
+
+  int retval = mav_data.load();
+  MU_CHECK_EQ(0, retval);
+
+  const Mat4 T_imu_cam0 = mav_data.cam0_data.T_BS;
+  const Mat4 T_imu_cam1 = mav_data.cam1_data.T_BS;
+  const Vec3 X{0.0, 0.0, 10.0};
+
+  // clang-format off
+  Mat4 T_body_imu;
+  T_body_imu << 0.0, 0.0, 1.0, 0.0,
+                0.0, -1.0, 0.0, 0.0,
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 1.0;
+  // clang-format on
+  const Mat4 T_body_cam0 = T_body_imu * T_imu_cam0;
+  const Mat4 T_cam0_body = T_body_cam0.inverse();
+
+  // std::cout << T_body_cam0 * X.homogeneous() << std::endl;
+
+  const Vec4 q_CI = rot2quat(T_cam0_body.block(0, 0, 3, 3));
+  std::cout << "q_CI: " << q_CI.transpose() << std::endl;
+  const Vec3 p_I_CI = T_cam0_body.block(0, 3, 3, 1);
+  std::cout << "p_I_CI: " << p_I_CI.transpose() << std::endl;
+
+  // std::cout << T_imu_cam0 << std::endl;
+  // std::cout << T_imu_cam1 << std::endl;
+  // std::cout << T_body_imu << std::endl;
+
+  return 0;
+}
+
 void test_suite() {
   MU_ADD_TEST(test_MAVDataset_constructor);
   MU_ADD_TEST(test_MAVDataset_loadIMUData);
   MU_ADD_TEST(test_MAVDataset_loadCameraData);
   MU_ADD_TEST(test_MAVDataset_loadGroundTruthData);
   MU_ADD_TEST(test_MAVDataset_load);
+  MU_ADD_TEST(test_MAVDataset_sandbox);
 }
 
 } // namespace gvio

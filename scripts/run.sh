@@ -28,12 +28,12 @@ cmake .. && time make -j${CPU_COUNT}
 # cd experiments
 # ./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
 # ./kitti_runner /data/kitti/raw 2011_09_26 0046 ./configs/msckf_kitti_raw-2011_09_26-0046.yaml /tmp/msckf
-# python3 scripts/plot_msckf.py /tmp/msckf/msckf
 # ./euroc_runner /data/euroc_mav/raw/V1_01_easy ./configs/msckf_euroc_V01_01_easy.yaml /tmp/msckf
 # python3 scripts/plot_msckf.py /tmp/msckf/msckf
+# python3 scripts/plot_euroc_dataset.py /data/euroc_mav/raw/V1_01_easy
 
 # TESTS
-# cd tests
+cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test
@@ -79,8 +79,9 @@ cmake .. && time make -j${CPU_COUNT}
 # ./sim-carrot_controller_test
 # ./sim-bezier_test
 # ./sim-camera_test
+# ./sim-camera_motion_test
 # ./sim-twowheel_test
-# ./sim-world_test
+./sim-world_test
 # ./util-config_test
 # ./util-data_test
 # ./util-file_test
@@ -96,6 +97,7 @@ cmake .. && time make -j${CPU_COUNT}
 # python3 scripts/plot_feature_track.py /tmp/track.dat 1242 375
 # python3 scripts/plot_feature_tracks.py /tmp/feature_tracks 1242 375
 # python3 scripts/plot_twowheel.py /tmp/twowheel.dat
+python3 scripts/plot_sim.py /tmp/sim
 
 # TOOLS
 # ./tools/pwm 40

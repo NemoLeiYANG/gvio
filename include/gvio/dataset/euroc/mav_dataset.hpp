@@ -56,8 +56,14 @@ namespace gvio {
             std::placeholders::_3,                                             \
             std::placeholders::_4);
 
+/**
+ * Dataset Event Type
+ */
 enum DatasetEventType { NOT_SET, IMU_EVENT, CAMERA_EVENT };
 
+/**
+ * Dataset Event
+ */
 struct DatasetEvent {
   // Event Type
   DatasetEventType type;

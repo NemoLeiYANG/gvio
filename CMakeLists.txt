@@ -97,6 +97,7 @@ ADD_LIBRARY(
   src/quaternion/jpl.cpp
   # sim
   src/sim/camera.cpp
+  src/sim/camera_motion.cpp
   src/sim/twowheel.cpp
   src/sim/world.cpp
   # utils
@@ -149,10 +150,10 @@ SET(
   # control-carrot_controller_test
   # control-pid_test
   # dataset-euroc-camera_data_test
-  dataset-euroc-ground_truth_test
-  dataset-euroc-imu_data_test
-  dataset-euroc-mav_dataset_test
-  dataset-kitti-raw-calib_test
+  # dataset-euroc-ground_truth_test
+  # dataset-euroc-imu_data_test
+  # dataset-euroc-mav_dataset_test
+  # dataset-kitti-raw-calib_test
   # dataset-kitti-raw-oxts_test
   # dataset-kitti-raw-parse_test
   # dataset-kitti-raw-raw_test
@@ -174,7 +175,7 @@ SET(
   # gimbal-calibration-stereo_calib_test
   # gimbal-gmr-gmr_test
   # gimbal-sbgc_test
-  # gimbal-saliency_test
+  # # gimbal-saliency_test
   # imu-mpu6050_test
   # msckf-camera_state_test
   # msckf-feature_estimator_test
@@ -185,8 +186,9 @@ SET(
   # quadrotor-mission_test
   # sim-bezier_test
   # sim-camera_test
+  sim-camera_motion_test
   # sim-twowheel_test
-  # sim-world_test
+  sim-world_test
   # util-config_test
   # util-data_test
   # util-file_test
@@ -194,7 +196,7 @@ SET(
   # util-linalg_test
   # util-math_test
   # util-stats_test
-  util-time_test
+  # util-time_test
 )
 FOREACH(TEST ${UNITTESTS})
   STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
@@ -202,26 +204,26 @@ FOREACH(TEST ${UNITTESTS})
   TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 ENDFOREACH(TEST)
 
-# EXPERIMENTS
-FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
-FILE(COPY experiments/scripts DESTINATION ${PROJECT_BINARY_DIR}/experiments)
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
-SET(EXPERIMENTS kitti_runner euroc_runner)
-FOREACH(TEST ${EXPERIMENTS})
-  STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
-  ADD_EXECUTABLE(${TEST} experiments/${TEST_PATH}.cpp)
-  TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
-ENDFOREACH(TEST)
-
-# TOOLS
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tools)
-SET(TOOLS
-    imu
-    camera
-    pwm
-    recorder)
-FOREACH(TOOL ${TOOLS})
-  STRING(REGEX REPLACE "-" "/" TOOL_PATH ${TOOL})
-  ADD_EXECUTABLE(${TOOL} tools/${TOOL_PATH}.cpp)
-  TARGET_LINK_LIBRARIES(${TOOL} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
-ENDFOREACH(TOOL)
+# # EXPERIMENTS
+# FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
+# FILE(COPY experiments/scripts DESTINATION ${PROJECT_BINARY_DIR}/experiments)
+# SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
+# SET(EXPERIMENTS kitti_runner euroc_runner)
+# FOREACH(TEST ${EXPERIMENTS})
+#   STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
+#   ADD_EXECUTABLE(${TEST} experiments/${TEST_PATH}.cpp)
+#   TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+# ENDFOREACH(TEST)
+#
+# # TOOLS
+# SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tools)
+# SET(TOOLS
+#     imu
+#     camera
+#     pwm
+#     recorder)
+# FOREACH(TOOL ${TOOLS})
+#   STRING(REGEX REPLACE "-" "/" TOOL_PATH ${TOOL})
+#   ADD_EXECUTABLE(${TOOL} tools/${TOOL_PATH}.cpp)
+#   TARGET_LINK_LIBRARIES(${TOOL} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+# ENDFOREACH(TOOL)

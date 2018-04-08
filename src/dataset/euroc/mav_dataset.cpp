@@ -163,9 +163,8 @@ int MAVDataset::step() {
     DatasetEvent event = it->second;
     if (event.type == IMU_EVENT) {
       imu_event = true;
-      const Mat3 R = euler321ToRot(Vec3{0.0, deg2rad(-90.0), deg2rad(180)});
-      a_m = R * event.a_m;
-      w_m = R * event.w_m;
+      a_m = event.a_m;
+      w_m = event.w_m;
     } else if (event.camera_index == 0) {
       cam0_event = true;
       cam0_image_path = event.image_path;
@@ -179,6 +178,16 @@ int MAVDataset::step() {
 
   // Trigger imu callback
   if (imu_event && this->imu_cb != nullptr) {
+    // clang-format off
+    Mat3 R_body_imu;
+    R_body_imu << 0.0, 0.0, 1.0,
+                  0.0, -1.0, 0.0,
+                  1.0, 0.0, 0.0;
+    // clang-format on
+    a_m = R_body_imu * a_m;
+    w_m = R_body_imu * w_m;
+    // std::cout << a_m.transpose() << std::endl;
+
     if (this->imu_cb(a_m, w_m, this->ts_now) != 0) {
       LOG_ERROR("IMU callback failed! Stopping MAVDataset!");
       return -2;
@@ -235,13 +244,13 @@ int MAVDataset::step() {
 }
 
 int MAVDataset::run() {
-  for (size_t i = 0; i < this->timestamps.size(); i++) {
+  // for (size_t i = 0; i < this->timestamps.size(); i++) {
+  for (size_t i = 0; i < 600; i++) {
     const int retval = this->step();
     if (retval != 0) {
       return retval;
     }
   }
-
   return 0;
 }
 

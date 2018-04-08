@@ -162,6 +162,7 @@ int KLTTracker::track(const cv::Mat &img_ref,
   if (this->show_matches) {
     cv::Mat matches_img = draw_tracks(img_cur, p0, p1, final_mask);
     cv::imshow("Matches", img_cur);
+    cv::waitKey(1);
   }
 
   return 0;

@@ -58,6 +58,8 @@ int test_bezier_derivative() {
   const Vec3 a = bezier_derivative(points, 0.0, 2);
   std::cout << a.transpose() << std::endl;
   std::cout << std::endl;
+
+  return 0;
 }
 
 int test_bezier_derivative2() {

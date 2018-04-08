@@ -57,7 +57,7 @@ int test_sandbox() {
   const Vec3 X{0.0, 10.0, 0.0};
   // std::cout << T_cam_imu * X.homogeneous() << std::endl;
 
-  const Vec4 q = rot2quat(T_imu_cam.block(0, 0, 3, 3));
+  const Vec4 q = rot2quat(T_imu_cam.block(0, 0, 3, 3).transpose());
   std::cout << q.transpose() << std::endl;
   // std::cout << C(q) * X << std::endl;
 

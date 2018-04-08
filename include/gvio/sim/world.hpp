@@ -13,6 +13,7 @@
 #include "gvio/feature2d/feature_container.hpp"
 #include "gvio/sim/twowheel.hpp"
 #include "gvio/sim/camera.hpp"
+#include "gvio/sim/camera_motion.hpp"
 
 namespace gvio {
 /**
@@ -32,15 +33,16 @@ struct feature_bounds {
 class SimWorld {
 public:
   double t = 0.0;
-  double dt = 0.0;
   double t_end = 0.0;
+  double dt = 0.0;
   size_t time_index = 0;
+  size_t frame_index = 0;
 
-  TwoWheelRobot robot;
   VirtualCamera camera;
+  CameraMotion camera_motion;
 
   Vec3 origin{0.0, 0.0, 0.0};
-  Vec3 dimensions{30.0, 30.0, 60.0};
+  Vec3 dimensions{30.0, 30.0, 10.0};
   size_t nb_features = 1000;
   MatX features3d;
 
@@ -48,19 +50,23 @@ public:
   std::map<int, FeatureTrack> tracks_tracking;
   FeatureTracks tracks_lost;
 
-  std::ofstream trajectory_file;
-  std::ofstream feature3d_file;
+  std::string output_path = "/tmp/sim";
+  std::ofstream gnd_file;
+  std::ofstream est_file;
+  std::ofstream mea_file;
+  std::ofstream cam0_idx_file;
 
-  SimWorld() {}
-  virtual ~SimWorld() {}
+  SimWorld();
+  virtual ~SimWorld();
 
   /**
    * Configure
    *
+   * @param t_end Time end (s)
    * @param dt Time step (s)
    * @returns 0 for success, -1 for failure
    */
-  int configure(const double dt);
+  int configure(const double t_end, const double dt);
 
   /**
    * Create 3D features
@@ -96,6 +102,56 @@ public:
    * @returns Lost feature tracks
    */
   FeatureTracks removeLostTracks();
+
+  /**
+   * Record ground truth
+   *
+   * @param time Relative time in seconds (where 0 is start)
+   * @param p_G Ground Truth position in global frame
+   * @param v_G Ground Truth velocity in global frame
+   * @param rpy_G Ground Truth roll, pitch, and yaw in global frame
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int recordGroundTruth(const double time,
+                        const Vec3 &p_G,
+                        const Vec3 &v_G,
+                        const Vec3 &rpy_G);
+
+  /**
+   * Record measurement
+   *
+   * @param time Relative time in seconds (where 0 is start)
+   * @param measurement_a_B Accelerometer measurement
+   * @param measurement_w_B Gyroscope measurement
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int recordMeasurement(const double time,
+                        const Vec3 &measurement_a_B,
+                        const Vec3 &measurement_w_B);
+
+  /**
+   * Record camera observation
+   */
+  int recordCameraObservation(const std::vector<size_t> &feature_ids,
+                              const std::vector<Vec2> &keypoints,
+                              const std::vector<Vec3> &landmarks);
+
+  /**
+   * Record estimate
+   *
+   * @param time Relative time in seconds (where 0 is start)
+   * @param p_G Position in global frame
+   * @param v_G Velocity in global frame
+   * @param rpy_G Roll, pitch and yaw in global frame
+   *
+   * @returns 0 for success, -1 for failure
+   */
+  int recordEstimate(const double time,
+                     const Vec3 &p_G,
+                     const Vec3 &v_G,
+                     const Vec3 &rpy_G);
 
   /**
    * Step simulation

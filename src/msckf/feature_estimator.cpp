@@ -26,7 +26,8 @@ Vec3 lls_triangulation(const Vec3 &u1,
   // clang-format on
 
   // SVD
-  Vec3 X = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(B);
+  const auto svd_options = Eigen::ComputeThinU | Eigen::ComputeThinV;
+  const Vec3 X = A.jacobiSvd(svd_options).solve(B);
 
   return X;
 }
@@ -35,23 +36,19 @@ Vec3 lls_triangulation(const Vec2 &p1,
                        const Vec2 &p2,
                        const Mat3 &C_C0C1,
                        const Vec3 &t_C0_C0C1) {
-  // Convert points to homogenous coordinates and normalize
-  Vec3 pt1{p1[0], p1[1], 1.0};
-  Vec3 pt2{p2[0], p2[1], 1.0};
-  // pt1.normalize();
-  // pt2.normalize();
-
   // Triangulate
   // -- Matrix A
   MatX A = zeros(3, 2);
-  A.block(0, 0, 3, 1) = pt1;
-  A.block(0, 1, 3, 1) = -C_C0C1 * pt2;
+  A.block(0, 0, 3, 1) = p1.homogeneous();
+  A.block(0, 1, 3, 1) = -C_C0C1 * p2.homogeneous();
+
   // -- Vector b
-  Vec3 b{t_C0_C0C1};
+  const Vec3 b{t_C0_C0C1};
   // -- Perform SVD
-  VecX x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+  const auto svd_options = Eigen::ComputeThinU | Eigen::ComputeThinV;
+  const VecX x = A.jacobiSvd(svd_options).solve(b);
   // -- Calculate p_C0_f
-  const Vec3 p_C0_f = x(0) * pt1;
+  const Vec3 p_C0_f = x(0) * p1.homogeneous();
 
   return p_C0_f;
 }
@@ -96,8 +93,16 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
   const Vec2 pt1 = this->track.track[0].getKeyPoint();
   const Vec2 pt2 = this->track.track[1].getKeyPoint();
 
-  // Calculate initial estimate of 3D position
-  FeatureEstimator::triangulate(pt1, pt2, C_C0C1, t_C0_C0C1, p_C0_f);
+  if ((pt1 - pt2).norm() > 1.0e-3) {
+    // Calculate initial estimate of 3D position
+    FeatureEstimator::triangulate(pt1, pt2, C_C0C1, t_C0_C0C1, p_C0_f);
+  } else {
+    p_C0_f << pt1(0), pt1(1), 5.0;
+  }
+  // std::cout << "pt1: " << pt1.transpose() << std::endl;
+  // std::cout << "pt2: " << pt2.transpose() << std::endl;
+  // std::cout << "p_C0_f: " << p_C0_f.transpose() << std::endl;
+  // exit(0);
 
   return 0;
 }
@@ -456,6 +461,10 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
 
   // Check estimate
   if (this->checkEstimate(p_G_f) != 0) {
+    LOG_WARN("Bad estimate p_G_f [%.2f, %.2f, %.2f]",
+             p_G_f(0),
+             p_G_f(1),
+             p_G_f(2));
     return -2;
   }
   // Vec3 gnd = this->track.track[0].ground_truth;

@@ -320,10 +320,10 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
   }
 
   // Peform chi squared test
-  const int dof = track.trackedLength() - 1;
-  if (this->chiSquaredTest(H_o_j, r_o_j, dof) != 0) {
-    return -3;
-  }
+  // const int dof = track.trackedLength() - 1;
+  // if (this->chiSquaredTest(H_o_j, r_o_j, dof) != 0) {
+  //   return -3;
+  // }
 
   return 0;
 }
@@ -353,10 +353,11 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
   if (r_o.rows() == 0) {
     return -1;
   }
-  // if (r_o.maxCoeff() > 0.1) {
-  //   LOG_INFO("Opps! max residual: %.4f", r_o.maxCoeff());
-  //   return -1;
-  // }
+  std::cout << r_o.maxCoeff() << std::endl;
+  if (r_o.maxCoeff() > 0.1) {
+    LOG_WARN("Large residual! [%.4f]", r_o.maxCoeff());
+    // return -1;
+  }
 
   // Reduce EKF measurement update computation with QR decomposition
   if (H_o.rows() > H_o.cols() && this->enable_qr_trick) {
@@ -445,7 +446,14 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
 
   // Filter feature tracks
   FeatureTracks filtered_tracks = this->filterTracks(tracks);
+  int i = 0;
+  for (auto track : tracks) {
+    std::cout << i << "\t";
+    std::cout << track << std::endl;
+  }
   if (filtered_tracks.size() == 0) {
+    LOG_WARN("No features tracked for more than [%d] frames!",
+             this->min_track_length);
     return 0;
   }
 
@@ -453,7 +461,8 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   MatX T_H;
   VecX r_n;
   if (this->calcResiduals(filtered_tracks, T_H, r_n) != 0) {
-    return -2;
+    LOG_WARN("No tracks made it through!");
+    return 0;
   }
 
   // Calculate the Kalman gain.
@@ -470,6 +479,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   const VecX dx = K * r_n;
   this->correctIMUState(dx);
   this->correctCameraStates(dx);
+  LOG_INFO("Correct estimation!");
 
   // Update covariance matrices
   const MatX I_KH = I(K.rows(), T_H.cols()) - K * T_H;
