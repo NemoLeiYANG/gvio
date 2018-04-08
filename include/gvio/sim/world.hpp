@@ -21,6 +21,9 @@ namespace gvio {
  * @{
  */
 
+/**
+ * Feature bounds
+ */
 struct feature_bounds {
   double x_min = 0.0;
   double x_max = 0.0;
@@ -30,6 +33,9 @@ struct feature_bounds {
   double z_max = 0.0;
 };
 
+/**
+ * Simulation world
+ */
 class SimWorld {
 public:
   double t = 0.0;
@@ -133,6 +139,10 @@ public:
 
   /**
    * Record camera observation
+   *
+   * @param feature_ids Feature IDs
+   * @param keypoints Observed keypoints
+   * @param landmarks Observed landmarks
    */
   int recordCameraObservation(const std::vector<size_t> &feature_ids,
                               const std::vector<Vec2> &keypoints,

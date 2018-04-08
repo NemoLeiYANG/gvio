@@ -18,8 +18,9 @@ namespace gvio {
 class CameraMotion {
 public:
   // Simulation settings
-  std::vector<Vec3> control_points; ///< Bezier curve control points
-  double max_time = 0.0;            ///< Simulation max time [s]
+  std::vector<Vec3> pos_points; ///< Bezier curve position control points
+  std::vector<Vec3> att_points; ///< Bezier curve attitude control points
+  double max_time = 0.0;        ///< Simulation max time [s]
 
   // Camera position velocity and accelation
   Vec3 p_G = Vec3::Zero();   ///< Global position [m]
@@ -34,7 +35,9 @@ public:
 
   CameraMotion();
 
-  CameraMotion(const std::vector<Vec3> &control_points, const double max_time);
+  CameraMotion(const std::vector<Vec3> &pos_points,
+               const std::vector<Vec3> &att_points,
+               const double max_time);
 
   virtual ~CameraMotion();
 

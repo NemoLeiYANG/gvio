@@ -43,11 +43,15 @@ int SimWorld::configure(const double t_end, const double dt) {
   this->camera = VirtualCamera(image_width, image_height, fx, fy, cx, cy);
 
   // Camera motion settings
-  const std::vector<Vec3> control_points{Vec3{0.0, 0.0, 0.0},
-                                         Vec3{0.0, 1.0, 0.0},
-                                         Vec3{4.0, 1.0, 1.0},
-                                         Vec3{4.0, 0.0, 1.0}};
-  this->camera_motion = CameraMotion(control_points, this->t_end);
+  const std::vector<Vec3> pos_points{Vec3{0.0, 0.0, 0.0},
+                                     Vec3{0.0, 5.0, 0.0},
+                                     Vec3{5.0, 5.0, 1.0},
+                                     Vec3{5.0, 0.0, 1.0}};
+  const std::vector<Vec3> att_points{Vec3{0.0, 0.0, 0.0},
+                                     Vec3{0.0, 0.0, 0.25},
+                                     Vec3{0.0, 0.0, 0.75},
+                                     Vec3{0.0, 0.0, 1.0}};
+  this->camera_motion = CameraMotion(pos_points, att_points, this->t_end);
   this->camera_motion.update(this->t);
 
   // Features
