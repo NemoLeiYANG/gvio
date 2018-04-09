@@ -75,6 +75,20 @@ public:
   int configure(const double t_end, const double dt);
 
   /**
+   * Configure
+   *
+   * @param config_file Path to config file
+   * @returns 0 for success, -1 for failure
+   */
+  int configure(const std::string &config_file);
+
+  /**
+   * Setup output directory and files
+   * @returns 0 for success, -1 for failure
+   */
+  int setupOutput();
+
+  /**
    * Create 3D features
    *
    * @param bounds Feature bounds

@@ -3,6 +3,8 @@
 
 namespace gvio {
 
+#define TEST_CONFIG "test_configs/sim/sim.yaml"
+
 int test_SimWorld_constructor() {
   SimWorld world;
 
@@ -19,6 +21,21 @@ int test_SimWorld_configure() {
   world.configure(10.0, 0.1);
   MU_CHECK_FLOAT(0.0, world.t);
   MU_CHECK_FLOAT(0.1, world.dt);
+
+  return 0;
+}
+
+int test_SimWorld_configure2() {
+  SimWorld world;
+
+  world.configure(TEST_CONFIG);
+  MU_CHECK_FLOAT(0.0, world.t);
+  MU_CHECK_FLOAT(0.1, world.dt);
+
+  MU_CHECK_EQ(640, world.camera.camera_model.image_width);
+  MU_CHECK_EQ(640, world.camera.camera_model.image_height);
+  MU_CHECK_EQ(4, world.camera_motion.pos_points.size());
+  MU_CHECK_EQ(4, world.camera_motion.att_points.size());
 
   return 0;
 }
@@ -115,7 +132,7 @@ int test_SimWorld_step() {
   SimWorld world;
 
   // Test step
-  world.configure(10.0, 0.1);
+  world.configure(TEST_CONFIG);
   while (world.t <= 10.0) {
     world.step();
   }
@@ -133,8 +150,8 @@ int test_SimWorld_step() {
 
 void test_suite() {
   MU_ADD_TEST(test_SimWorld_constructor);
-  MU_ADD_TEST(test_SimWorld_constructor);
   MU_ADD_TEST(test_SimWorld_configure);
+  MU_ADD_TEST(test_SimWorld_configure2);
   MU_ADD_TEST(test_SimWorld_create3DFeatures);
   MU_ADD_TEST(test_SimWorld_create3DFeaturePerimeter);
   MU_ADD_TEST(test_SimWorld_detectFeatures);

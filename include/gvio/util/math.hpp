@@ -115,6 +115,22 @@ void vec2array(const VecX &v, double *out);
 void mat2array(const MatX &m, double *out);
 
 /**
+ * Matrix to list of vectors
+ *
+ * @param m Matrix
+ * @returns Vectors
+ */
+std::vector<VecX> mat2vec(const MatX &m, bool row_wise = true);
+
+/**
+ * Matrix to list of vectors of size 3
+ *
+ * @param m Matrix
+ * @returns Vectors
+ */
+std::vector<Vec3> mat2vec3(const MatX &m, bool row_wise = true);
+
+/**
  * Create random integer
  *
  * @param ub Upper bound

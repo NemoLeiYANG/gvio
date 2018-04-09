@@ -74,6 +74,40 @@ void mat2array(const MatX &A, double *out) {
   }
 }
 
+std::vector<VecX> mat2vec(const MatX &m, bool row_wise) {
+  std::vector<VecX> vectors;
+
+  if (row_wise) {
+    for (long i = 0; i < m.rows(); i++) {
+      vectors.emplace_back(m.row(i));
+    }
+  } else {
+    for (long i = 0; i < m.cols(); i++) {
+      vectors.emplace_back(m.col(i));
+    }
+  }
+
+  return vectors;
+}
+
+std::vector<Vec3> mat2vec3(const MatX &m, bool row_wise) {
+  std::vector<Vec3> vectors;
+
+  if (row_wise) {
+    assert(m.cols() == 3);
+    for (long i = 0; i < m.rows(); i++) {
+      vectors.emplace_back(m.row(i));
+    }
+  } else {
+    assert(m.rows() == 3);
+    for (long i = 0; i < m.cols(); i++) {
+      vectors.emplace_back(m.col(i));
+    }
+  }
+
+  return vectors;
+}
+
 int randi(int ub, int lb) { return rand() % lb + ub; }
 
 double randf(const double ub, const double lb) {

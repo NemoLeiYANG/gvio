@@ -21,8 +21,8 @@ fi
 #   --imu_topic "/gvio/imu"
 
 # BUILD
-# mkdir -p build && cd build
-# cmake .. && time make -j${CPU_COUNT}
+mkdir -p build && cd build
+cmake .. && time make -j${CPU_COUNT}
 
 # EXPERIMENTS
 # cd experiments
@@ -81,7 +81,7 @@ cd tests
 # ./sim-camera_test
 # ./sim-camera_motion_test
 # ./sim-twowheel_test
-# ./sim-world_test
+./sim-world_test
 # ./util-config_test
 # ./util-data_test
 # ./util-file_test
@@ -97,7 +97,7 @@ cd tests
 # python3 scripts/plot_feature_track.py /tmp/track.dat 1242 375
 # python3 scripts/plot_feature_tracks.py /tmp/feature_tracks 1242 375
 # python3 scripts/plot_twowheel.py /tmp/twowheel.dat
-python3 scripts/plot_sim.py /tmp/sim
+# python3 scripts/plot_sim.py /tmp/sim
 
 # TOOLS
 # ./tools/pwm 40

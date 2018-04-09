@@ -26,13 +26,11 @@ int SimWorld::configure(const double t_end, const double dt) {
   assert(t_end > 0.0);
   assert(dt > 0.0);
 
-  // Time settings
-  this->t = 0.0;
+  // Time
   this->t_end = t_end;
   this->dt = dt;
-  this->time_index = 0;
 
-  // Camera settings
+  // Camera
   const int image_width = 640;
   const int image_height = 640;
   const double fov = 120.0;
@@ -42,7 +40,7 @@ int SimWorld::configure(const double t_end, const double dt) {
   const double cy = image_height / 2.0;
   this->camera = VirtualCamera(image_width, image_height, fx, fy, cx, cy);
 
-  // Camera motion settings
+  // Camera motion
   const std::vector<Vec3> pos_points{Vec3{0.0, 0.0, 0.0},
                                      Vec3{0.0, 5.0, 0.0},
                                      Vec3{5.0, 5.0, 1.0},
@@ -60,6 +58,95 @@ int SimWorld::configure(const double t_end, const double dt) {
                                                     this->nb_features);
   this->detectFeatures();
 
+  // Output directory and files
+  if (this->setupOutput() != 0) {
+    LOG_ERROR("Failed to setup simulation output directory / files!");
+    return -1;
+  }
+
+  // Record initial ground truth, measurement and camera id
+  this->recordGroundTruth(this->t,
+                          this->camera_motion.p_G,
+                          this->camera_motion.v_G,
+                          this->camera_motion.rpy_G);
+  this->recordMeasurement(this->t,
+                          this->camera_motion.a_B,
+                          this->camera_motion.w_B);
+
+  return 0;
+}
+
+int SimWorld::configure(const std::string &config_file) {
+  int image_width, image_height;
+  double fov;
+  MatX p_points;
+  MatX a_points;
+
+  // Load config file
+  ConfigParser parser;
+  // -- Simulation settings
+  parser.addParam("t_end", &this->t_end);
+  parser.addParam("dt", &this->dt);
+  parser.addParam("output_path", &this->output_path);
+  // -- Camera settings
+  parser.addParam("camera.image_width", &image_width);
+  parser.addParam("camera.image_height", &image_height);
+  parser.addParam("camera.fov", &fov);
+  // -- Camera motion settings
+  parser.addParam("camera_motion.pos_points", &p_points);
+  parser.addParam("camera_motion.att_points", &a_points);
+  if (parser.load(config_file) != 0) {
+    LOG_ERROR("Failed to load config file [%s]!", config_file.c_str());
+    return -1;
+  }
+
+  // Assert
+  assert(this->t_end > 1.0);
+  assert(this->dt > 0.0);
+  assert(this->output_path != "");
+  assert(image_width > 0);
+  assert(image_height > 0);
+  assert(fov > 0);
+  assert(p_points.size() > 0);
+  assert(a_points.size() > 0);
+
+  // Camera
+  const double fx = PinholeModel::focalLengthX(image_width, fov);
+  const double fy = PinholeModel::focalLengthY(image_height, fov);
+  const double cx = image_width / 2.0;
+  const double cy = image_height / 2.0;
+  this->camera = VirtualCamera(image_width, image_height, fx, fy, cx, cy);
+
+  // Camera motion
+  this->camera_motion =
+      CameraMotion(mat2vec3(p_points), mat2vec3(a_points), this->t_end);
+  this->camera_motion.update(this->t);
+
+  // Features
+  this->features3d = this->create3DFeaturePerimeter(this->origin,
+                                                    this->dimensions,
+                                                    this->nb_features);
+  this->detectFeatures();
+
+  // Output directory and files
+  if (this->setupOutput() != 0) {
+    LOG_ERROR("Failed to setup simulation output directory / files!");
+    return -1;
+  }
+
+  // Record initial ground truth, measurement and camera id
+  this->recordGroundTruth(this->t,
+                          this->camera_motion.p_G,
+                          this->camera_motion.v_G,
+                          this->camera_motion.rpy_G);
+  this->recordMeasurement(this->t,
+                          this->camera_motion.a_B,
+                          this->camera_motion.w_B);
+
+  return 0;
+}
+
+int SimWorld::setupOutput() {
   // Setup output files
   // -- Make directory if it does not exist already
   if (dir_exists(this->output_path) == false &&
@@ -265,11 +352,7 @@ int SimWorld::recordGroundTruth(const double time,
                                 const Vec3 &p_G,
                                 const Vec3 &v_G,
                                 const Vec3 &rpy_G) {
-  // Pre-check
-  if (this->gnd_file.good() == false) {
-    LOG_ERROR("SimWorld not configured!");
-    return -1;
-  }
+  assert(this->gnd_file.good());
 
   // -- Time
   this->gnd_file << time << ",";
@@ -292,11 +375,7 @@ int SimWorld::recordGroundTruth(const double time,
 int SimWorld::recordMeasurement(const double time,
                                 const Vec3 &a_B,
                                 const Vec3 &w_B) {
-  // Pre-check
-  if (this->mea_file.good() == false) {
-    LOG_ERROR("SimWorld not configured!");
-    return -1;
-  }
+  assert(this->mea_file.good());
 
   // -- Time
   this->mea_file << time << ",";
@@ -315,11 +394,7 @@ int SimWorld::recordMeasurement(const double time,
 int SimWorld::recordCameraObservation(const std::vector<size_t> &feature_ids,
                                       const std::vector<Vec2> &keypoints,
                                       const std::vector<Vec3> &landmarks) {
-  // Pre-check
-  if (this->cam0_idx_file.good() == false) {
-    LOG_ERROR("SimWorld not configured!");
-    return -1;
-  }
+  assert(this->cam0_idx_file.good());
 
   // Add new entry to camera index
   this->cam0_idx_file << this->t << "," << this->frame_index << std::endl;
@@ -355,11 +430,7 @@ int SimWorld::recordEstimate(const double time,
                              const Vec3 &p_G,
                              const Vec3 &v_G,
                              const Vec3 &rpy_G) {
-  // Pre-check
-  if (this->est_file.good() == false) {
-    LOG_ERROR("SimWorld not configured!");
-    return -1;
-  }
+  assert(this->est_file.good());
 
   // -- Time
   this->est_file << time << ",";
@@ -385,10 +456,10 @@ int SimWorld::step() {
   this->time_index++;
 
   // Update camera
-  this->detectFeatures();
   this->camera_motion.update(this->t);
+  this->detectFeatures();
 
-  // Record ground truth, measurement and camera id
+  // Record ground truth, measurement
   this->recordGroundTruth(this->t,
                           this->camera_motion.p_G,
                           this->camera_motion.v_G,

@@ -1,0 +1,25 @@
+t_end: 10.0
+dt: 0.1
+output_path: "/tmp/sim"
+
+camera:
+  image_width: 640
+  image_height: 640
+  fov: 120
+
+camera_motion:
+  pos_points:
+    rows: 4
+    cols: 3
+    data: [0.0, 0.0, 0.0,
+           0.0, 5.0, 0.0,
+           5.0, 5.0, 1.0,
+           5.0, 0.0, 1.0]
+  att_points:
+    rows: 4
+    cols: 3
+    data: [0.0, 0.0, 0.0,
+           0.0, 0.0, 0.25,
+           0.0, 0.0, 0.75,
+           0.0, 0.0, 1.0]
+
