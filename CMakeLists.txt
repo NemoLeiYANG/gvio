@@ -186,9 +186,9 @@ SET(
   # quadrotor-mission_test
   # sim-bezier_test
   # sim-camera_test
-  sim-camera_motion_test
+  # sim-camera_motion_test
   # sim-twowheel_test
-  sim-world_test
+  # sim-world_test
   # util-config_test
   # util-data_test
   # util-file_test
@@ -204,17 +204,17 @@ FOREACH(TEST ${UNITTESTS})
   TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 ENDFOREACH(TEST)
 
-# # EXPERIMENTS
-# FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
-# FILE(COPY experiments/scripts DESTINATION ${PROJECT_BINARY_DIR}/experiments)
-# SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
-# SET(EXPERIMENTS kitti_runner euroc_runner)
-# FOREACH(TEST ${EXPERIMENTS})
-#   STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
-#   ADD_EXECUTABLE(${TEST} experiments/${TEST_PATH}.cpp)
-#   TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
-# ENDFOREACH(TEST)
-#
+# EXPERIMENTS
+FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
+FILE(COPY experiments/scripts DESTINATION ${PROJECT_BINARY_DIR}/experiments)
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
+SET(EXPERIMENTS kitti_runner euroc_runner sim_runner)
+FOREACH(TEST ${EXPERIMENTS})
+  STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
+  ADD_EXECUTABLE(${TEST} experiments/${TEST_PATH}.cpp)
+  TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+ENDFOREACH(TEST)
+
 # # TOOLS
 # SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tools)
 # SET(TOOLS

@@ -109,17 +109,17 @@ int test_SimWorld_detectFeatures() {
   return 0;
 }
 
-int test_SimWorld_removeLostTracks() {
+int test_SimWorld_getLostTracks() {
   SimWorld world;
 
-  // Test SimWorld.removeLostTracks()
+  // Test SimWorld.getLostTracks()
   world.configure(10.0, 0.1);
   world.detectFeatures();
   for (int i = 0; i < 10; i++) {
     std::cout << "frame: " << i << std::endl;
     world.step();
   }
-  FeatureTracks tracks = world.removeLostTracks();
+  FeatureTracks tracks = world.getLostTracks();
 
   // Assert
   MU_CHECK(tracks.size() > 0);
@@ -136,7 +136,7 @@ int test_SimWorld_step() {
   while (world.t <= 10.0) {
     world.step();
   }
-  FeatureTracks tracks = world.removeLostTracks();
+  FeatureTracks tracks = world.getLostTracks();
 
   // Assert
   MU_CHECK(tracks.size() > 0);
@@ -155,7 +155,7 @@ void test_suite() {
   MU_ADD_TEST(test_SimWorld_create3DFeatures);
   MU_ADD_TEST(test_SimWorld_create3DFeaturePerimeter);
   MU_ADD_TEST(test_SimWorld_detectFeatures);
-  MU_ADD_TEST(test_SimWorld_removeLostTracks);
+  MU_ADD_TEST(test_SimWorld_getLostTracks);
   MU_ADD_TEST(test_SimWorld_step);
 }
 

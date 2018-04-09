@@ -117,11 +117,11 @@ public:
   void detectFeatures();
 
   /**
-   * Remove lost feature tracks
+   * Get lost feature tracks
    *
    * @returns Lost feature tracks
    */
-  FeatureTracks removeLostTracks();
+  FeatureTracks getLostTracks();
 
   /**
    * Record ground truth

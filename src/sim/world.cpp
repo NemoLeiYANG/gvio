@@ -266,7 +266,7 @@ void SimWorld::detectFeatures() {
   this->frame_index++;
 }
 
-FeatureTracks SimWorld::removeLostTracks() {
+FeatureTracks SimWorld::getLostTracks() {
   FeatureTracks lost_tracks;
   for (auto track : this->tracks_lost) {
     lost_tracks.push_back(track);
