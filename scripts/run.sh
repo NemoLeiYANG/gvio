@@ -21,8 +21,8 @@ fi
 #   --imu_topic "/gvio/imu"
 
 # BUILD
-mkdir -p build && cd build
-cmake .. && time make -j${CPU_COUNT}
+# mkdir -p build && cd build
+# cmake .. && time make -j${CPU_COUNT}
 
 # EXPERIMENTS
 # cd experiments

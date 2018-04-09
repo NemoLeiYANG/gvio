@@ -1,8 +1,74 @@
 import sys
+from math import cos
+from math import sin
 
 import numpy as np
 import matplotlib.pylab as plt
 from mpl_toolkits.mplot3d import Axes3D  # NOQA
+
+
+def euler2rot(euler, euler_seq):
+    """Convert euler to rotation matrix R
+    This function assumes we are performing a body fixed intrinsic rotation.
+
+    Source:
+
+        Kuipers, Jack B. Quaternions and Rotation Sequences: A Primer with
+        Applications to Orbits, Aerospace, and Virtual Reality. Princeton, N.J:
+        Princeton University Press, 1999. Print.
+
+        Page 86.
+
+    Parameters
+    ----------
+    euler : np.array
+        Euler angle (roll, pitch, yaw)
+    euler_seq : float
+        Euler rotation sequence
+
+    Returns
+    -------
+
+        Rotation matrix (np.array)
+
+    """
+    if euler_seq == 321:  # i.e. ZYX rotation sequence (world to body)
+        phi, theta, psi = euler
+
+        R11 = cos(psi) * cos(theta)
+        R21 = sin(psi) * cos(theta)
+        R31 = -sin(theta)
+
+        R12 = cos(psi) * sin(theta) * sin(phi) - sin(psi) * cos(phi)
+        R22 = sin(psi) * sin(theta) * sin(phi) + cos(psi) * cos(phi)
+        R32 = cos(theta) * sin(phi)
+
+        R13 = cos(psi) * sin(theta) * cos(phi) + sin(psi) * sin(phi)
+        R23 = sin(psi) * sin(theta) * cos(phi) - cos(psi) * sin(phi)
+        R33 = cos(theta) * cos(phi)
+
+    elif euler_seq == 123:  # i.e. XYZ rotation sequence (body to world)
+        phi, theta, psi = euler
+
+        R11 = cos(psi) * cos(theta)
+        R21 = cos(psi) * sin(theta) * sin(phi) - sin(psi) * cos(phi)
+        R31 = cos(psi) * sin(theta) * cos(phi) + sin(psi) * sin(phi)
+
+        R12 = sin(psi) * cos(theta)
+        R22 = sin(psi) * sin(theta) * sin(phi) + cos(psi) * cos(phi)
+        R32 = sin(psi) * sin(theta) * cos(phi) - cos(psi) * sin(phi)
+
+        R13 = -sin(theta)
+        R23 = cos(theta) * sin(phi)
+        R33 = cos(theta) * cos(phi)
+
+    else:
+        err_msg = "Error! Unsupported euler sequence [%s]" % str(euler_seq)
+        raise RuntimeError(err_msg)
+
+    return np.array([[R11, R12, R13],
+                     [R21, R22, R23],
+                     [R31, R32, R33]])
 
 
 def parse_data(data_path):
@@ -137,7 +203,24 @@ class PlotSimWorld:
         self.ax.set_xlim3d(-50, 50)
         self.ax.set_ylim3d(-50, 50)
         self.ax.set_zlim3d(-20, 20)
+        # self.ax.set_xlim3d(-2, 2)
+        # self.ax.set_ylim3d(-2, 2)
+        # self.ax.set_zlim3d(-2, 2)
+        self.ax.set_xlabel("x")
+        self.ax.set_ylabel("y")
+        self.ax.set_zlabel("z")
+        self.axis_equal_3dplot(self.ax)
         plt.show(block=False)
+
+    def axis_equal_3dplot(self, ax):
+        extents = np.array([getattr(ax, 'get_{}lim'.format(dim))()
+                            for dim in 'xyz'])
+        sz = extents[:, 1] - extents[:, 0]
+        centers = np.mean(extents, axis=1)
+        maxsize = max(abs(sz))
+        r = maxsize / 2
+        for ctr, dim in zip(centers, 'xyz'):
+            getattr(ax, 'set_{}lim'.format(dim))(ctr - r, ctr + r)
 
     def plot_landmarks(self):
         features_file = data_path + "/features.csv"
@@ -179,12 +262,60 @@ class PlotSimWorld:
         if self.camera:
             self.ax.collections.remove(self.camera)
 
+        # Camera frame
+        frame_sz = 0.5
+        corners = np.array([[frame_sz, frame_sz, frame_sz],  # top left
+                            [frame_sz, -frame_sz, frame_sz],  # top right
+                            [frame_sz, -frame_sz, -frame_sz],  # bottom right
+                            [frame_sz, frame_sz, -frame_sz]]).T  # bottom left
+        rpy_G = np.array([self.gnd_data["roll"][index],
+                          self.gnd_data["pitch"][index],
+                          self.gnd_data["yaw"][index]])
+        R_BG = euler2rot(rpy_G, 321)
+        corners = np.dot(R_BG, corners)
+
         # Plot camera position
-        self.camera = self.ax.scatter([self.gnd_data["x"][index]],
-                                      [self.gnd_data["y"][index]],
-                                      [self.gnd_data["z"][index]],
+        center = np.array([self.gnd_data["x"][index],
+                           self.gnd_data["y"][index],
+                           self.gnd_data["z"][index]])
+        self.camera = self.ax.scatter(center[0],
+                                      center[1],
+                                      center[2],
                                       color="red",
                                       marker="o")
+
+        # Plot camera frame only once every 10 frames
+        if (index % 5) != 0:
+            return
+
+        # Plot camera center to frame corners
+        for i in range(4):
+            self.ax.plot([center[0], center[0] + corners[0, i]],
+                         [center[1], center[1] + corners[1, i]],
+                         [center[2], center[2] + corners[2, i]],
+                         color="red")
+
+        # Plot frame corners to frame corners
+        # -- Top left to top right
+        self.ax.plot([center[0] + corners[0, 0], center[0] + corners[0, 1]],
+                     [center[1] + corners[1, 0], center[1] + corners[1, 1]],
+                     [center[2] + corners[2, 0], center[2] + corners[2, 1]],
+                     color="red")
+        # -- Top right to bottom right
+        self.ax.plot([center[0] + corners[0, 1], center[0] + corners[0, 2]],
+                     [center[1] + corners[1, 1], center[1] + corners[1, 2]],
+                     [center[2] + corners[2, 1], center[2] + corners[2, 2]],
+                     color="red")
+        # -- Bottom right to bottom left
+        self.ax.plot([center[0] + corners[0, 2], center[0] + corners[0, 3]],
+                     [center[1] + corners[1, 2], center[1] + corners[1, 3]],
+                     [center[2] + corners[2, 2], center[2] + corners[2, 3]],
+                     color="red")
+        # -- Bottom left to top left
+        self.ax.plot([center[0] + corners[0, 3], center[0] + corners[0, 0]],
+                     [center[1] + corners[1, 3], center[1] + corners[1, 0]],
+                     [center[2] + corners[2, 3], center[2] + corners[2, 0]],
+                     color="red")
 
     def update(self, index):
         assert index <= self.max_index

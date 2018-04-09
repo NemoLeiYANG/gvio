@@ -1,5 +1,4 @@
 # In-progress
-- Plot camera frame
 - Paramterize SimWorld so that it can be configured via yaml file
 - Create a sim world runner in experiments folder
 - Add noise to IMU measurements in SimWorld
@@ -19,3 +18,4 @@
 - Make Mono MSCKF work with Euroc mav dataset
 - Simulate 3D camera with bezier curve
 - Add bezier functionality to control camera's attitude
+- Plot camera frame
