@@ -1,5 +1,4 @@
 # In-progress
-- Create a sim world runner in experiments folder
 - Add noise to IMU measurements in SimWorld
 - Simlate stationary with MSCKF
 - Add undistort to feature trackers
@@ -19,3 +18,9 @@
 - Add bezier functionality to control camera's attitude
 - Plot camera frame
 - Paramterize SimWorld so that it can be configured via yaml file
+- Create a sim world runner in experiments folder
+
+# Notes
+In simulation it was found that the:
+- Feature estimator produces bad estimates
+- QR decomposition produces bad results

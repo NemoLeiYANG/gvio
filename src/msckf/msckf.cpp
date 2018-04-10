@@ -464,10 +464,10 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   const MatX S = T_H * P * T_H.transpose() + R_n;
   // -- Using Cholesky decomposition for matrix inversion
   // Note: Below is equiv to P * T_H^T * (T_H * P * T_H^T + R_n)^-1
-  // const MatX K = S.ldlt().solve(T_H * P).transpose();
+  const MatX K = S.ldlt().solve(T_H * P).transpose();
   // -- Conventional Kalman gain calculation
-  const MatX K =
-      P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
+  // const MatX K =
+  //     P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
 
   // Correct states
   const VecX dx = K * r_n;
@@ -496,7 +496,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
                                 P_new.cols() - IMUState::size);
 
   // Prune camera state to maintain sliding window size
-  // this->pruneCameraState();
+  this->pruneCameraState();
 
   return 0;
 }
