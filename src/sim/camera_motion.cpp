@@ -28,7 +28,8 @@ void CameraMotion::update(const double time) {
 
   // Calculate IMU measurements
   const Mat3 R_BG = euler321ToRot(this->rpy_G);
-  this->a_B = R_BG * this->a_G;
+  const Vec3 gravity{0.0, 0.0, 9.81};
+  this->a_B = R_BG * (this->a_G + gravity);
   this->w_B = R_BG * this->w_G;
 }
 

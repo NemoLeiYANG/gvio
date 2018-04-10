@@ -1,26 +1,26 @@
 # General Settings
 max_window_size: 200
-max_nb_tracks: 1000
+max_nb_tracks: 200
 min_track_length: 15
 enable_ns_trick: true
-enable_qr_trick: true
+enable_qr_trick: false
 
 # IMU Settings
 imu:
   initial_covariance:
-    q_init_var: [1e-3, 1e-3, 1e-3]
-    bg_init_var: [2e-3, 2e-3, 2e-3]
-    v_init_var: [3e-3, 3e-3, 3e-3]
-    ba_init_var: [4e-3, 4e-3, 4e-3]
-    p_init_var: [5e-3, 5e-3, 5e-3]
+    q_init_var: [0.3, 0.3, 0.3]
+    bg_init_var: [0.01, 0.01, 0.01]
+    v_init_var: [0.25, 0.25, 0.25]
+    ba_init_var: [0.01, 0.01, 0.01]
+    p_init_var: [0.2, 0.2, 0.2]
   process_noise:
-    w_var: [1e-2, 1e-2, 1e-2]
+    w_var: [5e-1, 5e-1, 5e-1]
     dbg_var: [1e-3, 1e-3, 1e-3]
-    a_var: [1e-2, 1e-2, 1e-2]
+    a_var: [1e-1, 1e-1, 1e-1]
     dba_var: [1e-3, 1e-3, 1e-3]
   constants:
     angular_constant: [0.0, 0.0, 0.0]
-    gravity_constant: [0.0, 0.0, -9.8]
+    gravity_constant: [0.0, 0.0, -9.81]
 
 # Camera Settings
 camera:
@@ -28,4 +28,4 @@ camera:
     p_IC: [0.0, 0.0, 0.0]
     q_CI: [0.5, -0.5, 0.5, -0.5]
   measurement_noise:
-    img_var: 1e-3
+    img_var: 1e-5

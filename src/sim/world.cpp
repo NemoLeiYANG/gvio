@@ -214,12 +214,12 @@ void SimWorld::detectFeatures() {
                                            feature_ids);
 
   // Get features lost
-  std::vector<int> tracks_lost;
+  std::vector<int> features_lost;
   std::set_difference(this->features_tracking.begin(),
                       this->features_tracking.end(),
                       feature_ids.begin(),
                       feature_ids.end(),
-                      std::inserter(tracks_lost, tracks_lost.begin()));
+                      std::inserter(features_lost, features_lost.begin()));
 
   // Add or updated features observed
   std::vector<size_t> record_feature_ids;
@@ -252,8 +252,15 @@ void SimWorld::detectFeatures() {
   }
   this->features_tracking = feature_ids;
 
+  // Remove tracks that are too long to lost
+  for (auto track : this->tracks_tracking) {
+    if (track.second.trackedLength() >= 20) {
+      features_lost.push_back(track.first);
+    }
+  }
+
   // Remove lost features
-  for (auto feature_id : tracks_lost) {
+  for (auto feature_id : features_lost) {
     this->tracks_lost.push_back(this->tracks_tracking[feature_id]);
     this->tracks_tracking.erase(this->tracks_tracking.find(feature_id));
   }

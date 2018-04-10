@@ -41,13 +41,13 @@ IMUState::IMUState(const IMUStateConfig &config) {
 MatX IMUState::F(const Vec3 &w_hat, const Vec4 &q_hat, const Vec3 &a_hat) {
   MatX F = zeros(15);
   // -- First row block --
-  F.block(0, 0, 3, 3) = -skew(w_hat);
-  F.block(0, 3, 3, 3) = -I(3);
+  F.block<3, 3>(0, 0) = -skew(w_hat);
+  F.block<3, 3>(0, 3) = -I(3);
   // -- Third Row block --
-  F.block(6, 0, 3, 3) = -C(q_hat).transpose() * skew(a_hat);
-  F.block(6, 9, 3, 3) = -C(q_hat).transpose();
+  F.block<3, 3>(6, 0) = -C(q_hat).transpose() * skew(a_hat);
+  F.block<3, 3>(6, 9) = -C(q_hat).transpose();
   // -- Fifth Row block --
-  F.block(12, 6, 3, 3) = I(3);
+  F.block<3, 3>(12, 6) = I(3);
 
   return F;
 }
@@ -55,13 +55,13 @@ MatX IMUState::F(const Vec3 &w_hat, const Vec4 &q_hat, const Vec3 &a_hat) {
 MatX IMUState::G(const Vec4 &q_hat) {
   MatX G = zeros(15, 12);
   // -- First row block --
-  G.block(0, 0, 3, 3) = -I(3);
+  G.block<3, 3>(0, 0) = -I(3);
   // -- Second row block --
-  G.block(3, 3, 3, 3) = I(3);
+  G.block<3, 3>(3, 3) = I(3);
   // -- Third row block --
-  G.block(6, 6, 3, 3) = -C(q_hat).transpose();
+  G.block<3, 3>(6, 6) = -C(q_hat).transpose();
   // -- Fourth row block --
-  G.block(9, 9, 3, 3) = I(3);
+  G.block<3, 3>(9, 9) = I(3);
 
   return G;
 }
@@ -127,7 +127,9 @@ void IMUState::update(const Vec3 &a_m, const Vec3 &w_m, const double dt) {
   const MatX F_dt_cube = F_dt_sq * F_dt;
   this->Phi = I(this->size) + F_dt + 0.5 * F_dt_sq + (1.0 / 6.0) * F_dt_cube;
   // -- Update
-  this->P = Phi * this->P * Phi.transpose() + (G * this->Q * G.transpose()) * dt;
+  // this->Q = this->Phi * G * this->Q * G.transpose() * this->Phi.transpose() * dt;
+  // this->P = this->Phi * this->P * this->Phi.transpose() + this->Q;
+  this->P = this->Phi * this->P * this->Phi.transpose() + (G * this->Q * G.transpose()) * dt;
   this->P = enforce_psd(P);
   // clang-format on
 

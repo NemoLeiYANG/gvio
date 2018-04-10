@@ -214,6 +214,7 @@ public:
  */
 class CeresFeatureEstimator : public FeatureEstimator {
 public:
+  std::string method = "ANALYTICAL";
   ceres::Problem problem;
   ceres::Solver::Options options;
   ceres::Solver::Summary summary;

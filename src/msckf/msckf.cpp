@@ -353,15 +353,14 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
   if (r_o.rows() == 0) {
     return -1;
   }
-  std::cout << r_o.maxCoeff() << std::endl;
   if (r_o.maxCoeff() > 0.1) {
     LOG_WARN("Large residual! [%.4f]", r_o.maxCoeff());
-    // return -1;
   }
 
   // Reduce EKF measurement update computation with QR decomposition
   if (H_o.rows() > H_o.cols() && this->enable_qr_trick) {
-    // Perform QR decompostion on H_sparse.
+    // Perform QR decompostion
+    // -- Sparse QR method (faster)
     Eigen::SparseMatrix<double> H_sparse = H_o.sparseView();
     Eigen::SPQR<Eigen::SparseMatrix<double>> spqr_helper;
     spqr_helper.setSPQROrdering(SPQR_ORDERING_NATURAL);
@@ -375,6 +374,7 @@ int MSCKF::calcResiduals(const FeatureTracks &tracks, MatX &T_H, VecX &r_n) {
     T_H = H_temp.topRows(IMUState::size + this->N() * CameraState::size);
     r_n = r_temp.head(IMUState::size + this->N() * CameraState::size);
 
+    // -- Dense QR method (slower)
     // Eigen::HouseholderQR<MatX> QR(H_o);
     // MatX Q = QR.householderQ();
     // MatX Q1 = Q.leftCols(IMUState::size + this->N() * CameraState::size);
@@ -446,14 +446,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
 
   // Filter feature tracks
   FeatureTracks filtered_tracks = this->filterTracks(tracks);
-  int i = 0;
-  for (auto track : tracks) {
-    std::cout << i << "\t";
-    std::cout << track << std::endl;
-  }
   if (filtered_tracks.size() == 0) {
-    LOG_WARN("No features tracked for more than [%d] frames!",
-             this->min_track_length);
     return 0;
   }
 
@@ -469,11 +462,12 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   const MatX P = this->P();
   const MatX R_n = this->img_var * I(T_H.rows());
   const MatX S = T_H * P * T_H.transpose() + R_n;
-  const MatX K = S.ldlt().solve(T_H * P).transpose();
-  // Note: above is equiv to P * T_H^T * (T_H * P * T_H^T + R_n)^-1
-  // But using Cholesky decomposition for matrix inversion
-  // const MatX K =
-  //     P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
+  // -- Using Cholesky decomposition for matrix inversion
+  // Note: Below is equiv to P * T_H^T * (T_H * P * T_H^T + R_n)^-1
+  // const MatX K = S.ldlt().solve(T_H * P).transpose();
+  // -- Conventional Kalman gain calculation
+  const MatX K =
+      P * T_H.transpose() * (T_H * P * T_H.transpose() + R_n).inverse();
 
   // Correct states
   const VecX dx = K * r_n;
@@ -483,11 +477,12 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
 
   // Update covariance matrices
   const MatX I_KH = I(K.rows(), T_H.cols()) - K * T_H;
-  const MatX P_new = ((I_KH * P) + (I_KH * P).transpose()) / 2.0;
   // -- Simplest, most unstable form
   // const MatX P_new = I_KH * P;
   // -- Symmetric and positive Joseph form
   // const MatX P_new = I_KH * P * I_KH.transpose() + K * R_n * K.transpose();
+  // -- Upenn's version?
+  const MatX P_new = ((I_KH * P) + (I_KH * P).transpose()) / 2.0;
 
   // Update covariance matrix
   this->imu_state.P = P_new.block(0, 0, IMUState::size, IMUState::size);
@@ -501,7 +496,7 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
                                 P_new.cols() - IMUState::size);
 
   // Prune camera state to maintain sliding window size
-  this->pruneCameraState();
+  // this->pruneCameraState();
 
   return 0;
 }

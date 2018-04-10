@@ -670,83 +670,83 @@ int test_MSCKF_measurementUpdate2() {
   return 0;
 }
 
-int test_MSCKF_measurementUpdate3() {
-  std::srand(23);
-
-  // Setup world
-  SimWorld world;
-  const double dt = 0.1;
-  world.nb_features = 10000;
-  world.configure(dt);
-
-  // Setup blackbox
-  BlackBox blackbox;
-  if (blackbox.configure("/tmp", "test_msckf_measurementUpdate") != 0) {
-    LOG_ERROR("Failed to configure MSCKF blackbox!");
-  }
-
-  // Setup MSCKF
-  MSCKF msckf;
-  // Initialize MSCKF
-  msckf.configure(MSCKF_CONFIG);
-  msckf.initialize(0,
-                   euler2quat(world.robot.rpy_G),
-                   euler321ToRot(world.robot.rpy_G) * world.robot.v_B,
-                   Vec3::Zero());
-
-  // Record initial conditions
-  blackbox.recordTimeStep(world.t,
-                          msckf,
-                          world.robot.a_B,
-                          world.robot.w_B,
-                          world.robot.p_G,
-                          world.robot.v_G,
-                          world.robot.rpy_G);
-
-  // Simulate
-  for (double t = dt; t < 10.0; t += dt) {
-    // for (double t = 0.0; t < 1.4; t += dt) {
-    // Step simulation
-    world.step();
-    FeatureTracks tracks = world.removeLostTracks();
-
-    // MSCKF
-    const Vec3 a_m = world.robot.a_B + Vec3{0.0, 0.0, 9.81};
-    const Vec3 w_m = world.robot.w_B;
-    const long ts = t * 1e9;
-    msckf.predictionUpdate(a_m, w_m, ts);
-
-    // // Cheat by loading the robot ground truth to MSCKF's imu state
-    // msckf.imu_state.p_G = world.robot.p_G;
-    // msckf.imu_state.q_IG = euler2quat(world.robot.rpy_G);
-
-    msckf.measurementUpdate(tracks);
-
-    // Record
-    blackbox.recordTimeStep(t,
-                            msckf,
-                            world.robot.a_B,
-                            world.robot.w_B,
-                            world.robot.p_G,
-                            world.robot.v_G,
-                            world.robot.rpy_G);
-
-    printf("Time index: %lu, nb_tracks: %lu\n",
-           world.time_index,
-           tracks.size());
-  }
-  blackbox.recordCameraStates(msckf);
-  PYTHON_SCRIPT("scripts/plot_msckf.py /tmp/test_msckf_measurementUpdate");
-
-  // mat2csv("/tmp/features.dat", world.features3d);
-  // PYTHON_SCRIPT("scripts/plot_world.py /tmp/features.dat");
-
-  return 0;
-}
+// int test_MSCKF_measurementUpdate3() {
+//   std::srand(23);
+//
+//   // Setup world
+//   SimWorld world;
+//   const double dt = 0.1;
+//   world.nb_features = 10000;
+//   world.configure(dt);
+//
+//   // Setup blackbox
+//   BlackBox blackbox;
+//   if (blackbox.configure("/tmp", "test_msckf_measurementUpdate") != 0) {
+//     LOG_ERROR("Failed to configure MSCKF blackbox!");
+//   }
+//
+//   // Setup MSCKF
+//   MSCKF msckf;
+//   // Initialize MSCKF
+//   msckf.configure(MSCKF_CONFIG);
+//   msckf.initialize(0,
+//                    euler2quat(world.robot.rpy_G),
+//                    euler321ToRot(world.robot.rpy_G) * world.robot.v_B,
+//                    Vec3::Zero());
+//
+//   // Record initial conditions
+//   blackbox.recordTimeStep(world.t,
+//                           msckf,
+//                           world.robot.a_B,
+//                           world.robot.w_B,
+//                           world.robot.p_G,
+//                           world.robot.v_G,
+//                           world.robot.rpy_G);
+//
+//   // Simulate
+//   for (double t = dt; t < 10.0; t += dt) {
+//     // for (double t = 0.0; t < 1.4; t += dt) {
+//     // Step simulation
+//     world.step();
+//     FeatureTracks tracks = world.removeLostTracks();
+//
+//     // MSCKF
+//     const Vec3 a_m = world.robot.a_B + Vec3{0.0, 0.0, 9.81};
+//     const Vec3 w_m = world.robot.w_B;
+//     const long ts = t * 1e9;
+//     msckf.predictionUpdate(a_m, w_m, ts);
+//
+//     // // Cheat by loading the robot ground truth to MSCKF's imu state
+//     // msckf.imu_state.p_G = world.robot.p_G;
+//     // msckf.imu_state.q_IG = euler2quat(world.robot.rpy_G);
+//
+//     msckf.measurementUpdate(tracks);
+//
+//     // Record
+//     blackbox.recordTimeStep(t,
+//                             msckf,
+//                             world.robot.a_B,
+//                             world.robot.w_B,
+//                             world.robot.p_G,
+//                             world.robot.v_G,
+//                             world.robot.rpy_G);
+//
+//     printf("Time index: %lu, nb_tracks: %lu\n",
+//            world.time_index,
+//            tracks.size());
+//   }
+//   blackbox.recordCameraStates(msckf);
+//   PYTHON_SCRIPT("scripts/plot_msckf.py /tmp/test_msckf_measurementUpdate");
+//
+//   // mat2csv("/tmp/features.dat", world.features3d);
+//   // PYTHON_SCRIPT("scripts/plot_world.py /tmp/features.dat");
+//
+//   return 0;
+// }
 
 void test_suite() {
-  // MU_ADD_TEST(test_MSCKF_constructor);
-  // MU_ADD_TEST(test_MSCKF_configure);
+  MU_ADD_TEST(test_MSCKF_constructor);
+  MU_ADD_TEST(test_MSCKF_configure);
   // MU_ADD_TEST(test_MSCKF_initialize);
   // MU_ADD_TEST(test_MSCKF_P);
   // MU_ADD_TEST(test_MSCKF_J);
@@ -760,7 +760,7 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_correctIMUState);
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_pruneCameraStates);
-  MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  // MU_ADD_TEST(test_MSCKF_measurementUpdate);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate2);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate3);
 }

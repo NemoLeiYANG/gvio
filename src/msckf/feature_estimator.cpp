@@ -366,28 +366,35 @@ void CeresFeatureEstimator::addResidualBlock(const Vec2 &kp,
                                              const Mat3 &C_CiC0,
                                              const Vec3 &t_Ci_CiC0,
                                              double *x) {
-  // // Build residual
-  // auto cost_func = new AnalyticalReprojectionError(C_CiC0, t_Ci_CiC0, kp);
-  //
-  // // Add residual block to problem
-  // this->problem.AddResidualBlock(cost_func, // Cost function
-  //                                NULL,      // Loss function
-  //                                x);        // Optimization parameters
-
   // Build residual
-  auto residual = new AutoDiffReprojectionError(C_CiC0, t_Ci_CiC0, kp);
+  if (this->method == "ANALYTICAL") {
+    auto cost_func = new AnalyticalReprojectionError(C_CiC0, t_Ci_CiC0, kp);
 
-  // Build cost and loss function
-  auto cost_func =
-      new ceres::AutoDiffCostFunction<AutoDiffReprojectionError, // Residual
-                                      2, // Size of residual
-                                      3 // Size of 1st parameter - inverse depth
-                                      >(residual);
+    // Add residual block to problem
+    this->problem.AddResidualBlock(cost_func, // Cost function
+                                   NULL,      // Loss function
+                                   x);        // Optimization parameters
 
-  // Add residual block to problem
-  this->problem.AddResidualBlock(cost_func, // Cost function
-                                 nullptr,   // Loss function
-                                 x);        // Optimization parameters
+  } else if (this->method == "AUTODIFF") {
+    // Build residual
+    auto residual = new AutoDiffReprojectionError(C_CiC0, t_Ci_CiC0, kp);
+
+    // Build cost and loss function
+    auto cost_func = new ceres::AutoDiffCostFunction<
+        AutoDiffReprojectionError, // Residual
+        2,                         // Size of residual
+        3                          // Size of 1st parameter - inverse depth
+        >(residual);
+
+    // Add residual block to problem
+    this->problem.AddResidualBlock(cost_func, // Cost function
+                                   nullptr,   // Loss function
+                                   x);        // Optimization parameters
+
+  } else {
+    LOG_ERROR("Invalid feature estimator method [%s]!", this->method.c_str());
+    exit(-1);
+  }
 }
 
 int CeresFeatureEstimator::setupProblem() {
@@ -399,10 +406,13 @@ int CeresFeatureEstimator::setupProblem() {
 
   // // Cheat by forming p_C0_f using ground truth data
   // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
+  //   std::cout << "est: " << p_C0_f.transpose() << std::endl;
   //   const Vec3 p_G_f = this->track.track[0].ground_truth;
   //   const Vec3 p_G_C = this->track_cam_states[0].p_G;
   //   const Mat3 C_CG = C(this->track_cam_states[0].q_CG);
   //   p_C0_f = C_CG * (p_G_f - p_G_C);
+  //   std::cout << "gnd: " << p_C0_f.transpose() << std::endl;
+  //   std::cout << std::endl;
   // }
 
   // Create inverse depth params (these are to be optimized)
@@ -437,7 +447,8 @@ int CeresFeatureEstimator::setupProblem() {
 
 int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // Set options
-  this->options.max_num_iterations = 100;
+  this->options.max_num_iterations = 10;
+  // this->options.minimizer_type = ceres::LINE_SEARCH;
   this->options.num_threads = 1;
   this->options.num_linear_solver_threads = 1;
   this->options.minimizer_progress_to_stdout = false;
@@ -447,7 +458,7 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
     return -1;
   }
 
-  // Cheat by using ground truth data
+  // // Cheat by using ground truth data
   // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
   //   p_G_f = this->track.track[0].ground_truth;
   //   return 0;
