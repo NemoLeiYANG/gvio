@@ -25,14 +25,14 @@ mkdir -p build && cd build
 cmake .. && time make -j${CPU_COUNT}
 
 # EXPERIMENTS
-cd experiments
+# cd experiments
 # ./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
 # ./kitti_runner /data/kitti/raw 2011_09_26 0046 ./configs/msckf_kitti_raw-2011_09_26-0046.yaml /tmp/msckf
 # python3 scripts/plot_msckf.py /tmp/msckf/msckf
 # ./euroc_runner /data/euroc_mav/raw/V1_01_easy ./configs/msckf_euroc_V01_01_easy.yaml /tmp/msckf
 # python3 scripts/plot_euroc_dataset.py /data/euroc_mav/raw/V1_01_easy
-./sim_runner ./configs/sim.yaml ./configs/msckf_sim.yaml
-python3 scripts/plot_sim.py /tmp/sim
+# ./sim_runner ./configs/sim.yaml ./configs/msckf_sim.yaml
+# python3 scripts/plot_sim.py /tmp/sim
 
 # TESTS
 cd tests
@@ -58,6 +58,7 @@ cd tests
 # ./feature2d-gms_matcher_test
 # ./feature2d-klt_tracker_test
 # ./feature2d-orb_tracker_test
+./feature2d-stereo_tracker_test
 # ./gimbal-calibration-aprilgrid_test
 # ./gimbal-calibration-chessboard_test
 # ./gimbal-calibration-calib_params_test

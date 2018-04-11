@@ -94,7 +94,7 @@ inline cv::Mat draw_inliers(const cv::Mat &src1,
 
 class GMSMatcher {
 public:
-  int threshold_factor = 20; ///< Threshold factor
+  int threshold_factor = 10; ///< Threshold factor
 
   cv::Ptr<cv::DescriptorMatcher> bf_matcher; ///< Brute-force Matcher
   std::vector<cv::Point2f> points1;          ///< Normalized points 1
@@ -151,13 +151,30 @@ public:
   ~GMSMatcher();
 
   /**
-   * Normalize Key Points to Range(0 - 1)
+   * Normalize Key Points to range (0 - 1)
+   *
+   * @param kp Keypoints
+   * @param img_size Image size
+   * @returns Normalized keypoints
    */
   std::vector<cv::Point2f> normalizePoints(const std::vector<cv::KeyPoint> &kp,
+                                           const cv::Size &img_size);
+
+  /**
+   * Normalize Key Points to range (0 - 1)
+   *
+   * @param kp Keypoints
+   * @param img_size Image size
+   * @returns Normalized keypoints
+   */
+  std::vector<cv::Point2f> normalizePoints(const std::vector<cv::Point2f> &kp,
                                            const cv::Size &size);
 
   /**
    * Convert OpenCV DMatch to `std::pair<int, int>`
+   *
+   * @param vDMatches Input matches
+   * @param vMatches Output matches
    */
   void convertMatches(const std::vector<cv::DMatch> &vDMatches,
                       std::vector<std::pair<int, int>> &vMatches);
@@ -199,24 +216,50 @@ public:
 
   /**
    * Run
+   *
+   * @param rotation_type Rotation type
    */
   int run(const int rotation_type);
 
   /**
    * Get inlier mask
+   *
+   * @param with_scale With scale
+   * @param with_rotation With rotation
+   * @returns Inlier mask
    */
   std::vector<bool> getInlierMask(const bool with_scale = false,
                                   const bool with_rotation = false);
 
   /**
    * Match
+   *
+   * @param kp1 Keypoints from camera 1
+   * @param desc1 Descriptors of keypoints detected in camera 1
+   * @param kp2 Keypoints from camera 2
+   * @param desc2 Descriptors of keypoints detected in camera 2
+   * @param img_size Image size
+   * @param matches Matches
    */
   int match(const std::vector<cv::KeyPoint> &kp1,
-            const cv::Mat &des1,
+            const cv::Mat &desc1,
             const std::vector<cv::KeyPoint> &kp2,
-            const cv::Mat &des2,
+            const cv::Mat &desc2,
             const cv::Size &img_size,
             std::vector<cv::DMatch> &matches);
+
+  /**
+   * Match
+   *
+   * @param kp1 Keypoints from camera 1
+   * @param kp2 Keypoints from camera 2
+   * @param img_size Image size
+   * @param matches Matches
+   */
+  int match(const std::vector<cv::Point2f> &kp1,
+            const std::vector<cv::Point2f> &kp2,
+            const cv::Size &img_size,
+            std::vector<bool> &matches);
 };
 
 /** @} group feature2d */

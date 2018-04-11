@@ -2,10 +2,39 @@
 
 namespace gvio {
 
+FeatureTrack::FeatureTrack() {}
+
+FeatureTrack::FeatureTrack(const TrackID &track_id,
+                           const FrameID &frame_id,
+                           const Feature &f1,
+                           const Feature &f2)
+    : track_id{track_id}, frame_start{frame_id - 1}, frame_end{frame_id},
+      track{f1, f2} {}
+
+FeatureTrack::FeatureTrack(const TrackID &track_id,
+                           const FrameID &frame_start,
+                           const FrameID &frame_end,
+                           const Features &track0,
+                           const Features &track1)
+    : track_id{track_id}, frame_start{frame_start}, frame_end{frame_end},
+      track0{track0}, track1{track1} {}
+
+void FeatureTrack::update(const FrameID &frame_id, const Feature &data) {
+  this->frame_end = frame_id;
+  this->track.push_back(data);
+}
+
+Feature &FeatureTrack::last() { return this->track.back(); }
+
+size_t FeatureTrack::trackedLength() { return this->track.size(); }
+
+size_t FeatureTrack::trackedLength() const { return this->track.size(); }
+
 std::ostream &operator<<(std::ostream &os, const FeatureTrack &track) {
   os << "track_id: " << track.track_id << std::endl;
   os << "frame_start: " << track.frame_start << std::endl;
   os << "frame_end: " << track.frame_end << std::endl;
+  os << "related: " << track.related << std::endl;
   os << "length: " << track.track.size() << std::endl;
   for (auto f : track.track) {
     os << f;

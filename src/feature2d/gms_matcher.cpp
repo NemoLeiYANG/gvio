@@ -22,6 +22,16 @@ std::vector<cv::Point2f> GMSMatcher::normalizePoints(
   return npts;
 }
 
+std::vector<cv::Point2f> GMSMatcher::normalizePoints(
+    const std::vector<cv::Point2f> &kp, const cv::Size &size) {
+  std::vector<cv::Point2f> npts;
+  for (size_t i = 0; i < kp.size(); i++) {
+    npts.emplace_back(kp[i].x / size.width, kp[i].y / size.height);
+  }
+
+  return npts;
+}
+
 void GMSMatcher::convertMatches(const std::vector<cv::DMatch> &vDMatches,
                                 std::vector<std::pair<int, int>> &vMatches) {
   vMatches.resize(this->nb_matches);
@@ -265,22 +275,21 @@ std::vector<bool> GMSMatcher::getInlierMask(const bool with_scale,
 }
 
 int GMSMatcher::match(const std::vector<cv::KeyPoint> &k1,
-                      const cv::Mat &d1,
+                      const cv::Mat &desc1,
                       const std::vector<cv::KeyPoint> &k2,
-                      const cv::Mat &d2,
+                      const cv::Mat &desc2,
                       const cv::Size &img_size,
                       std::vector<cv::DMatch> &matches) {
-  // Pre-check
   assert(img_size.width != 0 && img_size.height != 0);
 
   // Match using Brute-force matcher (First pass)
   std::vector<cv::DMatch> matches_bf;
 
 #ifdef USG_CUDA
-  cv::GpuMat gd1(d1), gd2(d2);
+  cv::GpuMat gd1(desc1), gd2(desc2);
   this->bf_matcher->match(gd1, gd2, matches_bf);
 #else
-  this->bf_matcher->match(d1, d2, matches_bf);
+  this->bf_matcher->match(desc1, desc2, matches_bf);
 #endif
 
   // Initialize input
@@ -305,6 +314,47 @@ int GMSMatcher::match(const std::vector<cv::KeyPoint> &k1,
     if (inliers[i] == true) {
       matches.push_back(matches_bf[i]);
     }
+  }
+
+  return inliers.size();
+}
+
+int GMSMatcher::match(const std::vector<cv::Point2f> &kp1,
+                      const std::vector<cv::Point2f> &kp2,
+                      const cv::Size &img_size,
+                      std::vector<bool> &matches) {
+  assert(kp1.size() == kp2.size());
+
+  // RANSAC
+  std::vector<uchar> ransac_mask;
+  cv::findFundamentalMat(kp1, kp2, cv::FM_RANSAC, 0, 0.9999, ransac_mask);
+
+  // Initialize input
+  this->points1 = this->normalizePoints(kp1, img_size);
+  this->points2 = this->normalizePoints(kp2, img_size);
+  this->nb_matches = kp1.size();
+
+  // GMS matcher normally expects keypoints with descriptors, this method
+  // however caters for keypoints that are already matched and kp1 kp2 are
+  // already matched 1-to-1
+  for (size_t i = 0; i < this->nb_matches; i++) {
+    this->matches.push_back({i, i});
+  }
+
+  // Initialize Grid
+  this->grid_size_left = cv::Size(20, 20);
+  this->grid_number_left =
+      this->grid_size_left.width * this->grid_size_left.height;
+
+  // Initialize the neihbor of left grid
+  this->grid_neighbor_left =
+      cv::Mat::zeros(this->grid_number_left, 9, CV_32SC1);
+  this->initNeighbors(this->grid_neighbor_left, this->grid_size_left);
+
+  // Matching using GMS matcher (Second pass)
+  const std::vector<bool> inliers = this->getInlierMask(false, false);
+  for (size_t i = 0; i < inliers.size(); i++) {
+    matches.push_back(inliers[i]);
   }
 
   return inliers.size();

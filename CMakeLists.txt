@@ -5,8 +5,8 @@ PROJECT(gvio)
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(BUILD_SHARED_LIBS ON)
-SET(CMAKE_BUILD_TYPE RELEASE)
-# SET(CMAKE_BUILD_TYPE DEBUG)
+# SET(CMAKE_BUILD_TYPE RELEASE)
+SET(CMAKE_BUILD_TYPE DEBUG)
 # SET(CMAKE_IGNORE_PATH `catkin locate`)
 
 # DEPENDENCIES
@@ -64,6 +64,7 @@ ADD_LIBRARY(
   src/feature2d/gms_matcher.cpp
   src/feature2d/orb_tracker.cpp
   src/feature2d/klt_tracker.cpp
+  src/feature2d/stereo_tracker.cpp
   # gimbal
   src/gimbal/calibration/aprilgrid.cpp
   src/gimbal/calibration/calib_data.cpp
@@ -163,7 +164,8 @@ SET(
   # feature2d-feature_tracker_test
   # feature2d-gms_matcher_test
   # feature2d-klt_tracker_test
-  # feature2d-orb_tracker_test
+  feature2d-orb_tracker_test
+  feature2d-stereo_tracker_test
   # gimbal-calibration-aprilgrid_test
   # gimbal-calibration-calib_data_test
   # gimbal-calibration-calib_params_test
@@ -180,7 +182,7 @@ SET(
   # msckf-camera_state_test
   # msckf-feature_estimator_test
   # msckf-imu_state_test
-  msckf-msckf_test
+  # msckf-msckf_test
   # pwm-pca9685_test
   # quadrotor-quadrotor_model_test
   # quadrotor-mission_test
@@ -188,7 +190,7 @@ SET(
   # sim-camera_test
   # sim-camera_motion_test
   # sim-twowheel_test
-  # sim-world_test
+  sim-world_test
   # util-config_test
   # util-data_test
   # util-file_test

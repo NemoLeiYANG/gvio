@@ -101,7 +101,7 @@ int SimWorld::configure(const std::string &config_file) {
   }
 
   // Assert
-  assert(this->t_end > 1.0);
+  assert(this->t_end > 0.0);
   assert(this->dt > 0.0);
   assert(this->output_path != "");
   assert(image_width > 0);

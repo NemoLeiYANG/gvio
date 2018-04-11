@@ -65,6 +65,17 @@ int mat2csv(const std::string &file_path, const MatX &data);
  */
 void print_progress(const double percentage);
 
+/**
+ * Pop front
+ * @param vec vector
+ */
+template <typename T>
+void pop_front(std::vector<T> &vec) {
+  assert(!vec.empty());
+  vec.front() = std::move(vec.back());
+  vec.pop_back();
+}
+
 /** @} group data */
 } // namespace gvio
 #endif // GVIO_UTIL_DATA_HPP

@@ -1,8 +1,9 @@
 # In-progress
+- Add undistort functionality to ORB and KLT trackers
+- Create Stereo KLT tracker
 - Add noise to IMU measurements in SimWorld
 - Simlate stationary with MSCKF
 - Add undistort to feature trackers
-- Create Stereo KLT tracker
 - Add OC-EKF to MSCKF (include flag to switch it off if needed)
 - Modify MSCK for Stero KLT tracker and test with Kitti
 - Modify MSCK for Stero KLT tracker and test with EuroC

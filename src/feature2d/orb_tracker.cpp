@@ -40,9 +40,6 @@ int ORBTracker::configure(const std::string &config_file) {
     return -1;
   }
 
-  this->orb->setFastThreshold(1.0);
-  this->orb->setMaxFeatures(100);
-
   return 0;
 }
 

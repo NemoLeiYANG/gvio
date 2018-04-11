@@ -34,16 +34,25 @@ struct FeatureTrack {
   TrackID track_id = -1;
   FrameID frame_start = -1;
   FrameID frame_end = -1;
+  TrackID related = -1;
+
+  // Monocular camera setup
   Features track;
 
-  FeatureTrack() {}
+  // Stereo camera setup
+  Features track0;
+  Features track1;
 
+  FeatureTrack();
   FeatureTrack(const TrackID &track_id,
                const FrameID &frame_id,
                const Feature &f1,
-               const Feature &f2)
-      : track_id{track_id}, frame_start{frame_id - 1}, frame_end{frame_id},
-        track{f1, f2} {}
+               const Feature &f2);
+  FeatureTrack(const TrackID &track_id,
+               const FrameID &frame_start,
+               const FrameID &frame_end,
+               const Features &tracks0,
+               const Features &tracks1);
 
   /**
    * Update feature track
@@ -51,31 +60,28 @@ struct FeatureTrack {
    * @param frame_id Frame ID
    * @param data Feature
    */
-  void update(const FrameID &frame_id, const Feature &data) {
-    this->frame_end = frame_id;
-    this->track.push_back(data);
-  }
+  void update(const FrameID &frame_id, const Feature &data);
 
   /**
    * Return last feature seen
    *
    * @returns Last feature
    */
-  Feature &last() { return this->track.back(); }
+  Feature &last();
 
   /**
    * Return feature track length
    *
    * @returns Size of feature track
    */
-  size_t trackedLength() { return this->track.size(); }
+  size_t trackedLength();
 
   /**
    * Return feature track length
    *
    * @returns Size of feature track
    */
-  size_t trackedLength() const { return this->track.size(); }
+  size_t trackedLength() const;
 };
 
 /**

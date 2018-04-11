@@ -68,8 +68,7 @@ public:
   int max_iter = 30;
 
   FeatureEstimator(const FeatureTrack &track,
-                   const CameraStates &track_cam_states)
-      : track{track}, track_cam_states{track_cam_states} {}
+                   const CameraStates &track_cam_states);
 
   /**
    * Triangulate feature observed from camera C0 and C1 and return the
@@ -106,7 +105,12 @@ public:
   int checkEstimate(const Vec3 &p_G_f);
 
   /**
+   * Transform feature position from camera to global frame
    *
+   * @param alpha Inverse depth parameter x
+   * @param beta Inverse depth parameter y
+   * @param rho Inverse depth parameter z
+   * @param p_G_f Feature position in global frame
    */
   void transformEstimate(const double alpha,
                          const double beta,
@@ -143,6 +147,8 @@ public:
  */
 struct AutoDiffReprojectionError {
 public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   // Camera extrinsics
   double C_CiC0[9];
   double t_Ci_CiC0[3];
@@ -215,6 +221,7 @@ public:
 class CeresFeatureEstimator : public FeatureEstimator {
 public:
   std::string method = "ANALYTICAL";
+  // std::string method = "AUTODIFF";
   ceres::Problem problem;
   ceres::Solver::Options options;
   ceres::Solver::Summary summary;

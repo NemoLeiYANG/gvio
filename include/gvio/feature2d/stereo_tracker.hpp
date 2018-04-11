@@ -9,7 +9,7 @@
 #include "gvio/camera/pinhole_model.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 #include "gvio/feature2d/feature_container.hpp"
-#include "gvio/feature2d/klt_tracker.hpp"
+#include "gvio/feature2d/orb_tracker.hpp"
 
 namespace gvio {
 /**
@@ -22,19 +22,41 @@ namespace gvio {
  */
 class StereoTracker {
 public:
-  KLTTracker tracker0;
-  KLTTracker tracker1;
+  ORBTracker tracker0;
+  ORBTracker tracker1;
+  GMSMatcher matcher;
+
+  TrackID counter_track_id = 0;
+
+  bool show_matches = false;
 
   StereoTracker();
   virtual ~StereoTracker();
 
   /**
-   * Update feature tracker
+   * Initialize stereo feature tracker
    *
-   * @param img_cur Current image frame
+   * @param img0_cur Current image frame from camera0
+   * @param img1_cur Current image frame from camera1
    * @returns 0 for success, -1 for failure
    */
-  int update(const cv::Mat &img_cur);
+  int initialize(const cv::Mat &img0_cur, const cv::Mat &img1_cur);
+
+  /**
+   * Update feature tracker
+   *
+   * @param img0_cur Current image frame from camera0
+   * @param img1_cur Current image frame from camera1
+   * @returns 0 for success, -1 for failure
+   */
+  int update(const cv::Mat &img0_cur, const cv::Mat &img1_cur);
+
+  /**
+   * Get lost feature tracks
+   *
+   * @returns List of feature track
+   */
+  std::vector<FeatureTrack> getLostTracks();
 };
 
 /** @} group feature2d */

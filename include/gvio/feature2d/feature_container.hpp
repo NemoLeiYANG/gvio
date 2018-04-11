@@ -42,6 +42,16 @@ struct FeatureContainer {
   int removeTrack(const TrackID &track_id, const bool lost = true);
 
   /**
+   * Remove feature tracks
+   *
+   * @param track_ids List of Track ID
+   * @param lost Mark feature track as lost
+   * @returns 0 for success, -1 for failure
+   */
+  int removeTracks(const std::vector<TrackID> &track_ids,
+                   const bool lost = true);
+
+  /**
    * Remove lost feature tracks
    *
    * @param tracks Lost feature tracks
@@ -57,6 +67,11 @@ struct FeatureContainer {
    * @returns 0 for success, -1 for failure
    */
   int updateTrack(const FrameID frame_id, const TrackID &track_id, Feature &f);
+
+  /**
+   * Get list of features currently tracking
+   */
+  std::vector<Feature> getFeaturesTracking();
 
   /**
    * Purge old feature tracks

@@ -85,7 +85,7 @@ int FeatureTracker::match(const Features &f1,
   f0.insert(f0.end(), this->unmatched.begin(), this->unmatched.end());
 
   // Match features
-  // -- Convert list of features to list of cv2.KeyPoint and descriptors
+  // -- Convert list of features to list of cv::KeyPoint and cv::descriptors
   std::vector<cv::KeyPoint> k0, k1;
   cv::Mat d0, d1;
   this->getKeyPointsAndDescriptors(f0, k0, d0);
@@ -177,6 +177,40 @@ int FeatureTracker::update(const cv::Mat &img_cur) {
   img_cur.copyTo(this->img_ref);
 
   return 0;
+}
+
+std::ostream &operator<<(std::ostream &os, const FeatureTracker &tracker) {
+  os << "tracking: [";
+  for (auto track_id : tracker.features.tracking) {
+    os << track_id << ", ";
+  }
+  if (tracker.features.tracking.size()) {
+    os << "\b\b]" << std::endl;
+  } else {
+    os << "]" << std::endl;
+  }
+
+  os << "lost : [";
+  for (auto track_id : tracker.features.lost) {
+    os << track_id << ", ";
+  }
+  if (tracker.features.lost.size()) {
+    os << "\b\b]" << std::endl;
+  } else {
+    os << "]" << std::endl;
+  }
+
+  os << "buffer: [";
+  for (auto kv : tracker.features.buffer) {
+    os << kv.first << ", ";
+  }
+  if (tracker.features.buffer.size()) {
+    os << "\b\b]" << std::endl;
+  } else {
+    os << "]" << std::endl;
+  }
+
+  return os;
 }
 
 } // namespace gvio

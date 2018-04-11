@@ -26,6 +26,10 @@ public:
   cv::Mat img_ref;
   Features fea_ref;
 
+  std::vector<cv::Point2f> p_ref;
+  std::vector<cv::Point2f> p_cur;
+  std::vector<uchar> inlier_mask;
+
   int max_corners = 1000;
   double quality_level = 0.001;
   double min_distance = 5.0;

@@ -23,20 +23,34 @@ int FeatureContainer::addTrack(const FrameID &frame_id,
 
 int FeatureContainer::removeTrack(const TrackID &track_id, const bool lost) {
   // Make sure track id is in the buffer
-  auto index = this->buffer.find(track_id);
-  if (index == this->buffer.end()) {
+  auto buf_index = this->buffer.find(track_id);
+  if (buf_index == this->buffer.end()) {
     return -1;
   }
 
   // Remove from tracking
-  this->tracking.erase(
-      std::remove(this->tracking.begin(), this->tracking.end(), track_id));
+  auto t_index =
+      std::remove(this->tracking.begin(), this->tracking.end(), track_id);
+  if (t_index != this->tracking.end()) {
+    this->tracking.erase(t_index);
+  }
 
   // Mark as lost or remove from buffer
   if (lost) {
     this->lost.push_back(track_id);
   } else {
-    this->buffer.erase(this->buffer.find(track_id));
+    this->buffer.erase(buf_index);
+  }
+
+  return 0;
+}
+
+int FeatureContainer::removeTracks(const std::vector<TrackID> &track_ids,
+                                   const bool lost) {
+  for (auto track_id : track_ids) {
+    if (this->removeTrack(track_id, lost) != 0) {
+      return -1;
+    }
   }
 
   return 0;
@@ -84,6 +98,18 @@ int FeatureContainer::updateTrack(const FrameID frame_id,
   this->buffer.at(track_id).update(frame_id, f);
 
   return 0;
+}
+
+std::vector<Feature> FeatureContainer::getFeaturesTracking() {
+  std::vector<Feature> features;
+
+  for (size_t i = 0; i < this->tracking.size(); i++) {
+    const TrackID track_id = this->tracking[i];
+    const Feature feature = this->buffer[track_id].last();
+    features.push_back(feature);
+  }
+
+  return features;
 }
 
 std::vector<FeatureTrack> FeatureContainer::purge(const size_t n) {

@@ -128,45 +128,12 @@ public:
    * @returns 0 for success, -1 for failure
    */
   virtual int update(const cv::Mat &img_cur);
-
-  /**
-   * FeatureTracker to string
-   */
-  friend std::ostream &operator<<(std::ostream &os,
-                                  const FeatureTracker &tracker) {
-    os << "tracking: [";
-    for (auto track_id : tracker.features.tracking) {
-      os << track_id << ", ";
-    }
-    if (tracker.features.tracking.size()) {
-      os << "\b\b]" << std::endl;
-    } else {
-      os << "]" << std::endl;
-    }
-
-    os << "lost : [";
-    for (auto track_id : tracker.features.lost) {
-      os << track_id << ", ";
-    }
-    if (tracker.features.lost.size()) {
-      os << "\b\b]" << std::endl;
-    } else {
-      os << "]" << std::endl;
-    }
-
-    os << "buffer: [";
-    for (auto kv : tracker.features.buffer) {
-      os << kv.first << ", ";
-    }
-    if (tracker.features.buffer.size()) {
-      os << "\b\b]" << std::endl;
-    } else {
-      os << "]" << std::endl;
-    }
-
-    return os;
-  }
 };
+
+/**
+  * FeatureTracker to string
+  */
+std::ostream &operator<<(std::ostream &os, const FeatureTracker &tracker);
 
 /** @} group feature2d */
 } // namespace gvio

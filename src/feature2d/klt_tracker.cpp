@@ -115,9 +115,9 @@ int KLTTracker::track(const cv::Mat &img_ref,
                       const Features &fea_ref,
                       Features &tracked) {
   // Convert list of features to list of cv::Point2f
-  std::vector<cv::Point2f> p0;
+  this->p_ref.clear();
   for (auto f : fea_ref) {
-    p0.push_back(f.kp.pt);
+    this->p_ref.push_back(f.kp.pt);
   }
 
   // Convert input images to gray scale
@@ -126,15 +126,15 @@ int KLTTracker::track(const cv::Mat &img_ref,
   cv::cvtColor(img_cur, gray_img_cur, CV_BGR2GRAY);
 
   // Track features with KLT
-  std::vector<cv::Point2f> p1;
+  this->p_cur.clear();
   std::vector<uchar> flow_mask;
   std::vector<float> err;
   cv::Size win_size(21, 21);
   const int pyr_levels = 3;
   cv::calcOpticalFlowPyrLK(gray_img_ref, // Reference image
                            gray_img_cur, // Current image
-                           p0,           // Input points
-                           p1,           // Output points
+                           this->p_ref,  // Input points
+                           this->p_cur,  // Output points
                            flow_mask,    // Tracking status
                            err,          // Tracking error
                            win_size,     // Window size
@@ -142,25 +142,31 @@ int KLTTracker::track(const cv::Mat &img_ref,
 
   // RANSAC
   std::vector<uchar> ransac_mask;
-  cv::findFundamentalMat(p0, p1, cv::FM_RANSAC, 0, 0.9999, ransac_mask);
+  cv::findFundamentalMat(this->p_ref,
+                         this->p_cur,
+                         cv::FM_RANSAC,
+                         0,
+                         0.9999,
+                         ransac_mask);
 
   // Add, update or remove feature tracks
-  std::vector<uchar> final_mask;
+  this->inlier_mask.clear();
   for (size_t i = 0; i < flow_mask.size(); i++) {
     auto fref = fea_ref[i];
-    auto fcur = Feature(p1[i]);
+    auto fcur = Feature(this->p_cur[i]);
     const uchar status = (flow_mask[i] && ransac_mask[i]) ? 1 : 0;
 
     if (this->processTrack(status, fref, fcur)) {
       tracked.push_back(fcur);
     }
 
-    final_mask.push_back(status);
+    this->inlier_mask.push_back(status);
   }
 
   // Show matches
   if (this->show_matches) {
-    cv::Mat matches_img = draw_tracks(img_cur, p0, p1, final_mask);
+    cv::Mat matches_img =
+        draw_tracks(img_cur, this->p_ref, this->p_cur, this->inlier_mask);
     cv::imshow("Matches", img_cur);
     cv::waitKey(1);
   }

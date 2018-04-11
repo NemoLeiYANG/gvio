@@ -53,6 +53,10 @@ Vec3 lls_triangulation(const Vec2 &p1,
   return p_C0_f;
 }
 
+FeatureEstimator::FeatureEstimator(const FeatureTrack &track,
+                                   const CameraStates &track_cam_states)
+    : track{track}, track_cam_states{track_cam_states} {}
+
 int FeatureEstimator::triangulate(const Vec2 &p1,
                                   const Vec2 &p2,
                                   const Mat3 &C_C0C1,
@@ -79,8 +83,8 @@ int FeatureEstimator::triangulate(const Vec2 &p1,
 
 int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
   // Calculate rotation and translation of first and second camera states
-  const CameraState cam0 = this->track_cam_states[0];
-  const CameraState cam1 = this->track_cam_states[1];
+  const CameraState cam0 = this->track_cam_states.front();
+  const CameraState cam1 = this->track_cam_states.back();
   // -- Get rotation and translation of camera 0 and camera 1
   const Mat3 C_C0G = C(cam0.q_CG);
   const Mat3 C_C1G = C(cam1.q_CG);
@@ -90,13 +94,14 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
   const Mat3 C_C0C1 = C_C0G * C_C1G.transpose();
   const Vec3 t_C0_C0C1 = C_C0G * (p_G_C1 - p_G_C0);
   // -- Convert from pixel coordinates to image coordinates
-  const Vec2 pt1 = this->track.track[0].getKeyPoint();
-  const Vec2 pt2 = this->track.track[1].getKeyPoint();
+  const Vec2 pt1 = this->track.track.front().getKeyPoint();
+  const Vec2 pt2 = this->track.track.back().getKeyPoint();
 
   if ((pt1 - pt2).norm() > 1.0e-3) {
     // Calculate initial estimate of 3D position
     FeatureEstimator::triangulate(pt1, pt2, C_C0C1, t_C0_C0C1, p_C0_f);
   } else {
+    LOG_WARN("Failed to triangulate feature!");
     p_C0_f << pt1(0), pt1(1), 5.0;
   }
   // std::cout << "pt1: " << pt1.transpose() << std::endl;
@@ -121,6 +126,7 @@ int FeatureEstimator::checkEstimate(const Vec3 &p_G_f) {
     const Mat3 C_CG = C(this->track_cam_states[i].q_CG);
     const Vec3 p_C_f = C_CG * (p_G_f - this->track_cam_states[i].p_G);
 
+    // Check if feature is in-front of camera
     if (p_C_f(2) < 0.0) {
       return -1;
     }
@@ -404,7 +410,7 @@ int CeresFeatureEstimator::setupProblem() {
     return -1;
   }
 
-  // // Cheat by forming p_C0_f using ground truth data
+  // Cheat by initializing p_C0_f using ground truth data
   // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
   //   std::cout << "est: " << p_C0_f.transpose() << std::endl;
   //   const Vec3 p_G_f = this->track.track[0].ground_truth;
@@ -447,7 +453,7 @@ int CeresFeatureEstimator::setupProblem() {
 
 int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // Set options
-  this->options.max_num_iterations = 10;
+  this->options.max_num_iterations = 100;
   // this->options.minimizer_type = ceres::LINE_SEARCH;
   this->options.num_threads = 1;
   this->options.num_linear_solver_threads = 1;
