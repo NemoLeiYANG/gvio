@@ -10,13 +10,12 @@
 #include <algorithm>
 
 #include "gvio/util/util.hpp"
+#include "gvio/calibration/calibration.hpp"
 #include "gvio/feature2d/draw.hpp"
 #include "gvio/feature2d/feature.hpp"
 #include "gvio/feature2d/feature_track.hpp"
 #include "gvio/feature2d/feature_container.hpp"
 #include "gvio/feature2d/gms_matcher.hpp"
-#include "gvio/camera/camera_model.hpp"
-#include "gvio/camera/pinhole_model.hpp"
 
 namespace gvio {
 /**
@@ -27,7 +26,7 @@ namespace gvio {
 class FeatureTracker {
 public:
   // Camera model
-  const CameraModel *camera_model = nullptr;
+  CameraProperty *camera_property = nullptr;
 
   // Features
   FrameID counter_frame_id = -1;
@@ -47,8 +46,8 @@ public:
   bool show_matches = false;
 
   FeatureTracker();
-  FeatureTracker(const CameraModel *camera_model);
-  FeatureTracker(const CameraModel *camera_model,
+  FeatureTracker(CameraProperty *camera_property);
+  FeatureTracker(CameraProperty *camera_property,
                  const size_t min_track_length,
                  const size_t max_track_length);
   virtual ~FeatureTracker();

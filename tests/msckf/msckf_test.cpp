@@ -303,11 +303,11 @@ int test_MSCKF_residualizeTrack() {
   const int image_width = 640;
   const int image_height = 480;
   const double fov = 60.0;
-  const double fx = PinholeModel::focalLengthX(image_width, fov);
-  const double fy = PinholeModel::focalLengthY(image_height, fov);
+  const double fx = pinhole_focal_length(image_width, fov);
+  const double fy = pinhole_focal_length(image_height, fov);
   const double cx = image_width / 2.0;
   const double cy = image_height / 2.0;
-  PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
+  CameraProperty camera_property{0, fx, fy, cx, cy, image_width, image_height};
 
   // Setup MSCKF
   MSCKF msckf;
@@ -323,14 +323,16 @@ int test_MSCKF_residualizeTrack() {
   // Prepare features and feature track
   // -- Create 2 features
   const Vec3 p_G_f{0.0, 0.0, 10.0};
-  Vec2 pt0 = pinhole_model.project(p_G_f,
-                                   C(msckf.cam_states[0].q_CG),
-                                   msckf.cam_states[0].p_G);
-  Vec2 pt1 = pinhole_model.project(p_G_f,
-                                   C(msckf.cam_states[1].q_CG),
-                                   msckf.cam_states[1].p_G);
-  pt0 = pinhole_model.pixel2image(pt0);
-  pt1 = pinhole_model.pixel2image(pt1);
+  Vec2 pt0 = pinhole_project(camera_property.K(),
+                             C(msckf.cam_states[0].q_CG),
+                             msckf.cam_states[0].p_G,
+                             p_G_f);
+  Vec2 pt1 = pinhole_project(camera_property.K(),
+                             C(msckf.cam_states[1].q_CG),
+                             msckf.cam_states[1].p_G,
+                             p_G_f);
+  pt0 = pinhole_pixel2ideal(camera_property.K(), pt0);
+  pt1 = pinhole_pixel2ideal(camera_property.K(), pt1);
   Feature f0{pt0};
   Feature f1{pt1};
   // -- Create a feature track based on two features
@@ -361,70 +363,70 @@ int test_MSCKF_residualizeTrack() {
   return 0;
 }
 
-int test_MSCKF_calcResiduals() {
-  // Camera model
-  const int image_width = 640;
-  const int image_height = 480;
-  const double fov = 60.0;
-  const double fx = PinholeModel::focalLengthX(image_width, fov);
-  const double fy = PinholeModel::focalLengthY(image_height, fov);
-  const double cx = image_width / 2.0;
-  const double cy = image_height / 2.0;
-  PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
-
-  // Setup MSCKF
-  MSCKF msckf;
-  // -- Modify default settings for test
-  msckf.min_track_length = 2;
-  // -- Add first camera state
-  msckf.initialize(0);
-  // -- Add second camera state
-  msckf.imu_state.p_G = Vec3{1.0, 1.0, 0.0};
-  msckf.augmentState();
-
-  // Prepare features and feature track
-  // -- Create a feature track1
-  const Vec3 p_G_f0{0.0, 0.0, 10.0};
-  Vec2 pt0 = pinhole_model.project(p_G_f0,
-                                   C(msckf.cam_states[0].q_CG),
-                                   msckf.cam_states[0].p_G);
-  Vec2 pt1 = pinhole_model.project(p_G_f0,
-                                   C(msckf.cam_states[1].q_CG),
-                                   msckf.cam_states[1].p_G);
-  pt0 = pinhole_model.pixel2image(pt0);
-  pt1 = pinhole_model.pixel2image(pt1);
-  Feature f0{pt0};
-  Feature f1{pt1};
-  FeatureTrack track1{0, 1, f0, f1};
-  // -- Create a feature track2
-  const Vec3 p_G_f1{1.0, 1.0, 10.0};
-  Vec2 pt2 = pinhole_model.project(p_G_f1,
-                                   C(msckf.cam_states[0].q_CG),
-                                   msckf.cam_states[0].p_G);
-  Vec2 pt3 = pinhole_model.project(p_G_f1,
-                                   C(msckf.cam_states[1].q_CG),
-                                   msckf.cam_states[1].p_G);
-  pt2 = pinhole_model.pixel2image(pt0);
-  pt3 = pinhole_model.pixel2image(pt1);
-  Feature f2{pt2};
-  Feature f3{pt3};
-  FeatureTrack track2{1, 1, f2, f3};
-  // // -- Create feature tracks
-  FeatureTracks tracks{track1, track2};
-  // FeatureTracks tracks{track1};
-
-  // Calculate residuals
-  MatX T_H;
-  VecX r_n;
-  int retval = msckf.calcResiduals(tracks, T_H, r_n);
-  print_shape("T_H", T_H);
-  print_shape("r_n", r_n);
-
-  // Assert
-  MU_CHECK_EQ(0, retval);
-
-  return 0;
-}
+// int test_MSCKF_calcResiduals() {
+//   // Camera model
+//   const int image_width = 640;
+//   const int image_height = 480;
+//   const double fov = 60.0;
+//   const double fx = pinhole_focal_length(image_width, fov);
+//   const double fy = pinhole_focal_length(image_height, fov);
+//   const double cx = image_width / 2.0;
+//   const double cy = image_height / 2.0;
+//   PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
+//
+//   // Setup MSCKF
+//   MSCKF msckf;
+//   // -- Modify default settings for test
+//   msckf.min_track_length = 2;
+//   // -- Add first camera state
+//   msckf.initialize(0);
+//   // -- Add second camera state
+//   msckf.imu_state.p_G = Vec3{1.0, 1.0, 0.0};
+//   msckf.augmentState();
+//
+//   // Prepare features and feature track
+//   // -- Create a feature track1
+//   const Vec3 p_G_f0{0.0, 0.0, 10.0};
+//   Vec2 pt0 = pinhole_model.project(p_G_f0,
+//                                    C(msckf.cam_states[0].q_CG),
+//                                    msckf.cam_states[0].p_G);
+//   Vec2 pt1 = pinhole_model.project(p_G_f0,
+//                                    C(msckf.cam_states[1].q_CG),
+//                                    msckf.cam_states[1].p_G);
+//   pt0 = pinhole_model.pixel2image(pt0);
+//   pt1 = pinhole_model.pixel2image(pt1);
+//   Feature f0{pt0};
+//   Feature f1{pt1};
+//   FeatureTrack track1{0, 1, f0, f1};
+//   // -- Create a feature track2
+//   const Vec3 p_G_f1{1.0, 1.0, 10.0};
+//   Vec2 pt2 = pinhole_model.project(p_G_f1,
+//                                    C(msckf.cam_states[0].q_CG),
+//                                    msckf.cam_states[0].p_G);
+//   Vec2 pt3 = pinhole_model.project(p_G_f1,
+//                                    C(msckf.cam_states[1].q_CG),
+//                                    msckf.cam_states[1].p_G);
+//   pt2 = pinhole_model.pixel2image(pt0);
+//   pt3 = pinhole_model.pixel2image(pt1);
+//   Feature f2{pt2};
+//   Feature f3{pt3};
+//   FeatureTrack track2{1, 1, f2, f3};
+//   // // -- Create feature tracks
+//   FeatureTracks tracks{track1, track2};
+//   // FeatureTracks tracks{track1};
+//
+//   // Calculate residuals
+//   MatX T_H;
+//   VecX r_n;
+//   int retval = msckf.calcResiduals(tracks, T_H, r_n);
+//   print_shape("T_H", T_H);
+//   print_shape("r_n", r_n);
+//
+//   // Assert
+//   MU_CHECK_EQ(0, retval);
+//
+//   return 0;
+// }
 
 int test_MSCKF_correctIMUState() {
   // Setup MSCKF
@@ -527,10 +529,10 @@ int test_MSCKF_measurementUpdate() {
   const double fy = raw_dataset.calib_cam_to_cam.K[0](1, 1);
   const double cx = raw_dataset.calib_cam_to_cam.K[0](0, 2);
   const double cy = raw_dataset.calib_cam_to_cam.K[0](1, 2);
-  PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
+  CameraProperty camera_property{0, fx, fy, cx, cy, image_width, image_height};
 
   // Setup feature tracker
-  KLTTracker tracker{&pinhole_model};
+  KLTTracker tracker{&camera_property};
   tracker.initialize(img_ref);
 
   // Setup MSCKF
@@ -745,8 +747,8 @@ int test_MSCKF_measurementUpdate2() {
 // }
 
 void test_suite() {
-  MU_ADD_TEST(test_MSCKF_constructor);
-  MU_ADD_TEST(test_MSCKF_configure);
+  // MU_ADD_TEST(test_MSCKF_constructor);
+  // MU_ADD_TEST(test_MSCKF_configure);
   // MU_ADD_TEST(test_MSCKF_initialize);
   // MU_ADD_TEST(test_MSCKF_P);
   // MU_ADD_TEST(test_MSCKF_J);
@@ -760,7 +762,7 @@ void test_suite() {
   // MU_ADD_TEST(test_MSCKF_correctIMUState);
   // MU_ADD_TEST(test_MSCKF_correctCameraStates);
   // MU_ADD_TEST(test_MSCKF_pruneCameraStates);
-  // MU_ADD_TEST(test_MSCKF_measurementUpdate);
+  MU_ADD_TEST(test_MSCKF_measurementUpdate);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate2);
   // MU_ADD_TEST(test_MSCKF_measurementUpdate3);
 }

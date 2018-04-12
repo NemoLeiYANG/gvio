@@ -9,8 +9,8 @@ struct test_config {
   const int image_height = 640;
   const double fov = 60.0;
 
-  const double fx = PinholeModel::focalLengthX(image_width, fov);
-  const double fy = PinholeModel::focalLengthY(image_height, fov);
+  const double fx = pinhole_focal_length(image_width, fov);
+  const double fy = pinhole_focal_length(image_height, fov);
   const double cx = image_width / 2.0;
   const double cy = image_height / 2.0;
 };

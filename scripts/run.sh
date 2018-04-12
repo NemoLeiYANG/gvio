@@ -57,7 +57,7 @@ cd tests
 # ./feature2d-feature_container_test
 # ./feature2d-feature_test
 # ./feature2d-feature_track_test
-./feature2d-feature_tracker_test
+# ./feature2d-feature_tracker_test
 # ./feature2d-gms_matcher_test
 # ./feature2d-klt_tracker_test
 # ./feature2d-orb_tracker_test
@@ -77,7 +77,7 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-# ./msckf-msckf_test
+./msckf-msckf_test
 # ./msckf-profiler_test
 # ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test

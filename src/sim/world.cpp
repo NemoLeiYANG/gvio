@@ -34,8 +34,8 @@ int SimWorld::configure(const double t_end, const double dt) {
   const int image_width = 640;
   const int image_height = 640;
   const double fov = 120.0;
-  const double fx = PinholeModel::focalLengthX(image_width, fov);
-  const double fy = PinholeModel::focalLengthY(image_height, fov);
+  const double fx = pinhole_focal_length(image_width, fov);
+  const double fy = pinhole_focal_length(image_height, fov);
   const double cx = image_width / 2.0;
   const double cy = image_height / 2.0;
   this->camera = VirtualCamera(image_width, image_height, fx, fy, cx, cy);
@@ -111,8 +111,8 @@ int SimWorld::configure(const std::string &config_file) {
   assert(a_points.size() > 0);
 
   // Camera
-  const double fx = PinholeModel::focalLengthX(image_width, fov);
-  const double fy = PinholeModel::focalLengthY(image_height, fov);
+  const double fx = pinhole_focal_length(image_width, fov);
+  const double fy = pinhole_focal_length(image_height, fov);
   const double cx = image_width / 2.0;
   const double cy = image_height / 2.0;
   this->camera = VirtualCamera(image_width, image_height, fx, fy, cx, cy);
@@ -228,7 +228,7 @@ void SimWorld::detectFeatures() {
   for (size_t i = 0; i < feature_ids.size(); i++) {
     const size_t feature_id = feature_ids[i];
     const Vec2 kp = keypoints.row(i).transpose();
-    const Vec2 img_pt = camera.camera_model.pixel2image(kp);
+    const Vec2 img_pt = camera.camera_model.pixel2ideal(kp);
     const Vec3 ground_truth = this->features3d.row(feature_id).transpose();
     const Feature f{img_pt, ground_truth};
 

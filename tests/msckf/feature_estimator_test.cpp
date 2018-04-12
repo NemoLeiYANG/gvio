@@ -9,8 +9,8 @@ struct test_config {
   const int image_height = 640;
   const double fov = 60.0;
 
-  const double fx = PinholeModel::focalLengthX(image_width, fov);
-  const double fy = PinholeModel::focalLengthY(image_height, fov);
+  const double fx = pinhole_focal_length(image_width, fov);
+  const double fy = pinhole_focal_length(image_height, fov);
   const double cx = image_width / 2.0;
   const double cy = image_height / 2.0;
 
@@ -53,8 +53,8 @@ void setup_test(const struct test_config &config,
   const Vec2 kp1 = cam_model.project(landmark, C_C0G, p_G_C0);
   const Vec2 kp2 = cam_model.project(landmark, C_C1G, p_G_C1);
   // -- Convert pixel coordinates to image coordinates
-  const Vec2 pt1 = cam_model.pixel2image(kp1);
-  const Vec2 pt2 = cam_model.pixel2image(kp2);
+  const Vec2 pt1 = cam_model.pixel2ideal(kp1);
+  const Vec2 pt2 = cam_model.pixel2ideal(kp2);
   // -- Add to feature track
   track = FeatureTrack{0, 1, Feature{pt1}, Feature{pt2}};
 }
@@ -74,10 +74,10 @@ int test_lls_triangulation() {
   const Vec2 kp1 = cam_model.project(landmark, I(3), Vec3{0.0, 0.0, 0.0});
   const Vec2 kp2 = cam_model.project(landmark, I(3), Vec3{0.0, 0.0, 0.2});
 
-  // const Vec2 ideal1 = cam_model.pixel2image(kp1);
+  // const Vec2 ideal1 = cam_model.pixel2ideal(kp1);
   const Vec3 u1{kp1(0), kp1(1), 1.0};
 
-  // const Vec2 ideal2 = cam_model.pixel2image(kp2);
+  // const Vec2 ideal2 = cam_model.pixel2ideal(kp2);
   const Vec3 u2{kp2(0), kp2(1), 1.0};
 
   const Mat34 P1{cam_model.P(I(3), Vec3{0.0, 0.0, 0.0})};
@@ -119,8 +119,8 @@ int test_FeatureEstimator_triangulate() {
   const Vec2 kp1 = cam_model.project(landmark, I(3), Vec3{0.0, 0.0, 0.0});
   const Vec2 kp2 = cam_model.project(landmark, I(3), Vec3{0.0, 0.0, 0.2});
   // -- Convert pixel coordinates to image coordinates
-  const Vec2 pt1 = cam_model.pixel2image(kp1);
-  const Vec2 pt2 = cam_model.pixel2image(kp2);
+  const Vec2 pt1 = cam_model.pixel2ideal(kp1);
+  const Vec2 pt2 = cam_model.pixel2ideal(kp2);
   // -- Add to feature track
   const FeatureTrack track{0, 1, Feature{pt1}, Feature{pt2}};
   std::cout << pt1.transpose() << std::endl;

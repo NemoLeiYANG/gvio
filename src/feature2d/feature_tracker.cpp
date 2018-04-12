@@ -4,26 +4,16 @@ namespace gvio {
 
 FeatureTracker::FeatureTracker() {}
 
-FeatureTracker::FeatureTracker(const CameraModel *camera_model)
-    : camera_model{camera_model} {}
+FeatureTracker::FeatureTracker(CameraProperty *camera_property)
+    : camera_property{camera_property} {}
 
-FeatureTracker::FeatureTracker(const CameraModel *camera_model,
+FeatureTracker::FeatureTracker(CameraProperty *camera_property,
                                const size_t min_track_length,
                                const size_t max_track_length)
-    : camera_model{camera_model}, features{min_track_length, max_track_length} {
-}
+    : camera_property{camera_property},
+      features{min_track_length, max_track_length} {}
 
-FeatureTracker::~FeatureTracker() {
-  // Pre-check
-  if (this->camera_model == nullptr) {
-    return;
-  }
-
-  // Delete PinholeModel
-  if (this->camera_model->model_name == "pinhole") {
-    delete (PinholeModel *) this->camera_model;
-  }
-}
+FeatureTracker::~FeatureTracker() {}
 
 int FeatureTracker::configure(const std::string &config_file) {
   LOG_ERROR("YOU SHOULD OVERRIDE ME!");
@@ -60,7 +50,8 @@ std::vector<FeatureTrack> FeatureTracker::getLostTracks() {
   // Get lost tracks
   std::vector<FeatureTrack> tracks;
   this->features.removeLostTracks(tracks);
-  if (this->camera_model == nullptr) {
+  if (this->camera_property == nullptr ||
+      this->camera_property->distortion_model.empty()) {
     return tracks;
   }
 
@@ -68,9 +59,10 @@ std::vector<FeatureTrack> FeatureTracker::getLostTracks() {
   for (auto &track : tracks) {
     for (auto &feature : track.track) {
       // Convert pixel coordinates to image coordinates
-      const Vec2 pt = this->camera_model->pixel2image(feature.kp.pt);
-      feature.kp.pt.x = pt(0);
-      feature.kp.pt.y = pt(1);
+      cv::Point2f pt_ud;
+      this->camera_property->undistortPoint(feature.kp.pt, pt_ud);
+      feature.kp.pt.x = pt_ud.x;
+      feature.kp.pt.y = pt_ud.y;
     }
   }
 

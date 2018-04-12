@@ -2,6 +2,20 @@
 
 namespace gvio {
 
+CameraProperty::CameraProperty() {}
+
+CameraProperty::CameraProperty(const int camera_index,
+                               const double fx,
+                               const double fy,
+                               const double cx,
+                               const double cy,
+                               const int image_width,
+                               const int image_height)
+    : camera_index{camera_index}, camera_model{"pinhole"}, distortion_model{},
+      resolution{image_width, image_height} {
+  intrinsics = Vec4{fx, fy, cx, cy};
+}
+
 Mat3 CameraProperty::K() {
   const double fx = this->intrinsics(0);
   const double fy = this->intrinsics(1);
@@ -47,7 +61,6 @@ VecX CameraProperty::D() {
 int CameraProperty::undistortPoints(
     const std::vector<cv::Point2f> &image_points,
     std::vector<cv::Point2f> &image_points_ud) {
-  std::vector<cv::Point2f> points_ud;
 
   if (distortion_model == "equidistant") {
     cv::fisheye::undistortPoints(image_points,
@@ -65,6 +78,35 @@ int CameraProperty::undistortPoints(
     LOG_ERROR("Unsupported distortion model [%s]!", distortion_model.c_str());
     return -1;
   }
+
+  return 0;
+}
+
+int CameraProperty::undistortPoint(const cv::Point2f &image_point,
+                                   cv::Point2f &image_point_ud) {
+  std::vector<cv::Point2f> points = {image_point};
+  std::vector<cv::Point2f> points_ud = {image_point};
+
+  if (distortion_model == "equidistant") {
+    cv::fisheye::undistortPoints(points,
+                                 points_ud,
+                                 convert(this->K()),
+                                 convert(this->D()));
+
+  } else if (distortion_model == "radtan") {
+    cv::undistortPoints(points,
+                        points_ud,
+                        convert(this->K()),
+                        convert(this->D()));
+
+  } else {
+    LOG_ERROR("Unsupported distortion model [%s]!", distortion_model.c_str());
+    exit(0);
+    return -1;
+  }
+
+  // Set result
+  image_point_ud = points_ud[0];
 
   return 0;
 }
@@ -120,16 +162,36 @@ int CameraProperty::project(const MatX &X, MatX &pixels) {
       pixels.col(i) = pixel;
     }
 
-  } else if (distortion_model == "radtan") {
+  } else if (this->distortion_model == "radtan") {
     for (long i = 0; i < X.cols(); i++) {
       const Vec3 p = X.col(i);
       const Vec2 pixel = project_pinhole_radtan(this->K(), this->D(), p);
       pixels.col(i) = pixel;
     }
 
+  } else if (this->distortion_model == "" && this->camera_model == "pinhole") {
+    for (long i = 0; i < X.cols(); i++) {
+      const Vec3 p = X.col(i);
+      pixels.col(i) = pinhole_project(this->K(), p);
+    }
+
   } else {
-    LOG_ERROR("Unsupported distortion model [%s]!", distortion_model.c_str());
+    LOG_ERROR("Distortion model and camera model are not set!");
     return -1;
+  }
+
+  return 0;
+}
+
+int CameraProperty::project(const Vec3 &X, Vec2 &pixel) {
+  if (this->distortion_model == "equidistant") {
+    pixel = project_pinhole_equi(this->K(), this->D(), X);
+
+  } else if (this->distortion_model == "radtan") {
+    pixel = project_pinhole_radtan(this->K(), this->D(), X);
+
+  } else if (this->distortion_model == "" && this->camera_model == "pinhole") {
+    pixel = pinhole_project(this->K(), X);
   }
 
   return 0;

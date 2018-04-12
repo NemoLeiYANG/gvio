@@ -4,13 +4,13 @@ namespace gvio {
 
 ORBTracker::ORBTracker() {}
 
-ORBTracker::ORBTracker(const CameraModel *camera_model)
-    : FeatureTracker{camera_model} {}
+ORBTracker::ORBTracker(CameraProperty *camera_property)
+    : FeatureTracker{camera_property} {}
 
-ORBTracker::ORBTracker(const CameraModel *camera_model,
+ORBTracker::ORBTracker(CameraProperty *camera_property,
                        const size_t min_track_length,
                        const size_t max_track_length)
-    : FeatureTracker{camera_model, min_track_length, max_track_length} {}
+    : FeatureTracker{camera_property, min_track_length, max_track_length} {}
 
 ORBTracker::~ORBTracker() {}
 
@@ -40,17 +40,17 @@ int ORBTracker::configure(const std::string &config_file) {
     return -1;
   }
 
-  // Load camera model
-  if (camera_model == "pinhole") {
-    auto *pinhole_model =
-        new PinholeModel{image_width, image_height, fx, fy, cx, cy};
-    this->camera_model = pinhole_model;
-  } else if (camera_model == "none") {
-    LOG_INFO("Not loading any camera model!");
-  } else {
-    LOG_ERROR("Invalid camera model [%s]!", camera_model.c_str());
-    return -1;
-  }
+  // // Load camera model
+  // if (camera_model == "pinhole") {
+  //   auto *pinhole_model =
+  //       new PinholeModel{image_width, image_height, fx, fy, cx, cy};
+  //   this->camera_model = pinhole_model;
+  // } else if (camera_model == "none") {
+  //   LOG_INFO("Not loading any camera model!");
+  // } else {
+  //   LOG_ERROR("Invalid camera model [%s]!", camera_model.c_str());
+  //   return -1;
+  // }
 
   return 0;
 }

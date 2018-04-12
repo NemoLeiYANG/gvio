@@ -13,7 +13,6 @@
 #include "gvio/util/util.hpp"
 #include "gvio/quaternion/jpl.hpp"
 #include "gvio/msckf/msckf.hpp"
-#include "gvio/camera/camera_model.hpp"
 #include "gvio/camera/pinhole_model.hpp"
 
 namespace gvio {

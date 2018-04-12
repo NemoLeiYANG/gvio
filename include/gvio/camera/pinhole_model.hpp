@@ -6,7 +6,6 @@
 #define GVIO_CAMERA_PINHOLE_MODEL_HPP
 
 #include "gvio/util/util.hpp"
-#include "gvio/camera/camera_model.hpp"
 
 namespace gvio {
 /**
@@ -15,13 +14,109 @@ namespace gvio {
  */
 
 /**
+ * Pinhole camera model theoretical focal length
+ *
+ * @param image_width Image width [px]
+ * @param fov Field of view [deg]
+ * @returns Focal length in pixels
+ */
+double pinhole_focal_length(const int image_width, const double fov);
+
+/**
+ * Pinhole camera model theoretical focal length
+ *
+ * @param image_size Image width and height [px]
+ * @param hfov Horizontal field of view [deg]
+ * @param vfov Vertical field of view [deg]
+ * @returns Focal length in pixels
+ */
+Vec2 pinhole_focal_length(const Vec2 &image_size,
+                          const double hfov,
+                          const double vfov);
+
+/**
+ * Pinhole projection matrix
+ *
+ * @param K camera intrinsics matrix K
+ * @param R Rotation matrix
+ * @param t translation vector
+ *
+ * @returns Projection matrix
+ */
+Mat34 pinhole_projection_matrix(const Mat3 &K, const Mat3 &R, const Vec3 &t);
+
+/**
+ * Project 3D point to image plane using pinhole model
+ *
+ * @param K camera intrinsics matrix K
+ * @param p 3D point
+ * @returns Projected point in image plane
+ */
+Vec2 pinhole_project(const Mat3 &K, const Vec3 &p);
+
+/**
+ * Project 3D point to image plane using pinhole model
+ *
+ * @param K camera intrinsics matrix K
+ * @param R Rotation matrix
+ * @param t translation vector
+ * @param X 3D point
+ * @returns Projected point in image plane
+ */
+Vec3 pinhole_project(const Mat3 &K,
+                     const Mat3 &R,
+                     const Vec3 &t,
+                     const Vec4 &X);
+
+/**
+ * Project 3D point to image plane using pinhole model
+ *
+ * @param K camera intrinsics matrix K
+ * @param R Rotation matrix
+ * @param t translation vector
+ * @param X 3D point
+ * @returns Projected point in image plane
+ */
+Vec2 pinhole_project(const Mat3 &K,
+                     const Mat3 &R,
+                     const Vec3 &t,
+                     const Vec3 &X);
+
+/**
+ * Convert pixel to ideal coordinates
+ *
+ * @param fx Focal length in x-axis
+ * @param fy Focal length in y-axis
+ * @param cx Principle center in x-axis
+ * @param cy Principle center in y-axis
+ * @param pixel Pixel measurement
+ *
+ * @returns Pixel in ideal coordinates
+ */
+Vec2 pinhole_pixel2ideal(const double fx,
+                         const double fy,
+                         const double cx,
+                         const double cy,
+                         const Vec2 &pixel);
+
+/**
+ * Convert pixel to ideal coordinates
+ *
+ * @param K camera intrinsics matrix K
+ * @param pixel Pixel measurement
+ * @returns Pixel in ideal coordinates
+ */
+Vec2 pinhole_pixel2ideal(const Mat3 &K, const Vec2 &pixel);
+
+/**
  * Pinhole camera model
  */
-class PinholeModel : public CameraModel {
+class PinholeModel {
 public:
-  std::string model_name = "pinhole";
+  int image_width = 0;
+  int image_height = 0;
 
-  MatX K = zeros(3, 3); ///< Camera intrinsics
+  Mat3 K = zeros(3, 3); ///< Camera intrinsics
   double cx = 0.0;      ///< Principle center in x-axis
   double cy = 0.0;      ///< Principle center in y-axis
   double fx = 0.0;      ///< Focal length in x-axis
@@ -31,8 +126,8 @@ public:
   virtual ~PinholeModel() {}
 
   PinholeModel(const int image_width, const int image_height, const MatX &K)
-      : CameraModel{image_width, image_height}, K{K}, cx{K(0, 2)}, cy{K(1, 2)},
-        fx{K(0, 0)}, fy{K(1, 1)} {}
+      : image_width{image_width}, image_height{image_height}, K{K}, cx{K(0, 2)},
+        cy{K(1, 2)}, fx{K(0, 0)}, fy{K(1, 1)} {}
 
   PinholeModel(const int image_width,
                const int image_height,
@@ -40,7 +135,8 @@ public:
                const double fy,
                const double cx,
                const double cy)
-      : CameraModel{image_width, image_height}, cx{cx}, cy{cy}, fx{fx}, fy{fy} {
+      : image_width{image_width}, image_height{image_height}, cx{cx}, cy{cy},
+        fx{fx}, fy{fy} {
     this->K = Mat3::Zero();
     K(0, 0) = fx;
     K(1, 1) = fy;
@@ -56,36 +152,6 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int configure(const std::string &config_file);
-
-  /**
-   * Focal length in x-axis
-   *
-   * @param image_width Image width in pixels
-   * @param fov Field of view in degrees
-   * @returns Theoretical focal length in x-axis
-   */
-  static double focalLengthX(const int image_width, const double fov);
-
-  /**
-   * Focal length in y-axis
-   *
-   * @param image_height Image height in pixels
-   * @param fov Field of view in degrees
-   * @returns Theoretical focal length in y-axis
-   */
-  static double focalLengthY(const int image_height, const double fov);
-
-  /**
-   * Focal length
-   *
-   * @param image_width Image width in pixels
-   * @param image_height Image height in pixels
-   * @param fov Field of view in degrees
-   * @returns Theoretical focal length
-   */
-  static Vec2 focalLength(const int image_width,
-                          const int image_height,
-                          const double fov);
 
   /**
    * Return projection matrix
@@ -106,7 +172,7 @@ public:
    *
    * @returns 3D point in image plane (homogenous)
    */
-  Vec2 project(const Vec3 &X, const Mat3 &R, const Vec3 &t) override;
+  Vec2 project(const Vec3 &X, const Mat3 &R, const Vec3 &t);
 
   /**
    * Project 3D point to image plane
@@ -117,82 +183,32 @@ public:
    *
    * @returns 3D point in image plane (homogenous)
    */
-  Vec3 project(const Vec4 &X, const Mat3 &R, const Vec3 &t) override;
+  Vec3 project(const Vec4 &X, const Mat3 &R, const Vec3 &t);
 
   /**
-   * Convert pixel measurement to image coordinates
+   * Convert pixel measurement to ideal coordinates
    *
    * @param pixel Pixel measurement
-   * @returns Pixel measurement to image coordinates
+   * @returns Pixel measurement to ideal coordinates
    */
-  Vec2 pixel2image(const Vec2 &pixel) override;
+  Vec2 pixel2ideal(const Vec2 &pixel);
 
   /**
-   * Convert pixel measurement to image coordinates
+   * Convert pixel measurement to ideal coordinates
    *
    * @param pixel Pixel measurement
-   * @returns Pixel measurement to image coordinates
+   * @returns Pixel measurement to ideal coordinates
    */
-  Vec2 pixel2image(const cv::Point2f &pixel) override;
+  Vec2 pixel2ideal(const cv::Point2f &pixel);
 
   /**
-   * Convert pixel measurement to image coordinates
+   * Convert pixel measurement to ideal coordinates
    *
    * @param pixel Pixel measurement
-   * @returns Pixel measurement to image coordinates
+   * @returns Pixel measurement to ideal coordinates
    */
-  Vec2 pixel2image(const cv::KeyPoint &pixel) override;
-
-  /**
-   * @copydoc Vec2 pixel2image(const Vec2 &pixel)
-   */
-  Vec2 pixel2image(const Vec2 &pixel) const override;
-
-  /**
-   * @copydoc Vec2 pixel2image(const cv::Point2f &pixel)
-   */
-  Vec2 pixel2image(const cv::Point2f &pixel) const override;
-
-  /**
-   * @copydoc Vec2 pixel2image(const cv::KeyPoint &pixel)
-   */
-  Vec2 pixel2image(const cv::KeyPoint &pixel) const override;
+  Vec2 pixel2ideal(const cv::KeyPoint &pixel);
 };
-
-/**
- * Project 3D point to image plane using pinhole model
- *
- * @param K camera intrinsics matrix K
- * @param p 3D point
- * @returns Projected point in image plane
- */
-Vec2 pinhole_project(const Mat3 &K, const Vec3 &p);
-
-/**
- * Convert pixel to ideal coordinates
- *
- * @param fx Focal length in x-axis
- * @param fy Focal length in y-axis
- * @param cx Principle center in x-axis
- * @param cy Principle center in y-axis
- * @param pixel Pixel measurement
- *
- * @returns Pixel in ideal coordinates
- */
-Vec2 pixel2ideal(const double fx,
-                 const double fy,
-                 const double cx,
-                 const double cy,
-                 const Vec2 &pixel);
-
-/**
- * Convert pixel to ideal coordinates
- *
- * @param K camera intrinsics matrix K
- * @param pixel Pixel measurement
- * @returns Pixel in ideal coordinates
- */
-Vec2 pixel2ideal(const Mat3 &K, const Vec2 &pixel);
 
 /** @} group camera */
 } // namespace gvio

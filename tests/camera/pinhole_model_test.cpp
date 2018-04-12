@@ -8,8 +8,8 @@ struct test_config {
   const int image_height = 640;
   const double fov = 60.0;
 
-  const double fx = PinholeModel::focalLengthX(image_width, fov);
-  const double fy = PinholeModel::focalLengthY(image_height, fov);
+  const double fx = pinhole_focal_length(image_width, fov);
+  const double fy = pinhole_focal_length(image_height, fov);
   const double cx = image_width / 2.0;
   const double cy = image_height / 2.0;
 };
@@ -88,9 +88,9 @@ int test_PinholeModel_constructor3() {
 }
 
 int test_PinholeModel_focalLength() {
-  const double fx = PinholeModel::focalLengthX(600, 90.0);
-  const double fy = PinholeModel::focalLengthY(600, 90.0);
-  const Vec2 focal_length = PinholeModel::focalLength(600, 600, 90.0);
+  const double fx = pinhole_focal_length(600, 90.0);
+  const double fy = pinhole_focal_length(600, 90.0);
+  const Vec2 focal_length = pinhole_focal_length(Vec2{600, 600}, 90.0, 90.0);
 
   MU_CHECK_FLOAT(300.0, fy);
   MU_CHECK_FLOAT(fx, fy);
@@ -134,7 +134,7 @@ int test_PinholeModel_project() {
 
 int test_PinholeModel_pixel2image() {
   PinholeModel cam_model = setup_pinhole_model();
-  Vec2 point = cam_model.pixel2image(Vec2{320, 320});
+  Vec2 point = cam_model.pixel2ideal(Vec2{320, 320});
 
   MU_CHECK_FLOAT(0.0, point(0));
   MU_CHECK_FLOAT(0.0, point(1));

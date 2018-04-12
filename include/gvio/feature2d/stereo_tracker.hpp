@@ -5,7 +5,6 @@
 #ifndef GVIO_FEATURE2D_STEREO_TRACKER_HPP
 #define GVIO_FEATURE2D_STEREO_TRACKER_HPP
 
-#include "gvio/camera/camera_model.hpp"
 #include "gvio/camera/pinhole_model.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 #include "gvio/feature2d/feature_container.hpp"
@@ -32,7 +31,7 @@ public:
   bool show_matches = false;
 
   StereoTracker();
-  StereoTracker(const CameraModel *camera_model,
+  StereoTracker(CameraProperty *camera_property,
                 const size_t min_track_length,
                 const size_t max_track_length);
   virtual ~StereoTracker();

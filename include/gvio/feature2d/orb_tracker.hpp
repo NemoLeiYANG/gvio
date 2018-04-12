@@ -21,8 +21,8 @@ public:
   cv::Ptr<cv::ORB> orb = cv::ORB::create();
 
   ORBTracker();
-  ORBTracker(const CameraModel *camera_model);
-  ORBTracker(const CameraModel *camera_model,
+  ORBTracker(CameraProperty *camera_property);
+  ORBTracker(CameraProperty *camera_property,
              const size_t min_track_length,
              const size_t max_track_length);
   virtual ~ORBTracker();

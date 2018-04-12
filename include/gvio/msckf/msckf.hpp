@@ -17,7 +17,6 @@
 
 #include "gvio/util/util.hpp"
 #include "gvio/quaternion/jpl.hpp"
-#include "gvio/camera/camera_model.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 
 #include "gvio/msckf/camera_state.hpp"

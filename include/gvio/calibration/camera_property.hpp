@@ -7,6 +7,7 @@
 
 #include "gvio/util/util.hpp"
 #include "gvio/camera/distortion.hpp"
+#include "gvio/camera/pinhole_model.hpp"
 
 namespace gvio {
 /**
@@ -21,6 +22,17 @@ struct CameraProperty {
   VecX distortion_coeffs;
   VecX intrinsics;
   Vec2 resolution;
+
+  CameraProperty();
+
+  // Pinhole Model w/o distortion constructor
+  CameraProperty(const int camera_index,
+                 const double fx,
+                 const double fy,
+                 const double cx,
+                 const double cy,
+                 const int image_width,
+                 const int image_height);
 
   /**
    * Camera intrinsics matrix K
@@ -43,6 +55,16 @@ struct CameraProperty {
    */
   int undistortPoints(const std::vector<cv::Point2f> &image_points,
                       std::vector<cv::Point2f> &image_points_ud);
+
+  /**
+   * Undistort point
+   *
+   * @param image_point Image point
+   * @param image_point_ud Undistorted image point
+   * @return 0 for success, -1 for failure
+   */
+  int undistortPoint(const cv::Point2f &image_point,
+                     cv::Point2f &image_point_ud);
 
   /**
    * Undistort image
@@ -73,13 +95,22 @@ struct CameraProperty {
                      cv::Mat &image_ud);
 
   /**
-   * Project 3D point to image plane
+   * Project 3D points to image plane
    *
    * @param X 3D points
    * @param pixels Points in image plane
    * @return 0 for success, -1 for failure
    */
   int project(const MatX &X, MatX &pixels);
+
+  /**
+   * Project 3D point to image plane
+   *
+   * @param X 3D point
+   * @param pixel Point in image plane
+   * @return 0 for success, -1 for failure
+   */
+  int project(const Vec3 &X, Vec2 &pixel);
 };
 
 /**

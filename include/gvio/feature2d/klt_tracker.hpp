@@ -5,8 +5,7 @@
 #ifndef GVIO_FEATURE2D_KLT_TRACKER_HPP
 #define GVIO_FEATURE2D_KLT_TRACKER_HPP
 
-#include "gvio/camera/camera_model.hpp"
-#include "gvio/camera/pinhole_model.hpp"
+#include "gvio/calibration/camera_property.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 #include "gvio/feature2d/feature_container.hpp"
 
@@ -38,18 +37,14 @@ public:
   int image_width = 0;
   int image_height = 0;
 
-  const CameraModel *camera_model = nullptr;
+  CameraProperty *camera_property = nullptr;
 
-  KLTTracker() {}
-
-  KLTTracker(const CameraModel *camera_model) : camera_model{camera_model} {}
-
-  KLTTracker(const int max_corners,
+  KLTTracker();
+  KLTTracker(CameraProperty *camera_property);
+  KLTTracker(CameraProperty *camera_property,
+             const int max_corners,
              const double quality_level,
-             const double min_distance,
-             const CameraModel *camera_model)
-      : max_corners{max_corners}, quality_level{quality_level},
-        min_distance{min_distance}, camera_model{camera_model} {}
+             const double min_distance);
 
   /**
    * Get lost feature tracks
