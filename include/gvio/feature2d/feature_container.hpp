@@ -22,6 +22,10 @@ struct FeatureContainer {
   std::vector<TrackID> lost;
   std::map<TrackID, FeatureTrack> buffer;
 
+  FeatureContainer();
+  FeatureContainer(const size_t min_track_length,
+                   const size_t max_track_length);
+
   /**
    * Add feature track
    *

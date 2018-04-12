@@ -24,6 +24,9 @@ fi
 mkdir -p build && cd build
 cmake .. && time make -j${CPU_COUNT}
 
+# SCRIPTS
+# python3 scripts/plot/plot_fig.py
+
 # EXPERIMENTS
 # cd experiments
 # ./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
@@ -58,7 +61,7 @@ cd tests
 # ./feature2d-gms_matcher_test
 # ./feature2d-klt_tracker_test
 # ./feature2d-orb_tracker_test
-./feature2d-stereo_tracker_test
+# ./feature2d-stereo_tracker_test
 # ./gimbal-calibration-aprilgrid_test
 # ./gimbal-calibration-chessboard_test
 # ./gimbal-calibration-calib_params_test

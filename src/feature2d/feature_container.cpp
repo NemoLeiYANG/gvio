@@ -2,6 +2,12 @@
 
 namespace gvio {
 
+FeatureContainer::FeatureContainer() {}
+
+FeatureContainer::FeatureContainer(const size_t min_track_length,
+                                   const size_t max_track_length)
+    : min_track_length{min_track_length}, max_track_length{max_track_length} {}
+
 int FeatureContainer::addTrack(const FrameID &frame_id,
                                Feature &f1,
                                Feature &f2) {

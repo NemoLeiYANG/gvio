@@ -7,7 +7,7 @@ namespace gvio {
 static const std::string KITTI_RAW_DATASET = "/data/kitti/raw";
 
 int test_StereoTracker_update() {
-  StereoTracker tracker(1, 5);
+  StereoTracker tracker(nullptr, 1, 5);
 
   // Load dataset
   RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
@@ -68,7 +68,7 @@ int test_StereoTracker_getLostTracks() {
   // Track features
   const cv::Mat img0 = cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR);
   const cv::Mat img1 = cv::imread(raw_dataset.cam1[0], CV_LOAD_IMAGE_COLOR);
-  StereoTracker tracker(0, 5);
+  StereoTracker tracker(nullptr, 0, 5);
   tracker.show_matches = true;
   tracker.initialize(img0, img1);
   for (int i = 1; i < 5; i++) {

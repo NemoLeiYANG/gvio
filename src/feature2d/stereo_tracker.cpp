@@ -2,21 +2,14 @@
 
 namespace gvio {
 
-StereoTracker::StereoTracker() {
-  this->tracker0.features.min_track_length = min_track_length;
-  this->tracker0.features.max_track_length = max_track_length;
-  this->tracker1.features.min_track_length = min_track_length;
-  this->tracker1.features.max_track_length = max_track_length;
-}
+StereoTracker::StereoTracker() {}
 
-StereoTracker::StereoTracker(const size_t min_track_length,
+StereoTracker::StereoTracker(const CameraModel *camera_model,
+                             const size_t min_track_length,
                              const size_t max_track_length)
-    : min_track_length{min_track_length}, max_track_length{max_track_length} {
-  this->tracker0.features.min_track_length = min_track_length;
-  this->tracker0.features.max_track_length = max_track_length;
-  this->tracker1.features.min_track_length = min_track_length;
-  this->tracker1.features.max_track_length = max_track_length;
-}
+    : tracker0{camera_model, min_track_length, max_track_length},
+      tracker1{camera_model, min_track_length, max_track_length},
+      min_track_length{min_track_length}, max_track_length{max_track_length} {}
 
 StereoTracker::~StereoTracker() {}
 

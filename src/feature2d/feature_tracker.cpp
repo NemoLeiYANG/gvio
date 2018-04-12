@@ -7,6 +7,12 @@ FeatureTracker::FeatureTracker() {}
 FeatureTracker::FeatureTracker(const CameraModel *camera_model)
     : camera_model{camera_model} {}
 
+FeatureTracker::FeatureTracker(const CameraModel *camera_model,
+                               const size_t min_track_length,
+                               const size_t max_track_length)
+    : camera_model{camera_model}, features{min_track_length, max_track_length} {
+}
+
 FeatureTracker::~FeatureTracker() {
   // Pre-check
   if (this->camera_model == nullptr) {

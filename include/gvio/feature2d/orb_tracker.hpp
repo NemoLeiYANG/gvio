@@ -22,6 +22,9 @@ public:
 
   ORBTracker();
   ORBTracker(const CameraModel *camera_model);
+  ORBTracker(const CameraModel *camera_model,
+             const size_t min_track_length,
+             const size_t max_track_length);
   virtual ~ORBTracker();
 
   /**

@@ -7,6 +7,11 @@ ORBTracker::ORBTracker() {}
 ORBTracker::ORBTracker(const CameraModel *camera_model)
     : FeatureTracker{camera_model} {}
 
+ORBTracker::ORBTracker(const CameraModel *camera_model,
+                       const size_t min_track_length,
+                       const size_t max_track_length)
+    : FeatureTracker{camera_model, min_track_length, max_track_length} {}
+
 ORBTracker::~ORBTracker() {}
 
 int ORBTracker::configure(const std::string &config_file) {
