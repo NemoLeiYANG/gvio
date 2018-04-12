@@ -28,6 +28,18 @@ ADD_LIBRARY(
   src/apriltag/base_detector.cpp
   src/apriltag/mit.cpp
   src/apriltag/michigan.cpp
+  # calibration
+  src/calibration/aprilgrid.cpp
+  src/calibration/calib_data.cpp
+  src/calibration/calib_params.cpp
+  src/calibration/calib_preprocessor.cpp
+  src/calibration/calib_validator.cpp
+  src/calibration/camchain.cpp
+  src/calibration/camera_property.cpp
+  src/calibration/chessboard.cpp
+  src/calibration/gimbal_calib.cpp
+  src/calibration/residual.cpp
+  src/calibration/stereo_calib.cpp
   # control
   src/control/carrot_controller.cpp
   src/control/pid.cpp
@@ -66,17 +78,6 @@ ADD_LIBRARY(
   src/feature2d/klt_tracker.cpp
   src/feature2d/stereo_tracker.cpp
   # gimbal
-  src/gimbal/calibration/aprilgrid.cpp
-  src/gimbal/calibration/calib_data.cpp
-  src/gimbal/calibration/calib_params.cpp
-  src/gimbal/calibration/calib_preprocessor.cpp
-  src/gimbal/calibration/calib_validator.cpp
-  src/gimbal/calibration/camchain.cpp
-  src/gimbal/calibration/camera_property.cpp
-  src/gimbal/calibration/chessboard.cpp
-  src/gimbal/calibration/gimbal_calib.cpp
-  src/gimbal/calibration/residual.cpp
-  src/gimbal/calibration/stereo_calib.cpp
   src/gimbal/gmr/gmr.cpp
   src/gimbal/gmr/slic.cpp
   src/gimbal/gimbal.cpp
@@ -144,6 +145,15 @@ FILE(COPY tests/test_configs DESTINATION ${PROJECT_BINARY_DIR}/tests)
 SET(
   UNITTESTS
   # apriltag-mit_test
+  # calibration-aprilgrid_test
+  # calibration-calib_data_test
+  # calibration-calib_params_test
+  # calibration-calib_preprocessor_test
+  # calibration-calib_validator_test
+  # calibration-chessboard_test
+  # calibration-gimbal_calib_test
+  # calibration-residual_test
+  # calibration-stereo_calib_test
   # camera-camera_test
   # camera-camera_config_test
   # camera-ids_test
@@ -166,15 +176,6 @@ SET(
   # feature2d-klt_tracker_test
   # feature2d-orb_tracker_test
   # feature2d-stereo_tracker_test
-  # gimbal-calibration-aprilgrid_test
-  # gimbal-calibration-calib_data_test
-  # gimbal-calibration-calib_params_test
-  # gimbal-calibration-calib_preprocessor_test
-  # gimbal-calibration-calib_validator_test
-  # gimbal-calibration-chessboard_test
-  # gimbal-calibration-gimbal_calib_test
-  # gimbal-calibration-residual_test
-  # gimbal-calibration-stereo_calib_test
   # gimbal-gmr-gmr_test
   # gimbal-sbgc_test
   # # gimbal-saliency_test
