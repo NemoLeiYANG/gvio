@@ -28,7 +28,7 @@ VecX CameraProperty::D() {
     D << k1, k2, k3, k4;
     return D;
 
-  } else if (distortion_model == "radial-tangential") {
+  } else if (distortion_model == "radtan") {
     const double k1 = this->distortion_coeffs(0);
     const double k2 = this->distortion_coeffs(1);
     const double p1 = this->distortion_coeffs(2);
@@ -38,6 +38,7 @@ VecX CameraProperty::D() {
     D << k1, k2, p1, p2, k3;
     return D;
   } else {
+    LOG_ERROR("Unsupported distortion model [%s]!", distortion_model.c_str());
     VecX D;
     return D;
   }
@@ -54,7 +55,7 @@ int CameraProperty::undistortPoints(
                                  convert(this->K()),
                                  convert(this->D()));
 
-  } else if (distortion_model == "radial-tangential") {
+  } else if (distortion_model == "radtan") {
     cv::undistortPoints(image_points,
                         image_points_ud,
                         convert(this->K()),
@@ -89,7 +90,7 @@ int CameraProperty::undistortImage(const cv::Mat &image,
     // Undistort image
     cv::fisheye::undistortImage(image, image_ud, K, D, K_ud);
 
-  } else if (distortion_model == "radial-tangential") {
+  } else if (distortion_model == "radtan") {
     // Undistort image
     K_ud = K.clone();
     cv::undistort(image, image_ud, K, D, K_ud);
@@ -119,7 +120,7 @@ int CameraProperty::project(const MatX &X, MatX &pixels) {
       pixels.col(i) = pixel;
     }
 
-  } else if (distortion_model == "radial-tangential") {
+  } else if (distortion_model == "radtan") {
     for (long i = 0; i < X.cols(); i++) {
       const Vec3 p = X.col(i);
       const Vec2 pixel = project_pinhole_radtan(this->K(), this->D(), p);
