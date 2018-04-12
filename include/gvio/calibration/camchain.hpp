@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_CAMCHAIN_HPP
 #define GVIO_CALIBRATION_CAMCHAIN_HPP
@@ -11,7 +11,7 @@
 
 namespace gvio {
 /**
- * @addtogroup gimbal
+ * @addtogroup calibration
  * @{
  */
 
@@ -49,6 +49,6 @@ public:
  */
 std::ostream &operator<<(std::ostream &os, const Camchain &camchain);
 
-/** @} group gimbal */
+/** @} group calibration */
 } // namespace gvio
 #endif // GVIO_CALIBRATION_CAMCHAIN_HPP

@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_CALIBDATA_HPP
 #define GVIO_CALIBRATION_CALIBDATA_HPP
@@ -10,7 +10,7 @@
 
 namespace gvio {
 /**
- * @addtogroup gimbal
+ * @addtogroup calibration
  * @{
  */
 
@@ -31,6 +31,6 @@ struct CalibData {
   int load(const std::string &data_dir);
 };
 
-/** @} group gimbal */
+/** @} group calibration */
 } // namespace gvio
 #endif // GVIO_GIMBAL_CALIBRATION_CALIB_DATA_HPP

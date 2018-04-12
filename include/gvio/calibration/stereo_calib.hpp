@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup calibration
+ */
 #ifndef GVIO_CALIBRATION_STEREO_CALIB_HPP
 #define GVIO_CALIBRATION_STEREO_CALIB_HPP
 
@@ -10,6 +14,10 @@
 #include "gvio/calibration/camchain.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup calibration
+ * @{
+ */
 
 class StereoCalib {
 public:
@@ -42,5 +50,6 @@ public:
   int calibrateExtrinsics();
 };
 
+/** @} group calibration */
 } // namespace gvio
 #endif // GVIO_CALIBRATION_STEREO_CALIB_HPP

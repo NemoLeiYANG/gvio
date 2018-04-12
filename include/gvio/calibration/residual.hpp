@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_RESIDUAL_HPP
 #define GVIO_CALIBRATION_RESIDUAL_HPP
@@ -12,7 +12,7 @@
 
 namespace gvio {
 /**
- * @addtogroup gimbal
+ * @addtogroup calibration
  * @{
  */
 
@@ -162,7 +162,7 @@ struct GimbalCalibNumericalResidual {
                   double *residual) const;
 };
 
-/** @} group gimbal */
+/** @} group calibration */
 } // namespace gvio
 
 #include "impl/residual.hpp"

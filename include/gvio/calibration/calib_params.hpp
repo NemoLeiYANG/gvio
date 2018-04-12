@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_CALIB_PARAMS_HPP
 #define GVIO_CALIBRATION_CALIB_PARAMS_HPP
@@ -10,7 +10,7 @@
 
 namespace gvio {
 /**
- * @addtogroup gimbal
+ * @addtogroup calibration
  * @{
  */
 
@@ -48,6 +48,6 @@ struct CalibParams {
  */
 std::ostream &operator<<(std::ostream &os, const CalibParams &m);
 
-/** @} group gimbal */
+/** @} group calibration */
 } // namespace gvio
 #endif // GVIO_GIMBAL_CALIBRATION_CALIB_PARAMS_HPP

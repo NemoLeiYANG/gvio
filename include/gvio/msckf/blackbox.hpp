@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @ingroup msckf
+ */
 #ifndef GVIO_MSCKF_BLACKBOX_HPP
 #define GVIO_MSCKF_BLACKBOX_HPP
 
@@ -9,6 +13,10 @@
 #include "gvio/msckf/msckf.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup msckf
+ * @{
+ */
 
 /**
  * BlackBox
@@ -116,5 +124,6 @@ public:
                      const Vec3 &gnd_rpy_G);
 };
 
+/** @} group msckf */
 } // namespace gvio
-#endif
+#endif // GVIO_MSCKF_BLACKBOX_HPP

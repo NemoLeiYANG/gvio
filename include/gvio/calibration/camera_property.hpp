@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_CAMERA_PROPERTY_HPP
 #define GVIO_CALIBRATION_CAMERA_PROPERTY_HPP
@@ -10,7 +10,7 @@
 
 namespace gvio {
 /**
- * @addtogroup gimbal
+ * @addtogroup calibration
  * @{
  */
 
@@ -87,6 +87,6 @@ struct CameraProperty {
  */
 std::ostream &operator<<(std::ostream &os, const CameraProperty &cam);
 
-/** @} group gimbal */
+/** @} group calibration */
 } // namespace gvio
 #endif // GVIO_CALIBRATION_CAMERA_PROPERTY_HPP

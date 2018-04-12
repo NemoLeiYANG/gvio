@@ -11,7 +11,7 @@
 
 namespace gvio {
 /**
- * @addtogroup quadrotor
+ * @addtogroup control
  * @{
  */
 
@@ -60,6 +60,6 @@ public:
   void reset();
 };
 
-/** @} group quadrotor */
+/** @} group control */
 } // namespace gvio
 #endif // GVIO_CONTROL_PID_HPP

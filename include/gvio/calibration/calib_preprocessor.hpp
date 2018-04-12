@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_CALIB_PREPROCESSOR_HPP
 #define GVIO_CALIBRATION_CALIB_PREPROCESSOR_HPP
@@ -15,7 +15,7 @@
 
 namespace gvio {
 /**
- * @addtogroup gimbal
+ * @addtogroup calibration
  * @{
  */
 
@@ -105,6 +105,6 @@ public:
   int preprocess(const std::string &dir_path);
 };
 
-/** @} group gimbal */
+/** @} group calibration */
 } // namespace gvio
 #endif // GVIO_CALIBRATION_CALIB_PREPROCESSOR_HPP

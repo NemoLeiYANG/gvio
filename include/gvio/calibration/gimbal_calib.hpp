@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_GIMBAL_CALIB_HPP
 #define GVIO_CALIBRATION_GIMBAL_CALIB_HPP
@@ -14,7 +14,7 @@
 
 namespace gvio {
 /**
- * @addtogroup gimbal
+ * @addtogroup calibration
  * @{
  */
 
@@ -39,7 +39,7 @@ public:
   int load(const std::string &data_dir);
 
   /**
-   * Calibrate gimbal
+   * Calibrate calibration
    */
   int calibrate();
 };

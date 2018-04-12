@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_CHESSBOARD_HPP
 #define GVIO_CALIBRATION_CHESSBOARD_HPP
@@ -11,7 +11,7 @@
 
 namespace gvio {
 /**
- * @addtogroup gimbal
+ * @addtogroup calibration
  * @{
  */
 
@@ -121,6 +121,6 @@ struct Chessboard {
   void project3DPoints(const MatX &X, const cv::Mat &K, cv::Mat &image);
 };
 
-/** @} group gimbal */
+/** @} group calibration */
 } // namespace gvio
 #endif // GVIO_CALIBRATION_CHESSBOARD_HPP

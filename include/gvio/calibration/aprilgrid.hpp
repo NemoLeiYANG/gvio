@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_APRILGRID_HPP
 #define GVIO_CALIBRATION_APRILGRID_HPP
@@ -12,6 +12,10 @@
 #include "gvio/camera/distortion.hpp"
 
 namespace gvio {
+/**
+ * @addtogroup calibration
+ * @{
+ */
 
 class AprilGrid {
 public:
@@ -103,5 +107,6 @@ public:
                MatX &grid_points);
 };
 
+/** @} group calibration */
 } // namespace gvio
 #endif // GVIO_CALIBRATION_APRILGRID_HPP

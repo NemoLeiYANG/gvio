@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_SIMULATION_HPP
 #define GVIO_CALIBRATION_SIMULATION_HPP
@@ -13,7 +13,7 @@
 
 namespace gvio {
 /**
- * @addtogroup gimbal
+ * @addtogroup calibration
  * @{
  */
 
@@ -26,6 +26,6 @@ public:
   virtual ~GimbalSimulation();
 };
 
-/** @} group gimbal */
+/** @} group calibration */
 } // namespace gvio
 #endif // GVIO_CALIBRATION_SIMULATION_HPP

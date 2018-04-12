@@ -1,6 +1,6 @@
 /**
  * @file
- * @ingroup gimbal
+ * @ingroup calibration
  */
 #ifndef GVIO_CALIBRATION_CALIB_VALIDATOR_HPP
 #define GVIO_CALIBRATION_CALIB_VALIDATOR_HPP
@@ -13,7 +13,7 @@
 
 namespace gvio {
 /**
- * @addtogroup gimbal
+ * @addtogroup calibration
  * @{
  */
 
@@ -131,6 +131,6 @@ public:
  */
 std::ostream &operator<<(std::ostream &os, const CalibValidator &validator);
 
-/** @} group gimbal */
+/** @} group calibration */
 } // namespace gvio
 #endif // GVIO_CALIBRATION_CALIB_VALIDATOR_HPP
