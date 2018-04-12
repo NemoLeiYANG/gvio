@@ -36,7 +36,8 @@ int FeatureContainer::removeTrack(const TrackID &track_id, const bool lost) {
   }
 
   // Mark as lost or remove from buffer
-  if (lost) {
+  auto track = this->buffer.at(track_id);
+  if (track.trackedLength() > this->min_track_length && lost) {
     this->lost.push_back(track_id);
   } else {
     this->buffer.erase(buf_index);
@@ -94,8 +95,14 @@ int FeatureContainer::updateTrack(const FrameID frame_id,
   }
 
   // Update track
+  auto &track = this->buffer.at(track_id);
   f.setTrackID(track_id);
-  this->buffer.at(track_id).update(frame_id, f);
+  track.update(frame_id, f);
+
+  // Mark as lost - too old
+  if (track.trackedLength() >= this->max_track_length) {
+    this->removeTrack(track.track_id, true);
+  }
 
   return 0;
 }

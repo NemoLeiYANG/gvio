@@ -26,12 +26,6 @@ namespace gvio {
 
 class FeatureTracker {
 public:
-  bool show_matches = false;
-
-  // Matcher
-  cv::Size img_size;
-  GMSMatcher matcher;
-
   // Features
   FrameID counter_frame_id = -1;
   FeatureContainer features;
@@ -42,12 +36,18 @@ public:
   cv::Mat img_cur;
   cv::Mat img_ref;
 
+  // Matcher
+  cv::Size img_size;
+  GMSMatcher matcher;
+
   // Camera model
   const CameraModel *camera_model = nullptr;
 
-  FeatureTracker() {}
-  FeatureTracker(const CameraModel *camera_model)
-      : camera_model{camera_model} {}
+  // Settings
+  bool show_matches = false;
+
+  FeatureTracker();
+  FeatureTracker(const CameraModel *camera_model);
   virtual ~FeatureTracker();
 
   /**

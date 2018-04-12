@@ -2,6 +2,11 @@
 
 namespace gvio {
 
+FeatureTracker::FeatureTracker() {}
+
+FeatureTracker::FeatureTracker(const CameraModel *camera_model)
+    : camera_model{camera_model} {}
+
 FeatureTracker::~FeatureTracker() {
   // Pre-check
   if (this->camera_model == nullptr) {

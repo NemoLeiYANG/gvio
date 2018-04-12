@@ -2,7 +2,21 @@
 
 namespace gvio {
 
-StereoTracker::StereoTracker() {}
+StereoTracker::StereoTracker() {
+  this->tracker0.features.min_track_length = min_track_length;
+  this->tracker0.features.max_track_length = max_track_length;
+  this->tracker1.features.min_track_length = min_track_length;
+  this->tracker1.features.max_track_length = max_track_length;
+}
+
+StereoTracker::StereoTracker(const size_t min_track_length,
+                             const size_t max_track_length)
+    : min_track_length{min_track_length}, max_track_length{max_track_length} {
+  this->tracker0.features.min_track_length = min_track_length;
+  this->tracker0.features.max_track_length = max_track_length;
+  this->tracker1.features.min_track_length = min_track_length;
+  this->tracker1.features.max_track_length = max_track_length;
+}
 
 StereoTracker::~StereoTracker() {}
 
@@ -107,6 +121,9 @@ std::vector<FeatureTrack> StereoTracker::getLostTracks() {
     // - feature track length
     FrameID frame_start = std::max(track0.frame_start, track1.frame_start);
     FrameID frame_end = std::min(track0.frame_end, track1.frame_end);
+    if ((frame_end - frame_start + 1) < (long) this->min_track_length) {
+      continue;
+    }
     track0.slice(frame_start, frame_end);
     track1.slice(frame_start, frame_end);
 

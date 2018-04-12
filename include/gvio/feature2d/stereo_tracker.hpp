@@ -25,12 +25,14 @@ public:
   ORBTracker tracker0;
   ORBTracker tracker1;
   GMSMatcher matcher;
-
   TrackID counter_track_id = 0;
 
+  size_t min_track_length = 10;
+  size_t max_track_length = 10;
   bool show_matches = false;
 
   StereoTracker();
+  StereoTracker(const size_t min_track_length, const size_t max_track_length);
   virtual ~StereoTracker();
 
   /**

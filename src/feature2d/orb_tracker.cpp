@@ -2,6 +2,13 @@
 
 namespace gvio {
 
+ORBTracker::ORBTracker() {}
+
+ORBTracker::ORBTracker(const CameraModel *camera_model)
+    : FeatureTracker{camera_model} {}
+
+ORBTracker::~ORBTracker() {}
+
 int ORBTracker::configure(const std::string &config_file) {
   std::string camera_model;
   int image_width = 0;
