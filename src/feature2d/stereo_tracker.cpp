@@ -107,26 +107,8 @@ std::vector<FeatureTrack> StereoTracker::getLostTracks() {
     // - feature track length
     FrameID frame_start = std::max(track0.frame_start, track1.frame_start);
     FrameID frame_end = std::min(track0.frame_end, track1.frame_end);
-    {
-      const size_t diff_start = (frame_start - track0.frame_start);
-      const size_t diff_end = (track0.frame_end - frame_end);
-      const auto first = track0.track.begin() + diff_start;
-      const auto last = track0.track.end() - diff_end;
-      std::vector<Feature> track_sliced(first, last);
-      track0.track = track_sliced;
-      track0.frame_start += diff_start;
-      track0.frame_end -= diff_end;
-    }
-    {
-      const size_t diff_start = (frame_start - track1.frame_start);
-      const size_t diff_end = (track1.frame_end - frame_end);
-      const auto first = track1.track.begin() + diff_start;
-      const auto last = track1.track.end() - diff_end;
-      std::vector<Feature> track_sliced(first, last);
-      track1.track = track_sliced;
-      track1.frame_start += diff_start;
-      track1.frame_end -= diff_end;
-    }
+    track0.slice(frame_start, frame_end);
+    track1.slice(frame_start, frame_end);
 
     // Assert
     assert(track0.frame_start == track1.frame_start);

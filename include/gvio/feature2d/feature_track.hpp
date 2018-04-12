@@ -31,15 +31,16 @@ using FrameID = long int;
  * Feature track
  */
 struct FeatureTrack {
+  // General
   TrackID track_id = -1;
   FrameID frame_start = -1;
   FrameID frame_end = -1;
   TrackID related = -1;
 
-  // Monocular camera setup
+  // Monocular camera
   Features track;
 
-  // Stereo camera setup
+  // Stereo camera
   Features track0;
   Features track1;
 
@@ -61,6 +62,14 @@ struct FeatureTrack {
    * @param data Feature
    */
   void update(const FrameID &frame_id, const Feature &data);
+
+  /**
+   * Slice feature track
+   *
+   * @param frame_start New frame start
+   * @param frame_end New frame end
+   */
+  void slice(const size_t frame_start, const size_t frame_end);
 
   /**
    * Return last feature seen

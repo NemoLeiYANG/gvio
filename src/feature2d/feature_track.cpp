@@ -24,6 +24,20 @@ void FeatureTrack::update(const FrameID &frame_id, const Feature &data) {
   this->track.push_back(data);
 }
 
+void FeatureTrack::slice(const size_t frame_start, const size_t frame_end) {
+  const size_t diff_start = (frame_start - this->frame_start);
+  const size_t diff_end = (this->frame_end - frame_end);
+  this->frame_start += diff_start;
+  this->frame_end -= diff_end;
+  assert(this->frame_start >= 0);
+  assert(this->frame_end > this->frame_start);
+
+  const auto first = this->track.begin() + diff_start;
+  const auto last = this->track.end() - diff_end;
+  const std::vector<Feature> track_sliced(first, last);
+  this->track = track_sliced;
+}
+
 Feature &FeatureTrack::last() { return this->track.back(); }
 
 size_t FeatureTrack::trackedLength() { return this->track.size(); }
