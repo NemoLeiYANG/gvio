@@ -46,8 +46,8 @@ int CalibValidator::detect(const int camera_index,
   }
 
   // Undistort points
-  std::vector<cv::Point2f> corners_ud;
-  this->camchain.cam[camera_index].undistortPoints(corners, corners_ud);
+  auto camera = this->camchain.cam[camera_index];
+  const std::vector<cv::Point2f> corners_ud = camera.undistortPoints(corners);
 
   // Calculate corner positions in 3D
   this->chessboard.calcCornerPositions(corners_ud, I(3), X);
@@ -110,8 +110,7 @@ cv::Mat CalibValidator::project(const int camera_index,
                                 const MatX &X,
                                 const cv::Scalar &color) {
   // Distort points
-  MatX pixels;
-  this->camchain.cam[camera_index].project(X, pixels);
+  MatX pixels = this->camchain.cam[camera_index].project(X);
 
   // Make an RGB version of the input image
   cv::Mat image_rgb = image.clone();

@@ -77,7 +77,7 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-./msckf-msckf_test
+# ./msckf-msckf_test
 # ./msckf-profiler_test
 # ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test

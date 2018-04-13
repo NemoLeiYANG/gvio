@@ -66,8 +66,7 @@ std::vector<FeatureTrack> KLTTracker::getLostTracks() {
   for (auto &track : tracks) {
     for (auto &feature : track.track) {
       // Convert pixel coordinates to image coordinates
-      cv::Point2f pt_ud;
-      this->camera_property->undistortPoint(feature.kp.pt, pt_ud);
+      cv::Point2f pt_ud = this->camera_property->undistortPoint(feature.kp.pt);
       feature.kp.pt.x = pt_ud.x;
       feature.kp.pt.y = pt_ud.y;
     }
