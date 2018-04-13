@@ -15,12 +15,6 @@ FeatureTracker::FeatureTracker(CameraProperty *camera_property,
 
 FeatureTracker::~FeatureTracker() {}
 
-int FeatureTracker::configure(const std::string &config_file) {
-  LOG_ERROR("YOU SHOULD OVERRIDE ME!");
-  UNUSED(config_file);
-  return 0;
-}
-
 void FeatureTracker::getKeyPointsAndDescriptors(
     const Features &features,
     std::vector<cv::KeyPoint> &keypoints,
@@ -66,16 +60,6 @@ std::vector<FeatureTrack> FeatureTracker::getLostTracks() {
   }
 
   return tracks;
-}
-
-int FeatureTracker::detect(const cv::Mat &image, Features &features) {
-  UNUSED(image);
-  UNUSED(features);
-  LOG_ERROR("You're suppose to override FeatureTracker::detect()!");
-  LOG_ERROR("FeatureTracker is a base class!");
-  exit(-1);
-
-  return 0;
 }
 
 int FeatureTracker::match(const Features &f1,

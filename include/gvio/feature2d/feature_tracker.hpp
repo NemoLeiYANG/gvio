@@ -23,6 +23,9 @@ namespace gvio {
  * @{
  */
 
+/**
+ * Feature tracker
+ */
 class FeatureTracker {
 public:
   // Camera model
@@ -57,7 +60,7 @@ public:
    *
    * @param config_file Path to config file
    */
-  virtual int configure(const std::string &config_file);
+  virtual int configure(const std::string &config_file) = 0;
 
   /**
    * Purge old feature tracks
@@ -101,7 +104,7 @@ public:
    * @param features List of features
    * @returns 0 for success, -1 for failure
    */
-  virtual int detect(const cv::Mat &image, Features &features);
+  virtual int detect(const cv::Mat &image, Features &features) = 0;
 
   /**
    * Match features to feature tracks

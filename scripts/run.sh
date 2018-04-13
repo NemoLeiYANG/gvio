@@ -57,7 +57,7 @@ cd tests
 # ./feature2d-feature_container_test
 # ./feature2d-feature_test
 # ./feature2d-feature_track_test
-# ./feature2d-feature_tracker_test
+./feature2d-feature_tracker_test
 # ./feature2d-gms_matcher_test
 # ./feature2d-klt_tracker_test
 # ./feature2d-orb_tracker_test
