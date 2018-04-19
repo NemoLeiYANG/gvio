@@ -73,4 +73,12 @@ Mat4 rvectvec2transform(const cv::Mat &rvec, const cv::Mat &tvec) {
   return T;
 }
 
+cv::Matx33d skew(const cv::Vec3d &v) {
+  // clang-format off
+  return cv::Matx33d(0.0, -v[2], v[1],
+                     v[2], 0.0, -v[0],
+                     -v[1], v[0], 0.0);
+  // clang-format on
+}
+
 } // namespace gvio

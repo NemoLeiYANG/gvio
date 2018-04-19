@@ -125,6 +125,18 @@ std::vector<Feature> FeatureContainer::getFeaturesTracking() {
   return features;
 }
 
+std::vector<cv::Point2f> FeatureContainer::getKeyPointsTracking() {
+  std::vector<cv::Point2f> keypoints;
+
+  for (size_t i = 0; i < this->tracking.size(); i++) {
+    const TrackID track_id = this->tracking[i];
+    const Feature feature = this->buffer[track_id].last();
+    keypoints.push_back(feature.kp.pt);
+  }
+
+  return keypoints;
+}
+
 std::vector<FeatureTrack> FeatureContainer::purge(const size_t n) {
   std::vector<FeatureTrack> tracks;
 

@@ -16,6 +16,34 @@ CameraProperty::CameraProperty(const int camera_index,
   intrinsics = Vec4{fx, fy, cx, cy};
 }
 
+CameraProperty::CameraProperty(const int camera_index,
+                               const Mat3 &K,
+                               const Vec2 &resolution)
+    : camera_index{camera_index}, camera_model{"pinhole"}, distortion_model{},
+      resolution{resolution} {
+  const double fx = K(0, 0);
+  const double fy = K(1, 1);
+  const double cx = K(0, 2);
+  const double cy = K(1, 2);
+  intrinsics = Vec4{fx, fy, cx, cy};
+}
+
+CameraProperty::CameraProperty(const int camera_index,
+                               const std::string &camera_model,
+                               const Mat3 &K,
+                               const std::string &distortion_model,
+                               const VecX &D,
+                               const Vec2 &resolution)
+    : camera_index{camera_index}, camera_model{camera_model},
+      distortion_model{distortion_model}, distortion_coeffs{D},
+      resolution{resolution} {
+  const double fx = K(0, 0);
+  const double fy = K(1, 1);
+  const double cx = K(0, 2);
+  const double cy = K(1, 2);
+  intrinsics = Vec4{fx, fy, cx, cy};
+}
+
 Mat3 CameraProperty::K() {
   const double fx = this->intrinsics(0);
   const double fy = this->intrinsics(1);
@@ -52,26 +80,33 @@ VecX CameraProperty::D() {
     D << k1, k2, p1, p2, k3;
     return D;
   } else {
-    LOG_ERROR("Unsupported distortion model [%s]!", distortion_model.c_str());
-    VecX D;
-    return D;
+    FATAL("Unsupported distortion model [%s]!", distortion_model.c_str());
   }
 }
 
-std::vector<cv::Point2f>
-CameraProperty::undistortPoints(const std::vector<cv::Point2f> &image_points) {
+std::vector<cv::Point2f> CameraProperty::undistortPoints(
+    const std::vector<cv::Point2f> &image_points, const Mat3 &rect_mat) {
   std::vector<cv::Point2f> image_points_ud;
+
+  const cv::Matx33d K_new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+
   if (distortion_model == "equidistant") {
     cv::fisheye::undistortPoints(image_points,
                                  image_points_ud,
                                  convert(this->K()),
-                                 convert(this->D()));
+                                 convert(this->D()),
+                                 convert(rect_mat),
+                                 K_new);
 
   } else if (distortion_model == "radtan") {
     cv::undistortPoints(image_points,
                         image_points_ud,
                         convert(this->K()),
-                        convert(this->D()));
+                        convert(this->D()),
+                        convert(rect_mat),
+                        K_new
+
+                        );
 
   } else {
     FATAL("Unsupported distortion model [%s]!", distortion_model.c_str());
@@ -80,27 +115,39 @@ CameraProperty::undistortPoints(const std::vector<cv::Point2f> &image_points) {
   return image_points_ud;
 }
 
-cv::Point2f CameraProperty::undistortPoint(const cv::Point2f &image_point) {
+cv::Point2f CameraProperty::undistortPoint(const cv::Point2f &image_point,
+                                           const Mat3 &rect_mat) {
   std::vector<cv::Point2f> points = {image_point};
-  std::vector<cv::Point2f> points_ud = {image_point};
+  std::vector<cv::Point2f> points_ud = this->undistortPoints(points, rect_mat);
+  return points_ud[0];
+}
 
-  if (distortion_model == "equidistant") {
-    cv::fisheye::undistortPoints(points,
-                                 points_ud,
-                                 convert(this->K()),
-                                 convert(this->D()));
+std::vector<cv::Point2f>
+CameraProperty::distortPoints(const std::vector<cv::Point2f> &points) {
+  std::vector<cv::Point2f> points_distorted;
 
-  } else if (distortion_model == "radtan") {
-    cv::undistortPoints(points,
-                        points_ud,
-                        convert(this->K()),
-                        convert(this->D()));
+  if (distortion_model == "radtan") {
+    std::vector<cv::Point3f> points_homo;
+    cv::convertPointsToHomogeneous(points, points_homo);
+
+    cv::projectPoints(points_homo,
+                      cv::Vec3d::zeros(), // rvec
+                      cv::Vec3d::zeros(), // tvec
+                      convert(this->K()), // Intrinsics matrix K
+                      convert(this->D()), // Distortion coefficients D
+                      points_distorted);
+
+  } else if (distortion_model == "equidistant") {
+    cv::fisheye::distortPoints(points,
+                               points_distorted,
+                               convert(this->K()),
+                               convert(this->D()));
 
   } else {
     FATAL("Unsupported distortion model [%s]!", distortion_model.c_str());
   }
 
-  return points_ud[0];
+  return points_distorted;
 }
 
 cv::Mat CameraProperty::undistortImage(const cv::Mat &image,
@@ -162,7 +209,8 @@ MatX CameraProperty::project(const MatX &X) {
       pixels.col(i) = pixel;
     }
 
-  } else if (this->camera_model == "pinhole" && this->distortion_model == "") {
+  } else if (this->camera_model == "pinhole" &&
+             this->distortion_model.empty()) {
     for (long i = 0; i < X.cols(); i++) {
       const Vec3 p = X.col(i);
       pixels.col(i) = pinhole_project(this->K(), p);
@@ -186,7 +234,8 @@ Vec2 CameraProperty::project(const Vec3 &X) {
              this->distortion_model == "radtan") {
     pixel = project_pinhole_radtan(this->K(), this->D(), X);
 
-  } else if (this->camera_model == "pinhole" && this->distortion_model == "") {
+  } else if (this->camera_model == "pinhole" &&
+             this->distortion_model.empty()) {
     pixel = pinhole_project(this->K(), X);
   }
 

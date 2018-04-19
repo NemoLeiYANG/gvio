@@ -44,6 +44,22 @@ cv::Mat draw_tracks(const cv::Mat &img_cur,
 /**
   * Draw matches
   *
+  * @param img0 Image frame 0
+  * @param img1 Image frame 1
+  * @param k0 Previous keypoints
+  * @param k1 Current keypoints
+  * @param matches Feature matches
+  * @returns Image with feature matches between frame 0 and 1
+  */
+cv::Mat draw_matches(const cv::Mat &img0,
+                     const cv::Mat &img1,
+                     const std::vector<cv::Point2f> k0,
+                     const std::vector<cv::Point2f> k1,
+                     const std::vector<uchar> &status);
+
+/**
+  * Draw matches
+  *
   * @param img0 Previous image frame
   * @param img1 Current image frame
   * @param k0 Previous keypoints

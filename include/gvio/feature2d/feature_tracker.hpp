@@ -56,13 +56,6 @@ public:
   virtual ~FeatureTracker();
 
   /**
-   * Configure
-   *
-   * @param config_file Path to config file
-   */
-  virtual int configure(const std::string &config_file) = 0;
-
-  /**
    * Purge old feature tracks
    *
    * @param n N-number of feature tracks to purge (starting with oldest)

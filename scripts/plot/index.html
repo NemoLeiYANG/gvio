@@ -1,0 +1,57 @@
+<html>
+<script src="//localhost:35729/livereload.js"></script>
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.4/svg.min.js">
+</script>
+
+<style>
+  html, body, #drawing{
+    width:100%;
+    height:100%;
+  }
+</style>
+
+<div id="drawing"></div>
+<script>
+
+class Coord2DAxis {
+  constructor(svg, params) {
+    this.svg = svg;
+    this.origin = params.origin || [0, 0];
+    this.width = params.width;
+    this.height = params.height;
+    this.padding_left = params.padding_left || 10;
+    this.padding_right = params.padding_right || 10;
+    this.stroke_width = params.stroke_width || 1;
+
+    this.x_axis = null;
+    this.y_axis = null;
+  }
+
+  draw() {
+    this.x_axis= this.svg.line(this.origin[0],
+                               this.origin[1] + this.height,
+                               this.width,
+                               this.origin[1] + this.height)
+                           .stroke({width: this.stroke_width});
+
+    this.y_axis = this.svg.line(this.origin[0],
+                                this.origin[1],
+                                this.origin[0],
+                                this.origin[1] + this.height)
+                            .stroke({width: this.stroke_width});
+  }
+}
+
+var svg = SVG('drawing').size(300, 300);
+
+const axis = new Coord2DAxis(svg, {origin: [20, 20], width: 300, height: 100});
+axis.draw();
+
+const axis2 = new Coord2DAxis(svg, {origin: [20, 180], width: 300, height: 100});
+axis2.draw();
+
+
+</script>
+</html>

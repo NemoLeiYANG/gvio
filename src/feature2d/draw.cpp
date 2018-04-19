@@ -24,6 +24,35 @@ cv::Mat draw_tracks(const cv::Mat &img_cur,
 
 cv::Mat draw_matches(const cv::Mat &img0,
                      const cv::Mat &img1,
+                     const std::vector<cv::Point2f> k0,
+                     const std::vector<cv::Point2f> k1,
+                     const std::vector<uchar> &status) {
+  cv::Mat match_img;
+
+  // Stack current and previous image vertically
+  cv::vconcat(img0, img1, match_img);
+
+  // Draw matches
+  for (size_t i = 0; i < status.size(); i++) {
+    if (status[i]) {
+      cv::Point2f p0 = k0[i];
+      cv::Point2f p1 = k1[i];
+
+      // Point 1
+      p1.y += img0.rows;
+
+      // Draw circle and line
+      cv::circle(match_img, p0, 2, cv::Scalar(0, 255, 0), -1);
+      cv::circle(match_img, p1, 2, cv::Scalar(0, 255, 0), -1);
+      cv::line(match_img, p0, p1, cv::Scalar(0, 255, 0));
+    }
+  }
+
+  return match_img;
+}
+
+cv::Mat draw_matches(const cv::Mat &img0,
+                     const cv::Mat &img1,
                      const std::vector<cv::KeyPoint> k0,
                      const std::vector<cv::KeyPoint> k1,
                      const std::vector<cv::DMatch> &matches) {

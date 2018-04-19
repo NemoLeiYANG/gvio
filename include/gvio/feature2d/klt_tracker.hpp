@@ -20,6 +20,9 @@ namespace gvio {
  */
 class KLTTracker {
 public:
+  // Camera model
+  CameraProperty *camera_property = nullptr;
+
   FrameID counter_frame_id = -1;
   FeatureContainer features;
   cv::Mat img_ref;
@@ -29,7 +32,7 @@ public:
   std::vector<cv::Point2f> p_cur;
   std::vector<uchar> inlier_mask;
 
-  int max_corners = 1000;
+  int max_corners = 100;
   double quality_level = 0.001;
   double min_distance = 5.0;
   bool show_matches = false;
@@ -37,11 +40,17 @@ public:
   int image_width = 0;
   int image_height = 0;
 
-  CameraProperty *camera_property = nullptr;
-
   KLTTracker();
+
   KLTTracker(CameraProperty *camera_property);
+
   KLTTracker(CameraProperty *camera_property,
+             const size_t min_track_length,
+             const size_t max_track_length);
+
+  KLTTracker(CameraProperty *camera_property,
+             const size_t min_track_length,
+             const size_t max_track_length,
              const int max_corners,
              const double quality_level,
              const double min_distance);

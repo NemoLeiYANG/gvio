@@ -78,6 +78,11 @@ struct FeatureContainer {
   std::vector<Feature> getFeaturesTracking();
 
   /**
+   * Get list of Keypoints currently tracking
+   */
+  std::vector<cv::Point2f> getKeyPointsTracking();
+
+  /**
    * Purge old feature tracks
    *
    * @param n N-number of feature tracks to purge (starting with oldest)

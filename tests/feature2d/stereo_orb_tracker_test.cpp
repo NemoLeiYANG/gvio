@@ -1,16 +1,16 @@
 #include "gvio/munit.hpp"
 #include "gvio/dataset/kitti/kitti.hpp"
-#include "gvio/feature2d/stereo_tracker.hpp"
+#include "gvio/feature2d/stereo_orb_tracker.hpp"
 
 namespace gvio {
 
-static const std::string KITTI_RAW_DATASET = "/data/kitti/raw";
+static const std::string KITTI_RAW_DATASET = "test_data/kitti/raw";
 
-int test_StereoTracker_update() {
-  StereoTracker tracker(nullptr, 1, 5);
+int test_StereoORBTracker_update() {
+  StereoORBTracker tracker(nullptr, nullptr, 1, 5);
 
   // Load dataset
-  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0001");
   if (raw_dataset.load() != 0) {
     return -1;
   }
@@ -56,9 +56,9 @@ int test_StereoTracker_update() {
   return 0;
 }
 
-int test_StereoTracker_getLostTracks() {
+int test_StereoORBTracker_getLostTracks() {
   // Load raw dataset
-  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0001");
   if (raw_dataset.load() != 0) {
     LOG_ERROR("Failed to load KITTI raw dataset [%s]!",
               KITTI_RAW_DATASET.c_str());
@@ -68,7 +68,7 @@ int test_StereoTracker_getLostTracks() {
   // Track features
   const cv::Mat img0 = cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR);
   const cv::Mat img1 = cv::imread(raw_dataset.cam1[0], CV_LOAD_IMAGE_COLOR);
-  StereoTracker tracker(nullptr, 0, 5);
+  StereoORBTracker tracker(nullptr, nullptr, 0, 5);
   tracker.show_matches = true;
   tracker.initialize(img0, img1);
   for (int i = 1; i < 5; i++) {
@@ -90,8 +90,8 @@ int test_StereoTracker_getLostTracks() {
 }
 
 void test_suite() {
-  MU_ADD_TEST(test_StereoTracker_update);
-  MU_ADD_TEST(test_StereoTracker_getLostTracks);
+  MU_ADD_TEST(test_StereoORBTracker_update);
+  MU_ADD_TEST(test_StereoORBTracker_getLostTracks);
 }
 
 } // namespace gvio

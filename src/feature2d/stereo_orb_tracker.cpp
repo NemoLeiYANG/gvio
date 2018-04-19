@@ -1,20 +1,21 @@
-#include "gvio/feature2d/stereo_tracker.hpp"
+#include "gvio/feature2d/stereo_orb_tracker.hpp"
 
 namespace gvio {
 
-StereoTracker::StereoTracker() {}
+StereoORBTracker::StereoORBTracker() {}
 
-StereoTracker::StereoTracker(CameraProperty *camera_property,
-                             const size_t min_track_length,
-                             const size_t max_track_length)
-    : tracker0{camera_property, min_track_length, max_track_length},
-      tracker1{camera_property, min_track_length, max_track_length},
+StereoORBTracker::StereoORBTracker(CameraProperty *camprop0,
+                                   CameraProperty *camprop1,
+                                   const size_t min_track_length,
+                                   const size_t max_track_length)
+    : tracker0{camprop0, min_track_length, max_track_length},
+      tracker1{camprop1, min_track_length, max_track_length},
       min_track_length{min_track_length}, max_track_length{max_track_length} {}
 
-StereoTracker::~StereoTracker() {}
+StereoORBTracker::~StereoORBTracker() {}
 
-int StereoTracker::initialize(const cv::Mat &img0_cur,
-                              const cv::Mat &img1_cur) {
+int StereoORBTracker::initialize(const cv::Mat &img0_cur,
+                                 const cv::Mat &img1_cur) {
   int retval = 0;
   retval += this->tracker0.initialize(img0_cur);
   retval += this->tracker1.initialize(img1_cur);
@@ -25,7 +26,7 @@ int StereoTracker::initialize(const cv::Mat &img0_cur,
   return 0;
 }
 
-int StereoTracker::update(const cv::Mat &img0_cur, const cv::Mat &img1_cur) {
+int StereoORBTracker::update(const cv::Mat &img0_cur, const cv::Mat &img1_cur) {
   // Detect features
   int retval = 0;
   retval += this->tracker0.update(img0_cur);
@@ -96,7 +97,7 @@ int StereoTracker::update(const cv::Mat &img0_cur, const cv::Mat &img1_cur) {
   return 0;
 }
 
-std::vector<FeatureTrack> StereoTracker::getLostTracks() {
+std::vector<FeatureTrack> StereoORBTracker::getLostTracks() {
   FeatureTracks stereo_tracks;
 
   for (auto track0_id : this->tracker0.features.lost) {

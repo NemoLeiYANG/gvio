@@ -45,12 +45,22 @@ public:
   std::vector<std::string> cam2;
   std::vector<std::string> cam3;
 
+  RawDataset() {}
+
   RawDataset(const std::string &raw_dir,
              const std::string &date,
              const std::string &seq)
       : raw_dir{strip_end(raw_dir, "/")}, date{date}, seq{seq},
         date_dir{raw_dir + "/" + date},
         drive_dir{date_dir + "/" + date + "_drive_" + seq + "_sync"} {}
+
+  RawDataset(const std::string &raw_dir,
+             const std::string &date,
+             const std::string &seq,
+             const std::string &type)
+      : raw_dir{strip_end(raw_dir, "/")}, date{date}, seq{seq},
+        date_dir{raw_dir + "/" + date},
+        drive_dir{date_dir + "/" + date + "_drive_" + seq + "_" + type} {}
 
   /// Load calibrations
   int loadCalibrations();

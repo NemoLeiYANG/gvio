@@ -13,12 +13,6 @@ public:
   FeatureTrackerTester() {}
   virtual ~FeatureTrackerTester() {}
 
-  virtual int configure(const std::string &config_file) override {
-    UNUSED(config_file);
-    LOG_ERROR("Not Implemented!");
-    return 0;
-  }
-
   virtual int detect(const cv::Mat &image, Features &features) override {
     // Feature descriptor extraction
     std::vector<cv::KeyPoint> keypoints;
@@ -42,7 +36,6 @@ int test_FeatureTracker_constructor() {
   FeatureTrackerTester tracker;
 
   MU_CHECK(tracker.show_matches == false);
-
   MU_CHECK_EQ(-1, (int) tracker.counter_frame_id);
 
   return 0;
@@ -115,10 +108,22 @@ int test_FeatureTracker_match() {
   return 0;
 }
 
+int test_FeatureTracker_initialize() {
+  FeatureTrackerTester tracker;
+  return 0;
+}
+
+int test_FeatureTracker_update() {
+  FeatureTrackerTester tracker;
+  return 0;
+}
+
 void test_suite() {
   MU_ADD_TEST(test_FeatureTracker_constructor);
   MU_ADD_TEST(test_FeatureTracker_conversions);
   MU_ADD_TEST(test_FeatureTracker_match);
+  MU_ADD_TEST(test_FeatureTracker_initialize);
+  MU_ADD_TEST(test_FeatureTracker_update);
 }
 
 } // namespace gvio

@@ -28,14 +28,6 @@ public:
   virtual ~ORBTracker();
 
   /**
-   * Configure
-   *
-   * @param config_file Path to config file
-   * @returns 0 for success, -1 for failure
-   */
-  int configure(const std::string &config_file) override;
-
-  /**
    * Detect features
    *
    * @param image Input image

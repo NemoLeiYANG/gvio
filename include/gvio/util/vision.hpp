@@ -90,6 +90,14 @@ Vec2 normalize(const Vec2 &x);
  */
 Mat4 rvectvec2transform(const cv::Mat &rvec, const cv::Mat &tvec);
 
+/**
+ * Skew symmetric matrix
+ *
+ * @param v Vector
+ * @returns Skew symmetric matrix
+ */
+cv::Matx33d skew(const cv::Vec3d &v);
+
 /** @} group vision */
 } // namespace gvio
 #endif // GVIO_UTIL_VISION_HPP

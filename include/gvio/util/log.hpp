@@ -27,7 +27,11 @@ namespace gvio {
   fprintf(stdout, "\033[33m[WARN] " M "\033[0m\n", ##__VA_ARGS__)
 
 #define FATAL(M, ...)                                                          \
-  fprintf(stdout, "\033[31m[FATAL] " M "\033[0m\n", ##__VA_ARGS__);            \
+  fprintf(stdout,                                                              \
+          "\033[31m[FATAL] [%s:%d] " M "\033[0m\n",                            \
+          __FILENAME__,                                                        \
+          __LINE__,                                                            \
+          ##__VA_ARGS__);                                                      \
   exit(-1)
 
 #ifdef NDEBUG

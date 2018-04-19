@@ -2,8 +2,8 @@
  * @file
  * @ingroup feature2d
  */
-#ifndef GVIO_FEATURE2D_STEREO_TRACKER_HPP
-#define GVIO_FEATURE2D_STEREO_TRACKER_HPP
+#ifndef GVIO_FEATURE2D_STEREO_ORB_TRACKER_HPP
+#define GVIO_FEATURE2D_STEREO_ORB_TRACKER_HPP
 
 #include "gvio/camera/pinhole_model.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
@@ -19,7 +19,7 @@ namespace gvio {
 /**
  * Stereo feature tracker
  */
-class StereoTracker {
+class StereoORBTracker {
 public:
   ORBTracker tracker0;
   ORBTracker tracker1;
@@ -30,11 +30,12 @@ public:
   size_t max_track_length = 20;
   bool show_matches = false;
 
-  StereoTracker();
-  StereoTracker(CameraProperty *camera_property,
-                const size_t min_track_length,
-                const size_t max_track_length);
-  virtual ~StereoTracker();
+  StereoORBTracker();
+  StereoORBTracker(CameraProperty *camprop0,
+                   CameraProperty *camprop1,
+                   const size_t min_track_length,
+                   const size_t max_track_length);
+  virtual ~StereoORBTracker();
 
   /**
    * Initialize stereo feature tracker
@@ -64,4 +65,4 @@ public:
 
 /** @} group feature2d */
 } // namespace gvio
-#endif // GVIO_FEATURE2D_STEREO_TRACKER_HPP
+#endif // GVIO_FEATURE2D_STEREO_ORB_TRACKER_HPP
