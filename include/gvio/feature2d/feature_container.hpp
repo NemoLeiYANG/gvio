@@ -30,11 +30,27 @@ struct FeatureContainer {
    * Add feature track
    *
    * @param frame_id Frame ID
-   * @param f1 First feature
-   * @param f2 Second feature
+   * @param f0 First feature
+   * @param f1 Second feature
    * @returns 0 for success, -1 for failure
    */
-  int addTrack(const FrameID &frame_id, Feature &f1, Feature &f2);
+  int addTrack(const FrameID &frame_id, Feature &f0, Feature &f1);
+
+  /**
+   * Add stereo feature track
+   *
+   * @param frame_id Frame ID
+   * @param cam0_f0 First feature in camera 0
+   * @param cam0_f1 Second feature in camera 0
+   * @param cam1_f0 First feature in camera 1
+   * @param cam1_f1 Second feature in camera 1
+   * @returns 0 for success, -1 for failure
+   */
+  int addStereoTrack(const FrameID &frame_id,
+                     Feature &cam0_f0,
+                     Feature &cam0_f1,
+                     Feature &cam1_f0,
+                     Feature &cam1_f1);
 
   /**
    * Remove feature track
@@ -71,6 +87,20 @@ struct FeatureContainer {
    * @returns 0 for success, -1 for failure
    */
   int updateTrack(const FrameID frame_id, const TrackID &track_id, Feature &f);
+
+  /**
+   * Update stereo feature track
+   *
+   * @param frame_id Frame ID
+   * @param track_id Track ID
+   * @param cam0_f Feature in camera 0
+   * @param cam1_f Feature in camera 1
+   * @returns 0 for success, -1 for failure
+   */
+  int updateStereoTrack(const FrameID frame_id,
+                        const TrackID &track_id,
+                        Feature &cam0_f,
+                        Feature &cam1_f);
 
   /**
    * Get list of features currently tracking

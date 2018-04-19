@@ -59,9 +59,9 @@ int test_StereoKLTTracker_match() {
   test.tracker.match(cam0_img, cam1_img, cam0_pts, cam1_pts, mask);
 
   // Visualize
-  cv::Mat match = draw_matches(cam0_img, cam1_img, cam0_pts, cam1_pts, mask);
-  cv::imshow("Matches", match);
-  cv::waitKey(0);
+  // cv::Mat match = draw_matches(cam0_img, cam1_img, cam0_pts, cam1_pts, mask);
+  // cv::imshow("Matches", match);
+  // cv::waitKey(0);
 
   // Assert
   MU_CHECK(cam0_pts.size() > 0);
@@ -81,7 +81,6 @@ int test_StereoKLTTracker_initialize() {
 
   // Assert
   MU_CHECK_FLOAT(test.tracker.counter_frame_id, 0);
-  MU_CHECK_FLOAT(test.tracker.counter_track_id, 0);
   MU_CHECK(test.tracker.cam0_pts.size() > 0);
   MU_CHECK(test.tracker.cam1_pts.size() > 0);
   MU_CHECK(test.tracker.prev_cam0_img.empty() == false);
@@ -99,14 +98,12 @@ int test_StereoKLTTracker_track() {
   test.tracker.initialize(cam0_img, cam1_img);
 
   // Update tracker
-  std::vector<cv::Point2f> cam0_pts = test.tracker.cam0_pts;
-  std::vector<cv::Point2f> cam1_pts = test.tracker.cam1_pts;
   test.tracker.show_matches = true;
 
   for (int i = 1; i < 30; i++) {
     const cv::Mat cam0_img = cv::imread(test.raw_dataset.cam0[i]);
     const cv::Mat cam1_img = cv::imread(test.raw_dataset.cam1[i]);
-    test.tracker.track(cam0_img, cam1_img, cam0_pts, cam1_pts);
+    test.tracker.trackFeatures(cam0_img, cam1_img);
 
     // Break loop if 'q' was pressed
     if (test.tracker.show_matches && cv::waitKey(0) == 113) {
@@ -126,14 +123,12 @@ int test_StereoKLTTracker_update() {
   test.tracker.initialize(cam0_img, cam1_img);
 
   // Update tracker
-  std::vector<cv::Point2f> cam0_pts = test.tracker.cam0_pts;
-  std::vector<cv::Point2f> cam1_pts = test.tracker.cam1_pts;
   test.tracker.show_matches = true;
 
   for (int i = 1; i < 30; i++) {
     const cv::Mat cam0_img = cv::imread(test.raw_dataset.cam0[i]);
     const cv::Mat cam1_img = cv::imread(test.raw_dataset.cam1[i]);
-    test.tracker.track(cam0_img, cam1_img, cam0_pts, cam1_pts);
+    test.tracker.trackFeatures(cam0_img, cam1_img);
 
     // Break loop if 'q' was pressed
     if (test.tracker.show_matches && cv::waitKey(0) == 113) {

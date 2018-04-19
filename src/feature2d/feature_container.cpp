@@ -9,21 +9,49 @@ FeatureContainer::FeatureContainer(const size_t min_track_length,
     : min_track_length{min_track_length}, max_track_length{max_track_length} {}
 
 int FeatureContainer::addTrack(const FrameID &frame_id,
-                               Feature &f1,
-                               Feature &f2) {
+                               Feature &f0,
+                               Feature &f1) {
   // Update and get track and frame ids
   const TrackID track_id = this->counter_track_id;
 
   // Update features with track ids
+  f0.setTrackID(track_id);
   f1.setTrackID(track_id);
-  f2.setTrackID(track_id);
 
   // Add feature track
-  auto track = FeatureTrack(track_id, frame_id, f1, f2);
+  auto track = FeatureTrack(track_id, frame_id, f0, f1);
   this->tracking.push_back(track_id);
   this->buffer.emplace(track_id, track);
 
   this->counter_track_id++;
+  return 0;
+}
+
+int FeatureContainer::addStereoTrack(const FrameID &frame_id,
+                                     Feature &cam0_f0,
+                                     Feature &cam0_f1,
+                                     Feature &cam1_f0,
+                                     Feature &cam1_f1) {
+  // Update and get track and frame ids
+  const TrackID track_id = this->counter_track_id;
+
+  // Update features with track ids
+  cam0_f0.setTrackID(track_id);
+  cam0_f1.setTrackID(track_id);
+  cam1_f0.setTrackID(track_id);
+  cam1_f1.setTrackID(track_id);
+
+  // Add feature track
+  auto track = FeatureTrack(track_id,
+                            frame_id - 1,
+                            frame_id,
+                            Features{cam0_f0, cam0_f1},
+                            Features{cam1_f0, cam1_f1});
+  this->tracking.push_back(track_id);
+  this->buffer.emplace(track_id, track);
+
+  this->counter_track_id++;
+
   return 0;
 }
 
@@ -108,6 +136,32 @@ int FeatureContainer::updateTrack(const FrameID frame_id,
   // Mark as lost - too old
   if (track.trackedLength() >= this->max_track_length) {
     this->removeTrack(track.track_id, true);
+    return 1;
+  }
+
+  return 0;
+}
+
+int FeatureContainer::updateStereoTrack(const FrameID frame_id,
+                                        const TrackID &track_id,
+                                        Feature &cam0_f,
+                                        Feature &cam1_f) {
+  // Make sure track id is in the buffer
+  auto index = this->buffer.find(track_id);
+  if (index == this->buffer.end()) {
+    return -1;
+  }
+
+  // Update track
+  auto &track = this->buffer.at(track_id);
+  cam0_f.setTrackID(track_id);
+  cam1_f.setTrackID(track_id);
+  track.updateStereo(frame_id, cam0_f, cam1_f);
+
+  // Mark as lost - too old
+  if (track.trackedLength() >= this->max_track_length) {
+    this->removeTrack(track.track_id, true);
+    return 1;
   }
 
   return 0;

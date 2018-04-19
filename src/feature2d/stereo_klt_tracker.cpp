@@ -97,6 +97,9 @@ int StereoKLTTracker::initialize(const cv::Mat &cam0_img,
     }
   }
 
+  // Initialize track_ids
+  this->track_ids = std::vector<int>(this->cam0_pts.size(), -1);
+
   // Make sure we're tracking someting
   if (this->cam0_pts.size() == 0) {
     LOG_ERROR("Failed stereo matching!");
@@ -111,53 +114,98 @@ int StereoKLTTracker::initialize(const cv::Mat &cam0_img,
   return 0;
 }
 
-void StereoKLTTracker::track(const cv::Mat &cam0_img,
-                             const cv::Mat &cam1_img,
-                             std::vector<cv::Point2f> &cam0_pts,
-                             std::vector<cv::Point2f> &cam1_pts) {
+int StereoKLTTracker::updateTrack(const int index,
+                                  const bool is_inlier,
+                                  const cv::Point2f &pt0_ref,
+                                  const cv::Point2f &pt0_cur,
+                                  const cv::Point2f &pt1_ref,
+                                  const cv::Point2f &pt1_cur) {
+  auto cam0_f0 = Feature(pt0_ref);
+  auto cam0_f1 = Feature(pt0_cur);
+  auto cam1_f0 = Feature(pt1_ref);
+  auto cam1_f1 = Feature(pt1_cur);
+  int track_id = this->track_ids[index];
+
+  // Remove feature track
+  if (is_inlier == false) {
+    this->features.removeTrack(track_id);
+    return -1;
+  }
+
+  // Add new feature track
+  if (track_id == -1) {
+    this->features.addStereoTrack(this->counter_frame_id,
+                                  cam0_f0,
+                                  cam0_f1,
+                                  cam1_f0,
+                                  cam1_f1);
+    track_id = cam0_f0.track_id;
+
+  } else {
+    // Update feature track
+    int too_old = this->features.updateStereoTrack(this->counter_frame_id,
+                                                   track_id,
+                                                   cam0_f1,
+                                                   cam1_f1);
+    if (too_old == 1) {
+      return -1;
+    }
+  }
+
+  return track_id;
+}
+
+void StereoKLTTracker::trackFeatures(const cv::Mat &cam0_img,
+                                     const cv::Mat &cam1_img) {
+  // Make a copy of feature points currently tracking
+  std::vector<cv::Point2f> pts0_ref = this->cam0_pts;
+  std::vector<cv::Point2f> pts1_ref = this->cam1_pts;
+
   // Temporally match cam0 images
-  std::vector<cv::Point2f> cam0_pts_new = cam0_pts;
-  std::vector<uchar> cam0_pts_mask;
-  this->match(this->prev_cam0_img,
-              cam0_img,
-              cam0_pts,
-              cam0_pts_new,
-              cam0_pts_mask);
+  std::vector<cv::Point2f> pts0_cur = pts0_ref;
+  std::vector<uchar> t0_mask;
+  this->match(this->prev_cam0_img, cam0_img, pts0_ref, pts0_cur, t0_mask);
 
   // Temporally match cam1 images
-  std::vector<cv::Point2f> cam1_pts_new = cam1_pts;
-  std::vector<uchar> cam1_pts_mask;
-  this->match(this->prev_cam1_img,
-              cam1_img,
-              cam1_pts,
-              cam1_pts_new,
-              cam1_pts_mask);
+  std::vector<cv::Point2f> pts1_cur = pts1_ref;
+  std::vector<uchar> t1_mask;
+  this->match(this->prev_cam1_img, cam1_img, pts1_ref, pts1_cur, t1_mask);
 
   // Stereo match cam0 and cam1 points
-  std::vector<uchar> stereo_mask;
-  this->match(cam0_img, cam1_img, cam0_pts_new, cam1_pts_new, stereo_mask);
+  std::vector<uchar> s_mask;
+  this->match(cam0_img, cam1_img, pts0_cur, pts1_cur, s_mask);
 
   // Remove outliers
-  std::vector<cv::Point2f> pts0;
-  std::vector<cv::Point2f> pts1;
-  for (size_t i = 0; i < cam0_pts.size(); i++) {
-    if (cam0_pts_mask[i] && cam1_pts_mask[i] && stereo_mask[i]) {
-      const auto p0 = cam0_pts_new[i];
-      const auto p1 = cam1_pts_new[i];
-      pts0.emplace_back(p0);
-      pts1.emplace_back(p1);
+  std::vector<cv::Point2f> pts0_inliers;
+  std::vector<cv::Point2f> pts1_inliers;
+  std::vector<int> tracks_tracking;
+
+  for (size_t i = 0; i < pts0_ref.size(); i++) {
+    bool is_inlier = (t0_mask[i] && t1_mask[i] && s_mask[i]) ? true : false;
+    int track_id = this->updateTrack(i,
+                                     is_inlier,
+                                     pts0_ref[i],
+                                     pts0_cur[i],
+                                     pts1_ref[i],
+                                     pts1_cur[i]);
+    if (track_id != -1) {
+      pts0_inliers.push_back(pts0_cur[i]);
+      pts1_inliers.push_back(pts1_cur[i]);
+      tracks_tracking.push_back(track_id);
     }
   }
 
   // Update
-  cam0_pts = pts0;
-  cam1_pts = pts1;
+  this->track_ids = tracks_tracking;
+  this->cam0_pts = pts0_inliers;
+  this->cam1_pts = pts1_inliers;
   this->prev_cam0_img = cam0_img.clone();
   this->prev_cam1_img = cam1_img.clone();
 
   if (this->show_matches) {
-    std::vector<uchar> mask(pts0.size(), 1);
-    cv::Mat match = draw_matches(cam0_img, cam1_img, pts0, pts1, mask);
+    std::vector<uchar> mask(pts0_inliers.size(), 1);
+    cv::Mat match =
+        draw_matches(cam0_img, cam1_img, pts0_inliers, pts1_inliers, mask);
     cv::imshow("Match", match);
     cv::waitKey(1);
   }
@@ -174,16 +222,9 @@ int StereoKLTTracker::update(const cv::Mat &cam0_img, const cv::Mat &cam1_img) {
 
   // Track features
   this->counter_frame_id++;
-  this->track(cam0_img, cam1_img, this->cam0_pts, this->cam1_pts);
+  this->trackFeatures(cam0_img, cam1_img);
 
-  // Compute the relative rotation between the cam0
-  // frame and cam1 frame.
-  // const Mat3 R_cam0_cam1 = R_cam1_imu.t() * R_cam0_imu;
-  // const Vec3 t_cam0_cam1 = R_cam1_imu.t() * (t_cam0_imu-t_cam1_imu);
-  // Compute the essential matrix.
-  // const Mat3 E = skew(t_cam0_cam1) * R_cam0_cam1;
-
-  // // Visualize tracks
+  // Visualize tracks
   // if (this->show_tracks) {
   //   const cv::Mat cam0_tracks = draw_tracks(cam0_img, this->cam0_pts);
   //   const cv::Mat cam1_tracks = draw_tracks(cam1_img, this->cam1_pts);

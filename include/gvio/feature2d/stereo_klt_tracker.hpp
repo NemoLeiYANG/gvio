@@ -26,9 +26,10 @@ public:
   Mat4 T_cam1_cam0 = I(4);
 
   TrackID counter_frame_id = -1;
-  TrackID counter_track_id = 0;
+  FeatureContainer features;
   std::vector<cv::Point2f> cam0_pts;
   std::vector<cv::Point2f> cam1_pts;
+  std::vector<int> track_ids;
   cv::Mat prev_cam0_img;
   cv::Mat prev_cam1_img;
 
@@ -78,6 +79,13 @@ public:
              std::vector<cv::Point2f> &pts1,
              std::vector<uchar> &mask);
 
+  int updateTrack(const int index,
+                  const bool is_inlier,
+                  const cv::Point2f &pt0_ref,
+                  const cv::Point2f &pt0_cur,
+                  const cv::Point2f &pt1_ref,
+                  const cv::Point2f &pt1_cur);
+
   /**
    * Track features
    *
@@ -86,14 +94,9 @@ public:
    *
    * @param cam0_img Camera 0 input image
    * @param cam1_img Camera 1 input image
-   * @param cam0_pts Camera 0 points [px]
-   * @param cam1_pts Camera 1 points [px]
    * @returns 0 for success, -1 for failure
    */
-  void track(const cv::Mat &img_ref,
-             const cv::Mat &img_cur,
-             std::vector<cv::Point2f> &cam0_pts,
-             std::vector<cv::Point2f> &cam1_pts);
+  void trackFeatures(const cv::Mat &img_ref, const cv::Mat &img_cur);
 
   /**
    * Initialize stereo feature tracker

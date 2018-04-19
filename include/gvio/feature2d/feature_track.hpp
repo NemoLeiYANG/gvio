@@ -64,6 +64,17 @@ struct FeatureTrack {
   void update(const FrameID &frame_id, const Feature &data);
 
   /**
+   * Update stereo feature track
+   *
+   * @param frame_id Frame ID
+   * @param cam0_f Feature from camera 0
+   * @param cam1_f Feature from camera 1
+   */
+  void updateStereo(const FrameID &frame_id,
+                    const Feature &cam0_f,
+                    const Feature &cam1_f);
+
+  /**
    * Slice feature track
    *
    * @param frame_start New frame start

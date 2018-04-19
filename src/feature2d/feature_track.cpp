@@ -24,6 +24,14 @@ void FeatureTrack::update(const FrameID &frame_id, const Feature &data) {
   this->track.push_back(data);
 }
 
+void FeatureTrack::updateStereo(const FrameID &frame_id,
+                                const Feature &cam0_f,
+                                const Feature &cam1_f) {
+  this->frame_end = frame_id;
+  this->track0.push_back(cam0_f);
+  this->track1.push_back(cam1_f);
+}
+
 void FeatureTrack::slice(const size_t frame_start, const size_t frame_end) {
   const size_t diff_start = (frame_start - this->frame_start);
   const size_t diff_end = (this->frame_end - frame_end);

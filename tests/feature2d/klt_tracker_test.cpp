@@ -4,15 +4,17 @@
 
 namespace gvio {
 
+static const std::string KITTI_RAW_DATASET = "/data/kitti/raw";
+
 int test_KLTTracker_detect() {
   KLTTracker tracker;
 
-  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
   if (raw_dataset.load() != 0) {
     return -1;
   }
 
-  cv::Mat img0 = cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR);
+  cv::Mat img0 = cv::imread(raw_dataset.cam0[0]);
 
   std::vector<Feature> features;
   tracker.detect(img0, features);
@@ -29,13 +31,13 @@ int test_KLTTracker_track() {
   KLTTracker tracker;
 
   // Setup test data
-  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
   if (raw_dataset.load() != 0) {
     return -1;
   }
 
-  cv::Mat img0 = cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR);
-  cv::Mat img1 = cv::imread(raw_dataset.cam0[1], CV_LOAD_IMAGE_COLOR);
+  cv::Mat img0 = cv::imread(raw_dataset.cam0[0]);
+  cv::Mat img1 = cv::imread(raw_dataset.cam0[1]);
 
   // Detect features in image 0
   tracker.initialize(img0);
@@ -58,7 +60,7 @@ int test_KLTTracker_track() {
 
 int test_KLTTracker_update() {
   // Setup test data
-  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
   if (raw_dataset.load() != 0) {
     return -1;
   }
@@ -81,7 +83,7 @@ int test_KLTTracker_update() {
 
 int test_KLTTracker_update2() {
   // Setup test data
-  RawDataset raw_dataset("/data/kitti/raw", "2011_09_26", "0005");
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0001", "extract");
   if (raw_dataset.load() != 0) {
     return -1;
   }
@@ -135,7 +137,7 @@ int test_KLTTracker_demo() {
 void test_suite() {
   MU_ADD_TEST(test_KLTTracker_detect);
   MU_ADD_TEST(test_KLTTracker_track);
-  // MU_ADD_TEST(test_KLTTracker_update);
+  MU_ADD_TEST(test_KLTTracker_update);
   MU_ADD_TEST(test_KLTTracker_update2);
   // MU_ADD_TEST(test_KLTTracker_demo);
 }
