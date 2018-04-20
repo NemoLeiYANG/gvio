@@ -44,8 +44,8 @@ public:
   double track_precision = 0.01;
 
   // Misc settings
-  size_t min_track_length = 10;
-  size_t max_track_length = 20;
+  int image_width = 0;
+  int image_height = 0;
   bool show_matches = false;
 
   StereoKLTTracker();
@@ -79,6 +79,19 @@ public:
              std::vector<cv::Point2f> &pts1,
              std::vector<uchar> &mask);
 
+  /**
+   * Update a feature track
+   *
+   * @param index Index of feature in StereoKLTTracker.track_ids
+   * @param is_inlier Is feature an inlier
+   * @param pt0_ref Feature point in camera 0 in previous frame
+   * @param pt0_cur Feature point in camera 0 in current frame
+   * @param pt1_ref Feature point in camera 1 in previous frame
+   * @param pt1_cur Feature point in camera 1 in current frame
+   *
+   * @returns Track ID if updated or added to container, else returns -1 for
+   * removed
+   */
   int updateTrack(const int index,
                   const bool is_inlier,
                   const cv::Point2f &pt0_ref,
@@ -106,6 +119,14 @@ public:
    * @returns 0 for success, -1 for failure
    */
   int initialize(const cv::Mat &img0_cur, const cv::Mat &img1_cur);
+
+  /**
+   * Replenish features
+   *
+   * @param image Image
+   * @returns 0 for success, -1 for failure
+   */
+  void replenishFeatures(const cv::Mat &image);
 
   /**
    * Update feature tracker

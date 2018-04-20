@@ -8,8 +8,6 @@ import matplotlib.pylab as plt
 
 if __name__ == "__main__":
     data_path = sys.argv[1]
-    image_width = int(sys.argv[2])
-    image_height = int(sys.argv[3])
 
     data_files = []
     for f in listdir(data_path):
@@ -23,7 +21,8 @@ if __name__ == "__main__":
         plt.plot(track[:, 0], track[:, 1])
 
     # ax.suptitle("Feature Track")
-    ax.set_xlim([0, image_width])
-    ax.set_ylim([image_height, 0])
+    ax.set_xlim([-1.0, 1.0])
+    ax.set_ylim([-1.0, 1.0])
     ax.xaxis.tick_top()
+    plt.gca().invert_yaxis()
     plt.show()

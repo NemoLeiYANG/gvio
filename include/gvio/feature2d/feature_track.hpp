@@ -24,13 +24,19 @@ namespace gvio {
  * @{
  */
 
-// Track and frame ID typedefs
+// Track ID
 using FrameID = long int;
+
+// Feature track type
+#define MONO_TRACK 0
+#define STEREO_TRACK 1
 
 /**
  * Feature track
  */
 struct FeatureTrack {
+  int type = MONO_TRACK;
+
   // General
   TrackID track_id = -1;
   FrameID frame_start = -1;

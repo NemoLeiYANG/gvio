@@ -43,7 +43,7 @@ struct test_config test_setup() {
                       image_size);
 
   // Initialize tracker
-  test.tracker = StereoKLTTracker(cam0, cam1, T_cam1_cam0, 1, 5);
+  test.tracker = StereoKLTTracker(cam0, cam1, T_cam1_cam0, 1, 20);
 
   return test;
 }
@@ -98,9 +98,9 @@ int test_StereoKLTTracker_track() {
   test.tracker.initialize(cam0_img, cam1_img);
 
   // Update tracker
-  test.tracker.show_matches = true;
+  test.tracker.show_matches = false;
 
-  for (int i = 1; i < 30; i++) {
+  for (int i = 1; i < 5; i++) {
     const cv::Mat cam0_img = cv::imread(test.raw_dataset.cam0[i]);
     const cv::Mat cam1_img = cv::imread(test.raw_dataset.cam1[i]);
     test.tracker.trackFeatures(cam0_img, cam1_img);
@@ -117,18 +117,44 @@ int test_StereoKLTTracker_track() {
 int test_StereoKLTTracker_update() {
   struct test_config test = test_setup();
 
-  // Initialize tracker
-  const cv::Mat cam0_img = cv::imread(test.raw_dataset.cam0[0]);
-  const cv::Mat cam1_img = cv::imread(test.raw_dataset.cam1[0]);
-  test.tracker.initialize(cam0_img, cam1_img);
-
   // Update tracker
-  test.tracker.show_matches = true;
+  test.tracker.show_matches = false;
 
+  for (int i = 0; i < 30; i++) {
+    const cv::Mat cam0_img = cv::imread(test.raw_dataset.cam0[i]);
+    const cv::Mat cam1_img = cv::imread(test.raw_dataset.cam1[i]);
+    test.tracker.update(cam0_img, cam1_img);
+
+    // Break loop if 'q' was pressed
+    if (test.tracker.show_matches && cv::waitKey(0) == 113) {
+      break;
+    }
+  }
+
+  return 0;
+}
+
+int test_StereoKLTTracker_getLostTracks() {
+  struct test_config test = test_setup();
+
+  test.tracker.show_matches = false;
   for (int i = 1; i < 30; i++) {
     const cv::Mat cam0_img = cv::imread(test.raw_dataset.cam0[i]);
     const cv::Mat cam1_img = cv::imread(test.raw_dataset.cam1[i]);
-    test.tracker.trackFeatures(cam0_img, cam1_img);
+    test.tracker.update(cam0_img, cam1_img);
+
+    auto tracks = test.tracker.getLostTracks();
+    for (auto track : tracks) {
+      MU_CHECK(track.track0.size() == track.track1.size());
+    }
+
+    // Save feature tracks and plot
+    // std::string output_dir = "/tmp/tracker_test/frame_" + std::to_string(i);
+    // save_feature_tracks(tracks, output_dir);
+    // std::string cmd = "python3 scripts/plot_feature_tracks.py " + output_dir;
+    // if (std::system(cmd.c_str()) != 0) {
+    //   return -1;
+    // }
 
     // Break loop if 'q' was pressed
     if (test.tracker.show_matches && cv::waitKey(0) == 113) {
@@ -143,7 +169,8 @@ void test_suite() {
   MU_ADD_TEST(test_StereoKLTTracker_match);
   MU_ADD_TEST(test_StereoKLTTracker_initialize);
   MU_ADD_TEST(test_StereoKLTTracker_track);
-  // MU_ADD_TEST(test_StereoKLTTracker_update);
+  MU_ADD_TEST(test_StereoKLTTracker_update);
+  MU_ADD_TEST(test_StereoKLTTracker_getLostTracks);
 }
 
 } // namespace gvio

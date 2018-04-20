@@ -10,11 +10,19 @@ StereoKLTTracker::StereoKLTTracker(const CameraProperty &camprop0,
                                    const size_t min_track_length,
                                    const size_t max_track_length)
     : camprop0{camprop0}, camprop1{camprop1}, T_cam1_cam0{T_cam1_cam0},
-      min_track_length{min_track_length}, max_track_length{max_track_length} {}
+      features{min_track_length, max_track_length} {}
 
 StereoKLTTracker::~StereoKLTTracker() {}
 
 std::vector<cv::Point2f> StereoKLTTracker::detect(const cv::Mat &image) {
+  // Keep track of image width and height
+  if (this->image_width == 0) {
+    this->image_width = image.cols;
+  }
+  if (this->image_height == 0) {
+    this->image_height = image.rows;
+  }
+
   // Convert image to gray scale
   cv::Mat gray_image;
   cv::cvtColor(image, gray_image, CV_BGR2GRAY);
@@ -83,9 +91,9 @@ int StereoKLTTracker::initialize(const cv::Mat &cam0_img,
   }
 
   // Project keypoints from cam0 to cam1 to form k1
-  const Mat3 R_cam1_cam0 = T_cam1_cam0.block(0, 0, 3, 3);
-  const auto pts0_ud = camprop0.undistortPoints(pts0, R_cam1_cam0);
-  auto pts1 = camprop1.distortPoints(pts0_ud);
+  const Mat3 R_cam1_cam0 = this->T_cam1_cam0.block(0, 0, 3, 3);
+  const auto pts0_ud = this->camprop0.undistortPoints(pts0, R_cam1_cam0);
+  auto pts1 = this->camprop1.distortPoints(pts0_ud);
 
   // Perform stereo match
   std::vector<uchar> inliers;
@@ -132,8 +140,8 @@ int StereoKLTTracker::updateTrack(const int index,
     return -1;
   }
 
-  // Add new feature track
   if (track_id == -1) {
+    // Add new feature track
     this->features.addStereoTrack(this->counter_frame_id,
                                   cam0_f0,
                                   cam0_f1,
@@ -160,6 +168,8 @@ void StereoKLTTracker::trackFeatures(const cv::Mat &cam0_img,
   // Make a copy of feature points currently tracking
   std::vector<cv::Point2f> pts0_ref = this->cam0_pts;
   std::vector<cv::Point2f> pts1_ref = this->cam1_pts;
+  assert(pts0_ref.size() == pts1_ref.size());
+  assert(pts0_ref.size() > 0);
 
   // Temporally match cam0 images
   std::vector<cv::Point2f> pts0_cur = pts0_ref;
@@ -188,7 +198,7 @@ void StereoKLTTracker::trackFeatures(const cv::Mat &cam0_img,
                                      pts0_cur[i],
                                      pts1_ref[i],
                                      pts1_cur[i]);
-    if (track_id != -1) {
+    if (is_inlier && track_id != -1) {
       pts0_inliers.push_back(pts0_cur[i]);
       pts1_inliers.push_back(pts1_cur[i]);
       tracks_tracking.push_back(track_id);
@@ -211,9 +221,60 @@ void StereoKLTTracker::trackFeatures(const cv::Mat &cam0_img,
   }
 }
 
+void StereoKLTTracker::replenishFeatures(const cv::Mat &image) {
+  // Pre-check
+  const int replenish_size = this->max_corners - this->cam0_pts.size();
+  if (replenish_size <= 0) {
+    return;
+  }
+
+  // Build a grid denoting where existing keypoints already are
+  assert(this->image_width > 0);
+  assert(this->image_height > 0);
+  MatX pt0_grid = zeros(this->image_height, this->image_width);
+  for (auto p : this->cam0_pts) {
+    const int px = int(p.x);
+    const int py = int(p.y);
+    if (px >= this->image_width || px <= 0) {
+      continue;
+    } else if (py >= this->image_height || py <= 0) {
+      continue;
+    }
+    pt0_grid(py, px) = 1;
+  }
+
+  // Detect new features
+  auto corners = this->detect(image);
+  std::vector<cv::Point2f> pts0_new;
+  for (auto p : corners) {
+    const int px = int(p.x);
+    const int py = int(p.y);
+    if (pt0_grid(py, px) == 0 && pts0_new.size() < (size_t) replenish_size) {
+      pts0_new.emplace_back(px, py);
+    }
+  }
+
+  // Project new keypoints from cam0 to cam1
+  const Mat3 R_cam1_cam0 = this->T_cam1_cam0.block(0, 0, 3, 3);
+  const auto pts0_ud = this->camprop0.undistortPoints(pts0_new, R_cam1_cam0);
+  auto pts1_new = this->camprop1.distortPoints(pts0_ud);
+
+  // Append new keypoints to cam0_pts and cam1_pts
+  const auto new_size = std::distance(pts0_new.begin(), pts0_new.end());
+  const std::vector<int> ids_new(new_size, -1);
+
+  this->cam0_pts.reserve(this->cam0_pts.size() + new_size);
+  this->cam1_pts.reserve(this->cam1_pts.size() + new_size);
+  this->track_ids.reserve(this->track_ids.size() + new_size);
+
+  this->cam0_pts.insert(this->cam0_pts.end(), pts0_new.begin(), pts0_new.end());
+  this->cam1_pts.insert(this->cam1_pts.end(), pts1_new.begin(), pts1_new.end());
+  this->track_ids.insert(this->track_ids.end(), ids_new.begin(), ids_new.end());
+}
+
 int StereoKLTTracker::update(const cv::Mat &cam0_img, const cv::Mat &cam1_img) {
   // Initialize feature tracker
-  if (this->cam0_pts.size() == 0 || this->cam1_pts.size() == 0) {
+  if (this->cam0_pts.size() == 0) {
     this->cam0_pts.clear();
     this->cam1_pts.clear();
     this->initialize(cam0_img, cam1_img);
@@ -224,18 +285,30 @@ int StereoKLTTracker::update(const cv::Mat &cam0_img, const cv::Mat &cam1_img) {
   this->counter_frame_id++;
   this->trackFeatures(cam0_img, cam1_img);
 
-  // Visualize tracks
-  // if (this->show_tracks) {
-  //   const cv::Mat cam0_tracks = draw_tracks(cam0_img, this->cam0_pts);
-  //   const cv::Mat cam1_tracks = draw_tracks(cam1_img, this->cam1_pts);
-  //
-  //   cv::Mat tracks;
-  //   cv::vconcat(cam0_tracks, cam1_tracks, tracks);
-  //   cv::imshow("Tracks", tracks);
-  //   cv::waitKey(1);
-  // }
+  // Replenish features
+  this->replenishFeatures(cam0_img);
 
   return 0;
+}
+
+std::vector<FeatureTrack> StereoKLTTracker::getLostTracks() {
+  // Get lost tracks
+  std::vector<FeatureTrack> tracks;
+  this->features.removeLostTracks(tracks);
+
+  // Transform keypoints
+  for (auto &track : tracks) {
+
+    // Undistort points and convert pixel coordinates to image coordinates
+    for (size_t i = 0; i < track.trackedLength(); i++) {
+      auto &f0 = track.track0[i];
+      auto &f1 = track.track1[i];
+      f0.kp.pt = this->camprop0.undistortPoint(f0.kp.pt);
+      f1.kp.pt = this->camprop1.undistortPoint(f1.kp.pt);
+    }
+  }
+
+  return tracks;
 }
 
 } // namespace gvio
