@@ -177,13 +177,13 @@ SET(
   # feature2d-klt_tracker_test
   # feature2d-orb_tracker_test
   # feature2d-stereo_orb_tracker_test
-  feature2d-stereo_klt_tracker_test
+  # feature2d-stereo_klt_tracker_test
   # gimbal-gmr-gmr_test
   # gimbal-sbgc_test
   # # gimbal-saliency_test
   # imu-mpu6050_test
   # msckf-camera_state_test
-  # msckf-feature_estimator_test
+  msckf-feature_estimator_test
   # msckf-imu_state_test
   # msckf-msckf_test
   # pwm-pca9685_test

@@ -19,6 +19,27 @@ void CameraState::setFrameID(const FrameID &frame_id) {
   this->frame_id = frame_id;
 }
 
+CameraStates get_track_camera_states(const CameraStates &cam_states,
+                                     const FeatureTrack &track) {
+  const size_t N = cam_states.size();
+  assert(N != 0);
+
+  // Calculate camera states where feature was observed
+  const FrameID fstart = track.frame_start;
+  const FrameID fend = track.frame_end;
+  const FrameID cstart = fstart - cam_states[0].frame_id;
+  const FrameID cend = N - (cam_states.back().frame_id - fend);
+
+  // Copy camera states
+  auto first = cam_states.begin() + cstart;
+  auto last = cam_states.begin() + cend;
+  CameraStates track_cam_states{first, last};
+  assert(track_cam_states.front().frame_id == track.frame_start);
+  assert(track_cam_states.back().frame_id == track.frame_end);
+
+  return track_cam_states;
+}
+
 int save_camera_states(const CameraStates &states,
                        const std::string &output_path) {
   // Setup output file

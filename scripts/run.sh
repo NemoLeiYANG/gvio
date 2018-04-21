@@ -2,8 +2,8 @@
 set -e
 
 # run clang
-find . -name "*.cpp" | xargs clang-format-3.8 -i
-find . -name "*.hpp" | xargs clang-format-3.8 -i
+find . -name "*.cpp" -print0 | xargs --null clang-format -i
+find . -name "*.hpp" -print0 | xargs --null clang-format -i
 
 # find . -name *.cpp | xargs clang-tidy
 
@@ -26,6 +26,8 @@ cmake .. && time make -j${CPU_COUNT}
 
 # SCRIPTS
 # python3 scripts/plot/plot_fig.py
+# python3 scripts/maths/transforms.py; exit 0
+# python3 scripts/plot/plot_landmarks.py /tmp/landmarks.csv; exit 0
 
 # EXPERIMENTS
 # cd experiments
@@ -62,7 +64,7 @@ cd tests
 # ./feature2d-klt_tracker_test
 # ./feature2d-orb_tracker_test
 # ./feature2d-stereo_orb_tracker_test
-./feature2d-stereo_klt_tracker_test
+# ./feature2d-stereo_klt_tracker_test
 # ./gimbal-calibration-aprilgrid_test
 # ./gimbal-calibration-chessboard_test
 # ./gimbal-calibration-calib_params_test
@@ -77,7 +79,7 @@ cd tests
 # ./imu-mpu6050_test
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
-# ./msckf-feature_estimator_test
+./msckf-feature_estimator_test
 # ./msckf-msckf_test
 # ./msckf-profiler_test
 # ./pwm-pca9685_test

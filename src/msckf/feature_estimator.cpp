@@ -32,15 +32,15 @@ Vec3 lls_triangulation(const Vec3 &u1,
   return X;
 }
 
-Vec3 lls_triangulation(const Vec2 &p1,
-                       const Vec2 &p2,
+Vec3 lls_triangulation(const Vec2 &z1,
+                       const Vec2 &z2,
                        const Mat3 &C_C0C1,
                        const Vec3 &t_C0_C0C1) {
   // Triangulate
   // -- Matrix A
   MatX A = zeros(3, 2);
-  A.block(0, 0, 3, 1) = p1.homogeneous();
-  A.block(0, 1, 3, 1) = -C_C0C1 * p2.homogeneous();
+  A.block(0, 0, 3, 1) = z1.homogeneous();
+  A.block(0, 1, 3, 1) = -C_C0C1 * z2.homogeneous();
 
   // -- Vector b
   const Vec3 b{t_C0_C0C1};
@@ -48,7 +48,34 @@ Vec3 lls_triangulation(const Vec2 &p1,
   const auto svd_options = Eigen::ComputeThinU | Eigen::ComputeThinV;
   const VecX x = A.jacobiSvd(svd_options).solve(b);
   // -- Calculate p_C0_f
-  const Vec3 p_C0_f = x(0) * p1.homogeneous();
+  const Vec3 p_C0_f = x(0) * z1.homogeneous();
+
+  return p_C0_f;
+}
+
+Vec3 lls_triangulation(const Vec2 &z1, const Vec2 &z2, const Mat4 T_C1_C0) {
+  const Mat3 C_C1C0 = T_C1_C0.block(0, 0, 3, 3);
+  const Vec3 t_C0_C1C0 = T_C1_C0.block(0, 3, 3, 1);
+  const Vec3 m = C_C1C0 * z1.homogeneous();
+
+  // Form A
+  Vec2 A;
+  A(0) = m(0) - z2(0) * m(2);
+  A(1) = m(1) - z2(1) * m(2);
+
+  // Form b
+  Vec2 b;
+  b(0) = z2(0) * t_C0_C1C0(2) - t_C0_C1C0(0);
+  b(1) = z2(1) * t_C0_C1C0(2) - t_C0_C1C0(1);
+
+  // Solve for depth
+  const double depth = (A.transpose() * A).inverse() * A.transpose() * b;
+
+  // Form initial feature position relative to camera 0
+  Vec3 p_C0_f;
+  p_C0_f(0) = z1(0) * depth;
+  p_C0_f(1) = z1(1) * depth;
+  p_C0_f(2) = depth;
 
   return p_C0_f;
 }
@@ -57,14 +84,19 @@ FeatureEstimator::FeatureEstimator(const FeatureTrack &track,
                                    const CameraStates &track_cam_states)
     : track{track}, track_cam_states{track_cam_states} {}
 
-int FeatureEstimator::triangulate(const Vec2 &p1,
-                                  const Vec2 &p2,
+FeatureEstimator::FeatureEstimator(const FeatureTrack &track,
+                                   const CameraStates &track_cam_states,
+                                   const Mat4 &T_C1_C0)
+    : track{track}, track_cam_states{track_cam_states}, T_C1_C0{T_C1_C0} {}
+
+int FeatureEstimator::triangulate(const Vec2 &z1,
+                                  const Vec2 &z2,
                                   const Mat3 &C_C0C1,
                                   const Vec3 &t_C0_C0C1,
                                   Vec3 &p_C0_f) {
   // Convert points to homogenous coordinates and normalize
-  const Vec3 pt1{p1[0], p1[1], 1.0};
-  const Vec3 pt2{p2[0], p2[1], 1.0};
+  const Vec3 pt1{z1[0], z1[1], 1.0};
+  const Vec3 pt2{z2[0], z2[1], 1.0};
 
   // Form camera matrix P1
   const Mat34 P1 = I(3) * I(3, 4);
@@ -82,32 +114,54 @@ int FeatureEstimator::triangulate(const Vec2 &p1,
 }
 
 int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
-  // Calculate rotation and translation of first and second camera states
-  const CameraState cam0 = this->track_cam_states.front();
-  const CameraState cam1 = this->track_cam_states.back();
-  // -- Get rotation and translation of camera 0 and camera 1
-  const Mat3 C_C0G = C(cam0.q_CG);
-  const Mat3 C_C1G = C(cam1.q_CG);
-  const Vec3 p_G_C0 = cam0.p_G;
-  const Vec3 p_G_C1 = cam1.p_G;
-  // -- Calculate rotation and translation from camera 0 to camera 1
-  const Mat3 C_C0C1 = C_C0G * C_C1G.transpose();
-  const Vec3 t_C0_C0C1 = C_C0G * (p_G_C1 - p_G_C0);
-  // -- Convert from pixel coordinates to image coordinates
-  const Vec2 pt1 = this->track.track.front().getKeyPoint();
-  const Vec2 pt2 = this->track.track.back().getKeyPoint();
+  Mat3 C_C0C1;
+  Vec3 t_C0_C0C1;
+  Vec2 z1;
+  Vec2 z2;
 
-  if ((pt1 - pt2).norm() > 1.0e-3) {
-    // Calculate initial estimate of 3D position
-    FeatureEstimator::triangulate(pt1, pt2, C_C0C1, t_C0_C0C1, p_C0_f);
+  if (this->track.type == MONO_TRACK) {
+    // -- Calculate rotation and translation of first and second camera states
+    const CameraState cam0 = this->track_cam_states.front();
+    const CameraState cam1 = this->track_cam_states.back();
+    // -- Get rotation and translation of camera 0 and camera 1
+    const Mat3 C_C0G = C(cam0.q_CG);
+    const Mat3 C_C1G = C(cam1.q_CG);
+    const Vec3 p_G_C0 = cam0.p_G;
+    const Vec3 p_G_C1 = cam1.p_G;
+    // -- Calculate rotation and translation from camera 0 to camera 1
+    C_C0C1 = C_C0G * C_C1G.transpose();
+    t_C0_C0C1 = C_C0G * (p_G_C1 - p_G_C0);
+    // -- Get observed image points
+    z1 = this->track.track.front().getKeyPoint();
+    z2 = this->track.track.back().getKeyPoint();
+
+    // Triangulate
+    if ((z1 - z2).norm() > 1.0e-3) {
+      FeatureEstimator::triangulate(z1, z2, C_C0C1, t_C0_C0C1, p_C0_f);
+    } else {
+      LOG_WARN("Failed to triangulate feature!");
+      return -1;
+    }
+
+  } else if (this->track.type == STEREO_TRACK) {
+    // Triangulate feature point observed by stereo camera
+    // -- Make sure the camera extrinsics are set
+    assert(this->T_C1_C0.isApprox(zeros(4, 4)) == false);
+    // -- Get observed image points
+    z1 = this->track.track0.front().getKeyPoint();
+    z2 = this->track.track1.front().getKeyPoint();
+
+    p_C0_f = lls_triangulation(z1, z2, this->T_C1_C0);
+    if (p_C0_f(2) < 1.0) {
+      LOG_WARN("Bad initialization: [%.2f, %.2f, %.2f]",
+               p_C0_f(0),
+               p_C0_f(1),
+               p_C0_f(2));
+    }
+
   } else {
-    LOG_WARN("Failed to triangulate feature!");
-    p_C0_f << pt1(0), pt1(1), 5.0;
+    FATAL("Invalid feature track type [%d]", track.type);
   }
-  // std::cout << "pt1: " << pt1.transpose() << std::endl;
-  // std::cout << "pt2: " << pt2.transpose() << std::endl;
-  // std::cout << "p_C0_f: " << p_C0_f.transpose() << std::endl;
-  // exit(0);
 
   return 0;
 }
@@ -123,14 +177,18 @@ int FeatureEstimator::checkEstimate(const Vec3 &p_G_f) {
   // Make sure feature is infront of camera all the way through
   for (int i = 0; i < N; i++) {
     // Transform feature from global frame to i-th camera frame
-    const Mat3 C_CG = C(this->track_cam_states[i].q_CG);
-    const Vec3 p_C_f = C_CG * (p_G_f - this->track_cam_states[i].p_G);
+    const Mat3 C_CiG = C(this->track_cam_states[i].q_CG);
+    const Vec3 p_Ci_f = C_CiG * (p_G_f - this->track_cam_states[i].p_G);
 
     // Check if feature is in-front of camera
-    if (p_C_f(2) < 0.0) {
+    if (p_Ci_f(2) < 0.0 || p_Ci_f(2) > 100.0) {
       return -1;
     }
   }
+
+  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
+  const Vec3 p_C0_f = C_C0G * (p_G_f - this->track_cam_states[0].p_G);
+  std::cout << "p_C0_f: " << p_C0_f.transpose() << std::endl;
 
   return 0;
 }
@@ -442,10 +500,20 @@ int CeresFeatureEstimator::setupProblem() {
     const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
 
     // Add residual block
-    this->addResidualBlock(this->track.track[i].getKeyPoint(),
-                           C_CiC0,
-                           t_Ci_CiC0,
-                           this->x);
+    if (this->track.type == MONO_TRACK) {
+      this->addResidualBlock(this->track.track[i].getKeyPoint(),
+                             C_CiC0,
+                             t_Ci_CiC0,
+                             this->x);
+    } else if (this->track.type == STEREO_TRACK) {
+      this->addResidualBlock(this->track.track0[i].getKeyPoint(),
+                             C_CiC0,
+                             t_Ci_CiC0,
+                             this->x);
+
+    } else {
+      FATAL("Invalid feature track type [%d]", this->track.type);
+    }
   }
 
   return 0;
@@ -454,7 +522,6 @@ int CeresFeatureEstimator::setupProblem() {
 int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // Set options
   this->options.max_num_iterations = 100;
-  // this->options.minimizer_type = ceres::LINE_SEARCH;
   this->options.num_threads = 1;
   this->options.num_linear_solver_threads = 1;
   this->options.minimizer_progress_to_stdout = false;
@@ -465,10 +532,10 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   }
 
   // Cheat by using ground truth data
-  if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
-    p_G_f = this->track.track[0].ground_truth;
-    return 0;
-  }
+  // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
+  //   p_G_f = this->track.track[0].ground_truth;
+  //   return 0;
+  // }
 
   // Solve
   ceres::Solve(this->options, &this->problem, &this->summary);

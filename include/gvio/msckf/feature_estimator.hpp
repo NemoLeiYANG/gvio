@@ -43,15 +43,26 @@ Vec3 lls_triangulation(const Vec3 &u1,
 /**
  * Linear Least Squares Triangulation
  *
- * @param p1 Feature point 1 in pixel coordinates
- * @param p2 Feature point 2 in pixel coordinates
+ * @param z1 Feature point 1 in image coordinates
+ * @param z2 Feature point 2 in image coordinates
+ * @param T_C1_C0 Transformation matrix from camera 0 to camera 1
+ *
+ * @returns Estimated feature position
+ */
+Vec3 lls_triangulation(const Vec2 &z1, const Vec2 &z2, const Mat4 T_C1_C0);
+
+/**
+ * Linear Least Squares Triangulation
+ *
+ * @param z1 Feature point 1 in image coordinates
+ * @param z2 Feature point 2 in image coordinates
  * @param C_C0C1 Rotation matrix from frame C1 to C0
  * @param t_C0_C0C1 Translation vector from frame C0 to C1 expressed in C0
  *
  * @returns Estimated feature position
  */
-Vec3 lls_triangulation(const Vec2 &p1,
-                       const Vec2 &p2,
+Vec3 lls_triangulation(const Vec2 &z1,
+                       const Vec2 &z2,
                        const Mat3 &C_C0C1,
                        const Vec3 &t_C0_C0C1);
 
@@ -62,12 +73,17 @@ class FeatureEstimator {
 public:
   FeatureTrack track;
   CameraStates track_cam_states;
+  Mat4 T_C1_C0 = zeros(4, 4);
 
   bool debug_mode = false;
   int max_iter = 30;
 
   FeatureEstimator(const FeatureTrack &track,
                    const CameraStates &track_cam_states);
+
+  FeatureEstimator(const FeatureTrack &track,
+                   const CameraStates &track_cam_states,
+                   const Mat4 &T_cam1_cam0);
 
   /**
    * Triangulate feature observed from camera C0 and C1 and return the
@@ -219,8 +235,8 @@ public:
  */
 class CeresFeatureEstimator : public FeatureEstimator {
 public:
-  std::string method = "ANALYTICAL";
-  // std::string method = "AUTODIFF";
+  // std::string method = "ANALYTICAL";
+  std::string method = "AUTODIFF";
   ceres::Problem problem;
   ceres::Solver::Options options;
   ceres::Solver::Summary summary;
@@ -229,6 +245,11 @@ public:
   CeresFeatureEstimator(const FeatureTrack &track,
                         const CameraStates &track_cam_states)
       : FeatureEstimator{track, track_cam_states} {}
+
+  CeresFeatureEstimator(const FeatureTrack &track,
+                        const CameraStates &track_cam_states,
+                        const Mat4 T_C1_C0)
+      : FeatureEstimator{track, track_cam_states, T_C1_C0} {}
 
   /**
    * Add residual block

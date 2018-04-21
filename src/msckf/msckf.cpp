@@ -197,8 +197,7 @@ void MSCKF::augmentState() {
 
   // Augment MSCKF covariance matrix (with new camera state)
   const MatX P = X * this->P() * X.transpose();
-  const MatX P_fixed =
-      (P + P.transpose()) / 2.0; // Fix covariance to be symmetric
+  const MatX P_fixed = (P + P.transpose()) / 2.0; // Ensure symmetry
 
   // Decompose covariance into its own constituents
   // clang-format off

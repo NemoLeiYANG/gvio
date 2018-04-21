@@ -53,6 +53,16 @@ public:
 using CameraStates = std::vector<CameraState>;
 
 /**
+ * Get camera states the feature track was observed in
+ *
+ * @param cam_states Camera states
+ * @param track Feature track
+ * @returns Camera states where feature track was observed
+ */
+CameraStates get_track_camera_states(const CameraStates &cam_states,
+                                     const FeatureTrack &track);
+
+/**
  * Camera states to CSV file
  *
  * @param states Camera states

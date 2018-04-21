@@ -4,20 +4,18 @@
 
 namespace gvio {
 
-static const std::string KITTI_RAW_DATASET = "/data/kitti/raw";
+static const std::string DATASET_PATH = "/data/kitti/raw";
 
 struct test_config {
   RawDataset raw_dataset;
   StereoKLTTracker tracker;
-
   test_config() {}
 };
 
 struct test_config test_setup() {
   struct test_config test;
 
-  test.raw_dataset =
-      RawDataset(KITTI_RAW_DATASET, "2011_09_26", "0001", "extract");
+  test.raw_dataset = RawDataset(DATASET_PATH, "2011_09_26", "0001", "extract");
   if (test.raw_dataset.load() != 0) {
     exit(-1);
   }
