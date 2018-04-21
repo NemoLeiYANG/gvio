@@ -147,6 +147,9 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
     // Triangulate feature point observed by stereo camera
     // -- Make sure the camera extrinsics are set
     assert(this->T_C1_C0.isApprox(zeros(4, 4)) == false);
+    // -- Calculate rotation and translation from camera 0 to camera 1
+    C_C0C1 = this->T_C1_C0.inverse().block(0, 0, 3, 3);
+    t_C0_C0C1 = this->T_C1_C0.inverse().block(0, 3, 3, 1);
     // -- Get observed image points
     z1 = this->track.track0.front().getKeyPoint();
     z2 = this->track.track1.front().getKeyPoint();
@@ -161,6 +164,7 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
 
   } else {
     FATAL("Invalid feature track type [%d]", track.type);
+
   }
 
   return 0;
@@ -186,9 +190,9 @@ int FeatureEstimator::checkEstimate(const Vec3 &p_G_f) {
     }
   }
 
-  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
-  const Vec3 p_C0_f = C_C0G * (p_G_f - this->track_cam_states[0].p_G);
-  std::cout << "p_C0_f: " << p_C0_f.transpose() << std::endl;
+  // const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
+  // const Vec3 p_C0_f = C_C0G * (p_G_f - this->track_cam_states[0].p_G);
+  // std::cout << "p_C0_f: " << p_C0_f.transpose() << std::endl;
 
   return 0;
 }
