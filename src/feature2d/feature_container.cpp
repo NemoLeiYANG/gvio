@@ -6,7 +6,9 @@ FeatureContainer::FeatureContainer() {}
 
 FeatureContainer::FeatureContainer(const size_t min_track_length,
                                    const size_t max_track_length)
-    : min_track_length{min_track_length}, max_track_length{max_track_length} {}
+    : min_track_length{min_track_length}, max_track_length{max_track_length} {
+  assert(min_track_length >= 2);
+}
 
 int FeatureContainer::addTrack(const FrameID &frame_id,
                                Feature &f0,
@@ -62,16 +64,17 @@ int FeatureContainer::removeTrack(const TrackID &track_id, const bool lost) {
   }
 
   // Remove from tracking
-  auto t_index =
+  auto idx =
       std::remove(this->tracking.begin(), this->tracking.end(), track_id);
-  if (t_index != this->tracking.end()) {
-    this->tracking.erase(t_index);
+  if (idx != this->tracking.end()) {
+    this->tracking.erase(idx);
   }
 
   // Mark as lost or remove from buffer
   auto track = this->buffer.at(track_id);
   if (track.trackedLength() >= this->min_track_length && lost) {
     this->lost.push_back(track_id);
+
   } else {
     this->buffer.erase(buf_index);
   }

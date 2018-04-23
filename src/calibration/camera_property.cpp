@@ -42,6 +42,18 @@ CameraProperty::CameraProperty(const int camera_index,
   const double cx = K(0, 2);
   const double cy = K(1, 2);
   intrinsics = Vec4{fx, fy, cx, cy};
+
+  // Some camera calibration results do not provide radtan k3, in the following
+  // we set radtan k3 = 0.0 if the provided distortion vector is of size 4. We
+  // assume:
+  //
+  //   D (size 4) = k1, k2, p1, p2
+  //   D (size 5) = k1, k2, p1, p2, k3
+  //
+  if (distortion_model == "radtan" && D.size() == 4) {
+    this->distortion_coeffs = zeros(5, 1);
+    this->distortion_coeffs << D, 0.0;
+  }
 }
 
 Mat3 CameraProperty::K() {

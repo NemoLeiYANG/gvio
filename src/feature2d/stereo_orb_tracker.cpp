@@ -109,7 +109,8 @@ int StereoORBTracker::update2(const cv::Mat &cam0_img,
 std::vector<FeatureTrack> StereoORBTracker::getLostTracks() {
   FeatureTracks stereo_tracks;
 
-  for (auto track0_id : this->tracker0.features.lost) {
+  auto tracker0_lost_tracks = this->tracker0.features.lost;
+  for (auto track0_id : tracker0_lost_tracks) {
     // Get track0 and track 1
     auto track0 = this->tracker0.features.buffer[track0_id];
     if (track0.related == -1) {
@@ -150,13 +151,22 @@ std::vector<FeatureTrack> StereoORBTracker::getLostTracks() {
     this->tracker1.features.removeTrack(track1.track_id, false);
     assert(this->tracker0.features.buffer.count(track0.track_id) == 0);
     assert(this->tracker1.features.buffer.count(track1.track_id) == 0);
+    assert(std::count(this->tracker0.features.lost.begin(),
+                      this->tracker0.features.lost.end(),
+                      track0.track_id) == 0);
+    assert(std::count(this->tracker1.features.lost.begin(),
+                      this->tracker1.features.lost.end(),
+                      track1.track_id) == 0);
+
+    std::cout << "--> lost: " << this->tracker0.features.lost.size()
+              << std::endl;
 
     this->counter_track_id++;
   }
 
   // Clear lost tracks
-  this->tracker0.features.lost.clear();
-  this->tracker1.features.lost.clear();
+  // this->tracker0.features.lost.clear();
+  // this->tracker1.features.lost.clear();
   assert(this->tracker0.features.lost.size() == 0);
   assert(this->tracker1.features.lost.size() == 0);
 

@@ -15,11 +15,14 @@ ORBTracker::ORBTracker(const CameraProperty &camera_property,
 ORBTracker::~ORBTracker() {}
 
 int ORBTracker::detect(const cv::Mat &image, Features &features) {
-  // Feature descriptor extraction
+  // // Feature descriptor extraction
   std::vector<cv::KeyPoint> keypoints;
   cv::Mat mask;
   cv::Mat descriptors;
   this->orb->detectAndCompute(image, mask, keypoints, descriptors);
+
+  // cv::FAST(image, keypoints, 20, false);
+  // this->orb->compute(image, keypoints, descriptors);
 
   // Update counters
   this->counter_frame_id += 1;

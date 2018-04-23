@@ -14,6 +14,14 @@ namespace gvio {
  */
 
 /**
+ * Pinhole camera model intrinsics matrix
+ *
+ * @param intrinsics Intrinsics vector (fx, fy, cx, cy)
+ * @returns Intrinsics matrix K
+ */
+Mat3 pinhole_K(const Vec4 &intrinsics);
+
+/**
  * Pinhole camera model theoretical focal length
  *
  * @param image_width Image width [px]

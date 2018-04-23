@@ -32,59 +32,52 @@ int main(const int argc, const char *argv[]) {
     return -1;
   }
 
-  // Setup camera model and feature tracker
-  const int image_width = mav_data.cam0_data.resolution(0);
-  const int image_height = mav_data.cam0_data.resolution(1);
+  // Setup camera property
+  const Vec2 image_size = mav_data.cam0_data.resolution;
   // -- Setup cam0 property
-  const double cam0_fx = mav_data.cam0_data.intrinsics(0);
-  const double cam0_fy = mav_data.cam0_data.intrinsics(1);
-  const double cam0_cx = mav_data.cam0_data.intrinsics(2);
-  const double cam0_cy = mav_data.cam0_data.intrinsics(3);
-  CameraProperty camprop0{0,
-                          cam0_fx,
-                          cam0_fy,
-                          cam0_cx,
-                          cam0_cy,
-                          image_width,
-                          image_height};
+  const Mat3 cam0_K = pinhole_K(mav_data.cam0_data.intrinsics);
+  const VecX cam0_D = mav_data.cam0_data.distortion_coefficients;
+  CameraProperty camprop0{0, "pinhole", cam0_K, "radtan", cam0_D, image_size};
   // -- Setup cam1 property
-  const double cam1_fx = mav_data.cam1_data.intrinsics(0);
-  const double cam1_fy = mav_data.cam1_data.intrinsics(1);
-  const double cam1_cx = mav_data.cam1_data.intrinsics(2);
-  const double cam1_cy = mav_data.cam1_data.intrinsics(3);
-  CameraProperty camprop1{1,
-                          cam1_fx,
-                          cam1_fy,
-                          cam1_cx,
-                          cam1_cy,
-                          image_width,
-                          image_height};
-  // -- Setup feature tracker
-  // StereoORBTracker tracker(camprop0, camprop1, 2, 100);
+  const Mat3 cam1_K = pinhole_K(mav_data.cam0_data.intrinsics);
+  const VecX cam1_D = mav_data.cam0_data.distortion_coefficients;
+  CameraProperty camprop1{1, "pinhole", cam1_K, "radtan", cam1_D, image_size};
 
+  // Mono ORB tracker
+  // clang-format off
+  ORBTracker orb_tracker(camprop0, 2, 100);
+  orb_tracker.show_matches = false;
+  mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(ORBTracker::update, orb_tracker);
+  mav_data.get_tracks_cb = BIND_GET_TRACKS_CALLBACK(ORBTracker::getLostTracks, orb_tracker);
+  mav_data.run();
+  save_feature_tracks(mav_data.feature_tracks, "/tmp/orb_feature_tracks");
+  // clang-format on
+
+  // Mono ORB tracker
+  // clang-format off
+  KLTTracker klt_tracker(camprop0, 2, 100);
+  klt_tracker.show_matches = false;
+  mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(KLTTracker::update, klt_tracker);
+  mav_data.get_tracks_cb = BIND_GET_TRACKS_CALLBACK(KLTTracker::getLostTracks, klt_tracker);
+  mav_data.run();
+  save_feature_tracks(mav_data.feature_tracks, "/tmp/klt_feature_tracks");
+  // clang-format on
+
+  // // Stereo KLT tracker
+  // // clang-format off
   // const Mat4 T_imu_cam0 = mav_data.cam0_data.T_BS;
   // const Mat4 T_imu_cam1 = mav_data.cam1_data.T_BS;
   // const Mat4 T_cam1_cam0 = T_imu_cam1.inverse() * T_imu_cam0;
-  // StereoKLTTracker tracker(camprop0, camprop1, T_cam1_cam0, 1, 100);
-
-  // Stereo ORB tracker
-  // clang-format off
-  StereoORBTracker tracker(camprop0, camprop1, 2, 100);
-  tracker.show_matches = true;
-  mav_data.stereo_camera_cb = BIND_STEREO_CAMERA_CALLBACK(StereoORBTracker::update, tracker);
-  mav_data.get_tracks_cb = BIND_GET_TRACKS_CALLBACK(StereoORBTracker::getLostTracks, tracker);
-  mav_data.run();
-  // clang-format on
-
-  // // Mono ORB tracker
-  // // clang-format off
-  // ORBTracker tracker(camprop0, 2, 100);
-  // tracker.show_matches = true;
-  // mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(ORBTracker::update,
-  // tracker);
+  // StereoKLTTracker stereo_klt_tracker(camprop0, camprop1, T_cam1_cam0, 2,
+  // 100);
+  // mav_data.stereo_camera_cb =
+  // BIND_STEREO_CAMERA_CALLBACK(StereoKLTTracker::update,
+  //                                                         stereo_klt_tracker);
   // mav_data.get_tracks_cb =
-  // BIND_GET_TRACKS_CALLBACK(ORBTracker::getLostTracks, tracker);
-  // mav_data.run();
+  // BIND_GET_TRACKS_CALLBACK(StereoKLTTracker::getLostTracks,
+  //                                                   stereo_klt_tracker);
+  // // save_feature_tracks(mav_data.feature_tracks, "/tmp/feature_tracks");
+  // // mav_data.run();
   // // clang-format on
 
   const long nb_images = mav_data.frame_index;

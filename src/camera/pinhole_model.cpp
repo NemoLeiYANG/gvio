@@ -2,6 +2,18 @@
 
 namespace gvio {
 
+Mat3 pinhole_K(const Vec4 &intrinsics) {
+  Mat3 K;
+
+  // clang-format off
+  K << intrinsics(0), 0.0, intrinsics(2),
+       0.0, intrinsics(1), intrinsics(3),
+       0.0, 0.0, 1.0;
+  // clang-format on
+
+  return K;
+}
+
 double pinhole_focal_length(const int image_width, const double fov) {
   return ((image_width / 2.0) / tan(deg2rad(fov) / 2.0));
 }

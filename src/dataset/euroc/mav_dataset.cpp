@@ -143,6 +143,7 @@ void MAVDataset::reset() {
   this->time_index = 0;
   this->imu_index = 0;
   this->frame_index = 0;
+  this->feature_tracks.clear();
 }
 
 int MAVDataset::step() {
@@ -186,7 +187,6 @@ int MAVDataset::step() {
     // clang-format on
     a_m = R_body_imu * a_m;
     w_m = R_body_imu * w_m;
-    // std::cout << a_m.transpose() << std::endl;
 
     if (this->imu_cb(a_m, w_m, this->ts_now) != 0) {
       LOG_ERROR("IMU callback failed! Stopping MAVDataset!");
@@ -216,7 +216,9 @@ int MAVDataset::step() {
     // Measurement callback
     if (this->get_tracks_cb != nullptr) {
       FeatureTracks tracks = this->get_tracks_cb();
-      save_feature_tracks(tracks, "./stereo_orb_tracker");
+      this->feature_tracks.insert(std::end(this->feature_tracks),
+                                  std::begin(tracks),
+                                  std::end(tracks));
 
       if (this->mea_cb != nullptr) {
         if (this->mea_cb(tracks) != 0) {
@@ -246,6 +248,8 @@ int MAVDataset::step() {
 }
 
 int MAVDataset::run() {
+  this->reset();
+
   for (size_t i = 0; i < this->timestamps.size(); i++) {
     // for (size_t i = 0; i < 600; i++) {
     const int retval = this->step();
