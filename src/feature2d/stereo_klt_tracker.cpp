@@ -291,6 +291,13 @@ int StereoKLTTracker::update(const cv::Mat &cam0_img, const cv::Mat &cam1_img) {
   return 0;
 }
 
+int StereoKLTTracker::update2(const cv::Mat &cam0_img,
+                              const cv::Mat &cam1_img,
+                              long ts) {
+  UNUSED(ts);
+  return this->update(cam0_img, cam1_img);
+}
+
 std::vector<FeatureTrack> StereoKLTTracker::getLostTracks() {
   // Get lost tracks
   std::vector<FeatureTrack> tracks;

@@ -29,13 +29,14 @@ namespace gvio {
 class FeatureTracker {
 public:
   // Camera model
-  CameraProperty *camera_property = nullptr;
+  CameraProperty camera_property;
 
   // Features
   FrameID counter_frame_id = -1;
   FeatureContainer features;
   Features unmatched;
   Features fea_ref;
+  int max_features = 2000;
 
   // Image, feature, unmatched features book keeping
   cv::Mat img_cur;
@@ -49,8 +50,8 @@ public:
   bool show_matches = false;
 
   FeatureTracker();
-  FeatureTracker(CameraProperty *camera_property);
-  FeatureTracker(CameraProperty *camera_property,
+  FeatureTracker(const CameraProperty &camera_property);
+  FeatureTracker(const CameraProperty &camera_property,
                  const size_t min_track_length,
                  const size_t max_track_length);
   virtual ~FeatureTracker();

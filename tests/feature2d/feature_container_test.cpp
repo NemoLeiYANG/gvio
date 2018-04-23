@@ -23,13 +23,13 @@ int test_FeatureContainer_addTrack() {
 }
 
 int test_FeatureContainer_removeTrack() {
-  FeatureContainer features;
+  FeatureContainer features(2, 5);
   Feature f1;
   Feature f2;
 
   // Test remove from buffer as lost
   features.addTrack(0, f1, f2);
-  features.removeTrack(0);
+  features.removeTrack(0, true);
 
   MU_CHECK_EQ(0, (int) features.tracking.size());
   MU_CHECK_EQ(1, (int) features.lost.size());
@@ -42,6 +42,24 @@ int test_FeatureContainer_removeTrack() {
   // Test remove as not lost
   features.addTrack(1, f1, f2);
   features.removeTrack(1, false);
+
+  MU_CHECK_EQ(0, (int) features.tracking.size());
+  MU_CHECK_EQ(0, (int) features.lost.size());
+  MU_CHECK_EQ(0, (int) features.buffer.size());
+
+  return 0;
+}
+
+int test_FeatureContainer_removeTracks() {
+  FeatureContainer features(2, 5);
+  Feature f1;
+  Feature f2;
+
+  // Test remove as not lost
+  features.addTrack(1, f1, f2);
+  features.addTrack(2, f1, f2);
+  features.addTrack(3, f1, f2);
+  features.removeTracks({0, 1, 2}, false);
 
   MU_CHECK_EQ(0, (int) features.tracking.size());
   MU_CHECK_EQ(0, (int) features.lost.size());
@@ -76,11 +94,12 @@ int test_FeatureContainer_purge() {
   }
 
   // Purge
-  const std::vector<FeatureTrack> tracks = features.purge(10);
+  const FeatureTracks tracks = features.purge(10);
 
   // Assert
   TrackID index = 0;
   MU_CHECK_EQ(10, tracks.size());
+  MU_CHECK_EQ(0, features.buffer.size());
   for (auto t : tracks) {
     MU_CHECK_EQ(index, t.track_id);
     index++;
@@ -92,6 +111,7 @@ int test_FeatureContainer_purge() {
 void test_suite() {
   MU_ADD_TEST(test_FeatureContainer_addTrack);
   MU_ADD_TEST(test_FeatureContainer_removeTrack);
+  MU_ADD_TEST(test_FeatureContainer_removeTracks);
   MU_ADD_TEST(test_FeatureContainer_updateTrack);
   MU_ADD_TEST(test_FeatureContainer_purge);
 }

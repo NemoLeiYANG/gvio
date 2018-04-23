@@ -36,7 +36,7 @@ int main(const int argc, const char *argv[]) {
   const std::string msckf_config_path(argv[2]);
   const std::string msckf_output_path(argv[3]);
 
-  // Load raw dataset
+  // Load dataset
   MAVDataset mav_data(dataset_path);
   if (mav_data.load() != 0) {
     LOG_ERROR("Failed to load EuRoC mav dataset [%s]!", dataset_path.c_str());
@@ -65,25 +65,22 @@ int main(const int argc, const char *argv[]) {
 
   // Setup camera model and feature tracker
   // -- Setup camera model
-  const int image_width = mav_data.cam0_data.resolution(0);
-  const int image_height = mav_data.cam0_data.resolution(1);
   const double fx = mav_data.cam0_data.intrinsics(0);
   const double fy = mav_data.cam0_data.intrinsics(1);
   const double cx = mav_data.cam0_data.intrinsics(2);
   const double cy = mav_data.cam0_data.intrinsics(2);
-  PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
+  const int image_width = mav_data.cam0_data.resolution(0);
+  const int image_height = mav_data.cam0_data.resolution(1);
+  CameraProperty camera_property{0, fx, fy, cx, cy, image_width, image_height};
   // -- Setup feature tracker
-  KLTTracker tracker{&pinhole_model};
-  // tracker.max_corners = 500;
-  // tracker.min_distance = 5.0;
-  // tracker.quality_level = 0.001;
+  KLTTracker tracker{camera_property};
   tracker.show_matches = true;
   cv::Mat cam0_img0 = cv::imread(mav_data.cam0_data.image_paths[0]);
 
   // Bind MSCKF to MAV dataset runner
   // clang-format off
   mav_data.imu_cb = BIND_IMU_CALLBACK(MSCKF::predictionUpdate, msckf);
-  mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(KLTTracker::update2, tracker);
+  mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(KLTTracker::update, tracker);
   mav_data.get_tracks_cb = BIND_GET_TRACKS_CALLBACK(KLTTracker::getLostTracks, tracker);
   mav_data.mea_cb = BIND_MEASUREMENT_CALLBACK(MSCKF::measurementUpdate, msckf);
   mav_data.get_state = BIND_GET_STATE_CALLBACK(MSCKF::getState, msckf);

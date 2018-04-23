@@ -4,10 +4,10 @@ namespace gvio {
 
 FeatureTracker::FeatureTracker() {}
 
-FeatureTracker::FeatureTracker(CameraProperty *camera_property)
+FeatureTracker::FeatureTracker(const CameraProperty &camera_property)
     : camera_property{camera_property} {}
 
-FeatureTracker::FeatureTracker(CameraProperty *camera_property,
+FeatureTracker::FeatureTracker(const CameraProperty &camera_property,
                                const size_t min_track_length,
                                const size_t max_track_length)
     : camera_property{camera_property},
@@ -44,8 +44,7 @@ std::vector<FeatureTrack> FeatureTracker::getLostTracks() {
   // Get lost tracks
   std::vector<FeatureTrack> tracks;
   this->features.removeLostTracks(tracks);
-  if (this->camera_property == nullptr ||
-      this->camera_property->distortion_model.empty()) {
+  if (this->camera_property.distortion_model.empty()) {
     return tracks;
   }
 
@@ -53,7 +52,7 @@ std::vector<FeatureTrack> FeatureTracker::getLostTracks() {
   for (auto &track : tracks) {
     for (auto &feature : track.track) {
       // Convert pixel coordinates to image coordinates
-      cv::Point2f pt_ud = this->camera_property->undistortPoint(feature.kp.pt);
+      cv::Point2f pt_ud = this->camera_property.undistortPoint(feature.kp.pt);
       feature.kp.pt.x = pt_ud.x;
       feature.kp.pt.y = pt_ud.y;
     }
@@ -88,6 +87,7 @@ int FeatureTracker::match(const Features &f1,
     const cv::Mat matches_img =
         draw_matches(this->img_ref, this->img_cur, k0, k1, matches);
     cv::imshow("Matches", matches_img);
+    cv::waitKey(1);
   }
 
   // Update or add feature track
@@ -122,9 +122,13 @@ int FeatureTracker::match(const Features &f1,
 
   // Update list of reference and unmatched features
   this->unmatched.clear();
+  int replenish_size =
+      std::min(f1.size(), this->max_features - this->fea_ref.size());
+  int j = 0;
   for (size_t i = 0; i < f1.size(); i++) {
-    if (idx_updated.find(i) == idx_updated.end()) {
+    if (idx_updated.find(i) == idx_updated.end() && j <= replenish_size) {
       this->unmatched.push_back(f1[i]);
+      j++;
     }
   }
 
@@ -158,6 +162,11 @@ int FeatureTracker::update(const cv::Mat &img_cur) {
   if (this->match(features, matches) != 0) {
     return -2;
   }
+
+  // std::cout << "tracking: " << this->features.tracking.size() << std::endl;
+  // std::cout << "lost: " << this->features.lost.size() << std::endl;
+  // std::cout << "buffer: " << this->features.buffer.size() << std::endl;
+  // std::cout << std::endl;
 
   // Update
   img_cur.copyTo(this->img_ref);

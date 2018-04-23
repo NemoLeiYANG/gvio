@@ -273,7 +273,7 @@ int test_FeatureEstimator_jacobian() {
   Vec3 p_C0_f;
   Vec3 x{0.0, 0.0, 0.1};
   FeatureEstimator estimator(track, track_cam_states);
-  estimator.jacobian(x);
+  // estimator.jacobian(x);
 
   return 0;
 }
@@ -289,7 +289,7 @@ int test_FeatureEstimator_reprojectionError() {
   Vec3 p_C0_f;
   Vec3 x{0.0, 0.0, 0.1};
   FeatureEstimator estimator(track, track_cam_states);
-  estimator.reprojectionError(x);
+  // estimator.reprojectionError(x);
 
   return 0;
 }
@@ -309,6 +309,7 @@ int test_FeatureEstimator_estimate() {
   struct timespec start = tic();
   int retval = estimator.estimate(p_G_f);
   printf("elasped: %fs\n", toc(&start));
+  std::cout << p_G_f.transpose() << std::endl;
 
   MU_CHECK_EQ(0, retval);
   MU_CHECK(((config.landmark - p_G_f).norm() < 1e-6));
@@ -498,12 +499,12 @@ void test_suite() {
   // FeatureEstimator
   // MU_ADD_TEST(test_lls_triangulation);
   MU_ADD_TEST(test_lls_triangulation2);
-  // MU_ADD_TEST(test_FeatureEstimator_triangulate);
-  // MU_ADD_TEST(test_FeatureEstimator_initialEstimate);
-  // MU_ADD_TEST(test_FeatureEstimator_jacobian);
-  // MU_ADD_TEST(test_FeatureEstimator_reprojectionError);
-  // MU_ADD_TEST(test_FeatureEstimator_estimate);
-  //
+  MU_ADD_TEST(test_FeatureEstimator_triangulate);
+  MU_ADD_TEST(test_FeatureEstimator_initialEstimate);
+  MU_ADD_TEST(test_FeatureEstimator_jacobian);
+  MU_ADD_TEST(test_FeatureEstimator_reprojectionError);
+  MU_ADD_TEST(test_FeatureEstimator_estimate);
+
   // // AnalyticalReprojectionError
   // MU_ADD_TEST(test_AnalyticalReprojectionError_constructor);
   // MU_ADD_TEST(test_AnalyticalReprojectionError_evaluate);
@@ -512,7 +513,7 @@ void test_suite() {
   // MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
   // MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
   // MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
-  MU_ADD_TEST(test_CeresFeatureEstimator_estimate_stereo);
+  // MU_ADD_TEST(test_CeresFeatureEstimator_estimate_stereo);
 }
 
 } // namespace gvio

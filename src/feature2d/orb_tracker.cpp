@@ -4,10 +4,10 @@ namespace gvio {
 
 ORBTracker::ORBTracker() {}
 
-ORBTracker::ORBTracker(CameraProperty *camera_property)
+ORBTracker::ORBTracker(const CameraProperty &camera_property)
     : FeatureTracker{camera_property} {}
 
-ORBTracker::ORBTracker(CameraProperty *camera_property,
+ORBTracker::ORBTracker(const CameraProperty &camera_property,
                        const size_t min_track_length,
                        const size_t max_track_length)
     : FeatureTracker{camera_property, min_track_length, max_track_length} {}

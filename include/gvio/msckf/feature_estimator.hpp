@@ -78,6 +78,19 @@ public:
   bool debug_mode = false;
   int max_iter = 30;
 
+  /**
+   * Optimation configuration
+   */
+  struct OptimizationConfig {
+    double translation_threshold = 0.2;
+    double huber_epsilon = 0.01;
+    double estimation_precision = 5e-7;
+    double initial_damping = 1e-3;
+    int outer_loop_max_iteration = 10;
+    int inner_loop_max_iteration = 10;
+    OptimizationConfig() {}
+  };
+
   FeatureEstimator(const FeatureTrack &track,
                    const CameraStates &track_cam_states);
 
@@ -133,20 +146,22 @@ public:
                          Vec3 &p_G_f);
 
   /**
+   * Reprojection error
+   *
+   * @param T_Ci_C0 Relative transform from camera 0 to i-th camera
+   * @param z Measurement
+   * @param x Optimization parameters
+   * @returns Jacobian
+   */
+  Vec2 residual(const Mat4 &T_Ci_C0, const Vec2 &z, const Vec3 &x);
+
+  /**
    * Jacobian
    *
    * @param x Optimization parameters
    * @returns Jacobian
    */
-  MatX jacobian(const VecX &x);
-
-  /**
-   * Reprojection error
-   *
-   * @param x Optimization parameters
-   * @returns Jacobian
-   */
-  VecX reprojectionError(const VecX &x);
+  MatX jacobian(const Mat4 &T_Ci_C0, const VecX &x);
 
   /**
    * Estimate feature position in global frame

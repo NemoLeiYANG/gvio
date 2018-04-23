@@ -172,18 +172,18 @@ SET(
   # feature2d-feature_container_test
   # feature2d-feature_test
   # feature2d-feature_track_test
-  # feature2d-feature_tracker_test
+  feature2d-feature_tracker_test
   # feature2d-gms_matcher_test
   # feature2d-klt_tracker_test
-  # feature2d-orb_tracker_test
-  # feature2d-stereo_orb_tracker_test
+  feature2d-orb_tracker_test
+  feature2d-stereo_orb_tracker_test
   # feature2d-stereo_klt_tracker_test
   # gimbal-gmr-gmr_test
   # gimbal-sbgc_test
   # # gimbal-saliency_test
   # imu-mpu6050_test
   # msckf-camera_state_test
-  msckf-feature_estimator_test
+  # msckf-feature_estimator_test
   # msckf-imu_state_test
   # msckf-msckf_test
   # pwm-pca9685_test
@@ -209,16 +209,21 @@ FOREACH(TEST ${UNITTESTS})
   TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 ENDFOREACH(TEST)
 
-# # EXPERIMENTS
-# FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
-# FILE(COPY experiments/scripts DESTINATION ${PROJECT_BINARY_DIR}/experiments)
-# SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
-# SET(EXPERIMENTS kitti_runner euroc_runner sim_runner)
-# FOREACH(TEST ${EXPERIMENTS})
-#   STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
-#   ADD_EXECUTABLE(${TEST} experiments/${TEST_PATH}.cpp)
-#   TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
-# ENDFOREACH(TEST)
+# EXPERIMENTS
+FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
+FILE(COPY experiments/scripts DESTINATION ${PROJECT_BINARY_DIR}/experiments)
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
+SET(EXPERIMENTS
+  euroc_runner
+  feature_tracker_benchmarker
+  kitti_runner
+  sim_runner
+)
+FOREACH(TEST ${EXPERIMENTS})
+  STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
+  ADD_EXECUTABLE(${TEST} experiments/${TEST_PATH}.cpp)
+  TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+ENDFOREACH(TEST)
 
 # # TOOLS
 # SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tools)

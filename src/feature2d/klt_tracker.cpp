@@ -4,16 +4,16 @@ namespace gvio {
 
 KLTTracker::KLTTracker() {}
 
-KLTTracker::KLTTracker(CameraProperty *camera_property)
+KLTTracker::KLTTracker(const CameraProperty &camera_property)
     : camera_property{camera_property} {}
 
-KLTTracker::KLTTracker(CameraProperty *camera_property,
+KLTTracker::KLTTracker(const CameraProperty &camera_property,
                        const size_t min_track_length,
                        const size_t max_track_length)
     : camera_property{camera_property},
       features{min_track_length, max_track_length} {}
 
-KLTTracker::KLTTracker(CameraProperty *camera_property,
+KLTTracker::KLTTracker(const CameraProperty &camera_property,
                        const size_t min_track_length,
                        const size_t max_track_length,
                        const int max_corners,
@@ -27,8 +27,7 @@ std::vector<FeatureTrack> KLTTracker::getLostTracks() {
   // Get lost tracks
   std::vector<FeatureTrack> tracks;
   this->features.removeLostTracks(tracks);
-  if (this->camera_property == nullptr ||
-      this->camera_property->distortion_model.empty()) {
+  if (this->camera_property.distortion_model.empty()) {
     return tracks;
   }
 
@@ -36,7 +35,7 @@ std::vector<FeatureTrack> KLTTracker::getLostTracks() {
   for (auto &track : tracks) {
     for (auto &feature : track.track) {
       // Convert pixel coordinates to image coordinates
-      cv::Point2f pt_ud = this->camera_property->undistortPoint(feature.kp.pt);
+      cv::Point2f pt_ud = this->camera_property.undistortPoint(feature.kp.pt);
       feature.kp.pt.x = pt_ud.x;
       feature.kp.pt.y = pt_ud.y;
     }

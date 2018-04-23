@@ -94,16 +94,21 @@ int test_FeatureTracker_match() {
   tracker.detect(img1, f1);
 
   // Perform matching
-  tracker.show_matches = true;
+  tracker.show_matches = false;
   tracker.img_ref = img0;
   tracker.img_cur = img1;
 
   std::vector<cv::DMatch> matches;
   tracker.match(f1, matches);
-  cv::waitKey();
+  if (tracker.show_matches) {
+    cv::waitKey();
+  }
 
   // Asserts
   MU_CHECK(matches.size() > 0);
+  MU_CHECK(tracker.fea_ref.size() == tracker.features.tracking.size());
+  MU_CHECK(tracker.features.lost.size() == 0);
+  MU_CHECK(tracker.features.buffer.size() == tracker.fea_ref.size());
 
   return 0;
 }
@@ -122,8 +127,8 @@ void test_suite() {
   MU_ADD_TEST(test_FeatureTracker_constructor);
   MU_ADD_TEST(test_FeatureTracker_conversions);
   MU_ADD_TEST(test_FeatureTracker_match);
-  MU_ADD_TEST(test_FeatureTracker_initialize);
-  MU_ADD_TEST(test_FeatureTracker_update);
+  // MU_ADD_TEST(test_FeatureTracker_initialize);
+  // MU_ADD_TEST(test_FeatureTracker_update);
 }
 
 } // namespace gvio

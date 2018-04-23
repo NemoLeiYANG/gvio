@@ -10,7 +10,7 @@ int test_ORBTracker_update() {
   ORBTracker tracker;
 
   // Load dataset
-  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0001", "extract");
   if (raw_dataset.load() != 0) {
     return -1;
   }
@@ -20,19 +20,24 @@ int test_ORBTracker_update() {
   // capture >> img0;
 
   tracker.show_matches = true;
-  tracker.initialize(cv::imread(raw_dataset.cam0[0], CV_LOAD_IMAGE_COLOR));
+  tracker.initialize(cv::imread(raw_dataset.cam0[0]));
   // tracker.initialize(img0);
 
   for (int i = 1; i < 100; i++) {
-    cv::Mat image = cv::imread(raw_dataset.cam0[i], CV_LOAD_IMAGE_COLOR);
+    cv::Mat image = cv::imread(raw_dataset.cam0[i]);
     // cv::Mat image;
     // capture >> image;
 
     tracker.update(image);
-    // std::cout << tracker << std::endl;
+    // std::cout << "buffer size: " << tracker.features.buffer.size() <<
+    // std::endl;
+    // std::cout << "lost size: " << tracker.features.lost.size() << std::endl;
+    // std::cout << "tracking size: " << tracker.features.tracking.size()
+    //           << std::endl;
+    // std::cout << std::endl;
 
     // Break loop if 'q' was pressed
-    if (cv::waitKey(1) == 113) {
+    if (tracker.show_matches && cv::waitKey(1) == 113) {
       break;
     }
   }
@@ -42,7 +47,7 @@ int test_ORBTracker_update() {
 
 int test_ORBTracker_getLostTracks() {
   // Load raw dataset
-  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0005");
+  RawDataset raw_dataset(KITTI_RAW_DATASET, "2011_09_26", "0001");
   if (raw_dataset.load() != 0) {
     LOG_ERROR("Failed to load KITTI raw dataset [%s]!",
               KITTI_RAW_DATASET.c_str());

@@ -23,7 +23,6 @@ class StereoORBTracker {
 public:
   ORBTracker tracker0;
   ORBTracker tracker1;
-  GMSMatcher matcher;
   TrackID counter_track_id = 0;
 
   size_t min_track_length = 10;
@@ -31,8 +30,8 @@ public:
   bool show_matches = false;
 
   StereoORBTracker();
-  StereoORBTracker(CameraProperty *camprop0,
-                   CameraProperty *camprop1,
+  StereoORBTracker(const CameraProperty &camprop0,
+                   const CameraProperty &camprop1,
                    const size_t min_track_length,
                    const size_t max_track_length);
   virtual ~StereoORBTracker();
@@ -40,20 +39,29 @@ public:
   /**
    * Initialize stereo feature tracker
    *
-   * @param img0_cur Current image frame from camera0
-   * @param img1_cur Current image frame from camera1
+   * @param cam0_img Current image frame from camera0
+   * @param cam1_img Current image frame from camera1
    * @returns 0 for success, -1 for failure
    */
-  int initialize(const cv::Mat &img0_cur, const cv::Mat &img1_cur);
+  int initialize(const cv::Mat &cam0_img, const cv::Mat &cam1_img);
 
   /**
    * Update feature tracker
    *
-   * @param img0_cur Current image frame from camera0
-   * @param img1_cur Current image frame from camera1
+   * @param cam0_img Current image frame from camera0
+   * @param cam1_img Current image frame from camera1
    * @returns 0 for success, -1 for failure
    */
-  int update(const cv::Mat &img0_cur, const cv::Mat &img1_cur);
+  int update(const cv::Mat &cam0_img, const cv::Mat &cam1_img);
+
+  /**
+   * Update feature tracker
+   *
+   * @param cam0_img Current image frame from camera0
+   * @param cam1_img Current image frame from camera1
+   * @returns 0 for success, -1 for failure
+   */
+  int update2(const cv::Mat &cam0_img, const cv::Mat &cam1_img, long ts);
 
   /**
    * Get lost feature tracks

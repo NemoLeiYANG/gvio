@@ -164,7 +164,6 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
 
   } else {
     FATAL("Invalid feature track type [%d]", track.type);
-
   }
 
   return 0;
@@ -209,88 +208,62 @@ void FeatureEstimator::transformEstimate(const double alpha,
   p_G_f = z * C_C0G.transpose() * X + p_G_C0;
 }
 
-MatX FeatureEstimator::jacobian(const VecX &x) {
-  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
-  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
+Vec2 FeatureEstimator::residual(const Mat4 &T_Ci_C0,
+                                const Vec2 &z,
+                                const Vec3 &x) {
+  // Project estimated feature location to image plane
+  // -- Inverse depth params
+  const double alpha = x(0);
+  const double beta = x(1);
+  const double rho = x(2);
+  // -- Setup vectors and matrices
+  const Vec3 A{alpha, beta, 1.0};
+  const Mat3 C_CiC0 = T_Ci_C0.block(0, 0, 3, 3);
+  const Vec3 t_C0_CiC0 = T_Ci_C0.block(0, 3, 3, 1);
+  // -- Project estimated feature
+  const Vec3 h = C_CiC0 * A + rho * t_C0_CiC0;
 
-  double alpha = x(0);
-  double beta = x(1);
-  double rho = x(2);
+  // Calculate reprojection error
+  // -- Convert feature location to normalized coordinates
+  const Vec2 z_hat{h(0) / h(2), h(1) / h(2)};
+  // -- Reprojection error
+  const Vec2 r = z - z_hat;
 
-  const int N = this->track_cam_states.size();
-  MatX J = zeros(2 * N, 3);
-
-  for (int i = 0; i < N; i++) {
-    // Get camera current rotation and translation
-    const Mat3 C_CiG = C(track_cam_states[i].q_CG);
-    const Vec3 p_G_Ci = track_cam_states[i].p_G;
-
-    // Set camera 0 as origin, work out rotation and translation
-    // of camera i relative to to camera 0
-    const Mat3 C_CiC0 = C_CiG * C_C0G.transpose();
-    const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
-
-    // Project estimated feature location to image plane
-    const Vec3 A{alpha, beta, 1.0};
-    const Vec3 h = C_CiC0 * A + rho * t_Ci_CiC0;
-
-    // Compute jacobian
-    const double hx_div_hz2 = (h(0) / pow(h(2), 2));
-    const double hy_div_hz2 = (h(1) / pow(h(2), 2));
-
-    const Vec2 drdalpha{-C_CiC0(0, 0) / h(2) + hx_div_hz2 * C_CiC0(2, 0),
-                        -C_CiC0(1, 0) / h(2) + hy_div_hz2 * C_CiC0(2, 0)};
-
-    const Vec2 drdbeta{-C_CiC0(0, 1) / h(2) + hx_div_hz2 * C_CiC0(2, 1),
-                       -C_CiC0(1, 1) / h(2) + hy_div_hz2 * C_CiC0(2, 1)};
-
-    const Vec2 drdrho{-t_Ci_CiC0(0) / h(2) + hx_div_hz2 * t_Ci_CiC0(2),
-                      -t_Ci_CiC0(1) / h(2) + hy_div_hz2 * t_Ci_CiC0(2)};
-
-    // Fill in the jacobian
-    J.block(2 * i, 0, 2, 1) = drdalpha;
-    J.block(2 * i, 1, 2, 1) = drdbeta;
-    J.block(2 * i, 2, 2, 1) = drdrho;
-  }
-
-  return J;
+  return r;
 }
 
-VecX FeatureEstimator::reprojectionError(const VecX &x) {
-  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
-  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
-
-  const int N = this->track_cam_states.size();
-  VecX residuals = zeros(2 * N, 1);
-
+MatX FeatureEstimator::jacobian(const Mat4 &T_Ci_C0, const VecX &x) {
   double alpha = x(0);
   double beta = x(1);
   double rho = x(2);
 
-  for (int i = 0; i < N; i++) {
-    // Get camera current rotation and translation
-    const Mat3 C_CiG = C(track_cam_states[i].q_CG);
-    const Vec3 p_G_Ci = track_cam_states[i].p_G;
+  // Set camera 0 as origin, work out rotation and translation
+  // of camera i relative to to camera 0
+  const Mat3 C_CiC0 = T_Ci_C0.block(0, 0, 3, 3);
+  const Vec3 t_C0_CiC0 = T_Ci_C0.block(0, 3, 3, 1);
 
-    // Set camera 0 as origin, work out rotation and translation
-    // of camera i relative to to camera 0
-    const Mat3 C_CiC0 = C_CiG * C_C0G.transpose();
-    const Vec3 t_Ci_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
+  // Project estimated feature location to image plane
+  const Vec3 A{alpha, beta, 1.0};
+  const Vec3 h = C_CiC0 * A + rho * t_C0_CiC0;
 
-    // Project estimated feature location to image plane
-    const Vec3 A{alpha, beta, 1.0};
-    const Vec3 h = C_CiC0 * A + rho * t_Ci_CiC0;
+  // Compute jacobian
+  const double hx_div_hz2 = (h(0) / pow(h(2), 2));
+  const double hy_div_hz2 = (h(1) / pow(h(2), 2));
 
-    // Calculate reprojection error
-    // -- Convert measurment to image coordinates
-    const Vec2 z = track.track[i].getKeyPoint();
-    // -- Convert feature location to normalized coordinates
-    const Vec2 z_hat{h(0) / h(2), h(1) / h(2)};
-    // -- Reprojcetion error
-    residuals.block(2 * i, 0, 2, 1) = z - z_hat;
-  }
+  const Vec2 drdalpha{-C_CiC0(0, 0) / h(2) + hx_div_hz2 * C_CiC0(2, 0),
+                      -C_CiC0(1, 0) / h(2) + hy_div_hz2 * C_CiC0(2, 0)};
+  const Vec2 drdbeta{-C_CiC0(0, 1) / h(2) + hx_div_hz2 * C_CiC0(2, 1),
+                     -C_CiC0(1, 1) / h(2) + hy_div_hz2 * C_CiC0(2, 1)};
+  const Vec2 drdrho{-t_C0_CiC0(0) / h(2) + hx_div_hz2 * t_C0_CiC0(2),
+                    -t_C0_CiC0(1) / h(2) + hy_div_hz2 * t_C0_CiC0(2)};
 
-  return residuals;
+  // Fill in the jacobian
+  MatX J = zeros(2, 3);
+  J.block(2, 0, 2, 1) = drdalpha;
+  J.block(2, 1, 2, 1) = drdbeta;
+  J.block(2, 2, 2, 1) = drdrho;
+
+  return J;
 }
 
 int FeatureEstimator::estimate(Vec3 &p_G_f) {
@@ -300,39 +273,115 @@ int FeatureEstimator::estimate(Vec3 &p_G_f) {
     return -1;
   }
 
+  p_C0_f(0) += 0.01;
+  p_C0_f(1) -= 0.01;
+  p_C0_f(2) += 0.01;
+  std::cout << "p_C0_f: " << p_C0_f.transpose() << std::endl;
+
+  // Prepare data
+  const Mat3 C_C0G = C(this->track_cam_states[0].q_CG);
+  const Vec3 p_G_C0 = this->track_cam_states[0].p_G;
+  const int N = this->track_cam_states.size();
+  std::vector<Vec2> measurements;
+  std::vector<Mat4> cam_poses;
+  for (int i = 0; i < N; i++) {
+    // Add the measurement
+    measurements.push_back(this->track.track[i].getKeyPoint());
+
+    // Get camera current rotation and translation
+    const Mat3 C_CiG = C(this->track_cam_states[i].q_CG);
+    const Vec3 p_G_Ci = this->track_cam_states[i].p_G;
+
+    // Set camera 0 as origin, work out rotation and translation
+    // of camera i relative to to camera 0
+    const Mat3 C_CiC0 = C_CiG * C_C0G.transpose();
+    const Vec3 t_C0_CiC0 = C_CiG * (p_G_C0 - p_G_Ci);
+
+    // Add camera pose
+    const Mat4 T_Ci_CiC0 = transformation_matrix(C_CiC0, t_C0_CiC0);
+    cam_poses.push_back(T_Ci_CiC0);
+  }
+
   // Create inverse depth params (these are to be optimized)
   const double alpha = p_C0_f(0) / p_C0_f(2);
   const double beta = p_C0_f(1) / p_C0_f(2);
   const double rho = 1.0 / p_C0_f(2);
   Vec3 x{alpha, beta, rho};
 
-  // Optimize feature position
-  for (int k = 0; k < this->max_iter; k++) {
-    // Calculate residuals and jacobian
-    const VecX r = this->reprojectionError(x);
-    const MatX J = this->jacobian(x);
+  // Apply Levenberg-Marquart method to solve for the 3d position.
+  struct OptimizationConfig optimization_config;
+  double lambda = optimization_config.initial_damping;
+  int inner_loop_cntr = 0;
+  int outer_loop_cntr = 0;
+  bool is_cost_reduced = false;
+  double delta_norm = 0;
 
-    // Update optimization params using Gauss Newton
-    MatX H_approx = J.transpose() * J;
-    const VecX delta = H_approx.inverse() * J.transpose() * r;
-    x = x - delta;
+  // Compute the initial cost.
+  double total_cost = 0.0;
+  for (size_t i = 0; i < cam_poses.size(); i++) {
+    const Vec2 r = this->residual(cam_poses[i], measurements[i], x);
+    total_cost += r.squaredNorm();
+  }
 
-    // Debug
-    if (this->debug_mode) {
-      printf("iteration: %d  ", k);
-      printf("track_length: %ld  ", track.trackedLength());
-      printf("delta norm: %f  ", delta.norm());
-      printf("max_residual: %.2f  ", r.maxCoeff());
-      printf("\n");
-    }
+  // Outer loop.
+  while (outer_loop_cntr++ < optimization_config.outer_loop_max_iteration &&
+         delta_norm > optimization_config.estimation_precision) {
+    Mat3 A = Mat3::Zero();
+    Vec3 b = Vec3::Zero();
 
-    // Converged?
-    if (delta.norm() < 1e-8) {
-      if (this->debug_mode) {
-        printf("Converged!\n");
+    for (size_t i = 0; i < cam_poses.size(); ++i) {
+      // Calculate jacobian and residual
+      const MatX J = this->jacobian(cam_poses[i], x);
+      const Vec2 r = this->residual(cam_poses[i], measurements[i], x);
+
+      // Compute weight based on residual
+      double e = r.norm();
+      double w = 0.0;
+      if (e <= optimization_config.huber_epsilon) {
+        w = 1.0;
+      } else {
+        w = optimization_config.huber_epsilon / (2 * e);
       }
-      break;
+
+      // Apply weight
+      if (w == 1) {
+        A += J.transpose() * J;
+        b += J.transpose() * r;
+      } else {
+        double w_square = w * w;
+        A += w_square * J.transpose() * J;
+        b += w_square * J.transpose() * r;
+      }
     }
+
+    // Inner loop.
+    // Solve for the delta that can reduce the total cost.
+    while (inner_loop_cntr++ < optimization_config.inner_loop_max_iteration &&
+           !is_cost_reduced) {
+      const Mat3 damper = lambda * Mat3::Identity();
+      const Vec3 delta = (A + damper).ldlt().solve(b);
+      const Vec3 x_new = x - delta;
+      delta_norm = delta.norm();
+
+      double new_cost = 0.0;
+      for (size_t i = 0; i < cam_poses.size(); ++i) {
+        const Vec2 r = this->residual(cam_poses[i], measurements[i], x_new);
+        new_cost += r.squaredNorm();
+      }
+
+      if (new_cost < total_cost) {
+        is_cost_reduced = true;
+        x = x_new;
+        total_cost = new_cost;
+        lambda = lambda / 10 > 1e-10 ? lambda / 10 : 1e-10;
+
+      } else {
+        is_cost_reduced = false;
+        lambda = lambda * 10 < 1e12 ? lambda * 10 : 1e12;
+      }
+    }
+
+    inner_loop_cntr = 0;
   }
 
   // Transform feature position from camera to global frame

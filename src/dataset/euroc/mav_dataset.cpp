@@ -200,14 +200,14 @@ int MAVDataset::step() {
     // Camera callback
     if (this->mono_camera_cb != nullptr) {
       const cv::Mat frame = cv::imread(cam0_image_path);
-      if (this->mono_camera_cb(frame, this->ts_now) != 0) {
+      if (this->mono_camera_cb(frame) != 0) {
         LOG_ERROR("Mono camera callback failed! Stopping MAVDataset!");
         return -3;
       }
     } else if (this->stereo_camera_cb != nullptr) {
       const cv::Mat frame0 = cv::imread(cam0_image_path);
       const cv::Mat frame1 = cv::imread(cam1_image_path);
-      if (this->stereo_camera_cb(frame0, frame1, this->ts_now) != 0) {
+      if (this->stereo_camera_cb(frame0, frame1) != 0) {
         LOG_ERROR("Stereo camera callback failed! Stopping MAVDataset!");
         return -3;
       }
@@ -216,6 +216,8 @@ int MAVDataset::step() {
     // Measurement callback
     if (this->get_tracks_cb != nullptr) {
       FeatureTracks tracks = this->get_tracks_cb();
+      save_feature_tracks(tracks, "./stereo_orb_tracker");
+
       if (this->mea_cb != nullptr) {
         if (this->mea_cb(tracks) != 0) {
           LOG_ERROR("Measurement callback failed! Stopping MAVDataset!");
@@ -244,8 +246,8 @@ int MAVDataset::step() {
 }
 
 int MAVDataset::run() {
-  // for (size_t i = 0; i < this->timestamps.size(); i++) {
-  for (size_t i = 0; i < 600; i++) {
+  for (size_t i = 0; i < this->timestamps.size(); i++) {
+    // for (size_t i = 0; i < 600; i++) {
     const int retval = this->step();
     if (retval != 0) {
       return retval;

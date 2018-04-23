@@ -14,5 +14,6 @@
 #include "gvio/feature2d/klt_tracker.hpp"
 #include "gvio/feature2d/orb_tracker.hpp"
 #include "gvio/feature2d/stereo_orb_tracker.hpp"
+#include "gvio/feature2d/stereo_klt_tracker.hpp"
 
 #endif // GVIO_FEATURE2D_HPP

@@ -21,7 +21,7 @@ namespace gvio {
 class KLTTracker {
 public:
   // Camera model
-  CameraProperty *camera_property = nullptr;
+  CameraProperty camera_property;
 
   FrameID counter_frame_id = -1;
   FeatureContainer features;
@@ -42,13 +42,13 @@ public:
 
   KLTTracker();
 
-  KLTTracker(CameraProperty *camera_property);
+  KLTTracker(const CameraProperty &camera_property);
 
-  KLTTracker(CameraProperty *camera_property,
+  KLTTracker(const CameraProperty &camera_property,
              const size_t min_track_length,
              const size_t max_track_length);
 
-  KLTTracker(CameraProperty *camera_property,
+  KLTTracker(const CameraProperty &camera_property,
              const size_t min_track_length,
              const size_t max_track_length,
              const int max_corners,

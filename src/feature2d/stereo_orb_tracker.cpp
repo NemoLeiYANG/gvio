@@ -4,8 +4,8 @@ namespace gvio {
 
 StereoORBTracker::StereoORBTracker() {}
 
-StereoORBTracker::StereoORBTracker(CameraProperty *camprop0,
-                                   CameraProperty *camprop1,
+StereoORBTracker::StereoORBTracker(const CameraProperty &camprop0,
+                                   const CameraProperty &camprop1,
                                    const size_t min_track_length,
                                    const size_t max_track_length)
     : tracker0{camprop0, min_track_length, max_track_length},
@@ -14,11 +14,11 @@ StereoORBTracker::StereoORBTracker(CameraProperty *camprop0,
 
 StereoORBTracker::~StereoORBTracker() {}
 
-int StereoORBTracker::initialize(const cv::Mat &img0_cur,
-                                 const cv::Mat &img1_cur) {
+int StereoORBTracker::initialize(const cv::Mat &cam0_img,
+                                 const cv::Mat &cam1_img) {
   int retval = 0;
-  retval += this->tracker0.initialize(img0_cur);
-  retval += this->tracker1.initialize(img1_cur);
+  retval += this->tracker0.initialize(cam0_img);
+  retval += this->tracker1.initialize(cam1_img);
   if (retval != 0) {
     return -1;
   }
@@ -26,11 +26,11 @@ int StereoORBTracker::initialize(const cv::Mat &img0_cur,
   return 0;
 }
 
-int StereoORBTracker::update(const cv::Mat &img0_cur, const cv::Mat &img1_cur) {
+int StereoORBTracker::update(const cv::Mat &cam0_img, const cv::Mat &cam1_img) {
   // Detect features
   int retval = 0;
-  retval += this->tracker0.update(img0_cur);
-  retval += this->tracker1.update(img1_cur);
+  retval += this->tracker0.update(cam0_img);
+  retval += this->tracker1.update(cam1_img);
   if (retval != 0) {
     return -1;
   }
@@ -47,7 +47,8 @@ int StereoORBTracker::update(const cv::Mat &img0_cur, const cv::Mat &img1_cur) {
 
   // Use matcher to match features
   std::vector<cv::DMatch> matches;
-  this->matcher.match(k0, d0, k1, d1, img0_cur.size(), matches);
+  auto matcher = GMSMatcher();
+  matcher.match(k0, d0, k1, d1, cam0_img.size(), matches);
 
   // Initialize list of outliers with inliers
   std::vector<TrackID> outliers0 = this->tracker0.features.tracking;
@@ -90,11 +91,19 @@ int StereoORBTracker::update(const cv::Mat &img0_cur, const cv::Mat &img1_cur) {
 
   // Visualize matches
   if (this->show_matches) {
-    cv::Mat match_img = draw_matches(img0_cur, img1_cur, k0, k1, matches);
+    cv::Mat match_img = draw_matches(cam0_img, cam1_img, k0, k1, matches);
     cv::imshow("Matches", match_img);
+    cv::waitKey(1);
   }
 
   return 0;
+}
+
+int StereoORBTracker::update2(const cv::Mat &cam0_img,
+                              const cv::Mat &cam1_img,
+                              long ts) {
+  UNUSED(ts);
+  return this->update(cam0_img, cam1_img);
 }
 
 std::vector<FeatureTrack> StereoORBTracker::getLostTracks() {
@@ -135,16 +144,21 @@ std::vector<FeatureTrack> StereoORBTracker::getLostTracks() {
                                track0.frame_end,
                                track0.track,
                                track1.track);
-    this->counter_track_id++;
 
     // Remove them from tracker0 and tracker1
     this->tracker0.features.removeTrack(track0.track_id, false);
     this->tracker1.features.removeTrack(track1.track_id, false);
-
-    // Assert
     assert(this->tracker0.features.buffer.count(track0.track_id) == 0);
     assert(this->tracker1.features.buffer.count(track1.track_id) == 0);
+
+    this->counter_track_id++;
   }
+
+  // Clear lost tracks
+  this->tracker0.features.lost.clear();
+  this->tracker1.features.lost.clear();
+  assert(this->tracker0.features.lost.size() == 0);
+  assert(this->tracker1.features.lost.size() == 0);
 
   return stereo_tracks;
 }

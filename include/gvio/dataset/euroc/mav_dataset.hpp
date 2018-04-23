@@ -34,10 +34,13 @@ namespace gvio {
             std::placeholders::_3);
 
 #define BIND_MONO_CAMERA_CALLBACK(CLASS_METHOD, INSTANCE)                      \
+  std::bind(&CLASS_METHOD, &INSTANCE, std::placeholders::_1);
+
+#define BIND_STEREO_CAMERA_CALLBACK(CLASS_METHOD, INSTANCE)                    \
   std::bind(&CLASS_METHOD,                                                     \
             &INSTANCE,                                                         \
             std::placeholders::_1,                                             \
-            std::placeholders::_2);
+            std::placeholders::_2)
 
 #define BIND_GET_TRACKS_CALLBACK(CLASS_METHOD, INSTANCE)                       \
   std::bind(&CLASS_METHOD, &INSTANCE);
@@ -111,11 +114,12 @@ public:
   std::vector<long> timestamps;
   std::map<long, double> time;
   std::multimap<long, DatasetEvent> timeline;
+  FeatureTracks feature_tracks;
 
   // clang-format off
   std::function<VecX()> get_state;
-  std::function<int(const cv::Mat &frame, const long ts)> mono_camera_cb;
-  std::function<int(const cv::Mat &frame0, const cv::Mat &frame1, const long ts)> stereo_camera_cb;
+  std::function<int(const cv::Mat &frame)> mono_camera_cb;
+  std::function<int(const cv::Mat &frame0, const cv::Mat &frame1)> stereo_camera_cb;
   std::function<std::vector<FeatureTrack>()> get_tracks_cb;
   std::function<int(const Vec3 &a_m, const Vec3 &w_m, const long ts)> imu_cb;
   std::function<int(const FeatureTracks &tracks)> mea_cb;

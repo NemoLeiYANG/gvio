@@ -51,7 +51,6 @@ int FeatureContainer::addStereoTrack(const FrameID &frame_id,
   this->buffer.emplace(track_id, track);
 
   this->counter_track_id++;
-
   return 0;
 }
 
@@ -71,7 +70,7 @@ int FeatureContainer::removeTrack(const TrackID &track_id, const bool lost) {
 
   // Mark as lost or remove from buffer
   auto track = this->buffer.at(track_id);
-  if (track.trackedLength() > this->min_track_length && lost) {
+  if (track.trackedLength() >= this->min_track_length && lost) {
     this->lost.push_back(track_id);
   } else {
     this->buffer.erase(buf_index);
@@ -193,6 +192,7 @@ std::vector<cv::Point2f> FeatureContainer::getKeyPointsTracking() {
 
 std::vector<FeatureTrack> FeatureContainer::purge(const size_t n) {
   std::vector<FeatureTrack> tracks;
+  std::vector<TrackID> remove_track_ids;
 
   /**
    * Note: Map is ordered (source: https://stackoverflow.com/q/7648756/154688)
@@ -202,13 +202,17 @@ std::vector<FeatureTrack> FeatureContainer::purge(const size_t n) {
     auto track_id = kv.first;
     auto track = kv.second;
 
+    remove_track_ids.push_back(track_id);
     tracks.push_back(track);
-    this->buffer.erase(track_id);
 
     counter++;
     if (counter == n) {
       break;
     }
+  }
+
+  for (auto track_id : remove_track_ids) {
+    this->buffer.erase(track_id);
   }
 
   return tracks;

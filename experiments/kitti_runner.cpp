@@ -1,8 +1,8 @@
-#include "gvio/dataset/kitti/kitti.hpp"
 #include "gvio/msckf/msckf.hpp"
 #include "gvio/msckf/blackbox.hpp"
+#include "gvio/dataset/kitti/kitti.hpp"
 #include "gvio/feature2d/klt_tracker.hpp"
-#include "gvio/feature2d/orb_tracker.hpp"
+#include "gvio/quaternion/quaternion.hpp"
 
 using namespace gvio;
 
@@ -68,16 +68,16 @@ int main(const int argc, const char *argv[]) {
   cv::Mat img_ref = cv::imread(raw_dataset.cam0[0]);
 
   // Setup camera model
-  const int image_width = img_ref.cols;
-  const int image_height = img_ref.rows;
   const double fx = raw_dataset.calib_cam_to_cam.K[0](0, 0);
   const double fy = raw_dataset.calib_cam_to_cam.K[0](1, 1);
   const double cx = raw_dataset.calib_cam_to_cam.K[0](0, 2);
   const double cy = raw_dataset.calib_cam_to_cam.K[0](1, 2);
-  PinholeModel pinhole_model{image_width, image_height, fx, fy, cx, cy};
+  const int image_width = img_ref.cols;
+  const int image_height = img_ref.rows;
+  CameraProperty camera_property{0, fx, fy, cx, cy, image_width, image_height};
 
   // Setup feature tracker
-  KLTTracker tracker{&pinhole_model};
+  KLTTracker tracker{camera_property};
   tracker.initialize(img_ref);
 
   // Setup MSCKF

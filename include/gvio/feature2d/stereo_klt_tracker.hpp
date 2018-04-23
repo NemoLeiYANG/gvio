@@ -137,6 +137,8 @@ public:
    */
   int update(const cv::Mat &img0_cur, const cv::Mat &img1_cur);
 
+  int update2(const cv::Mat &img0_cur, const cv::Mat &img1_cur, long ts);
+
   /**
    * Get lost feature tracks
    *

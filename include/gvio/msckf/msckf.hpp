@@ -22,7 +22,6 @@
 #include "gvio/msckf/camera_state.hpp"
 #include "gvio/msckf/feature_estimator.hpp"
 #include "gvio/msckf/imu_state.hpp"
-#include "gvio/msckf/msckf.hpp"
 
 namespace gvio {
 /**
