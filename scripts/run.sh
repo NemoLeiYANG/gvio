@@ -41,7 +41,7 @@ cmake .. && time make -j${CPU_COUNT}
 # ./feature_tracker_benchmarker /data/euroc_mav/raw/V1_01_easy; exit 0
 
 # TESTS
-# cd tests
+cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test
@@ -80,7 +80,7 @@ cmake .. && time make -j${CPU_COUNT}
 # ./imu-mpu6050_test
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
-# ./msckf-feature_estimator_test
+./msckf-feature_estimator_test
 # ./msckf-msckf_test
 # ./msckf-profiler_test
 # ./pwm-pca9685_test

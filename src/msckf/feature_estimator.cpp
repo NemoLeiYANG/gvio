@@ -259,9 +259,9 @@ MatX FeatureEstimator::jacobian(const Mat4 &T_Ci_C0, const VecX &x) {
 
   // Fill in the jacobian
   MatX J = zeros(2, 3);
-  J.block(2, 0, 2, 1) = drdalpha;
-  J.block(2, 1, 2, 1) = drdbeta;
-  J.block(2, 2, 2, 1) = drdrho;
+  J.block(0, 0, 2, 1) = drdalpha;
+  J.block(0, 1, 2, 1) = drdbeta;
+  J.block(0, 2, 2, 1) = drdrho;
 
   return J;
 }
@@ -273,9 +273,9 @@ int FeatureEstimator::estimate(Vec3 &p_G_f) {
     return -1;
   }
 
-  p_C0_f(0) += 0.01;
-  p_C0_f(1) -= 0.01;
-  p_C0_f(2) += 0.01;
+  p_C0_f(0) += 0.1;
+  p_C0_f(1) -= 0.1;
+  p_C0_f(2) += 0.1;
   std::cout << "p_C0_f: " << p_C0_f.transpose() << std::endl;
 
   // Prepare data
@@ -320,12 +320,13 @@ int FeatureEstimator::estimate(Vec3 &p_G_f) {
   double total_cost = 0.0;
   for (size_t i = 0; i < cam_poses.size(); i++) {
     const Vec2 r = this->residual(cam_poses[i], measurements[i], x);
+    std::cout << "residual: " << r.transpose() << std::endl;
     total_cost += r.squaredNorm();
   }
 
   // Outer loop.
-  while (outer_loop_cntr++ < optimization_config.outer_loop_max_iteration &&
-         delta_norm > optimization_config.estimation_precision) {
+  do {
+    std::cout << "outer_loop_cntr: " << outer_loop_cntr << std::endl;
     Mat3 A = Mat3::Zero();
     Vec3 b = Vec3::Zero();
 
@@ -356,8 +357,7 @@ int FeatureEstimator::estimate(Vec3 &p_G_f) {
 
     // Inner loop.
     // Solve for the delta that can reduce the total cost.
-    while (inner_loop_cntr++ < optimization_config.inner_loop_max_iteration &&
-           !is_cost_reduced) {
+    do {
       const Mat3 damper = lambda * Mat3::Identity();
       const Vec3 delta = (A + damper).ldlt().solve(b);
       const Vec3 x_new = x - delta;
@@ -379,10 +379,12 @@ int FeatureEstimator::estimate(Vec3 &p_G_f) {
         is_cost_reduced = false;
         lambda = lambda * 10 < 1e12 ? lambda * 10 : 1e12;
       }
-    }
+    } while (inner_loop_cntr++ < optimization_config.inner_loop_max_iteration &&
+             !is_cost_reduced);
 
     inner_loop_cntr = 0;
-  }
+  } while (outer_loop_cntr++ < optimization_config.outer_loop_max_iteration &&
+           delta_norm > optimization_config.estimation_precision);
 
   // Transform feature position from camera to global frame
   this->transformEstimate(x(0), x(1), x(2), p_G_f);
