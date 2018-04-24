@@ -98,6 +98,15 @@ Mat4 rvectvec2transform(const cv::Mat &rvec, const cv::Mat &tvec);
  */
 cv::Matx33d skew(const cv::Vec3d &v);
 
+/**
+ * Sort Keypoints
+ *
+ * @param keypoints
+ * @returns Sorted keypoints by response
+ */
+std::vector<cv::KeyPoint>
+sort_keypoints(const std::vector<cv::KeyPoint> keypoints);
+
 /** @} group vision */
 } // namespace gvio
 #endif // GVIO_UTIL_VISION_HPP

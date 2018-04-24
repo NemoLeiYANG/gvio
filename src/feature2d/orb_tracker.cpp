@@ -19,10 +19,17 @@ int ORBTracker::detect(const cv::Mat &image, Features &features) {
   std::vector<cv::KeyPoint> keypoints;
   cv::Mat mask;
   cv::Mat descriptors;
-  this->orb->detectAndCompute(image, mask, keypoints, descriptors);
+  // this->orb->detectAndCompute(image, mask, keypoints, descriptors);
 
-  // cv::FAST(image, keypoints, 20, false);
-  // this->orb->compute(image, keypoints, descriptors);
+  cv::Mat image_gray;
+  cv::cvtColor(image, image_gray, CV_BGR2GRAY);
+  cv::FAST(image_gray, keypoints, 40.0, false);
+  this->orb->compute(image, keypoints, descriptors);
+
+  // for (auto kp : keypoints) {
+  //   std::cout << kp.response << std::endl;
+  // }
+  // exit(0);
 
   // Update counters
   this->counter_frame_id += 1;

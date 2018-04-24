@@ -62,6 +62,7 @@ cd tests
 # ./feature2d-feature_track_test
 # ./feature2d-feature_tracker_test
 # ./feature2d-gms_matcher_test
+./feature2d-grid_fast_test
 # ./feature2d-klt_tracker_test
 # ./feature2d-orb_tracker_test
 # ./feature2d-stereo_orb_tracker_test
@@ -80,7 +81,7 @@ cd tests
 # ./imu-mpu6050_test
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
-./msckf-feature_estimator_test
+# ./msckf-feature_estimator_test
 # ./msckf-msckf_test
 # ./msckf-profiler_test
 # ./pwm-pca9685_test

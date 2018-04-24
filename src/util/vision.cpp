@@ -81,4 +81,26 @@ cv::Matx33d skew(const cv::Vec3d &v) {
   // clang-format on
 }
 
+std::vector<cv::KeyPoint>
+sort_keypoints(const std::vector<cv::KeyPoint> keypoints) {
+  // Obtain vector responses
+  std::vector<int> responses;
+  for (size_t i = 0; i < keypoints.size(); i++) {
+    responses.push_back(keypoints[i].response);
+  }
+
+  // Sort responses
+  std::vector<int> index(responses.size());
+  std::iota(std::begin(index), std::end(index), 0);
+  cv::sortIdx(responses, index, CV_SORT_DESCENDING);
+
+  // Form sorted keypoints
+  std::vector<cv::KeyPoint> keypoints_sorted;
+  for (size_t i = 0; i < keypoints.size(); i++) {
+    keypoints_sorted.push_back(keypoints[index[i]]);
+  }
+
+  return keypoints_sorted;
+}
+
 } // namespace gvio

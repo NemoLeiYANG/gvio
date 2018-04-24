@@ -25,8 +25,6 @@ int test_ORBTracker_update() {
 
   for (int i = 1; i < 100; i++) {
     cv::Mat image = cv::imread(raw_dataset.cam0[i]);
-    // cv::Mat image;
-    // capture >> image;
 
     tracker.update(image);
     // std::cout << "buffer size: " << tracker.features.buffer.size() <<

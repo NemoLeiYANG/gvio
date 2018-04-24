@@ -74,6 +74,7 @@ ADD_LIBRARY(
   src/feature2d/feature_track.cpp
   src/feature2d/feature_tracker.cpp
   src/feature2d/gms_matcher.cpp
+  src/feature2d/grid_fast.cpp
   src/feature2d/orb_tracker.cpp
   src/feature2d/klt_tracker.cpp
   src/feature2d/stereo_orb_tracker.cpp
@@ -176,6 +177,7 @@ SET(
   # feature2d-gms_matcher_test
   # feature2d-klt_tracker_test
   # feature2d-orb_tracker_test
+  feature2d-grid_fast_test
   # feature2d-stereo_orb_tracker_test
   # feature2d-stereo_klt_tracker_test
   # gimbal-gmr-gmr_test
