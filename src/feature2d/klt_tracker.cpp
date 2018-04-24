@@ -54,21 +54,27 @@ int KLTTracker::initialize(const cv::Mat &img_cur) {
 
 int KLTTracker::detect(const cv::Mat &image, Features &features) {
   // Convert image to gray scale
-  cv::Mat gray_image;
-  cv::cvtColor(image, gray_image, CV_BGR2GRAY);
+  cv::Mat image_gray;
+  cv::cvtColor(image, image_gray, CV_BGR2GRAY);
 
-  // Feature detection
-  std::vector<cv::Point2f> corners;
-  cv::goodFeaturesToTrack(gray_image,
-                          corners,
-                          this->max_corners,
-                          this->quality_level,
-                          this->min_distance);
+  // // Feature detection
+  // std::vector<cv::Point2f> corners;
+  // cv::goodFeaturesToTrack(image_gray,
+  //                         corners,
+  //                         this->max_corners,
+  //                         this->quality_level,
+  //                         this->min_distance);
+  //
+  // // Create features
+  // features.clear();
+  // for (auto corner : corners) {
+  //   features.emplace_back(corner);
+  // }
 
-  // Create features
+  auto keypoints = grid_fast(image_gray, this->max_corners, 5, 5, 40.0);
   features.clear();
-  for (auto corner : corners) {
-    features.emplace_back(corner);
+  for (auto keypoint : keypoints) {
+    features.emplace_back(keypoint);
   }
 
   return 0;

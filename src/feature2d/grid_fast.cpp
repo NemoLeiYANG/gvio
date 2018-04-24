@@ -2,104 +2,8 @@
 
 namespace gvio {
 
-std::vector<cv::KeyPoint> SSC(std::vector<cv::KeyPoint> keyPoints,
-                              int numRetPoints,
-                              float tolerance,
-                              int cols,
-                              int rows) {
-  // Several temp expression variables to simplify solution equation
-  int exp1 = rows + cols + 2 * numRetPoints;
-  long long exp2 =
-      ((long long) 4 * cols + (long long) 4 * numRetPoints +
-       (long long) 4 * rows * numRetPoints + (long long) rows * rows +
-       (long long) cols * cols - (long long) 2 * rows * cols +
-       (long long) 4 * rows * cols * numRetPoints);
-  double exp3 = sqrt(exp2);
-  double exp4 = (2 * (numRetPoints - 1));
-
-  double sol1 = -round((exp1 + exp3) / exp4); // first solution
-  double sol2 = -round((exp1 - exp3) / exp4); // second solution
-
-  // Binary search range initialization with positive solution
-  int high = (sol1 > sol2) ? sol1 : sol2;
-  int low = floor(sqrt((double) keyPoints.size() / numRetPoints));
-
-  int width;
-  int prevWidth = -1;
-
-  std::vector<int> ResultVec;
-  bool complete = false;
-  unsigned int K = numRetPoints;
-  unsigned int Kmin = round(K - (K * tolerance));
-  unsigned int Kmax = round(K + (K * tolerance));
-
-  std::vector<int> result;
-  result.reserve(keyPoints.size());
-  while (!complete) {
-    width = low + (high - low) / 2;
-
-    // Needed to reassure the same radius is not repeated again
-    if (width == prevWidth || low > high) {
-      // Return the keypoints from the previous iteration
-      ResultVec = result;
-      break;
-    }
-    result.clear();
-    double c = width / 2; // initializing Grid
-    int numCellCols = floor(cols / c);
-    int numCellRows = floor(rows / c);
-    std::vector<std::vector<bool>> coveredVec(numCellRows + 1,
-                                              std::vector<bool>(numCellCols + 1,
-                                                                false));
-
-    for (unsigned int i = 0; i < keyPoints.size(); ++i) {
-      // Get position of the cell current point is located at
-      int row = floor(keyPoints[i].pt.y / c);
-      int col = floor(keyPoints[i].pt.x / c);
-
-      // If the cell is not covered
-      if (coveredVec[row][col] == false) {
-        result.push_back(i);
-        int rowMin = ((row - floor(width / c)) >= 0)
-                         ? (row - floor(width / c))
-                         : 0; // get range which current radius is covering
-        int rowMax = ((row + floor(width / c)) <= numCellRows)
-                         ? (row + floor(width / c))
-                         : numCellRows;
-        int colMin =
-            ((col - floor(width / c)) >= 0) ? (col - floor(width / c)) : 0;
-        int colMax = ((col + floor(width / c)) <= numCellCols)
-                         ? (col + floor(width / c))
-                         : numCellCols;
-        for (int rowToCov = rowMin; rowToCov <= rowMax; ++rowToCov) {
-          for (int colToCov = colMin; colToCov <= colMax; ++colToCov) {
-            if (!coveredVec[rowToCov][colToCov])
-              coveredVec[rowToCov][colToCov] = true; // cover cells within the
-                                                     // square bounding box with
-                                                     // width w
-          }
-        }
-      }
-    }
-
-    if (result.size() >= Kmin && result.size() <= Kmax) { // solution found
-      ResultVec = result;
-      complete = true;
-    } else if (result.size() < Kmin)
-      high = width - 1; // update binary search range
-    else
-      low = width + 1;
-    prevWidth = width;
-  }
-  // retrieve final keypoints
-  std::vector<cv::KeyPoint> kp;
-  for (unsigned int i = 0; i < ResultVec.size(); i++)
-    kp.push_back(keyPoints[ResultVec[i]]);
-
-  return kp;
-}
-
 std::vector<cv::KeyPoint> grid_fast(const cv::Mat &image,
+                                    const int max_corners,
                                     const int grid_rows,
                                     const int grid_cols,
                                     const double threshold,
@@ -113,24 +17,55 @@ std::vector<cv::KeyPoint> grid_fast(const cv::Mat &image,
     image_gray = image.clone();
   }
 
-  // Detect corners
-  std::vector<cv::KeyPoint> keypoints;
-  cv::FAST(image_gray, keypoints, threshold, nonmax_suppression);
-  keypoints = sort_keypoints(keypoints);
-  keypoints = SSC(keypoints, 1000, 0.1, image.cols, image.rows);
+  // Calculate number of grid cells and max corners per cell
+  const int image_width = image.cols;
+  const int image_height = image.rows;
+  const int dx = image_width / grid_cols;
+  const int dy = image_height / grid_rows;
+  const int nb_cells = grid_rows * grid_cols;
+  const size_t max_corners_per_cell = (float) max_corners / (float) nb_cells;
+
+  // Detect corners in each grid cell
+  std::vector<cv::KeyPoint> keypoints_all;
+  for (int x = 0; x < image_width; x += dx) {
+    for (int y = 0; y < image_height; y += dy) {
+      // Make sure roi width and height are not out of bounds
+      const double w = (x + dx > image_width) ? image_width - x : dx;
+      const double h = (y + dy > image_height) ? image_height - y : dy;
+
+      // Detect corners in grid cell
+      cv::Rect roi = cv::Rect(x, y, w, h);
+      std::vector<cv::KeyPoint> keypoints;
+      cv::FAST(image_gray(roi), keypoints, threshold, nonmax_suppression);
+
+      // Sort by keypoint response
+      keypoints = sort_keypoints(keypoints);
+
+      // Adjust keypoint's position according to the offset limit to max
+      // corners per cell
+      std::vector<cv::KeyPoint> keypoints_adjusted;
+      for (auto &kp : keypoints) {
+        keypoints_adjusted.emplace_back(kp.pt.x += x, kp.pt.y += y, kp.size);
+        if (keypoints_adjusted.size() == max_corners_per_cell) {
+          break;
+        }
+      }
+
+      // Add to total keypoints detected
+      keypoints_all.insert(std::end(keypoints_all),
+                           std::begin(keypoints_adjusted),
+                           std::end(keypoints_adjusted));
+    }
+  }
 
   // Debug
   if (debug) {
     // Draw corners
-    for (auto kp : keypoints) {
+    for (auto kp : keypoints_all) {
       cv::circle(image, kp.pt, 2, cv::Scalar(0, 255, 0), -1);
     }
 
     // Draw vertical lines
-    const int image_width = image.cols;
-    const int image_height = image.rows;
-    const int dx = image_width / grid_cols;
-    const int dy = image_height / grid_rows;
     for (int x = dx; x < image_width; x += dx) {
       const cv::Point start(x, 0);
       const cv::Point end(x, image_height);
@@ -147,11 +82,11 @@ std::vector<cv::KeyPoint> grid_fast(const cv::Mat &image,
     }
 
     // Draw
-    cv::imshow("Grid Fast Debug", image);
+    cv::imshow("Grid Fast", image);
     cv::waitKey(1);
   }
 
-  return keypoints;
+  return keypoints_all;
 }
 
 } // namespace gvio

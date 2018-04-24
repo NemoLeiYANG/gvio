@@ -43,20 +43,22 @@ int main(const int argc, const char *argv[]) {
   const VecX cam1_D = mav_data.cam0_data.distortion_coefficients;
   CameraProperty camprop1{1, "pinhole", cam1_K, "radtan", cam1_D, image_size};
 
-  // Mono ORB tracker
-  // clang-format off
-  ORBTracker orb_tracker(camprop0, 2, 100);
-  orb_tracker.show_matches = false;
-  mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(ORBTracker::update, orb_tracker);
-  mav_data.get_tracks_cb = BIND_GET_TRACKS_CALLBACK(ORBTracker::getLostTracks, orb_tracker);
-  mav_data.run();
-  save_feature_tracks(mav_data.feature_tracks, "/tmp/orb_feature_tracks");
-  // clang-format on
+  // // Mono ORB tracker
+  // // clang-format off
+  // ORBTracker orb_tracker(camprop0, 2, 100);
+  // orb_tracker.show_matches = true;
+  // mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(ORBTracker::update,
+  // orb_tracker);
+  // mav_data.get_tracks_cb =
+  // BIND_GET_TRACKS_CALLBACK(ORBTracker::getLostTracks, orb_tracker);
+  // mav_data.run();
+  // save_feature_tracks(mav_data.feature_tracks, "/tmp/orb_feature_tracks");
+  // // clang-format on
 
   // Mono ORB tracker
   // clang-format off
   KLTTracker klt_tracker(camprop0, 2, 100);
-  klt_tracker.show_matches = false;
+  klt_tracker.show_matches = true;
   mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(KLTTracker::update, klt_tracker);
   mav_data.get_tracks_cb = BIND_GET_TRACKS_CALLBACK(KLTTracker::getLostTracks, klt_tracker);
   mav_data.run();

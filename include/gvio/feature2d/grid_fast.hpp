@@ -26,6 +26,7 @@ namespace gvio {
  * Grid fast
  *
  * @param image Input image
+ * @param max_corners Max number of corners
  * @param grid_rows Number of grid rows
  * @param grid_cols Number of grid cols
  * @param threshold Fast threshold
@@ -35,10 +36,11 @@ namespace gvio {
  * @returns List of keypoints
  */
 std::vector<cv::KeyPoint> grid_fast(const cv::Mat &image,
-                                    const int grid_rows,
-                                    const int grid_cols,
-                                    const double threshold,
-                                    const bool nonmax_suppression,
+                                    const int max_corners = 100,
+                                    const int grid_rows = 5,
+                                    const int grid_cols = 5,
+                                    const double threshold = 10.0,
+                                    const bool nonmax_suppression = true,
                                     const bool debug = false);
 
 /** @} group feature2d */

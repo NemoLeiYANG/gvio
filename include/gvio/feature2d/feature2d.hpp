@@ -11,6 +11,7 @@
 #include "gvio/feature2d/feature_track.hpp"
 #include "gvio/feature2d/feature_tracker.hpp"
 #include "gvio/feature2d/gms_matcher.hpp"
+#include "gvio/feature2d/grid_fast.hpp"
 #include "gvio/feature2d/klt_tracker.hpp"
 #include "gvio/feature2d/orb_tracker.hpp"
 #include "gvio/feature2d/stereo_orb_tracker.hpp"

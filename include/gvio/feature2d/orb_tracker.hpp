@@ -6,6 +6,7 @@
 #define GVIO_FEATURE2D_ORB_TRACKER_HPP
 
 #include "gvio/feature2d/feature_tracker.hpp"
+#include "gvio/feature2d/grid_fast.hpp"
 
 namespace gvio {
 /**

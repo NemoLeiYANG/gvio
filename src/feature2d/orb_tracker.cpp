@@ -23,7 +23,7 @@ int ORBTracker::detect(const cv::Mat &image, Features &features) {
 
   cv::Mat image_gray;
   cv::cvtColor(image, image_gray, CV_BGR2GRAY);
-  cv::FAST(image_gray, keypoints, 40.0, false);
+  keypoints = grid_fast(image_gray, 1000, 5, 5, 40.0);
   this->orb->compute(image, keypoints, descriptors);
 
   // for (auto kp : keypoints) {
