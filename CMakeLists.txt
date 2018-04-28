@@ -5,8 +5,8 @@ PROJECT(gvio)
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(BUILD_SHARED_LIBS ON)
-# SET(CMAKE_BUILD_TYPE RELEASE)
-SET(CMAKE_BUILD_TYPE DEBUG)
+SET(CMAKE_BUILD_TYPE RELEASE)
+# SET(CMAKE_BUILD_TYPE DEBUG)
 # SET(CMAKE_IGNORE_PATH `catkin locate`)
 
 # DEPENDENCIES
@@ -177,7 +177,7 @@ SET(
   # feature2d-gms_matcher_test
   # feature2d-klt_tracker_test
   # feature2d-orb_tracker_test
-  feature2d-grid_fast_test
+  # feature2d-grid_fast_test
   # feature2d-stereo_orb_tracker_test
   # feature2d-stereo_klt_tracker_test
   # gimbal-gmr-gmr_test
@@ -216,8 +216,9 @@ FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
 FILE(COPY experiments/scripts DESTINATION ${PROJECT_BINARY_DIR}/experiments)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
 SET(EXPERIMENTS
+  bundle_adjustment_benchmark
   euroc_runner
-  feature_tracker_benchmarker
+  tracker_benchmark
   kitti_runner
   sim_runner
 )

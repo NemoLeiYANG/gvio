@@ -10,7 +10,9 @@ StereoKLTTracker::StereoKLTTracker(const CameraProperty &camprop0,
                                    const size_t min_track_length,
                                    const size_t max_track_length)
     : camprop0{camprop0}, camprop1{camprop1}, T_cam1_cam0{T_cam1_cam0},
-      features{min_track_length, max_track_length} {}
+      features{min_track_length, max_track_length} {
+  assert(T_cam1_cam0.isApprox(Mat4::Zero()) == false);
+}
 
 StereoKLTTracker::~StereoKLTTracker() {}
 
@@ -23,23 +25,27 @@ std::vector<cv::Point2f> StereoKLTTracker::detect(const cv::Mat &image) {
     this->image_height = image.rows;
   }
 
-  // Convert image to gray scale
-  cv::Mat gray_image;
-  cv::cvtColor(image, gray_image, CV_BGR2GRAY);
+  // Ensure image is grayscale
+  cv::Mat image_gray;
+  if (image.channels() == 3) {
+    cv::cvtColor(image, image_gray, CV_BGR2GRAY);
+  } else {
+    image_gray = image.clone();
+  }
 
-  // Feature detection
+  // // Feature detection
+  // std::vector<cv::Point2f> corners;
+  // cv::goodFeaturesToTrack(image_gray,
+  //                         corners,
+  //                         this->max_corners,
+  //                         this->quality_level,
+  //                         this->min_distance);
+
+  auto keypoints = grid_fast(image_gray, this->max_corners, 5, 5, 50.0);
   std::vector<cv::Point2f> corners;
-  cv::goodFeaturesToTrack(gray_image,
-                          corners,
-                          this->max_corners,
-                          this->quality_level,
-                          this->min_distance);
-
-  // std::vector<cv::KeyPoint> keypoints;
-  // cv::FAST(gray_image, keypoints, 30, false);
-  // for (auto kp : keypoints) {
-  //   corners.emplace_back(kp.pt);
-  // }
+  for (auto kp : keypoints) {
+    corners.emplace_back(kp.pt);
+  }
 
   return corners;
 }

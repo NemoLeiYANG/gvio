@@ -2,6 +2,7 @@
 #include "gvio/msckf/blackbox.hpp"
 #include "gvio/dataset/kitti/kitti.hpp"
 #include "gvio/feature2d/klt_tracker.hpp"
+#include "gvio/feature2d/stereo_klt_tracker.hpp"
 #include "gvio/quaternion/quaternion.hpp"
 
 using namespace gvio;
@@ -65,20 +66,41 @@ int main(const int argc, const char *argv[]) {
   }
 
   // Load first image
-  cv::Mat img_ref = cv::imread(raw_dataset.cam0[0]);
+  cv::Mat cam0_img = cv::imread(raw_dataset.cam0[0]);
+  cv::Mat cam1_img = cv::imread(raw_dataset.cam1[0]);
 
-  // Setup camera model
-  const double fx = raw_dataset.calib_cam_to_cam.K[0](0, 0);
-  const double fy = raw_dataset.calib_cam_to_cam.K[0](1, 1);
-  const double cx = raw_dataset.calib_cam_to_cam.K[0](0, 2);
-  const double cy = raw_dataset.calib_cam_to_cam.K[0](1, 2);
-  const int image_width = img_ref.cols;
-  const int image_height = img_ref.rows;
-  CameraProperty camera_property{0, fx, fy, cx, cy, image_width, image_height};
+  // // Setup camera model
+  // const double fx = raw_dataset.calib_cam_to_cam.K[0](0, 0);
+  // const double fy = raw_dataset.calib_cam_to_cam.K[0](1, 1);
+  // const double cx = raw_dataset.calib_cam_to_cam.K[0](0, 2);
+  // const double cy = raw_dataset.calib_cam_to_cam.K[0](1, 2);
+  // const int image_width = cam0_img.cols;
+  // const int image_height = cam0_img.rows;
+  // CameraProperty camera_property{0, fx, fy, cx, cy, image_width,
+  // image_height};
+
+  // Setup camera property
+  const Vec2 image_size{cam0_img.size().width, cam0_img.size().height};
+  // -- Setup cam0 property
+  const Mat3 cam0_K = raw_dataset.calib_cam_to_cam.K[0];
+  // const VecX cam0_D = raw_dataset.calib_cam_to_cam.D[0];
+  const VecX cam0_D = Vec4::Zero();
+  CameraProperty camprop0{0, "pinhole", cam0_K, "radtan", cam0_D, image_size};
+  // -- Setup cam1 property
+  const Mat3 cam1_K = raw_dataset.calib_cam_to_cam.K[1];
+  // const VecX cam1_D = raw_dataset.calib_cam_to_cam.D[1];
+  const VecX cam1_D = Vec4::Zero();
+  CameraProperty camprop1{1, "pinhole", cam1_K, "radtan", cam1_D, image_size};
+  // -- cam0 to cam1 extrinsics
+  const Mat3 R_C1C0 = raw_dataset.calib_cam_to_cam.R[1];
+  const Vec3 t_C1C0 = raw_dataset.calib_cam_to_cam.T[1];
+  const Mat4 T_C1_C0 = transformation_matrix(R_C1C0, t_C1C0);
 
   // Setup feature tracker
-  KLTTracker tracker{camera_property};
-  tracker.initialize(img_ref);
+  KLTTracker tracker{camprop0};
+  tracker.initialize(cam0_img);
+  // StereoKLTTracker tracker{camprop0, camprop1, T_C1_C0, 10, 20};
+  // tracker.initialize(cam0_img, cam1_img);
 
   // Setup MSCKF
   MSCKF msckf;
@@ -86,6 +108,7 @@ int main(const int argc, const char *argv[]) {
     LOG_ERROR("Failed to configure MSCKF!");
     return -1;
   }
+  msckf.T_C1_C0 = T_C1_C0;
   msckf.initialize(raw_dataset.oxts.timestamps[0],
                    euler2quat(raw_dataset.oxts.rpy[0]),
                    raw_dataset.oxts.v_G[0],
@@ -104,10 +127,17 @@ int main(const int argc, const char *argv[]) {
   struct timespec msckf_start = tic();
   for (size_t i = 1; i < raw_dataset.oxts.time.size(); i++) {
     // Feature tracker
-    const std::string img_path = raw_dataset.cam0[i];
-    const cv::Mat img_cur = cv::imread(img_path);
-    tracker.update(img_cur);
+    const std::string cam0_img_path = raw_dataset.cam0[i];
+    const std::string cam1_img_path = raw_dataset.cam1[i];
+    const cv::Mat cam0_img = cv::imread(cam0_img_path);
+    const cv::Mat cam1_img = cv::imread(cam1_img_path);
+    // tracker.update(cam0_img, cam1_img);
+    tracker.update(cam0_img);
     FeatureTracks tracks = tracker.getLostTracks();
+
+    // Triangulate tracks
+    // auto T_cam1_cam0 = tracker.T_cam1_cam0;
+    // triangulate_tracks(T_cam1_cam0, tracks);
 
     // MSCKF
     const Vec3 a_B = raw_dataset.oxts.a_B[i];

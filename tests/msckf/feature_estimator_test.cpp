@@ -86,18 +86,12 @@ struct stereo_test_config setup_stereo_test() {
 
   // Create camera properties
   const Vec2 image_size = config.raw_dataset.calib_cam_to_cam.S[0];
-  CameraProperty cam0(0,
-                      "pinhole",
-                      config.raw_dataset.calib_cam_to_cam.K[0],
-                      "radtan",
-                      config.raw_dataset.calib_cam_to_cam.D[0],
-                      image_size);
-  CameraProperty cam1(1,
-                      "pinhole",
-                      config.raw_dataset.calib_cam_to_cam.K[1],
-                      "radtan",
-                      config.raw_dataset.calib_cam_to_cam.D[1],
-                      image_size);
+  const Mat3 cam0_K = config.raw_dataset.calib_cam_to_cam.K[0];
+  const VecX cam0_D = config.raw_dataset.calib_cam_to_cam.D[0];
+  const Mat3 cam1_K = config.raw_dataset.calib_cam_to_cam.K[1];
+  const VecX cam1_D = config.raw_dataset.calib_cam_to_cam.D[1];
+  CameraProperty cam0(0, "pinhole", cam0_K, "radtan", cam0_D, image_size);
+  CameraProperty cam1(1, "pinhole", cam1_K, "radtan", cam1_D, image_size);
 
   // Initialize tracker
   config.tracker = StereoKLTTracker(cam0, cam1, T_cam1_cam0, 5, 20);
@@ -441,7 +435,7 @@ int test_CeresFeatureEstimator_estimate_stereo() {
   struct stereo_test_config test = setup_stereo_test();
 
   CameraStates camera_states;
-  test.tracker.show_matches = false;
+  test.tracker.show_matches = true;
 
   std::vector<Vec3> landmarks;
 
@@ -457,14 +451,18 @@ int test_CeresFeatureEstimator_estimate_stereo() {
     const Vec4 imu_q_IG = euler2quat(test.raw_dataset.oxts.rpy[i]);
     const Vec4 cam_q_CG = quatlcomp(ext_q_CI) * imu_q_IG;
     const Vec3 cam_p_G = imu_p_G + C(imu_q_IG).transpose() * ext_p_IC;
-
     camera_states.emplace_back(i, cam_p_G, cam_q_CG);
 
     // Track features and get lost tracks
     test.tracker.update(cam0_img, cam1_img);
     auto tracks = test.tracker.getLostTracks();
 
+    // // Triangulate tracks
+    // auto T_cam1_cam0 = test.tracker.T_cam1_cam0;
+    // triangulate_tracks(T_cam1_cam0, tracks);
+
     // Estimate features
+    int landmarks_added = 0;
     for (auto track : tracks) {
       auto track_cam_states = get_track_camera_states(camera_states, track);
       auto T_cam1_cam0 = test.tracker.T_cam1_cam0;
@@ -474,8 +472,10 @@ int test_CeresFeatureEstimator_estimate_stereo() {
       Vec3 p_G_f;
       if (estimator.estimate(p_G_f) == 0) {
         landmarks.emplace_back(p_G_f);
+        landmarks_added++;
       }
     }
+    std::cout << "landmarks added: " << landmarks_added << std::endl;
 
     // Break loop if 'q' was pressed
     if (test.tracker.show_matches && cv::waitKey(0) == 113) {
@@ -505,15 +505,15 @@ void test_suite() {
   MU_ADD_TEST(test_FeatureEstimator_reprojectionError);
   MU_ADD_TEST(test_FeatureEstimator_estimate);
 
-  // // AnalyticalReprojectionError
-  // MU_ADD_TEST(test_AnalyticalReprojectionError_constructor);
-  // MU_ADD_TEST(test_AnalyticalReprojectionError_evaluate);
-  //
-  // // CeresFeatureEstimator
-  // MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
-  // MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
-  // MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
-  // MU_ADD_TEST(test_CeresFeatureEstimator_estimate_stereo);
+  // AnalyticalReprojectionError
+  MU_ADD_TEST(test_AnalyticalReprojectionError_constructor);
+  MU_ADD_TEST(test_AnalyticalReprojectionError_evaluate);
+
+  // CeresFeatureEstimator
+  MU_ADD_TEST(test_CeresFeatureEstimator_constructor);
+  MU_ADD_TEST(test_CeresFeatureEstimator_setupProblem);
+  MU_ADD_TEST(test_CeresFeatureEstimator_estimate);
+  MU_ADD_TEST(test_CeresFeatureEstimator_estimate_stereo);
 }
 
 } // namespace gvio

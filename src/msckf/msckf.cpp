@@ -272,10 +272,21 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
 
   // Estimate j-th feature position in global frame
   const CameraStates track_cam_states = this->getTrackCameraStates(track);
-  CeresFeatureEstimator feature_estimator(track, track_cam_states);
   Vec3 p_G_f;
-  if (feature_estimator.estimate(p_G_f) != 0) {
-    return -2;
+  if (track.type == MONO_TRACK) {
+    CeresFeatureEstimator feature_estimator(track, track_cam_states);
+    if (feature_estimator.estimate(p_G_f) != 0) {
+      return -2;
+    }
+  } else if (track.type == STEREO_TRACK) {
+    CeresFeatureEstimator feature_estimator(track,
+                                            track_cam_states,
+                                            this->T_C1_C0);
+    if (feature_estimator.estimate(p_G_f) != 0) {
+      return -2;
+    }
+  } else {
+    FATAL("Invalid track type [%d]!", track.type);
   }
 
   // Calculate residuals

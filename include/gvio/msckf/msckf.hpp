@@ -66,6 +66,7 @@ public:
   // -- Extrinsics
   Vec3 ext_p_IC = zeros(3, 1);
   Vec4 ext_q_CI = Vec4{0.0, 0.0, 0.0, 1.0};
+  Mat4 T_C1_C0 = I(4);
   // -- Measurement noise
   double img_var = 1e-1;
 

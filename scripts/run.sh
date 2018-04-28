@@ -27,10 +27,10 @@ cmake .. && time make -j${CPU_COUNT}
 # SCRIPTS
 # python3 scripts/plot/plot_fig.py
 # python3 scripts/maths/transforms.py; exit 0
-# python3 scripts/plot/plot_landmarks.py /tmp/landmarks.csv; exit 0
+# python3 ../scripts/plot/plot_landmarks.py /tmp/landmarks.csv /tmp/pose.csv; exit 0
 
 # EXPERIMENTS
-cd experiments
+# cd experiments
 # ./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
 # ./kitti_runner /data/kitti/raw 2011_09_26 0046 ./configs/msckf_kitti_raw-2011_09_26-0046.yaml /tmp/msckf
 # python3 scripts/plot_msckf.py /tmp/msckf/msckf
@@ -38,10 +38,11 @@ cd experiments
 # python3 scripts/plot_euroc_dataset.py /data/euroc_mav/raw/V1_01_easy
 # ./sim_runner ./configs/sim.yaml ./configs/msckf_sim.yaml
 # python3 scripts/plot_sim.py /tmp/sim
-./feature_tracker_benchmarker /data/euroc_mav/raw/V1_01_easy; exit 0
+# ./tracker_benchmark /data/euroc_mav/raw/V1_01_easy; exit 0
+# ./bundle_adjustment_benchmark /data/kitti/raw 2011_09_26 0005; exit 0
 
 # TESTS
-# cd tests
+cd tests
 # ./apriltag-mit_test
 # ./camera-camera_test
 # ./camera-camera_config_test

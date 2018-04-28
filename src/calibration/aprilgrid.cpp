@@ -64,9 +64,13 @@ AprilGrid::AprilGrid(const int tag_rows,
 AprilGrid::~AprilGrid() {}
 
 int AprilGrid::detect(cv::Mat &image) {
-  // Convert image to gray-scale
+  // Ensure image is grayscale
   cv::Mat image_gray;
-  cv::cvtColor(image, image_gray, CV_BGR2GRAY);
+  if (image.channels() == 3) {
+    cv::cvtColor(image, image_gray, CV_BGR2GRAY);
+  } else {
+    image_gray = image.clone();
+  }
 
   // Extract corners
   std::vector<AprilTags::TagDetection> detections;

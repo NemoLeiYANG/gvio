@@ -13,7 +13,7 @@ CameraProperty::CameraProperty(const int camera_index,
                                const int image_height)
     : camera_index{camera_index}, camera_model{"pinhole"}, distortion_model{},
       resolution{image_width, image_height} {
-  intrinsics = Vec4{fx, fy, cx, cy};
+  this->intrinsics = Vec4{fx, fy, cx, cy};
 }
 
 CameraProperty::CameraProperty(const int camera_index,
@@ -25,7 +25,7 @@ CameraProperty::CameraProperty(const int camera_index,
   const double fy = K(1, 1);
   const double cx = K(0, 2);
   const double cy = K(1, 2);
-  intrinsics = Vec4{fx, fy, cx, cy};
+  this->intrinsics = Vec4{fx, fy, cx, cy};
 }
 
 CameraProperty::CameraProperty(const int camera_index,
@@ -41,7 +41,7 @@ CameraProperty::CameraProperty(const int camera_index,
   const double fy = K(1, 1);
   const double cx = K(0, 2);
   const double cy = K(1, 2);
-  intrinsics = Vec4{fx, fy, cx, cy};
+  this->intrinsics = Vec4{fx, fy, cx, cy};
 
   // Some camera calibration results do not provide radtan k3, in the following
   // we set radtan k3 = 0.0 if the provided distortion vector is of size 4. We
@@ -116,9 +116,7 @@ std::vector<cv::Point2f> CameraProperty::undistortPoints(
                         convert(this->K()),
                         convert(this->D()),
                         convert(rect_mat),
-                        K_new
-
-                        );
+                        K_new);
 
   } else {
     FATAL("Unsupported distortion model [%s]!", distortion_model.c_str());

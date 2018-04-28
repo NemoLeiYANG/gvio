@@ -15,9 +15,9 @@ imu:
     p_init_var: [0.2, 0.2, 0.2]
   process_noise:
     w_var: [5e-1, 5e-1, 5e-1]
-    dbg_var: [1e-3, 1e-3, 1e-3]
+    dbg_var: [1e-2, 1e-2, 1e-2]
     a_var: [1e-1, 1e-1, 1e-1]
-    dba_var: [1e-3, 1e-3, 1e-3]
+    dba_var: [1e-2, 1e-2, 1e-2]
   constants:
     angular_constant: [0.0, 0.0, 0.0]
     gravity_constant: [0.0, 0.0, -9.81]
@@ -28,4 +28,4 @@ camera:
     p_IC: [0.0, 0.0, 0.0]
     q_CI: [0.5, -0.5, 0.5, -0.5]
   measurement_noise:
-    img_var: 1e-5
+    img_var: 1e-9

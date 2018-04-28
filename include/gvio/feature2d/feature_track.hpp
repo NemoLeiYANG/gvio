@@ -50,6 +50,9 @@ struct FeatureTrack {
   Features track0;
   Features track1;
 
+  // 3D position of feature relative to camera's first pose
+  Vec3 p_C0_f = Vec3::Zero();
+
   FeatureTrack();
   FeatureTrack(const TrackID &track_id,
                const FrameID &frame_id,
