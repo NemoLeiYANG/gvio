@@ -3,7 +3,7 @@
 
 namespace gvio {
 
-#define TEST_CONFIG_FILE "test_configs/gimbal/calibration/params.yaml"
+#define TEST_CAMCHAIN_FILE "test_configs/gimbal/calibration/camchain.yaml"
 #define TEST_JOINT_DATA "test_data/calibration/joint.csv"
 
 int test_CalibParmas_constructor() {
@@ -21,7 +21,7 @@ int test_CalibParmas_constructor() {
 
 int test_CalibParmas_load() {
   CalibParams params;
-  params.load(TEST_CONFIG_FILE, TEST_JOINT_DATA);
+  params.load(TEST_CAMCHAIN_FILE, TEST_JOINT_DATA);
 
   return 0;
 }

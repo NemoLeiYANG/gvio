@@ -30,10 +30,11 @@ cmake .. && time make -j${CPU_COUNT}
 # python3 ../scripts/plot/plot_landmarks.py /tmp/landmarks.csv /tmp/pose.csv; exit 0
 
 # EXPERIMENTS
-# cd experiments
-# ./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
+cd experiments
+./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
 # ./kitti_runner /data/kitti/raw 2011_09_26 0046 ./configs/msckf_kitti_raw-2011_09_26-0046.yaml /tmp/msckf
-# python3 scripts/plot_msckf.py /tmp/msckf/msckf
+python3 scripts/plot_msckf.py /tmp/msckf/msckf
+exit 0
 # ./euroc_runner /data/euroc_mav/raw/V1_01_easy ./configs/msckf_euroc_V01_01_easy.yaml /tmp/msckf
 # python3 scripts/plot_euroc_dataset.py /data/euroc_mav/raw/V1_01_easy
 # ./sim_runner ./configs/sim.yaml ./configs/msckf_sim.yaml
@@ -68,14 +69,14 @@ cd tests
 # ./feature2d-orb_tracker_test
 # ./feature2d-stereo_orb_tracker_test
 # ./feature2d-stereo_klt_tracker_test
-# ./gimbal-calibration-aprilgrid_test
-# ./gimbal-calibration-chessboard_test
-# ./gimbal-calibration-calib_params_test
-# ./gimbal-calibration-calib_preprocessor_test
-# ./gimbal-calibration-calib_validator_test
-# ./gimbal-calibration-stereo_calib_test
-# ./gimbal-calibration-gimbal_calib_test
-# ./gimbal-calibration-residual_test
+# ./calibration-aprilgrid_test
+# ./calibration-chessboard_test
+# ./calibration-calib_params_test
+# ./calibration-calib_preprocessor_test
+# ./calibration-calib_validator_test
+# ./calibration-stereo_calib_test
+# ./calibration-gimbal_calib_test
+# ./calibration-residual_test
 # ./gimbal-gmr-gmr_test
 # ./gimbal-sbgc_test
 # ./gimbal-saliency_test
@@ -83,12 +84,10 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-# ./msckf-msckf_test
-# ./msckf-profiler_test
+./msckf-msckf_test
 # ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test
 # ./quadrotor-mission_test
-# ./sim-carrot_controller_test
 # ./sim-bezier_test
 # ./sim-camera_test
 # ./sim-camera_motion_test

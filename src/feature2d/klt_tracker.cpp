@@ -25,16 +25,27 @@ KLTTracker::KLTTracker(const CameraProperty &camera_property,
 
 std::vector<FeatureTrack> KLTTracker::getLostTracks() {
   // Get lost tracks
-  std::vector<FeatureTrack> tracks;
+  FeatureTracks tracks;
   this->features.removeLostTracks(tracks);
+
+  // Convert pixel coordinates to image coordinates - no distortion
   if (this->camera_property.distortion_model.empty()) {
+    for (auto &track : tracks) {
+      for (auto &feature : track.track) {
+        // Convert pixel coordinates to image coordinates
+        const Vec2 px{feature.kp.pt.x, feature.kp.pt.y};
+        const Vec2 pt = pinhole_pixel2ideal(this->camera_property.K(), px);
+        feature.kp.pt.x = pt(0);
+        feature.kp.pt.y = pt(1);
+      }
+    }
+
     return tracks;
   }
 
-  // Transform keypoints
+  // Convert pixel coordinates to image coordinates - with undistort
   for (auto &track : tracks) {
     for (auto &feature : track.track) {
-      // Convert pixel coordinates to image coordinates
       cv::Point2f pt_ud = this->camera_property.undistortPoint(feature.kp.pt);
       feature.kp.pt.x = pt_ud.x;
       feature.kp.pt.y = pt_ud.y;

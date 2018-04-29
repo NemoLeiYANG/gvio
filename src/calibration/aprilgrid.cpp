@@ -10,6 +10,13 @@ AprilGrid::AprilGrid(const int tag_rows,
                      const double tag_spacing)
     : tag_rows{tag_rows}, tag_cols{tag_cols}, tag_size{tag_size},
       tag_spacing{tag_spacing} {
+  // If the below assert fails it means you have not modified the AprilTag
+  // library so
+  // that the TagFamily.blackborder == 2, this is required else you will fail
+  // to detect Kalibr's AprilGrid. It is worth noting that changing
+  // TagFamily.blackborder == 2, makes it incapable of detecting normal
+  // AprilTags.
+  assert(this->detector.thisTagFamily.blackBorder == 2);
 
   // Construct an AprilGrid object points
   //
@@ -95,25 +102,25 @@ int AprilGrid::detect(cv::Mat &image) {
 
 int AprilGrid::extractTags(cv::Mat &image,
                            std::map<int, std::vector<cv::Point2f>> &tags) {
-  assert(this->detector.thisTagFamily.blackBorder == 2);
-  // If the above fails, it means you have not modified the AprilTag library so
-  // that the TagFamily.blackborder == 2, this is required else you will fail
-  // to detect the AprilGrid. It is worth noting that changing
-  // TagFamily.blackborder == 2, makes it incapable of detecting normal
-  // AprilTags.
-
   // Convert image to gray-scale
   cv::Mat image_gray;
-  cv::cvtColor(image, image_gray, CV_BGR2GRAY);
+  if (image.channels() == 3) {
+    cv::cvtColor(image, image_gray, CV_BGR2GRAY);
+  } else {
+    image_gray = image.clone();
+  }
 
   // Extract corners
   std::vector<AprilTags::TagDetection> detections;
   detections = this->detector.extractTags(image_gray);
 
   // Make an RGB version of the input image
-  cv::Mat image_rgb(image_gray.size(), CV_8UC3);
-  image_rgb = image.clone();
-  cv::cvtColor(image_gray, image_rgb, CV_GRAY2RGB);
+  cv::Mat image_rgb(image.size(), CV_8UC3);
+  if (image.channels() == 3) {
+    image_rgb = image.clone();
+  } else {
+    cv::cvtColor(image, image_rgb, CV_GRAY2RGB);
+  }
 
   // Iterate through detections
   for (auto &det : detections) {

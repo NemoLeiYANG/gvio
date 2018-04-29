@@ -24,6 +24,7 @@ namespace gvio {
  * OXTS entry
  */
 struct OXTSEntry {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Vec3 gps = zeros(3, 1);
   Vec3 rpy = zeros(3, 1);
   Vec3 v_G = zeros(3, 1);
@@ -48,6 +49,7 @@ struct OXTSEntry {
  * OXTS
  */
 struct OXTS {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   std::vector<long> timestamps;
   std::vector<double> time;
   std::vector<Vec3> gps;

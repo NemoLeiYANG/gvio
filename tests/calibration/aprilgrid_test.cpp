@@ -131,8 +131,8 @@ int test_AprilGrid_solvePnP() {
 
   MU_CHECK_EQ(retval, 0);
 
-  cv::imshow("Image", image);
-  cv::waitKey();
+  // cv::imshow("Image", image);
+  // cv::waitKey();
 
   return 0;
 }

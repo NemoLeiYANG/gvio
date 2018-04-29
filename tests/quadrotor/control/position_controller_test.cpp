@@ -5,45 +5,31 @@ namespace gvio {
 
 #define TEST_CONFIG "tests/configs/control/position_controller.yaml"
 
-// int test_PositionController_constructor() {
-//   PositionController controller;
-//
-//   MU_CHECK(controller.configured == false);
-//
-//   MU_CHECK_FLOAT(0.0, controller.dt);
-//
-//   MU_CHECK_FLOAT(0.0, controller.x_controller.k_p);
-//   MU_CHECK_FLOAT(0.0, controller.x_controller.k_i);
-//   MU_CHECK_FLOAT(0.0, controller.x_controller.k_d);
-//
-//   MU_CHECK_FLOAT(0.0, controller.y_controller.k_p);
-//   MU_CHECK_FLOAT(0.0, controller.y_controller.k_i);
-//   MU_CHECK_FLOAT(0.0, controller.y_controller.k_d);
-//
-//   MU_CHECK_FLOAT(0.0, controller.z_controller.k_p);
-//   MU_CHECK_FLOAT(0.0, controller.z_controller.k_i);
-//   MU_CHECK_FLOAT(0.0, controller.z_controller.k_d);
-//
-//   MU_CHECK_FLOAT(0.0, controller.hover_throttle);
-//
-//   MU_CHECK_FLOAT(0.0, controller.roll_limit[0]);
-//   MU_CHECK_FLOAT(0.0, controller.roll_limit[1]);
-//
-//   MU_CHECK_FLOAT(0.0, controller.pitch_limit[0]);
-//   MU_CHECK_FLOAT(0.0, controller.pitch_limit[1]);
-//
-//   MU_CHECK_FLOAT(0.0, controller.setpoints(0));
-//   MU_CHECK_FLOAT(0.0, controller.setpoints(1));
-//   MU_CHECK_FLOAT(0.0, controller.setpoints(2));
-//
-//   MU_CHECK_FLOAT(0.0, controller.outputs(0));
-//   MU_CHECK_FLOAT(0.0, controller.outputs(1));
-//   MU_CHECK_FLOAT(0.0, controller.outputs(2));
-//   MU_CHECK_FLOAT(0.0, controller.outputs(3));
-//
-//   return 0;
-// }
-//
+int test_PositionController_constructor() {
+  PositionController controller;
+
+  MU_CHECK_FLOAT(0.0, controller.dt);
+
+  MU_CHECK_FLOAT(0.0, controller.x_controller.k_p);
+  MU_CHECK_FLOAT(0.0, controller.x_controller.k_i);
+  MU_CHECK_FLOAT(0.0, controller.x_controller.k_d);
+
+  MU_CHECK_FLOAT(0.0, controller.y_controller.k_p);
+  MU_CHECK_FLOAT(0.0, controller.y_controller.k_i);
+  MU_CHECK_FLOAT(0.0, controller.y_controller.k_d);
+
+  MU_CHECK_FLOAT(0.0, controller.z_controller.k_p);
+  MU_CHECK_FLOAT(0.0, controller.z_controller.k_i);
+  MU_CHECK_FLOAT(0.0, controller.z_controller.k_d);
+
+  MU_CHECK_FLOAT(0.0, controller.outputs(0));
+  MU_CHECK_FLOAT(0.0, controller.outputs(1));
+  MU_CHECK_FLOAT(0.0, controller.outputs(2));
+  MU_CHECK_FLOAT(0.0, controller.outputs(3));
+
+  return 0;
+}
+
 // int test_PositionController_configure() {
 //   PositionController controller;
 //
@@ -157,7 +143,7 @@ namespace gvio {
 //
 //   MU_CHECK_FLOAT(yaw_setpoint, controller.outputs(2));
 // }
-
+//
 // int test_PositionController_update2() {
 //   Vec3 setpoint_nwu, euler;
 //   Pose actual;

@@ -200,12 +200,13 @@ Mat4 Omega(const Vec3 &w) {
 Vec4 quatzoi(const Vec4 &q, const Vec3 &w, const double dt) {
   Vec4 dqdt;
 
-  if (w.norm() > 1e-5) {
-    dqdt = (cos(w.norm() * dt * 0.5) * I(4) +
-            1 / w.norm() * sin(w.norm() * dt * 0.5) * Omega(w)) *
+  const double gyro_norm = w.norm();
+  if (gyro_norm > 1e-5) {
+    dqdt = (cos(gyro_norm * dt * 0.5) * I(4) +
+            1 / gyro_norm * sin(gyro_norm * dt * 0.5) * Omega(w)) *
            q;
   } else {
-    dqdt = I(4) + dt * 0.5 * Omega(w);
+    dqdt = (I(4) + dt * 0.5 * Omega(w)) * cos(gyro_norm * dt * 0.5) * q;
   }
 
   return dqdt;

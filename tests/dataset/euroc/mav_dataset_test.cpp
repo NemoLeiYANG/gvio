@@ -6,21 +6,17 @@ namespace gvio {
 
 #define TEST_DATA "test_data/euroc"
 
-int mono_camera_cb(const cv::Mat &frame, const long ts) {
-  UNUSED(ts);
+int mono_camera_cb(const cv::Mat &frame) {
   UNUSED(frame);
   // cv::imshow("Mono camera", frame);
   // cv::waitKey(1);
   return 0;
 }
 
-int stereo_camera_cb(const cv::Mat &frame0,
-                     const cv::Mat &frame1,
-                     const long ts) {
+int stereo_camera_cb(const cv::Mat &frame0, const cv::Mat &frame1) {
   cv::Mat stereo_img;
   cv::hconcat(frame0, frame1, stereo_img);
 
-  UNUSED(ts);
   cv::imshow("Stereo", stereo_img);
   cv::waitKey(1);
   return 0;

@@ -91,6 +91,10 @@ VecX CameraProperty::D() {
     VecX D = zeros(5, 1);
     D << k1, k2, p1, p2, k3;
     return D;
+
+  } else if (distortion_model.empty()) {
+    FATAL("Distortion model not set!");
+
   } else {
     FATAL("Unsupported distortion model [%s]!", distortion_model.c_str());
   }
@@ -117,6 +121,9 @@ std::vector<cv::Point2f> CameraProperty::undistortPoints(
                         convert(this->D()),
                         convert(rect_mat),
                         K_new);
+
+  } else if (distortion_model.empty()) {
+    FATAL("Distortion model not set!");
 
   } else {
     FATAL("Unsupported distortion model [%s]!", distortion_model.c_str());
@@ -153,6 +160,9 @@ CameraProperty::distortPoints(const std::vector<cv::Point2f> &points) {
                                convert(this->K()),
                                convert(this->D()));
 
+  } else if (distortion_model.empty()) {
+    FATAL("Distortion model not set!");
+
   } else {
     FATAL("Unsupported distortion model [%s]!", distortion_model.c_str());
   }
@@ -185,6 +195,9 @@ cv::Mat CameraProperty::undistortImage(const cv::Mat &image,
     // Undistort image
     K_ud = K.clone();
     cv::undistort(image, image_ud, K, D, K_ud);
+
+  } else if (distortion_model.empty()) {
+    FATAL("Distortion model not set!");
 
   } else {
     FATAL("Unsupported distortion model [%s]!", distortion_model.c_str());

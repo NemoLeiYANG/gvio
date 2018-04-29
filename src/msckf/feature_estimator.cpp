@@ -665,13 +665,13 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
     return -2;
   }
 
-  const Vec3 X{this->x[0], this->x[1], 1.0};
-  const double z = 1 / this->x[2];
-  Vec3 p_C0_f_est = z * X;
-  std::cout << "p_C0_f initial: " << this->track.p_C0_f.transpose()
-            << std::endl;
-  std::cout << "p_C0_f estimated: " << p_C0_f_est.transpose() << std::endl;
-  std::cout << std::endl;
+  // const Vec3 X{this->x[0], this->x[1], 1.0};
+  // const double z = 1 / this->x[2];
+  // Vec3 p_C0_f_est = z * X;
+  // std::cout << "p_C0_f initial: " << this->track.p_C0_f.transpose()
+  //           << std::endl;
+  // std::cout << "p_C0_f estimated: " << p_C0_f_est.transpose() << std::endl;
+  // std::cout << std::endl;
 
   // Vec3 gnd = this->track.track[0].ground_truth;
   // std::cout << "gnd: " << gnd.transpose() << std::endl;

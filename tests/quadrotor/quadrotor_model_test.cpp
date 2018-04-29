@@ -119,20 +119,6 @@ int test_QuadrotorModel_update() {
 
   // Setup quadrotor model
   QuadrotorModel quad(Vec3{0.0, 0.0, 0.0}, Vec3{0.0, 0.0, 5.0});
-  // if (quad.loadMission(TEST_MISSION) != 0) {
-  //   LOG_ERROR("Failed to load mission!");
-  //   return -1;
-  // }
-
-  // Setup carrot controller
-  CarrotController controller;
-  std::vector<Vec3> waypoints;
-  waypoints.emplace_back(0.0, 0.0, 5.0);
-  waypoints.emplace_back(5.0, 0.0, 5.0);
-  waypoints.emplace_back(10.0, 1.0, 5.0);
-  // waypoints.emplace_back(0.0, 5.0, 5.0);
-  // waypoints.emplace_back(0.0, 0.0, 5.0);
-  controller.configure(waypoints, 0.5);
 
   // Setup IMU state
   IMUState imu;
@@ -143,28 +129,21 @@ int test_QuadrotorModel_update() {
   // Record initial quadrotor state
   record_timestep(0.0, quad, imu, gnd_file, mea_file, est_file);
 
-  quad.setPosition(Vec3{10, 10, 5.0});
+  // Set quadrotor desired position
+  const Vec3 pos_desired{1.0, 0.0, 5.0};
+  quad.setPosition(pos_desired);
 
   // Simulate
-  double imu_dt = 0.01;
-  const double dt = 0.001;
+  const double dt = 0.01;
+  // for (double t = 0.0; t <= 30.0; t += dt) {
   for (double t = 0.0; t <= 30.0; t += dt) {
-    // Calculate carrot point
-    // Vec3 carrot_pt;
-    // controller.update(quad.p_G, carrot_pt);
-
     // Update quadrotor model
     quad.update(dt);
 
     // Update imu
     const Vec3 a_m = quad.a_B;
     const Vec3 w_m = quad.w_B;
-
-    imu_dt += dt;
-    if (imu_dt > 0.1) {
-      imu.update(a_m, w_m, imu_dt);
-      imu_dt = 0.0;
-    }
+    imu.update(a_m, w_m, dt);
 
     // Record
     record_timestep(t, quad, imu, gnd_file, mea_file, est_file);
@@ -174,10 +153,10 @@ int test_QuadrotorModel_update() {
   est_file.close();
 
   // Plot quadrotor trajectory
-  PYTHON_SCRIPT("scripts/plot_quadrotor.py "
-                "/tmp/quadrotor_gnd.dat "
-                "/tmp/quadrotor_mea.dat "
-                "/tmp/quadrotor_est.dat");
+  // PYTHON_SCRIPT("scripts/plot_quadrotor.py "
+  //               "/tmp/quadrotor_gnd.dat "
+  //               "/tmp/quadrotor_mea.dat "
+  //               "/tmp/quadrotor_est.dat");
 
   return 0;
 }

@@ -185,9 +185,9 @@ SET(
   # # gimbal-saliency_test
   # imu-mpu6050_test
   # msckf-camera_state_test
-  msckf-feature_estimator_test
+  # msckf-feature_estimator_test
   # msckf-imu_state_test
-  # msckf-msckf_test
+  msckf-msckf_test
   # pwm-pca9685_test
   # quadrotor-quadrotor_model_test
   # quadrotor-mission_test

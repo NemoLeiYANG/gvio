@@ -166,20 +166,17 @@ int CalibPreprocessor::preprocess(const std::string &dir_path) {
     // Undistort image 0
     const cv::Mat K0 = convert(this->camera_properties[0].K());
     const cv::Mat D0 = convert(this->camera_properties[0].D());
-    cv::Mat img0_ud;
-    this->camera_properties[0].undistortImage(img0, 0.0, img0_ud);
+    cv::Mat img0_ud = this->camera_properties[0].undistortImage(img0, 0.0);
 
     // Undistort image 1
     const cv::Mat K1 = convert(this->camera_properties[1].K());
     const cv::Mat D1 = convert(this->camera_properties[1].D());
-    cv::Mat img1_ud;
-    this->camera_properties[1].undistortImage(img1, 0.0, img1_ud);
+    cv::Mat img1_ud = this->camera_properties[1].undistortImage(img1, 0.0);
 
     // Undistort image 2
     const cv::Mat K2 = convert(this->camera_properties[2].K());
     const cv::Mat D2 = convert(this->camera_properties[2].D());
-    cv::Mat img2_ud;
-    this->camera_properties[2].undistortImage(img2, 0.0, img2_ud);
+    cv::Mat img2_ud = this->camera_properties[2].undistortImage(img2, 0.0);
 
     // Extract tags
     std::map<int, std::vector<cv::Point2f>> tags0;
@@ -230,11 +227,10 @@ int CalibPreprocessor::preprocess(const std::string &dir_path) {
     // }
 
     // // Visualize detected AprilTags
-    cv::imshow("img0", img0_ud);
+    // cv::imshow("img0", img0_ud);
     // cv::imshow("img1", img1_ud);
     // cv::imshow("img2", img2_ud);
-    //
-    cv::waitKey();
+    // cv::waitKey();
   }
 
   return 0;

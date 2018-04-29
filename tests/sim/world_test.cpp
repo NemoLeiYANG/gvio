@@ -143,7 +143,7 @@ int test_SimWorld_step() {
   MU_CHECK_EQ(0, world.tracks_lost.size());
 
   // Plot
-  PYTHON_SCRIPT("scripts/plot_sim.py /tmp/sim");
+  // PYTHON_SCRIPT("scripts/plot_sim.py /tmp/sim");
 
   return 0;
 }

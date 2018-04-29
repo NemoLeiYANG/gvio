@@ -116,8 +116,8 @@ int test_Chessboard_calcCornerPositions() {
 
   MU_CHECK_EQ(retval, 0);
 
-  cv::imshow("Image", image);
-  cv::waitKey();
+  // cv::imshow("Image", image);
+  // cv::waitKey();
 
   return 0;
 }

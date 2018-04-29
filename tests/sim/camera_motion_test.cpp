@@ -12,11 +12,6 @@ int test_CameraMotion_constructor() {
   MU_CHECK_EQ(0, camera_motion.pos_points.size());
   MU_CHECK_EQ(0, camera_motion.att_points.size());
   MU_CHECK_FLOAT(0.0, camera_motion.max_time);
-  MU_CHECK(Vec3::Zero().isApprox(camera_motion.p_G));
-  MU_CHECK(Vec3::Zero().isApprox(camera_motion.v_G));
-  MU_CHECK(Vec3::Zero().isApprox(camera_motion.a_G));
-  MU_CHECK(Vec3::Zero().isApprox(camera_motion.w_B));
-  MU_CHECK(Vec3::Zero().isApprox(camera_motion.a_B));
 
   return 0;
 }

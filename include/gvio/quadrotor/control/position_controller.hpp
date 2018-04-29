@@ -22,15 +22,10 @@ public:
   double dt = 0.0;
   Vec4 outputs{0.0, 0.0, 0.0, 0.0};
 
-  // PID tunes for dt = 0.001 (i.e. 1000Hz)
-  PID x_controller = PID(0.5, 0.0, 0.035);
-  PID y_controller = PID(0.5, 0.0, 0.035);
-  PID z_controller = PID(0.3, 0.0, 0.1);
-
   // PID tunes for dt = 0.01 (i.e. 100Hz)
-  // PID x_controller = PID(5.0, 0.0, 3.5);
-  // PID y_controller = PID(5.0, 0.0, 3.5);
-  // PID z_controller = PID(3.0, 0.0, 1.0);
+  PID x_controller = PID(0.5, 0.0, 0.35);
+  PID y_controller = PID(0.5, 0.0, 0.35);
+  PID z_controller = PID(0.3, 0.0, 0.1);
 
   PositionController() {}
 

@@ -20,7 +20,6 @@ int MSCKF::configure(const std::string &config_file) {
   // -- General Settings
   parser.addParam("max_window_size", &this->max_window_size);
   parser.addParam("max_nb_tracks", &this->max_nb_tracks);
-  parser.addParam("min_track_length", &this->min_track_length);
   parser.addParam("enable_ns_trick", &this->enable_ns_trick);
   parser.addParam("enable_qr_trick", &this->enable_ns_trick);
   // -- IMU Settings
@@ -240,6 +239,12 @@ CameraStates MSCKF::getTrackCameraStates(const FeatureTrack &track) {
 
 int MSCKF::predictionUpdate(const Vec3 &a_m, const Vec3 &w_m, const long ts) {
   const double dt = (ts - this->last_updated) * 1e-9;
+  if (dt < 0.0) {
+    LOG_ERROR("IMU timestamp: [%lu]", ts);
+    LOG_ERROR("MSCKF.last_updated: [%lu]", this->last_updated);
+    FATAL("Calculated dt is negative! [%.4f]", dt);
+  }
+
   this->imu_state.update(a_m, w_m, dt);
   this->P_cam = this->P_cam;
   this->P_imu_cam = this->imu_state.Phi * this->P_imu_cam;
@@ -264,9 +269,7 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
                             MatX &H_o_j,
                             VecX &r_o_j) {
   // Pre-check
-  if (track.trackedLength() < (size_t) this->min_track_length) {
-    return -1;
-  } else if (track.trackedLength() >= (size_t) this->max_window_size) {
+  if (track.trackedLength() >= (size_t) this->max_window_size) {
     return -1;
   }
 
@@ -435,35 +438,14 @@ void MSCKF::pruneCameraState() {
                         this->P_cam.cols() - CameraState::size * prune_sz);
 }
 
-FeatureTracks MSCKF::filterTracks(const FeatureTracks &tracks) {
-  FeatureTracks filtered_tracks;
-  for (auto track : tracks) {
-    if (track.trackedLength() < (size_t) this->min_track_length) {
-      continue;
-    } else if (track.trackedLength() > (size_t) this->max_window_size) {
-      continue;
-    }
-
-    filtered_tracks.push_back(track);
-  }
-
-  return filtered_tracks;
-}
-
 int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   // Add a camera state to state vector
   this->augmentState();
 
-  // Filter feature tracks
-  FeatureTracks filtered_tracks = this->filterTracks(tracks);
-  if (filtered_tracks.size() == 0) {
-    return 0;
-  }
-
   // Calculate residuals
   MatX T_H;
   VecX r_n;
-  if (this->calcResiduals(filtered_tracks, T_H, r_n) != 0) {
+  if (this->calcResiduals(tracks, T_H, r_n) != 0) {
     LOG_WARN("No tracks made it through!");
     return 0;
   }

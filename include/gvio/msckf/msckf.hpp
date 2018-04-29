@@ -40,13 +40,13 @@ enum class MSCKFState {
  *
  * This class implements the MSCKF based on:
  *
- *   Mourikis, Anastasios I., and Stergios I. Roumeliotis. "A multi-state
- *   constraint Kalman filter for vision-aided inertial navigation." Robotics
- *   and automation, 2007 IEEE international conference on. IEEE, 2007.  APA
+ * Mourikis, Anastasios I., and Stergios I. Roumeliotis. "A multi-state
+ * constraint Kalman filter for vision-aided inertial navigation." Robotics
+ * and automation, 2007 IEEE international conference on. IEEE, 2007.  APA
  *
- *   A.I. Mourikis, S.I. Roumeliotis: "A Multi-state Kalman Filter for
- *   Vision-Aided Inertial Navigation," Technical Report, September 2006
- *   [http://www.ee.ucr.edu/~mourikis/tech_reports/TR_MSCKF.pdf]
+ * A.I. Mourikis, S.I. Roumeliotis: "A Multi-state Kalman Filter for
+ * Vision-Aided Inertial Navigation," Technical Report, September 2006
+ * [http://www.ee.ucr.edu/~mourikis/tech_reports/TR_MSCKF.pdf]
  */
 class MSCKF {
 public:
@@ -72,12 +72,11 @@ public:
 
   // Misc
   std::map<int, double> chi_squared_table;
-  long last_updated = 0;
+  long last_updated = -1;
 
   // Settings
   int max_window_size = 30;
   int max_nb_tracks = 10;
-  int min_track_length = 8;
   bool enable_ns_trick = true;
   bool enable_qr_trick = true;
 

@@ -52,8 +52,8 @@ int test_CalibValidator_validate() {
 
   cv::Mat image = cv::imread("test_data/chessboard/cam0/image_0.jpg");
   cv::Mat result = validator.validate(0, image);
-  cv::imshow("Image", result);
-  cv::waitKey();
+  // cv::imshow("Image", result);
+  // cv::waitKey();
 
   return 0;
 }
@@ -212,7 +212,7 @@ int test_CalibValidator_validateTriclops_live() {
 void test_suite() {
   MU_ADD_TEST(test_CalibValidator_constructor);
   MU_ADD_TEST(test_CalibValidator_load);
-  // MU_ADD_TEST(test_CalibValidator_validate);
+  MU_ADD_TEST(test_CalibValidator_validate);
   MU_ADD_TEST(test_CalibValidator_validateStereo);
   // MU_ADD_TEST(test_CalibValidator_validate_live);
   // MU_ADD_TEST(test_CalibValidator_validateStereo_live);

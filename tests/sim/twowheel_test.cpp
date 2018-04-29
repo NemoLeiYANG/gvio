@@ -56,8 +56,6 @@ int test_TwoWheel_update() {
 
   // Simulate robot motion
   for (double t = 0.0; t < t_end; t += dt) {
-    printf("t: %f\n", t);
-
     // Update
     robot.update(dt);
 
@@ -76,7 +74,7 @@ int test_TwoWheel_update() {
     output_file << robot.rpy_G(1) << ",";
     output_file << robot.rpy_G(2) << std::endl;
   }
-  PYTHON_SCRIPT("scripts/plot_twowheel.py /tmp/twowheel.dat")
+  // PYTHON_SCRIPT("scripts/plot_twowheel.py /tmp/twowheel.dat")
 
   return 0;
 }

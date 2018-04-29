@@ -42,9 +42,9 @@ int QuadrotorModel::update(const VecX &motor_inputs, const double dt) {
   // clang-format off
   Mat4 A;
   A << 1.0, 1.0, 1.0, 1.0,
-        0.0, -this->l, 0.0, this->l,
-        -this->l, 0.0, this->l, 0.0,
-        -this->d, this->d, -this->d, this->d;
+       0.0, -this->l, 0.0, this->l,
+       -this->l, 0.0, this->l, 0.0,
+       -this->d, this->d, -this->d, this->d;
   // clang-format on
 
   Vec4 tau = A * motor_inputs;
