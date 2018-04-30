@@ -48,11 +48,9 @@ int main(const int argc, const char *argv[]) {
     return -1;
   }
 
-  // Load first image
-  cv::Mat img = cv::imread(raw_dataset.cam0[0]);
-  // cv::Mat cam1_img = cv::imread(raw_dataset.cam1[0]);
-
   // Setup mono front-end
+  // -- Load first image to obtain image size
+  const cv::Mat img = cv::imread(raw_dataset.cam0[0]);
   // -- Setup camera model
   const double fx = raw_dataset.calib_cam_to_cam.K[0](0, 0);
   const double fy = raw_dataset.calib_cam_to_cam.K[0](1, 1);
@@ -62,30 +60,30 @@ int main(const int argc, const char *argv[]) {
   const int image_height = img.rows;
   CameraProperty camera_property{0, fx, fy, cx, cy, image_width, image_height};
   // -- Setup feature tracker
-  KLTTracker tracker{camera_property};
-  tracker.initialize(cv::imread(raw_dataset.cam0[0]));
+  KLTTracker mono_tracker{camera_property, 10, 20};
+  mono_tracker.initialize(cv::imread(raw_dataset.cam0[0]));
 
-  // // Setup stereo front-end
-  // const Vec2 image_size{cam0_img.size().width, cam0_img.size().height};
-  // // -- Setup cam0 property
-  // const Mat3 cam0_K = raw_dataset.calib_cam_to_cam.K[0];
-  // // const VecX cam0_D = raw_dataset.calib_cam_to_cam.D[0];
-  // const VecX cam0_D = Vec4::Zero();
-  // CameraProperty camprop0{0, "pinhole", cam0_K, "radtan", cam0_D,
-  // image_size};
-  // // -- Setup cam1 property
-  // const Mat3 cam1_K = raw_dataset.calib_cam_to_cam.K[1];
-  // // const VecX cam1_D = raw_dataset.calib_cam_to_cam.D[1];
-  // const VecX cam1_D = Vec4::Zero();
-  // CameraProperty camprop1{1, "pinhole", cam1_K, "radtan", cam1_D,
-  // image_size};
-  // // -- cam0 to cam1 extrinsics
-  // const Mat3 R_C1C0 = raw_dataset.calib_cam_to_cam.R[1];
-  // const Vec3 t_C1C0 = raw_dataset.calib_cam_to_cam.T[1];
-  // const Mat4 T_C1_C0 = transformation_matrix(R_C1C0, t_C1C0);
-  // // -- Setup feature tracker
-  // StereoKLTTracker tracker{camprop0, camprop1, T_C1_C0, 10, 20};
-  // tracker.initialize(cam0_img, cam1_img);
+  // Setup stereo front-end
+  // -- Load first image from cam0 and cam1
+  const cv::Mat cam0_img = cv::imread(raw_dataset.cam0[0]);
+  const cv::Mat cam1_img = cv::imread(raw_dataset.cam1[0]);
+  // -- Obtain image size
+  const Vec2 image_size{img.size().width, img.size().height};
+  // -- Setup cam0 property
+  const Mat3 cam0_K = raw_dataset.calib_cam_to_cam.K[0];
+  const VecX cam0_D = Vec4::Zero();
+  CameraProperty camprop0{0, "pinhole", cam0_K, "radtan", cam0_D, image_size};
+  // -- Setup cam1 property
+  const Mat3 cam1_K = raw_dataset.calib_cam_to_cam.K[1];
+  const VecX cam1_D = Vec4::Zero();
+  CameraProperty camprop1{1, "pinhole", cam1_K, "radtan", cam1_D, image_size};
+  // -- cam0 to cam1 extrinsics
+  const Mat3 R_C1C0 = raw_dataset.calib_cam_to_cam.R[1];
+  const Vec3 t_C1C0 = raw_dataset.calib_cam_to_cam.T[1];
+  const Mat4 T_C1_C0 = transformation_matrix(R_C1C0, t_C1C0);
+  // -- Setup feature tracker
+  StereoKLTTracker stereo_tracker{camprop0, camprop1, T_C1_C0, 10, 20};
+  stereo_tracker.initialize(cam0_img, cam1_img);
 
   // Setup MSCKF
   MSCKF msckf;
@@ -93,12 +91,11 @@ int main(const int argc, const char *argv[]) {
     LOG_ERROR("Failed to configure MSCKF!");
     return -1;
   }
-  // msckf.T_C1_C0 = T_C1_C0;
+  msckf.T_C1_C0 = T_C1_C0;
   msckf.initialize(raw_dataset.oxts.timestamps[0],
                    euler2quat(raw_dataset.oxts.rpy[0]),
                    raw_dataset.oxts.v_G[0],
                    Vec3{0.0, 0.0, 0.0});
-  std::cout << msckf.last_updated << std::endl;
 
   // Record initial conditions
   blackbox.recordTimeStep(raw_dataset.oxts.time[0],
@@ -117,9 +114,14 @@ int main(const int argc, const char *argv[]) {
     const std::string cam1_img_path = raw_dataset.cam1[i];
     const cv::Mat cam0_img = cv::imread(cam0_img_path);
     const cv::Mat cam1_img = cv::imread(cam1_img_path);
-    // tracker.update(cam0_img, cam1_img);
-    tracker.update(cam0_img);
-    FeatureTracks tracks = tracker.getLostTracks();
+
+    // Mono front-end
+    mono_tracker.update(cam0_img);
+    FeatureTracks tracks = mono_tracker.getLostTracks();
+
+    // stereo_tracker.update(cam0_img, cam1_img);
+    // FeatureTracks tracks = stereo_tracker.getLostTracks();
+    // std::cout << tracks.size() << std::endl;
 
     // Triangulate tracks
     // auto T_cam1_cam0 = tracker.T_cam1_cam0;
@@ -128,7 +130,7 @@ int main(const int argc, const char *argv[]) {
     // MSCKF
     const Vec3 a_B = raw_dataset.oxts.a_B[i];
     const Vec3 w_B = raw_dataset.oxts.w_B[i];
-    const long ts = raw_dataset.oxts.timestamps[i];
+    const size_t ts = raw_dataset.oxts.timestamps[i];
     msckf.predictionUpdate(a_B, w_B, ts);
     msckf.measurementUpdate(tracks);
 

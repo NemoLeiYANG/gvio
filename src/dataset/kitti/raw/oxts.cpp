@@ -124,9 +124,16 @@ int OXTS::loadOXTS(const std::string &oxts_dir) {
 
 int OXTS::parseSingleTimeStamp(const std::string &line, long *s) {
   // Parse datetime string
-  unsigned int year, month, day, hour, minute, second, subsecond;
+  unsigned int year = 0;
+  unsigned int month = 0;
+  unsigned int day = 0;
+  unsigned int hour = 0;
+  unsigned int minute = 0;
+  unsigned int second = 0;
+  unsigned int subsecond = 0;
+
   int scanned = std::sscanf(line.c_str(),
-                            "%4u-%2u-%2u %2u:%2u:%2u.%9u",
+                            "%4u-%2u-%2u %2u:%2u:%2u.%u",
                             &year,
                             &month,
                             &day,
@@ -139,14 +146,14 @@ int OXTS::parseSingleTimeStamp(const std::string &line, long *s) {
   }
 
   // Convert datetime to milliseconds since epoch (1970)
-  struct tm t;
+  struct tm t = {}; // IMPORTANT: MUST INITIALIZE TO ZERO ELSE BUGS...
   t.tm_year = year - 1900;
   t.tm_mon = month - 1;
   t.tm_mday = day;
   t.tm_hour = hour;
   t.tm_min = minute;
   t.tm_sec = second;
-  *s = (mktime(&t) * 1e9) + subsecond;
+  *s = ((double) mktime(&t) * 1.0e9) + subsecond;
 
   return 0;
 }
@@ -158,18 +165,39 @@ int OXTS::loadTimeStamps(const std::string &oxts_dir) {
   std::ifstream timestamps_file(file_path.c_str());
 
   // Get first timestamp
-  long ts_first;
+  long ts_first = 0;
+  int retval = 0;
   std::getline(timestamps_file, line);
-  this->parseSingleTimeStamp(line, &ts_first);
+  retval = this->parseSingleTimeStamp(line, &ts_first);
+  if (retval != 0) {
+    LOG_ERROR("Failed to parse timestamp -> [%s]", line.c_str());
+    return -1;
+  }
   this->timestamps.push_back(ts_first);
   this->time.push_back(0.0);
+  line = std::string();
 
   // Parse the rest of timestamps
-  long ts;
+  long ts = 0;
   while (std::getline(timestamps_file, line)) {
-    this->parseSingleTimeStamp(line, &ts);
+    // Parse timestamp
+    retval = this->parseSingleTimeStamp(line, &ts);
+    if (retval != 0) {
+      LOG_ERROR("Failed to parse timestamp -> [%s]", line.c_str());
+      return -1;
+    }
+
+    // Check to make sure current parsed timestamp is larger than first
+    if (ts_first > ts) {
+      LOG_ERROR("First timestamp: %ld", ts_first);
+      LOG_ERROR("Current timestamp: %ld", ts);
+      LOG_ERROR("Current timestamp line: %s", line.c_str());
+      FATAL("Failed to parse timestamp properly!");
+    }
+
     this->timestamps.push_back(ts);
-    this->time.push_back((double) (ts - ts_first) * 1e-9);
+    this->time.push_back((double) (ts - ts_first) * 1.0e-9);
+    line = std::string();
   }
 
   return 0;

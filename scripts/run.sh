@@ -33,8 +33,7 @@ cmake .. && time make -j${CPU_COUNT}
 cd experiments
 ./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
 # ./kitti_runner /data/kitti/raw 2011_09_26 0046 ./configs/msckf_kitti_raw-2011_09_26-0046.yaml /tmp/msckf
-python3 scripts/plot_msckf.py /tmp/msckf/msckf
-exit 0
+python3 scripts/plot_msckf.py /tmp/msckf/msckf; exit 0
 # ./euroc_runner /data/euroc_mav/raw/V1_01_easy ./configs/msckf_euroc_V01_01_easy.yaml /tmp/msckf
 # python3 scripts/plot_euroc_dataset.py /data/euroc_mav/raw/V1_01_easy
 # ./sim_runner ./configs/sim.yaml ./configs/msckf_sim.yaml
@@ -56,7 +55,7 @@ cd tests
 # ./dataset-euroc-imu_data_test
 # ./dataset-euroc-ground_truth_test
 # ./dataset-kitti-raw-calib_test
-# ./dataset-kitti-raw-oxts_test
+./dataset-kitti-raw-oxts_test
 # ./dataset-kitti-raw-parse_test
 # ./dataset-kitti-raw-raw_test
 # ./feature2d-feature_container_test
@@ -84,7 +83,7 @@ cd tests
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
 # ./msckf-feature_estimator_test
-./msckf-msckf_test
+# ./msckf-msckf_test
 # ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test
 # ./quadrotor-mission_test

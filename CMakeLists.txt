@@ -167,7 +167,7 @@ SET(
   # dataset-euroc-imu_data_test
   # dataset-euroc-mav_dataset_test
   # dataset-kitti-raw-calib_test
-  # dataset-kitti-raw-oxts_test
+  dataset-kitti-raw-oxts_test
   # dataset-kitti-raw-parse_test
   # dataset-kitti-raw-raw_test
   # feature2d-feature_container_test

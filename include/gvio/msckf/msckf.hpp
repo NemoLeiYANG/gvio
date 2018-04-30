@@ -72,7 +72,7 @@ public:
 
   // Misc
   std::map<int, double> chi_squared_table;
-  long last_updated = -1;
+  long last_updated = 0;
 
   // Settings
   int max_window_size = 30;

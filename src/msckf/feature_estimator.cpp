@@ -192,7 +192,6 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
     if ((z1 - z2).norm() > 1.0e-3) {
       FeatureEstimator::triangulate(z1, z2, C_C0C1, t_C0_C0C1, p_C0_f);
     } else {
-      LOG_WARN("Failed to triangulate feature!");
       return -1;
     }
 
@@ -203,19 +202,18 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
     // -- Get observed image points
     const Vec2 z1 = this->track.track0.front().getKeyPoint();
     const Vec2 z2 = this->track.track1.front().getKeyPoint();
-
+    // -- Triangulate
     p_C0_f = lls_triangulation(z1, z2, this->T_C1_C0);
     if (p_C0_f(2) < 1.0) {
       LOG_WARN("Bad initialization: [%.2f, %.2f, %.2f]",
                p_C0_f(0),
                p_C0_f(1),
                p_C0_f(2));
+      // std::cout << z1.transpose() << std::endl;
+      // std::cout << z2.transpose() << std::endl;
+      // std::cout << this->T_C1_C0 << std::endl;
+      // std::cout << p_C0_f.transpose() << std::endl;
     }
-    // std::cout << z1.transpose() << std::endl;
-    // std::cout << z2.transpose() << std::endl;
-    // std::cout << this->T_C1_C0 << std::endl;
-    // std::cout << p_C0_f.transpose() << std::endl;
-    // exit(0);
 
   } else {
     FATAL("Invalid feature track type [%d]", track.type);
