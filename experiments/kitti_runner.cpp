@@ -115,17 +115,17 @@ int main(const int argc, const char *argv[]) {
     const cv::Mat cam0_img = cv::imread(cam0_img_path);
     const cv::Mat cam1_img = cv::imread(cam1_img_path);
 
-    // Mono front-end
-    mono_tracker.update(cam0_img);
-    FeatureTracks tracks = mono_tracker.getLostTracks();
+    // // Mono front-end
+    // mono_tracker.update(cam0_img);
+    // FeatureTracks tracks = mono_tracker.getLostTracks();
 
-    // stereo_tracker.update(cam0_img, cam1_img);
-    // FeatureTracks tracks = stereo_tracker.getLostTracks();
-    // std::cout << tracks.size() << std::endl;
+    // Stereo front-end
+    stereo_tracker.update(cam0_img, cam1_img);
+    FeatureTracks tracks = stereo_tracker.getLostTracks();
 
     // Triangulate tracks
-    // auto T_cam1_cam0 = tracker.T_cam1_cam0;
-    // triangulate_tracks(T_cam1_cam0, tracks);
+    auto T_cam1_cam0 = stereo_tracker.T_cam1_cam0;
+    triangulate_stereo_tracks(T_cam1_cam0, tracks);
 
     // MSCKF
     const Vec3 a_B = raw_dataset.oxts.a_B[i];

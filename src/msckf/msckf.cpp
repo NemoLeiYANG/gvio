@@ -302,12 +302,20 @@ int MSCKF::residualizeTrack(const FeatureTrack &track,
     const double v = p_C_f(1) / p_C_f(2);
     const Vec2 z_hat{u, v};
 
-    // Transform idealized measurement
-    const Vec2 z{track.track[i].getKeyPoint()};
-
     // Calculate reprojection error and add it to the residual vector
-    const int rs = 2 * i;
-    r_j.block(rs, 0, 2, 1) = z - z_hat;
+    if (track.type == MONO_TRACK) {
+      const int rs = 2 * i;
+      const Vec2 z{track.track[i].getKeyPoint()};
+      r_j.block(rs, 0, 2, 1) = z - z_hat;
+
+    } else if (track.type == STEREO_TRACK) {
+      const int rs = 2 * i;
+      const Vec2 z{track.track0[i].getKeyPoint()};
+      r_j.block(rs, 0, 2, 1) = z - z_hat;
+
+    } else {
+      FATAL("Invalid track type [%d]!", track.type);
+    }
   }
 
   // Form jacobian of measurement w.r.t both state and feature

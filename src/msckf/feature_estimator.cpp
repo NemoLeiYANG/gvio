@@ -80,7 +80,59 @@ Vec3 lls_triangulation(const Vec2 &z1, const Vec2 &z2, const Mat4 T_C1_C0) {
   return p_C0_f;
 }
 
-void triangulate_tracks(const Mat4 &T_cam1_cam0, FeatureTracks &tracks) {
+void triangulate_mono_tracks(const Mat4 &T_cam1_cam0, FeatureTracks &tracks) {
+  // Pre-check
+  if (tracks.size() == 0) {
+    return;
+  }
+
+  // Camera 0 - projection matrix P
+  const Mat3 cam0_R = I(3);
+  const Vec3 cam0_t = zeros(3, 1);
+  const Mat34 cam0_P = pinhole_projection_matrix(I(3), cam0_R, cam0_t);
+  const cv::Mat P0 = convert(cam0_P);
+
+  // Camera 1 - projection matrix P
+  const Mat3 cam1_R = T_cam1_cam0.block(0, 0, 3, 3);
+  const Vec3 cam1_t = T_cam1_cam0.block(0, 3, 3, 1);
+  Mat34 cam1_P;
+  cam1_P.block(0, 0, 3, 3) = cam1_R;
+  cam1_P.block(0, 3, 3, 1) = cam1_t;
+  const cv::Mat P1 = convert(cam1_P);
+
+  // Construct cam0 and cam1 points for triangulation
+  cv::Mat cam0_pts(2, tracks.size(), CV_32FC1);
+  cv::Mat cam1_pts(2, tracks.size(), CV_32FC1);
+  int column = 0;
+  for (auto track : tracks) {
+    // We are using the last keypoint observed because all tracks have
+    // different lengths, the only keypoints we can guarantee are observed on
+    // the same stereo camera pose are the keypoints from the last frame
+    const Vec2 z1 = track.track[0].getKeyPoint();
+    const Vec2 z2 = track.track[1].getKeyPoint();
+    cam0_pts.at<float>(0, column) = (float) z1(0);
+    cam0_pts.at<float>(1, column) = (float) z1(1);
+    cam1_pts.at<float>(0, column) = (float) z2(0);
+    cam1_pts.at<float>(1, column) = (float) z2(1);
+    column++;
+  }
+
+  // Triangulate points
+  cv::Mat pts_3d(4, tracks.size(), CV_64F);
+  cv::triangulatePoints(P0, P1, cam0_pts, cam1_pts, pts_3d);
+
+  // Normalize homogeneous 3D points and set feature tracl
+  for (int i = 0; i < pts_3d.cols; i++) {
+    const cv::Mat pt = pts_3d.col(i);
+    const float x = pt.at<float>(0, 0);
+    const float y = pt.at<float>(1, 0);
+    const float z = pt.at<float>(2, 0);
+    const float h = pt.at<float>(3, 0);
+    tracks[i].p_C0_f = Vec3{x / h, y / h, z / h};
+  }
+}
+
+void triangulate_stereo_tracks(const Mat4 &T_cam1_cam0, FeatureTracks &tracks) {
   // Pre-check
   if (tracks.size() == 0) {
     return;
@@ -202,18 +254,57 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
     // -- Get observed image points
     const Vec2 z1 = this->track.track0.front().getKeyPoint();
     const Vec2 z2 = this->track.track1.front().getKeyPoint();
-    // -- Triangulate
-    p_C0_f = lls_triangulation(z1, z2, this->T_C1_C0);
-    if (p_C0_f(2) < 1.0) {
-      LOG_WARN("Bad initialization: [%.2f, %.2f, %.2f]",
-               p_C0_f(0),
-               p_C0_f(1),
-               p_C0_f(2));
-      // std::cout << z1.transpose() << std::endl;
-      // std::cout << z2.transpose() << std::endl;
-      // std::cout << this->T_C1_C0 << std::endl;
-      // std::cout << p_C0_f.transpose() << std::endl;
-    }
+
+    // Camera 0 - projection matrix P
+    const Mat3 cam0_R = I(3);
+    const Vec3 cam0_t = zeros(3, 1);
+    const Mat34 cam0_P = pinhole_projection_matrix(I(3), cam0_R, cam0_t);
+    const cv::Mat P0 = convert(cam0_P);
+
+    // Camera 1 - projection matrix P
+    const Mat3 cam1_R = this->T_C1_C0.block(0, 0, 3, 3);
+    const Vec3 cam1_t = this->T_C1_C0.block(0, 3, 3, 1);
+    Mat34 cam1_P;
+    cam1_P.block(0, 0, 3, 3) = cam1_R;
+    cam1_P.block(0, 3, 3, 1) = cam1_t;
+    const cv::Mat P1 = convert(cam1_P);
+
+    // Construct cam0 and cam1 points for triangulation
+    cv::Mat cam0_pts(2, 1, CV_32FC1);
+    cv::Mat cam1_pts(2, 1, CV_32FC1);
+    cam0_pts.at<float>(0, 0) = (float) z1(0);
+    cam0_pts.at<float>(1, 0) = (float) z1(1);
+    cam1_pts.at<float>(0, 0) = (float) z2(0);
+    cam1_pts.at<float>(1, 0) = (float) z2(1);
+
+    // Triangulate points
+    cv::Mat pts_3d(4, 1, CV_64F);
+    cv::triangulatePoints(P0, P1, cam0_pts, cam1_pts, pts_3d);
+
+    const cv::Mat pt = pts_3d.col(0);
+    const float x = pt.at<float>(0, 0);
+    const float y = pt.at<float>(1, 0);
+    const float z = pt.at<float>(2, 0);
+    const float h = pt.at<float>(3, 0);
+    p_C0_f = Vec3{x / h, y / h, z / h};
+
+    // // -- Triangulate
+    // p_C0_f = lls_triangulation(z1, z2, this->T_C1_C0);
+    // if (p_C0_f(2) < 0.0) {
+    //   LOG_WARN("Bad initialization: [%.2f, %.2f, %.2f]",
+    //            p_C0_f(0),
+    //            p_C0_f(1),
+    //            p_C0_f(2));
+    //   // std::cout << z1.transpose() << std::endl;
+    //   // std::cout << z2.transpose() << std::endl;
+    //   // std::cout << this->T_C1_C0 << std::endl;
+    //   // std::cout << p_C0_f.transpose() << std::endl;
+    // }
+
+    // std::cout << (z1 - z2).norm() << std::endl;
+    // std::cout << z1.transpose() << std::endl;
+    // std::cout << z2.transpose() << std::endl;
+    // std::cout << p_C0_f.transpose() << std::endl;
 
   } else {
     FATAL("Invalid feature track type [%d]", track.type);
@@ -666,6 +757,7 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // const Vec3 X{this->x[0], this->x[1], 1.0};
   // const double z = 1 / this->x[2];
   // Vec3 p_C0_f_est = z * X;
+  // std::cout << this->track.p_C0_f.transpose() << std::endl;
   // std::cout << "p_C0_f initial: " << this->track.p_C0_f.transpose()
   //           << std::endl;
   // std::cout << "p_C0_f estimated: " << p_C0_f_est.transpose() << std::endl;

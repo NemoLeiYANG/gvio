@@ -5,8 +5,8 @@ PROJECT(gvio)
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(BUILD_SHARED_LIBS ON)
-SET(CMAKE_BUILD_TYPE RELEASE)
-# SET(CMAKE_BUILD_TYPE DEBUG)
+# SET(CMAKE_BUILD_TYPE RELEASE)
+SET(CMAKE_BUILD_TYPE DEBUG)
 # SET(CMAKE_IGNORE_PATH `catkin locate`)
 
 # DEPENDENCIES
@@ -185,7 +185,7 @@ SET(
   # # gimbal-saliency_test
   # imu-mpu6050_test
   # msckf-camera_state_test
-  # msckf-feature_estimator_test
+  msckf-feature_estimator_test
   # msckf-imu_state_test
   msckf-msckf_test
   # pwm-pca9685_test
@@ -211,22 +211,22 @@ FOREACH(TEST ${UNITTESTS})
   TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 ENDFOREACH(TEST)
 
-# EXPERIMENTS
-FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
-FILE(COPY experiments/scripts DESTINATION ${PROJECT_BINARY_DIR}/experiments)
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
-SET(EXPERIMENTS
-  bundle_adjustment_benchmark
-  euroc_runner
-  tracker_benchmark
-  kitti_runner
-  sim_runner
-)
-FOREACH(TEST ${EXPERIMENTS})
-  STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
-  ADD_EXECUTABLE(${TEST} experiments/${TEST_PATH}.cpp)
-  TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
-ENDFOREACH(TEST)
+# # EXPERIMENTS
+# FILE(COPY experiments/configs DESTINATION ${PROJECT_BINARY_DIR}/experiments)
+# FILE(COPY experiments/scripts DESTINATION ${PROJECT_BINARY_DIR}/experiments)
+# SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/experiments)
+# SET(EXPERIMENTS
+#   bundle_adjustment_benchmark
+#   euroc_runner
+#   tracker_benchmark
+#   kitti_runner
+#   sim_runner
+# )
+# FOREACH(TEST ${EXPERIMENTS})
+#   STRING(REGEX REPLACE "-" "/" TEST_PATH ${TEST})
+#   ADD_EXECUTABLE(${TEST} experiments/${TEST_PATH}.cpp)
+#   TARGET_LINK_LIBRARIES(${TEST} ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+# ENDFOREACH(TEST)
 
 # # TOOLS
 # SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tools)

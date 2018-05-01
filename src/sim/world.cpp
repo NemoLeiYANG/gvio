@@ -230,19 +230,25 @@ void SimWorld::detectFeatures() {
     const Vec2 kp = keypoints.row(i).transpose();
     const Vec2 img_pt = camera.camera_model.pixel2ideal(kp);
     const Vec3 ground_truth = this->features3d.row(feature_id).transpose();
-    const Feature f{img_pt, ground_truth};
+    Feature f{img_pt, ground_truth};
 
     if (this->tracks_tracking.count(feature_id)) {
       // Update feature track
+      f.track_id = this->tracks_tracking[feature_id].track_id;
       this->tracks_tracking[feature_id].update(this->time_index, f);
 
     } else {
+      // Set feature's track id
+      f.track_id = this->track_id_counter;
+
       // Add feature track
       FeatureTrack track;
+      track.track_id = this->track_id_counter;
       track.frame_start = this->time_index;
       track.frame_end = this->time_index;
       track.track.push_back(f);
       this->tracks_tracking[feature_id] = track;
+      this->track_id_counter++;
     }
 
     // Keep track of keypoints, landmarks and feature for recording
@@ -253,16 +259,22 @@ void SimWorld::detectFeatures() {
   this->features_tracking = feature_ids;
 
   // Remove tracks that are too long to lost
-  for (auto track : this->tracks_tracking) {
-    if (track.second.trackedLength() >= 20) {
-      features_lost.push_back(track.first);
+  for (auto kv : this->tracks_tracking) {
+    const auto feature_id = kv.first;
+    const auto track = kv.second;
+    if (track.trackedLength() >= 20) {
+      features_lost.push_back(feature_id);
     }
   }
 
   // Remove lost features
   for (auto feature_id : features_lost) {
-    this->tracks_lost.push_back(this->tracks_tracking[feature_id]);
-    this->tracks_tracking.erase(this->tracks_tracking.find(feature_id));
+    // Tracks that are too old may already be in feastures_lost
+    // hence we need to double check with count
+    if (this->tracks_tracking.count(feature_id)) {
+      this->tracks_lost.push_back(this->tracks_tracking[feature_id]);
+      this->tracks_tracking.erase(this->tracks_tracking.find(feature_id));
+    }
   }
 
   // Record observed keypoints and landmarks

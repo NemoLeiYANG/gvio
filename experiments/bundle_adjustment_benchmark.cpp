@@ -16,12 +16,9 @@ void print_usage() {
   std::cout << "/data/kitti/raw 2011_09_26 0005 ";
 }
 
-int main(const int argc, const char *argv[]) {
-  // Parse cli args
-  if (argc != 4) {
-    print_usage();
-    return -1;
-  }
+void run_kitti(const char *argv[],
+               CameraStates &camera_states,
+               std::vector<Vec3> &landmarks) {
   const std::string dataset_path(argv[1]);
   const std::string dataset_date(argv[2]);
   const std::string dataset_seq(argv[3]);
@@ -29,8 +26,7 @@ int main(const int argc, const char *argv[]) {
   // Load raw dataset
   RawDataset raw_dataset(dataset_path, dataset_date, dataset_seq);
   if (raw_dataset.load() != 0) {
-    LOG_ERROR("Failed to load KITTI raw dataset [%s]!", dataset_path.c_str());
-    return -1;
+    FATAL("Failed to load KITTI raw dataset [%s]!", dataset_path.c_str());
   }
 
   // Setup front-end
@@ -52,8 +48,6 @@ int main(const int argc, const char *argv[]) {
   StereoKLTTracker tracker{camprop0, camprop1, T_C1_C0, 10, 20};
   tracker.show_matches = false;
 
-  CameraStates camera_states;
-  std::vector<Vec3> landmarks;
   const Vec3 ext_p_IC{0.0, 0.0, 0.0};
   const Vec4 ext_q_CI{0.50243, -0.491157, 0.504585, -0.50172};
 
@@ -72,6 +66,10 @@ int main(const int argc, const char *argv[]) {
     const Vec4 cam_q_CG = quatlcomp(ext_q_CI) * imu_q_IG;
     const Vec3 cam_p_G = imu_p_G + C(imu_q_IG).transpose() * ext_p_IC;
     camera_states.emplace_back(i, cam_p_G, cam_q_CG);
+
+    // // Triangulate tracks
+    // auto T_cam1_cam0 = tracker.T_cam1_cam0;
+    // triangulate_tracks(T_cam1_cam0, tracks);
 
     // Estimate features
     int landmarks_added = 0;
@@ -98,6 +96,21 @@ int main(const int argc, const char *argv[]) {
     }
   }
   LOG_INFO("Dataset done!");
+}
+
+int main(const int argc, const char *argv[]) {
+  // Parse cli args
+  if (argc != 4) {
+    print_usage();
+    return -1;
+  }
+
+  // Benchmark outputs
+  CameraStates camera_states;
+  std::vector<Vec3> landmarks;
+
+  // Run benchmark
+  run_kitti(argv, camera_states, landmarks);
 
   // Output landmarks to file
   LOG_INFO("Outputting landmarks to file!");

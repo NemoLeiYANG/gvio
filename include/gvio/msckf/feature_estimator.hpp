@@ -67,7 +67,7 @@ Vec3 lls_triangulation(const Vec2 &z1,
                        const Vec3 &t_C0_C0C1);
 
 /**
- * Triangulate feature tracks
+ * Triangulate monocular feature tracks
  *
  * This function uses OpenCV's `cv::triangulatePoints()` to initialize the
  * feature position in 3D.
@@ -75,7 +75,18 @@ Vec3 lls_triangulation(const Vec2 &z1,
  * @param T_C1_C0 Transformation matrix from camera 0 to camera 1
  * @param tracks Feature tracks to triangulate
  */
-void triangulate_tracks(const Mat4 &T_cam1_cam0, FeatureTracks &tracks);
+void triangulate_mono_tracks(const Mat4 &T_cam1_cam0, FeatureTracks &tracks);
+
+/**
+ * Triangulate stereo feature tracks
+ *
+ * This function uses OpenCV's `cv::triangulatePoints()` to initialize the
+ * feature position in 3D.
+ *
+ * @param T_C1_C0 Transformation matrix from camera 0 to camera 1
+ * @param tracks Feature tracks to triangulate
+ */
+void triangulate_stereo_tracks(const Mat4 &T_cam1_cam0, FeatureTracks &tracks);
 
 /**
  * Feature estimator

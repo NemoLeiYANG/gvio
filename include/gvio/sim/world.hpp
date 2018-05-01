@@ -52,6 +52,7 @@ public:
   size_t nb_features = 1000;
   MatX features3d;
 
+  long track_id_counter = 0;
   std::vector<int> features_tracking;
   std::map<int, FeatureTrack> tracks_tracking;
   FeatureTracks tracks_lost;
