@@ -39,6 +39,11 @@ cmake .. && time make -j${CPU_COUNT}
 # ./sim_runner ./configs/sim.yaml ./configs/msckf_sim.yaml
 # python3 scripts/plot_sim.py /tmp/sim
 # ./tracker_benchmark /data/euroc_mav/raw/V1_01_easy; exit 0
+# python3 scripts/plot_tracker_stats.py \
+#   /home/chutsu/mono_klt \
+#   /home/chutsu/cam0_K.csv \
+#   /home/chutsu/mono_klt_stats.csv
+  # /tmp/mono_orb_stats.csv
 # ./bundle_adjustment_benchmark /data/kitti/raw 2011_09_26 0005; exit 0
 
 # TESTS
@@ -82,13 +87,13 @@ cd tests
 # ./imu-mpu6050_test
 # ./msckf-camera_state_test
 # ./msckf-imu_state_test
-./msckf-feature_estimator_test
+# ./msckf-feature_estimator_test
 # ./msckf-msckf_test
 # ./pwm-pca9685_test
 # ./quadrotor-quadrotor_model_test
 # ./quadrotor-mission_test
 # ./sim-bezier_test
-# ./sim-camera_test
+./sim-camera_test
 # ./sim-camera_motion_test
 # ./sim-twowheel_test
 # ./sim-world_test

@@ -143,9 +143,137 @@ int test_VirtualCamera_observedFeatures() {
   return 0;
 }
 
+int test_VirtualStereoCamera_observedFeatures() {
+  struct test_config config;
+  const Mat3 R_C1C0 = I(3);
+  const Vec3 t_C1C0{0.5, 0.0, 0.0};
+  const Mat4 T_cam1_cam0 = transformation_matrix(R_C1C0, t_C1C0);
+  VirtualStereoCamera cam_model(config.image_width,
+                                config.image_height,
+                                config.fx,
+                                config.fy,
+                                config.cx,
+                                config.cy,
+                                T_cam1_cam0);
+
+  MatX features;
+  features.resize(1, 3);
+  features << 10.0, 0.0, 0.0;
+
+  // Test no change in orientation
+  Vec3 rpy{deg2rad(0.0), deg2rad(0.0), deg2rad(0.0)};
+  Vec3 t{0.0, 0.0, 0.0};
+  MatX observed;
+  std::vector<int> feature_ids;
+  observed = cam_model.observedFeatures(features, rpy, t, feature_ids);
+
+  MU_CHECK_EQ(1, feature_ids.size());
+  MU_CHECK_EQ(0, feature_ids[0]);
+  MU_CHECK_EQ(2, observed.rows());
+  MU_CHECK_EQ(2, observed.cols());
+  MU_CHECK_FLOAT(320.0, observed(0, 0));
+  MU_CHECK_FLOAT(320.0, observed(0, 1));
+
+  // Test change in roll
+  features.row(0) = Vec3{10.0, 1.0, 0.0};
+  rpy = Vec3{deg2rad(10.0), deg2rad(0.0), deg2rad(0.0)};
+  t = Vec3{0.0, 0.0, 0.0};
+  feature_ids.clear();
+  observed = cam_model.observedFeatures(features, rpy, t, feature_ids);
+
+  MU_CHECK_EQ(1, feature_ids.size());
+  MU_CHECK_EQ(0, feature_ids[0]);
+  MU_CHECK_EQ(1, observed.rows());
+  MU_CHECK_EQ(2, observed.cols());
+  MU_CHECK(320.0 > observed(0, 0));
+  MU_CHECK(320.0 < observed(0, 1));
+
+  // Test change in pitch
+  features.row(0) = Vec3{10.0, 0.0, 0.0};
+  rpy = Vec3{deg2rad(0.0), deg2rad(10.0), deg2rad(0.0)};
+  t = Vec3{0.0, 0.0, 0.0};
+  feature_ids.clear();
+  observed = cam_model.observedFeatures(features, rpy, t, feature_ids);
+
+  MU_CHECK_EQ(1, feature_ids.size());
+  MU_CHECK_EQ(0, feature_ids[0]);
+  MU_CHECK_EQ(1, observed.rows());
+  MU_CHECK_EQ(2, observed.cols());
+  MU_CHECK_FLOAT(320.0, observed(0, 0));
+  MU_CHECK(320.0 > observed(0, 1));
+
+  // Test change in yaw
+  features.row(0) = Vec3{10.0, 0.0, 0.0};
+  rpy = Vec3{deg2rad(0.0), deg2rad(0.0), deg2rad(10.0)};
+  t = Vec3{0.0, 0.0, 0.0};
+  feature_ids.clear();
+  observed = cam_model.observedFeatures(features, rpy, t, feature_ids);
+
+  MU_CHECK_EQ(1, feature_ids.size());
+  MU_CHECK_EQ(0, feature_ids[0]);
+  MU_CHECK_EQ(1, observed.rows());
+  MU_CHECK_EQ(2, observed.cols());
+  MU_CHECK(320.0 < observed(0, 0));
+  MU_CHECK_FLOAT(320.0, observed(0, 1));
+
+  // Test change in translation x in global frame
+  features.row(0) = Vec3{10.0, 0.0, 0.0};
+  rpy = Vec3{deg2rad(0.0), deg2rad(0.0), deg2rad(0.0)};
+  t = Vec3{1.0, 0.0, 0.0};
+  feature_ids.clear();
+  observed = cam_model.observedFeatures(features, rpy, t, feature_ids);
+
+  MU_CHECK_EQ(1, feature_ids.size());
+  MU_CHECK_EQ(0, feature_ids[0]);
+  MU_CHECK_EQ(1, observed.rows());
+  MU_CHECK_EQ(2, observed.cols());
+  MU_CHECK_FLOAT(320.0, observed(0, 0));
+  MU_CHECK_FLOAT(320.0, observed(0, 1));
+
+  // Test change in translation y in global frame
+  features.row(0) = Vec3{10.0, 0.0, 0.0};
+  rpy = Vec3{deg2rad(0.0), deg2rad(0.0), deg2rad(0.0)};
+  t = Vec3{0.0, 1.0, 0.0};
+  feature_ids.clear();
+  observed = cam_model.observedFeatures(features, rpy, t, feature_ids);
+
+  MU_CHECK_EQ(1, feature_ids.size());
+  MU_CHECK_EQ(0, feature_ids[0]);
+  MU_CHECK_EQ(1, observed.rows());
+  MU_CHECK_EQ(2, observed.cols());
+  MU_CHECK(320.0 < observed(0, 0));
+  MU_CHECK_FLOAT(320.0, observed(0, 1));
+
+  // Test change in translation z in global frame
+  features.row(0) = Vec3{10.0, 0.0, 0.0};
+  rpy = Vec3{deg2rad(0.0), deg2rad(0.0), deg2rad(0.0)};
+  t = Vec3{0.0, 0.0, 1.0};
+  feature_ids.clear();
+  observed = cam_model.observedFeatures(features, rpy, t, feature_ids);
+
+  MU_CHECK_EQ(1, feature_ids.size());
+  MU_CHECK_EQ(0, feature_ids[0]);
+  MU_CHECK_EQ(1, observed.rows());
+  MU_CHECK_EQ(2, observed.cols());
+  MU_CHECK_FLOAT(320.0, observed(0, 0));
+  MU_CHECK(320.0 < observed(0, 1));
+
+  // Test point is behind camera
+  features.row(0) = Vec3{-10.0, 0.0, 0.0};
+  rpy = Vec3{deg2rad(0.0), deg2rad(0.0), deg2rad(0.0)};
+  t = Vec3{0.0, 0.0, 0.0};
+  feature_ids.clear();
+  observed = cam_model.observedFeatures(features, rpy, t, feature_ids);
+
+  MU_CHECK_EQ(0, feature_ids.size());
+
+  return 0;
+}
+
 void test_suite() {
   MU_ADD_TEST(test_VirtualCamera_constructor);
   MU_ADD_TEST(test_VirtualCamera_observedFeatures);
+  MU_ADD_TEST(test_VirtualStereoCamera_observedFeatures);
 }
 
 } // namespace gvio

@@ -20,6 +20,7 @@ namespace gvio {
 class ORBTracker : public FeatureTracker {
 public:
   cv::Ptr<cv::ORB> orb = cv::ORB::create();
+  bool use_grid_fast = false;
 
   ORBTracker();
   ORBTracker(const CameraProperty &camera_property);

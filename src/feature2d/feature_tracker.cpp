@@ -87,6 +87,7 @@ int FeatureTracker::match(const Features &f1,
     const cv::Mat matches_img =
         draw_matches(this->img_ref, this->img_cur, k0, k1, matches);
     cv::imshow("Matches", matches_img);
+    cv::waitKey(1);
   }
 
   // Update or add feature track
@@ -119,20 +120,22 @@ int FeatureTracker::match(const Features &f1,
     }
   }
 
-  // Update list of reference and unmatched features
-  this->unmatched.clear();
-  int replenish_size = std::min(f1.size(), this->features.buffer.size() - 1000);
+  // Update tracker stats
+  this->stats.update(this->features.tracking.size(),
+                     this->features.lost.size());
 
-  for (int i = 0; i < replenish_size; i++) {
+  // Update list of reference and unmatched features
+  // -- Clear unmatched
+  this->unmatched.clear();
+  // -- Calculate replenish size
+  int replenish_size = this->max_features - this->features.tracking.size();
+  replenish_size = (replenish_size > 0) ? replenish_size : 0;
+  // -- Replenish features tracking (to make sure we don't runout over time)
+  for (int i = 0; i < (int) std::min(f1.size(), (size_t) replenish_size); i++) {
     if (idx_updated.find(i) == idx_updated.end()) {
       this->unmatched.push_back(f1[i]);
     }
   }
-
-  std::cout << "buffer_size: " << this->features.buffer.size() << std::endl;
-  std::cout << "unmatched_size: "
-            << this->unmatched.size() + this->fea_ref.size() << std::endl;
-  std::cout << std::endl;
 
   return 0;
 }

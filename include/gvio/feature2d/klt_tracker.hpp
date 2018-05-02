@@ -33,6 +33,7 @@ public:
   std::vector<cv::Point2f> p_cur;
   std::vector<uchar> inlier_mask;
 
+  bool use_grid_fast = false;
   int max_corners = 1000;
   double quality_level = 0.001;
   double min_distance = 5.0;
@@ -40,6 +41,9 @@ public:
 
   int image_width = 0;
   int image_height = 0;
+
+  // Stats
+  struct FeatureContainerStats stats;
 
   KLTTracker();
 

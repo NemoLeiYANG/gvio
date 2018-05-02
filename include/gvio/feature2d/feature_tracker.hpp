@@ -36,7 +36,7 @@ public:
   FeatureContainer features;
   Features unmatched;
   Features fea_ref;
-  int max_features = 2000;
+  int max_features = 1000;
 
   // Image, feature, unmatched features book keeping
   cv::Mat img_cur;
@@ -48,6 +48,9 @@ public:
 
   // Settings
   bool show_matches = false;
+
+  // Stats
+  struct FeatureContainerStats stats;
 
   FeatureTracker();
   FeatureTracker(const CameraProperty &camera_property);

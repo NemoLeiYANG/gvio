@@ -15,21 +15,26 @@ ORBTracker::ORBTracker(const CameraProperty &camera_property,
 ORBTracker::~ORBTracker() {}
 
 int ORBTracker::detect(const cv::Mat &image, Features &features) {
-  // // Feature descriptor extraction
+  // Convert image to graysacle
+  cv::Mat image_gray;
+  if (image.channels() == 3) {
+    cv::cvtColor(image, image_gray, CV_BGR2GRAY);
+  } else {
+    image_gray = image.clone();
+  }
+
+  // Detect and extract feature descriptors
   std::vector<cv::KeyPoint> keypoints;
   cv::Mat mask;
   cv::Mat descriptors;
-  // this->orb->detectAndCompute(image, mask, keypoints, descriptors);
 
-  cv::Mat image_gray;
-  cv::cvtColor(image, image_gray, CV_BGR2GRAY);
-  keypoints = grid_fast(image_gray, 1000, 5, 5, 40.0);
-  this->orb->compute(image, keypoints, descriptors);
+  if (this->use_grid_fast) {
+    keypoints = grid_fast(image_gray, 1000, 5, 5, 40.0);
+    this->orb->compute(image, keypoints, descriptors);
 
-  // for (auto kp : keypoints) {
-  //   std::cout << kp.response << std::endl;
-  // }
-  // exit(0);
+  } else {
+    this->orb->detectAndCompute(image, mask, keypoints, descriptors);
+  }
 
   // Update counters
   this->counter_frame_id += 1;

@@ -43,27 +43,37 @@ int main(const int argc, const char *argv[]) {
   const VecX cam1_D = mav_data.cam0_data.distortion_coefficients;
   CameraProperty camprop1{1, "pinhole", cam1_K, "radtan", cam1_D, image_size};
 
-  // // Mono ORB tracker
-  // // clang-format off
-  // ORBTracker orb_tracker(camprop0, 2, 100);
-  // orb_tracker.show_matches = true;
-  // mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(ORBTracker::update,
-  // orb_tracker);
-  // mav_data.get_tracks_cb =
-  // BIND_GET_TRACKS_CALLBACK(ORBTracker::getLostTracks, orb_tracker);
-  // mav_data.run();
-  // save_feature_tracks(mav_data.feature_tracks, "/tmp/orb_feature_tracks");
-  // // clang-format on
+  // auto image = cv::imread(mav_data.cam0_data.image_paths[0]);
+  // std::cout << image.rows << std::endl;
+  // std::cout << image.cols << std::endl;
 
   // Mono ORB tracker
   // clang-format off
+  ORBTracker orb_tracker(camprop0, 2, 100);
+  orb_tracker.show_matches = false;
+  mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(ORBTracker::update, orb_tracker);
+  mav_data.get_tracks_cb = BIND_GET_TRACKS_CALLBACK(ORBTracker::getLostTracks, orb_tracker);
+  mav_data.run();
+  save_feature_tracks(mav_data.feature_tracks, "/tmp/mono_orb");
+  orb_tracker.stats.save("/tmp/mono_orb_stats.csv");
+  // clang-format on
+
+  // Mono KLT tracker
+  // clang-format off
   KLTTracker klt_tracker(camprop0, 2, 100);
-  klt_tracker.show_matches = true;
+  klt_tracker.show_matches = false;
   mav_data.mono_camera_cb = BIND_MONO_CAMERA_CALLBACK(KLTTracker::update, klt_tracker);
   mav_data.get_tracks_cb = BIND_GET_TRACKS_CALLBACK(KLTTracker::getLostTracks, klt_tracker);
   mav_data.run();
-  save_feature_tracks(mav_data.feature_tracks, "/tmp/klt_feature_tracks");
+  save_feature_tracks(mav_data.feature_tracks, "/tmp/mono_klt");
+  klt_tracker.stats.save("/tmp/mono_klt_stats.csv");
   // clang-format on
+
+  // for (int i = 0; i < (int) klt_tracker.stats_tracking.size(); i++) {
+  //   std::cout << klt_tracker.stats_tracking[i] << "\t";
+  //   std::cout << klt_tracker.stats_lost[i] << "\n";
+  // }
+  // std::cout << std::endl;
 
   // // Stereo KLT tracker
   // // clang-format off

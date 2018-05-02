@@ -14,6 +14,32 @@ namespace gvio {
  * @{
  */
 
+/**
+ * Feature container stats
+ */
+struct FeatureContainerStats {
+  std::vector<int> tracking;
+  std::vector<int> lost;
+
+  /**
+   * Keep track of features tracking and lost
+   *
+   * @param tracking Features currently tracking
+   * @param lost Features lost
+   */
+  void update(const int tracking, const int lost);
+
+  /**
+   * Output stats to file
+   *
+   * @param output_path Output path for stats
+   */
+  int save(const std::string &output_path);
+};
+
+/**
+ * Feature container
+ */
 struct FeatureContainer {
   TrackID counter_track_id = 0;
   size_t min_track_length = 10;

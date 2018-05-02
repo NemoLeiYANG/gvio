@@ -60,7 +60,10 @@ int KLTTracker::initialize(const cv::Mat &img_cur) {
   this->counter_frame_id++;
   this->image_width = img_cur.cols;
   this->image_height = img_cur.rows;
-  return this->detect(img_cur, this->fea_ref);
+
+  int retval = this->detect(img_cur, this->fea_ref);
+
+  return retval;
 }
 
 int KLTTracker::detect(const cv::Mat &image, Features &features) {
@@ -68,24 +71,24 @@ int KLTTracker::detect(const cv::Mat &image, Features &features) {
   cv::Mat image_gray;
   cv::cvtColor(image, image_gray, CV_BGR2GRAY);
 
-  // // Feature detection
-  // std::vector<cv::Point2f> corners;
-  // cv::goodFeaturesToTrack(image_gray,
-  //                         corners,
-  //                         this->max_corners,
-  //                         this->quality_level,
-  //                         this->min_distance);
-  //
-  // // Create features
-  // features.clear();
-  // for (auto corner : corners) {
-  //   features.emplace_back(corner);
-  // }
-
-  auto keypoints = grid_fast(image_gray, this->max_corners, 5, 5, 40.0);
-  features.clear();
-  for (auto keypoint : keypoints) {
-    features.emplace_back(keypoint);
+  // Feature detection
+  if (use_grid_fast) {
+    auto keypoints = grid_fast(image_gray, this->max_corners, 5, 5, 40.0);
+    features.clear();
+    for (auto keypoint : keypoints) {
+      features.emplace_back(keypoint);
+    }
+  } else {
+    std::vector<cv::Point2f> corners;
+    cv::goodFeaturesToTrack(image_gray,
+                            corners,
+                            this->max_corners,
+                            this->quality_level,
+                            this->min_distance);
+    features.clear();
+    for (auto corner : corners) {
+      features.emplace_back(corner);
+    }
   }
 
   return 0;
@@ -119,8 +122,16 @@ int KLTTracker::track(const cv::Mat &img_ref,
 
   // Convert input images to gray scale
   cv::Mat gray_img_ref, gray_img_cur;
-  cv::cvtColor(img_ref, gray_img_ref, CV_BGR2GRAY);
-  cv::cvtColor(img_cur, gray_img_cur, CV_BGR2GRAY);
+  if (img_ref.channels() == 3) {
+    cv::cvtColor(img_ref, gray_img_ref, CV_BGR2GRAY);
+  } else {
+    gray_img_ref = img_ref.clone();
+  }
+  if (img_cur.channels() == 3) {
+    cv::cvtColor(img_cur, gray_img_cur, CV_BGR2GRAY);
+  } else {
+    gray_img_cur = img_cur.clone();
+  }
 
   // Track features with KLT
   this->p_cur.clear();
@@ -160,6 +171,10 @@ int KLTTracker::track(const cv::Mat &img_ref,
     this->inlier_mask.push_back(status);
   }
 
+  // Update tracker stats
+  this->stats.update(this->features.tracking.size(),
+                     this->features.lost.size());
+
   // Show matches
   if (this->show_matches) {
     cv::Mat matches_img =
@@ -194,11 +209,15 @@ int KLTTracker::replenishFeatures(const cv::Mat &image, Features &features) {
   // Detect new features
   Features fea_new;
   this->detect(image, fea_new);
+
+  // Add new features to feature list
+  int added = 0;
   for (auto f : fea_new) {
     const int px = int(f.kp.pt.x);
     const int py = int(f.kp.pt.y);
-    if (pt_grid(py, px) == 0) {
+    if (pt_grid(py, px) == 0 && added < replenish_size) {
       features.push_back(f);
+      added++;
     }
   }
 

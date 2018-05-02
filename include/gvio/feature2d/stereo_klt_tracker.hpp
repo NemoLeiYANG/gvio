@@ -48,6 +48,9 @@ public:
   int image_height = 0;
   bool show_matches = false;
 
+  // Stats
+  struct FeatureContainerStats stats;
+
   StereoKLTTracker();
   StereoKLTTracker(const CameraProperty &camprop0,
                    const CameraProperty &camprop1,

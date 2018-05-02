@@ -3,6 +3,27 @@
 
 namespace gvio {
 
+int test_FeatureContainerStats_update() {
+  FeatureContainerStats stats;
+
+  stats.update(1, 2);
+  MU_CHECK(stats.tracking.size() == 1);
+  MU_CHECK(stats.lost.size() == 1);
+  MU_CHECK(stats.tracking.size() == stats.lost.size());
+
+  return 0;
+}
+
+int test_FeatureContainerStats_save() {
+  FeatureContainerStats stats;
+
+  stats.update(1, 2);
+  int retval = stats.save("/tmp/stat.csv");
+  MU_CHECK(retval == 0);
+
+  return 0;
+}
+
 int test_FeatureContainer_addTrack() {
   FeatureContainer features;
   Feature f1;
@@ -109,6 +130,9 @@ int test_FeatureContainer_purge() {
 }
 
 void test_suite() {
+  MU_ADD_TEST(test_FeatureContainerStats_update);
+  MU_ADD_TEST(test_FeatureContainerStats_save);
+
   MU_ADD_TEST(test_FeatureContainer_addTrack);
   MU_ADD_TEST(test_FeatureContainer_removeTrack);
   MU_ADD_TEST(test_FeatureContainer_removeTracks);

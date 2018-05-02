@@ -33,6 +33,9 @@ struct feature_bounds {
   double z_max = 0.0;
 };
 
+#define MONOCULAR_CAMERA "MONOCULAR_CAMERA"
+#define STEREO_CAMERA "STEREO_CAMERA"
+
 /**
  * Simulation world
  */
@@ -45,6 +48,8 @@ public:
   size_t frame_index = 0;
 
   VirtualCamera camera;
+  std::string camera_type = MONOCULAR_CAMERA;
+  Mat4 T_C1_C0 = I(4);
   CameraMotion camera_motion;
 
   Vec3 origin{0.0, 0.0, 0.0};

@@ -103,6 +103,7 @@ public:
   CameraData cam0_data;
   CameraData cam1_data;
   GroundTruth ground_truth;
+  cv::Size image_size;
 
   long ts_start = 0;
   long ts_end = 0;

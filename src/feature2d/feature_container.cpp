@@ -2,6 +2,33 @@
 
 namespace gvio {
 
+void FeatureContainerStats::update(const int tracking, const int lost) {
+  assert(this->tracking.size() == this->lost.size());
+  this->tracking.push_back(tracking);
+  this->lost.push_back(lost);
+}
+
+int FeatureContainerStats::save(const std::string &output_path) {
+  // Open file
+  std::ofstream stats_file(output_path);
+  if (stats_file.good() == false) {
+    LOG_ERROR("Failed to open file at [%s]!", output_path.c_str());
+    return -1;
+  }
+
+  // Write header
+  stats_file << "tracking,lost" << std::endl;
+
+  // Write data
+  for (size_t i = 0; i < this->tracking.size(); i++) {
+    stats_file << this->tracking[i] << ",";
+    stats_file << this->lost[i] << std::endl;
+  }
+  stats_file.close();
+
+  return 0;
+}
+
 FeatureContainer::FeatureContainer() {}
 
 FeatureContainer::FeatureContainer(const size_t min_track_length,

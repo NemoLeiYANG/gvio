@@ -61,6 +61,9 @@ int MAVDataset::loadCameraData() {
     this->timeline.insert({ts, cam1_event});
   }
 
+  cv::Mat image = cv::imread(this->cam0_data.image_paths[0]);
+  this->image_size = cv::Size(image.size());
+
   return 0;
 }
 

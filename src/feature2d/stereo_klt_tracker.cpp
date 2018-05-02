@@ -95,6 +95,7 @@ int StereoKLTTracker::initialize(const cv::Mat &cam0_img,
     LOG_ERROR("Failed to detect any features !");
     return -1;
   }
+  this->stats.update(pts0.size(), 0);
 
   // Project keypoints from cam0 to cam1 to form k1
   const Mat3 R_cam1_cam0 = this->T_cam1_cam0.block(0, 0, 3, 3);
@@ -195,6 +196,7 @@ void StereoKLTTracker::trackFeatures(const cv::Mat &cam0_img,
   std::vector<cv::Point2f> pts0_inliers;
   std::vector<cv::Point2f> pts1_inliers;
   std::vector<int> tracks_tracking;
+  int nb_outliers = 0;
 
   for (size_t i = 0; i < pts0_ref.size(); i++) {
     bool is_inlier = (t0_mask[i] && t1_mask[i] && s_mask[i]) ? true : false;
@@ -208,6 +210,8 @@ void StereoKLTTracker::trackFeatures(const cv::Mat &cam0_img,
       pts0_inliers.push_back(pts0_cur[i]);
       pts1_inliers.push_back(pts1_cur[i]);
       tracks_tracking.push_back(track_id);
+    } else {
+      nb_outliers++;
     }
   }
 
@@ -217,6 +221,7 @@ void StereoKLTTracker::trackFeatures(const cv::Mat &cam0_img,
   this->cam1_pts = pts1_inliers;
   this->prev_cam0_img = cam0_img.clone();
   this->prev_cam1_img = cam1_img.clone();
+  this->stats.update(this->cam0_pts.size(), nb_outliers);
 
   if (this->show_matches) {
     std::vector<uchar> mask(pts0_inliers.size(), 1);
