@@ -461,9 +461,9 @@ int MSCKF::measurementUpdate(const FeatureTracks &tracks) {
   // Calculate the Kalman gain.
   const MatX P = this->P();
   const MatX R_n = this->img_var * I(T_H.rows());
-  const MatX S = T_H * P * T_H.transpose() + R_n;
   // -- Using Cholesky decomposition for matrix inversion
   // Note: Below is equiv to P * T_H^T * (T_H * P * T_H^T + R_n)^-1
+  const MatX S = T_H * P * T_H.transpose() + R_n;
   const MatX K = S.ldlt().solve(T_H * P).transpose();
   // -- Conventional Kalman gain calculation
   // const MatX K =

@@ -1,8 +1,9 @@
 t_end: 10.0
-dt: 0.1
+fps: 100
 output_path: "/tmp/sim"
 
 camera:
+  type: "MONO_CAMERA"
   image_width: 640
   image_height: 640
   fov: 120

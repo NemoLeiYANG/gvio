@@ -1,9 +1,11 @@
 #include "gvio/munit.hpp"
 #include "gvio/sim/world.hpp"
+#include "gvio/msckf/imu_state.hpp"
 
 namespace gvio {
 
-#define TEST_CONFIG "test_configs/sim/sim.yaml"
+#define TEST_MONO_CONFIG "test_configs/sim/sim_mono_camera.yaml"
+#define TEST_STEREO_CONFIG "test_configs/sim/sim_stereo_camera.yaml"
 
 int test_SimWorld_constructor() {
   SimWorld world;
@@ -18,22 +20,12 @@ int test_SimWorld_constructor() {
 int test_SimWorld_configure() {
   SimWorld world;
 
-  world.configure(10.0, 0.1);
+  world.configure(TEST_MONO_CONFIG);
   MU_CHECK_FLOAT(0.0, world.t);
   MU_CHECK_FLOAT(0.1, world.dt);
 
-  return 0;
-}
-
-int test_SimWorld_configure2() {
-  SimWorld world;
-
-  world.configure(TEST_CONFIG);
-  MU_CHECK_FLOAT(0.0, world.t);
-  MU_CHECK_FLOAT(0.1, world.dt);
-
-  MU_CHECK_EQ(640, world.camera.camera_model.image_width);
-  MU_CHECK_EQ(640, world.camera.camera_model.image_height);
+  MU_CHECK_EQ(640, world.mono_camera.camera_model.image_width);
+  MU_CHECK_EQ(640, world.mono_camera.camera_model.image_height);
   MU_CHECK_EQ(4, world.camera_motion.pos_points.size());
   MU_CHECK_EQ(4, world.camera_motion.att_points.size());
 
@@ -94,7 +86,7 @@ int test_SimWorld_detectFeatures() {
   SimWorld world;
 
   // Test SimWorld.detectFeatures()
-  world.configure(10.0, 0.1);
+  world.configure(TEST_MONO_CONFIG);
   world.detectFeatures();
   for (int i = 0; i < 100; i++) {
     world.step();
@@ -113,7 +105,7 @@ int test_SimWorld_getLostTracks() {
   SimWorld world;
 
   // Test SimWorld.getLostTracks()
-  world.configure(10.0, 0.1);
+  world.configure(TEST_MONO_CONFIG);
   world.detectFeatures();
   for (int i = 0; i < 10; i++) {
     std::cout << "frame: " << i << std::endl;
@@ -128,11 +120,11 @@ int test_SimWorld_getLostTracks() {
   return 0;
 }
 
-int test_SimWorld_step() {
+int test_SimWorld_step_mono_camera() {
   SimWorld world;
 
   // Test step
-  world.configure(TEST_CONFIG);
+  world.configure(TEST_MONO_CONFIG);
   while (world.t <= 10.0) {
     world.step();
   }
@@ -148,15 +140,45 @@ int test_SimWorld_step() {
   return 0;
 }
 
+int test_SimWorld_step_stereo_camera() {
+  SimWorld world;
+  IMUState imu;
+
+  // Test step
+  world.configure(TEST_STEREO_CONFIG);
+  imu.q_IG = euler2quat(world.camera_motion.rpy_G);
+  imu.p_G = world.camera_motion.p_G;
+  imu.v_G = world.camera_motion.v_G;
+
+  while (world.step() == 0) {
+    const Vec3 a_m = world.camera_motion.a_B;
+    const Vec3 w_m = world.camera_motion.w_B;
+    imu.update(a_m, w_m, world.dt);
+  }
+  FeatureTracks tracks = world.getLostTracks();
+
+  // Assert
+  MU_CHECK(tracks.size() > 0);
+  MU_CHECK_EQ(0, world.tracks_lost.size());
+
+  std::cout << world.camera_motion.p_G.transpose() << std::endl;
+  std::cout << imu.p_G.transpose() << std::endl;
+
+  // Plot
+  // PYTHON_SCRIPT("scripts/plot_sim.py /tmp/sim");
+
+  return 0;
+}
+
 void test_suite() {
-  MU_ADD_TEST(test_SimWorld_constructor);
-  MU_ADD_TEST(test_SimWorld_configure);
-  MU_ADD_TEST(test_SimWorld_configure2);
-  MU_ADD_TEST(test_SimWorld_create3DFeatures);
-  MU_ADD_TEST(test_SimWorld_create3DFeaturePerimeter);
-  MU_ADD_TEST(test_SimWorld_detectFeatures);
-  MU_ADD_TEST(test_SimWorld_getLostTracks);
-  MU_ADD_TEST(test_SimWorld_step);
+  // MU_ADD_TEST(test_SimWorld_constructor);
+  // MU_ADD_TEST(test_SimWorld_configure);
+  // MU_ADD_TEST(test_SimWorld_create3DFeatures);
+  // MU_ADD_TEST(test_SimWorld_create3DFeaturePerimeter);
+  // MU_ADD_TEST(test_SimWorld_detectFeatures);
+  // MU_ADD_TEST(test_SimWorld_getLostTracks);
+  // MU_ADD_TEST(test_SimWorld_step_mono_camera);
+  MU_ADD_TEST(test_SimWorld_step_stereo_camera);
 }
 
 } // namespace gvio

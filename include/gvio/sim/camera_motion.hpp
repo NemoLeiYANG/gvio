@@ -20,7 +20,9 @@ public:
   // Simulation settings
   std::vector<Vec3> pos_points; ///< Bezier curve position control points
   std::vector<Vec3> att_points; ///< Bezier curve attitude control points
-  double max_time = 0.0;        ///< Simulation max time [s]
+  double time_index = 0.0;      ///< Bezier curve parameter between 0.0 to 1.0
+  int max_steps = 0.0;          ///< Max simulation steps
+  double dt = 0.0;              ///< Simulation time difference [s]
 
   // Camera position velocity and accelation
   Vec3 p_G = Vec3::Zero();   ///< Global position [m]
@@ -37,16 +39,19 @@ public:
 
   CameraMotion(const std::vector<Vec3> &pos_points,
                const std::vector<Vec3> &att_points,
-               const double max_time);
+               const int max_steps);
 
   virtual ~CameraMotion();
 
   /**
    * Update
    *
-   * @time Current simulation time [s]
+   * @returns
+   *   - 0 for success
+   *   - -1 for failure
+   *   - 1 for camera motion complete
    */
-  void update(const double time);
+  int update();
 };
 
 /**

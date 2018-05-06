@@ -92,13 +92,11 @@ MatX VirtualStereoCamera::observedFeatures(const MatX &features,
   // EDN: (x - right, y - down, z - forward)
   const Vec3 rpy_C{-rpy_G(1), -rpy_G(2), rpy_G(0)};
   const Mat3 R_C0G = euler123ToRot(rpy_C);
-  const Mat3 R_C1C0 = this->T_cam1_cam0.block(0, 0, 3, 3);
-  const Mat3 R_C1G = R_C1C0 * R_C0G;
-
-  // Transform translation from global frame to camera frame
   const Vec3 t_C0 = rotx(-M_PI / 2.0) * rotz(-M_PI / 2.0) * t_G;
-  const Vec3 t_C1C0 = this->T_cam1_cam0.block(0, 3, 3, 1);
-  const Vec3 t_C1 = t_C1C0 + t_C0;
+
+  const Mat4 T_cam0_cam1 = this->T_cam1_cam0.inverse();
+  const Mat3 R_C1G = T_cam0_cam1.block(0, 0, 3, 3) * R_C0G;
+  const Vec3 t_C1 = (T_cam0_cam1 * t_C0.homogeneous()).head<3>();
 
   // Check which features are observable from camera
   std::vector<Vec2> observed;

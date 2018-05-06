@@ -192,10 +192,10 @@ SET(
   # quadrotor-quadrotor_model_test
   # quadrotor-mission_test
   # sim-bezier_test
-  sim-camera_test
-  # sim-camera_motion_test
+  # sim-camera_test
+  sim-camera_motion_test
   # sim-twowheel_test
-  # sim-world_test
+  sim-world_test
   # util-config_test
   # util-data_test
   # util-file_test

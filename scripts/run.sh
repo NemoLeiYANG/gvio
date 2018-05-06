@@ -21,6 +21,8 @@ fi
 #   --imu_topic "/gvio/imu"
 
 # BUILD
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
 mkdir -p build && cd build
 cmake .. && time make -j${CPU_COUNT}
 
@@ -30,14 +32,14 @@ cmake .. && time make -j${CPU_COUNT}
 # python3 ../scripts/plot/plot_landmarks.py /tmp/landmarks.csv /tmp/pose.csv; exit 0
 
 # EXPERIMENTS
-# cd experiments
+cd experiments
 # ./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
 # ./kitti_runner /data/kitti/raw 2011_09_26 0046 ./configs/msckf_kitti_raw-2011_09_26-0046.yaml /tmp/msckf
 # python3 scripts/plot_msckf.py /tmp/msckf/msckf; exit 0
 # ./euroc_runner /data/euroc_mav/raw/V1_01_easy ./configs/msckf_euroc_V01_01_easy.yaml /tmp/msckf
 # python3 scripts/plot_euroc_dataset.py /data/euroc_mav/raw/V1_01_easy
-# ./sim_runner ./configs/sim.yaml ./configs/msckf_sim.yaml
-# python3 scripts/plot_sim.py /tmp/sim
+./sim_runner ./configs/sim.yaml ./configs/msckf_sim.yaml
+python3 scripts/plot_sim.py /tmp/sim
 # ./tracker_benchmark /data/euroc_mav/raw/V1_01_easy; exit 0
 # python3 scripts/plot_tracker_stats.py \
 #   /home/chutsu/mono_klt \
@@ -93,10 +95,10 @@ cd tests
 # ./quadrotor-quadrotor_model_test
 # ./quadrotor-mission_test
 # ./sim-bezier_test
-./sim-camera_test
+# ./sim-camera_test
 # ./sim-camera_motion_test
 # ./sim-twowheel_test
-# ./sim-world_test
+./sim-world_test
 # ./util-config_test
 # ./util-data_test
 # ./util-file_test

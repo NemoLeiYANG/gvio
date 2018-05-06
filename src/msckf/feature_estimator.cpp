@@ -288,6 +288,14 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
     const float h = pt.at<float>(3, 0);
     p_C0_f = Vec3{x / h, y / h, z / h};
 
+    // std::cout << z1 << std::endl;
+    // std::cout << z2 << std::endl;
+    // std::cout << P0 << std::endl;
+    // std::cout << P1 << std::endl;
+    //
+    // std::cout << p_C0_f.transpose() << std::endl;
+    // exit(0);
+
     // // -- Triangulate
     // p_C0_f = lls_triangulation(z1, z2, this->T_C1_C0);
     // if (p_C0_f(2) < 0.0) {
@@ -734,8 +742,8 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   }
 
   // // Cheat by using ground truth data
-  // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
-  //   p_G_f = this->track.track[0].ground_truth;
+  // if (this->track.track0[0].ground_truth.isApprox(Vec3::Zero()) == false) {
+  //   p_G_f = this->track.track0[0].ground_truth;
   //   return 0;
   // }
 
@@ -763,10 +771,11 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // std::cout << "p_C0_f estimated: " << p_C0_f_est.transpose() << std::endl;
   // std::cout << std::endl;
 
-  // Vec3 gnd = this->track.track[0].ground_truth;
-  // std::cout << "gnd: " << gnd.transpose() << std::endl;
-  // std::cout << "est: " << p_G_f.transpose() << std::endl;
-  // std::cout << std::endl;
+  Vec3 gnd = this->track.track0[0].ground_truth;
+  std::cout << "gnd: " << gnd.transpose() << std::endl;
+  std::cout << "est: " << p_G_f.transpose() << std::endl;
+  std::cout << "diff: " << (gnd - p_G_f).norm() << std::endl;
+  std::cout << std::endl;
 
   return 0;
 }

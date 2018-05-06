@@ -33,9 +33,6 @@ struct feature_bounds {
   double z_max = 0.0;
 };
 
-#define MONOCULAR_CAMERA "MONOCULAR_CAMERA"
-#define STEREO_CAMERA "STEREO_CAMERA"
-
 /**
  * Simulation world
  */
@@ -44,17 +41,19 @@ public:
   double t = 0.0;
   double t_end = 0.0;
   double dt = 0.0;
+  double fps = 0;
   size_t time_index = 0;
   size_t frame_index = 0;
 
-  VirtualCamera camera;
-  std::string camera_type = MONOCULAR_CAMERA;
-  Mat4 T_C1_C0 = I(4);
+  std::string camera_type = "MONO_CAMERA";
+  VirtualCamera mono_camera;
+  VirtualStereoCamera stereo_camera;
   CameraMotion camera_motion;
 
   Vec3 origin{0.0, 0.0, 0.0};
   Vec3 dimensions{30.0, 30.0, 10.0};
   size_t nb_features = 1000;
+  size_t max_track_length = 20;
   MatX features3d;
 
   long track_id_counter = 0;
@@ -70,15 +69,6 @@ public:
 
   SimWorld();
   virtual ~SimWorld();
-
-  /**
-   * Configure
-   *
-   * @param t_end Time end (s)
-   * @param dt Time step (s)
-   * @returns 0 for success, -1 for failure
-   */
-  int configure(const double t_end, const double dt);
 
   /**
    * Configure
@@ -116,6 +106,16 @@ public:
   MatX create3DFeaturePerimeter(const Vec3 &origin,
                                 const Vec3 &dimensions,
                                 const size_t nb_features);
+
+  /**
+   * Detect features with mono camera
+   */
+  void detectFeaturesWithMonoCamera();
+
+  /**
+   * Detect features with stereo camera
+   */
+  void detectFeaturesWithStereoCamera();
 
   /**
    * Detect features

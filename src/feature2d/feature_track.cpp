@@ -70,9 +70,18 @@ std::ostream &operator<<(std::ostream &os, const FeatureTrack &track) {
   os << "frame_end: " << track.frame_end << std::endl;
   os << "related: " << track.related << std::endl;
   os << "length: " << track.trackedLength() << std::endl;
-  for (auto f : track.track) {
-    os << f;
+
+  if (track.type == MONO_TRACK) {
+    for (auto f : track.track) {
+      os << f;
+    }
+  } else if (track.type == STEREO_TRACK) {
+    for (size_t i = 0; i < track.track0.size(); i++) {
+      os << track.track0[i];
+      os << track.track1[i];
+    }
   }
+
   os << std::endl;
   return os;
 }

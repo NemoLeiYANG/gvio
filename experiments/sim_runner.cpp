@@ -36,6 +36,7 @@ int main(const int argc, const char *argv[]) {
     LOG_ERROR("Failed to configure simulation!");
     return -1;
   }
+  msckf.T_C1_C0 = sim.stereo_camera.T_cam1_cam0;
 
   // Initialize MSCKF
   msckf.initialize(sim.t,
