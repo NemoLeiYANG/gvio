@@ -25,8 +25,7 @@ int test_grid_fast() {
 }
 
 int benchmark_grid_fast() {
-
-  // Standard FAST corner detector
+  // Grid-FAST corner detector
   {
     const cv::Mat image = cv::imread(TEST_IMAGE);
     auto keypoints = grid_fast(image, // Input image
@@ -47,9 +46,10 @@ int benchmark_grid_fast() {
       row_index++;
     }
     mat2csv("/tmp/grid_fast.csv", data);
+    cv::imwrite("/tmp/grid_fast.png", image);
   }
 
-  // Grid-FAST corner detector
+  // Standard FAST corner detector
   {
     // Prepare input image - make sure it is grayscale
     const cv::Mat image = cv::imread(TEST_IMAGE);
@@ -78,7 +78,7 @@ int benchmark_grid_fast() {
     cv::imshow("FAST", image);
     cv::waitKey(1);
 
-    // Save keypoints to file
+    // Save image and keypoints to file
     MatX data;
     data.resize(keypoints.size(), 2);
     int row_index = 0;
@@ -88,6 +88,7 @@ int benchmark_grid_fast() {
       row_index++;
     }
     mat2csv("/tmp/fast.csv", data);
+    cv::imwrite("/tmp/fast.png", image);
   }
 
   // Visualize results
@@ -99,7 +100,7 @@ int benchmark_grid_fast() {
 
 void test_suite() {
   MU_ADD_TEST(test_grid_fast);
-  // MU_ADD_TEST(benchmark_grid_fast);
+  MU_ADD_TEST(benchmark_grid_fast);
 }
 
 } // namespace gvio

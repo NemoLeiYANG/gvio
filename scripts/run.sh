@@ -20,11 +20,11 @@ fi
 #   --bag "/home/chutsu/gvio_datasets/calibration/imu_calibration/2018-03-11-14-42-05.bag" \
 #   --imu_topic "/gvio/imu"
 
-# BUILD
-export CC=/usr/bin/clang
-export CXX=/usr/bin/clang++
-mkdir -p build && cd build
-cmake .. && time make -j${CPU_COUNT}
+# # BUILD
+# export CC=/usr/bin/clang
+# export CXX=/usr/bin/clang++
+# mkdir -p build && cd build
+# cmake .. && time make -j${CPU_COUNT}
 
 # SCRIPTS
 # python3 scripts/plot/plot_fig.py
@@ -32,7 +32,8 @@ cmake .. && time make -j${CPU_COUNT}
 # python3 ../scripts/plot/plot_landmarks.py /tmp/landmarks.csv /tmp/pose.csv; exit 0
 
 # EXPERIMENTS
-# cd experiments
+cd experiments
+python3 scripts/plot_grid_fast_results.py results/grid_fast_vs_fast
 # ./kitti_runner /data/kitti/raw 2011_09_26 0005 ./configs/msckf_kitti_raw-2011_09_26-0005.yaml /tmp/msckf
 # ./kitti_runner /data/kitti/raw 2011_09_26 0046 ./configs/msckf_kitti_raw-2011_09_26-0046.yaml /tmp/msckf
 # python3 scripts/plot_msckf.py /tmp/msckf/msckf; exit 0
