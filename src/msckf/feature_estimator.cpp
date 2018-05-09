@@ -255,64 +255,14 @@ int FeatureEstimator::initialEstimate(Vec3 &p_C0_f) {
     const Vec2 z1 = this->track.track0.front().getKeyPoint();
     const Vec2 z2 = this->track.track1.front().getKeyPoint();
 
-    // Camera 0 - projection matrix P
-    const Mat3 cam0_R = I(3);
-    const Vec3 cam0_t = zeros(3, 1);
-    const Mat34 cam0_P = pinhole_projection_matrix(I(3), cam0_R, cam0_t);
-    const cv::Mat P0 = convert(cam0_P);
-
-    // Camera 1 - projection matrix P
-    const Mat3 cam1_R = this->T_C1_C0.block(0, 0, 3, 3);
-    const Vec3 cam1_t = this->T_C1_C0.block(0, 3, 3, 1);
-    Mat34 cam1_P;
-    cam1_P.block(0, 0, 3, 3) = cam1_R;
-    cam1_P.block(0, 3, 3, 1) = cam1_t;
-    const cv::Mat P1 = convert(cam1_P);
-
-    // Construct cam0 and cam1 points for triangulation
-    cv::Mat cam0_pts(2, 1, CV_32FC1);
-    cv::Mat cam1_pts(2, 1, CV_32FC1);
-    cam0_pts.at<float>(0, 0) = (float) z1(0);
-    cam0_pts.at<float>(1, 0) = (float) z1(1);
-    cam1_pts.at<float>(0, 0) = (float) z2(0);
-    cam1_pts.at<float>(1, 0) = (float) z2(1);
-
-    // Triangulate points
-    cv::Mat pts_3d(4, 1, CV_64F);
-    cv::triangulatePoints(P0, P1, cam0_pts, cam1_pts, pts_3d);
-
-    const cv::Mat pt = pts_3d.col(0);
-    const float x = pt.at<float>(0, 0);
-    const float y = pt.at<float>(1, 0);
-    const float z = pt.at<float>(2, 0);
-    const float h = pt.at<float>(3, 0);
-    p_C0_f = Vec3{x / h, y / h, z / h};
-
-    // std::cout << z1 << std::endl;
-    // std::cout << z2 << std::endl;
-    // std::cout << P0 << std::endl;
-    // std::cout << P1 << std::endl;
-    //
-    // std::cout << p_C0_f.transpose() << std::endl;
-    // exit(0);
-
-    // // -- Triangulate
-    // p_C0_f = lls_triangulation(z1, z2, this->T_C1_C0);
-    // if (p_C0_f(2) < 0.0) {
-    //   LOG_WARN("Bad initialization: [%.2f, %.2f, %.2f]",
-    //            p_C0_f(0),
-    //            p_C0_f(1),
-    //            p_C0_f(2));
-    //   // std::cout << z1.transpose() << std::endl;
-    //   // std::cout << z2.transpose() << std::endl;
-    //   // std::cout << this->T_C1_C0 << std::endl;
-    //   // std::cout << p_C0_f.transpose() << std::endl;
-    // }
-
-    // std::cout << (z1 - z2).norm() << std::endl;
-    // std::cout << z1.transpose() << std::endl;
-    // std::cout << z2.transpose() << std::endl;
-    // std::cout << p_C0_f.transpose() << std::endl;
+    // -- Triangulate
+    p_C0_f = lls_triangulation(z1, z2, this->T_C1_C0);
+    if (p_C0_f(2) < 0.0) {
+      LOG_WARN("Bad initialization: [%.2f, %.2f, %.2f]",
+               p_C0_f(0),
+               p_C0_f(1),
+               p_C0_f(2));
+    }
 
   } else {
     FATAL("Invalid feature track type [%d]", track.type);
@@ -678,17 +628,6 @@ int CeresFeatureEstimator::setupProblem() {
     return -1;
   }
 
-  // // Cheat by initializing p_C0_f using ground truth data
-  // if (this->track.track[0].ground_truth.isApprox(Vec3::Zero()) == false) {
-  //   std::cout << "est: " << p_C0_f.transpose() << std::endl;
-  //   const Vec3 p_G_f = this->track.track[0].ground_truth;
-  //   const Vec3 p_G_C = this->track_cam_states[0].p_G;
-  //   const Mat3 C_CG = C(this->track_cam_states[0].q_CG);
-  //   p_C0_f = C_CG * (p_G_f - p_G_C);
-  //   std::cout << "gnd: " << p_C0_f.transpose() << std::endl;
-  //   std::cout << std::endl;
-  // }
-
   // Create inverse depth params (these are to be optimized)
   this->x[0] = p_C0_f(0) / p_C0_f(2); // Alpha
   this->x[1] = p_C0_f(1) / p_C0_f(2); // Beta
@@ -771,11 +710,11 @@ int CeresFeatureEstimator::estimate(Vec3 &p_G_f) {
   // std::cout << "p_C0_f estimated: " << p_C0_f_est.transpose() << std::endl;
   // std::cout << std::endl;
 
-  Vec3 gnd = this->track.track0[0].ground_truth;
-  std::cout << "gnd: " << gnd.transpose() << std::endl;
-  std::cout << "est: " << p_G_f.transpose() << std::endl;
-  std::cout << "diff: " << (gnd - p_G_f).norm() << std::endl;
-  std::cout << std::endl;
+  // Vec3 gnd = this->track.track0[0].ground_truth;
+  // std::cout << "gnd: " << gnd.transpose() << std::endl;
+  // std::cout << "est: " << p_G_f.transpose() << std::endl;
+  // std::cout << "diff: " << (gnd - p_G_f).norm() << std::endl;
+  // std::cout << std::endl;
 
   return 0;
 }

@@ -82,7 +82,7 @@ cv::Matx33d skew(const cv::Vec3d &v) {
 }
 
 std::vector<cv::KeyPoint>
-sort_keypoints(const std::vector<cv::KeyPoint> keypoints) {
+sort_keypoints(const std::vector<cv::KeyPoint> keypoints, const size_t limit) {
   if (keypoints.size() == 0) {
     return std::vector<cv::KeyPoint>();
   }
@@ -102,6 +102,9 @@ sort_keypoints(const std::vector<cv::KeyPoint> keypoints) {
   std::vector<cv::KeyPoint> keypoints_sorted;
   for (size_t i = 0; i < keypoints.size(); i++) {
     keypoints_sorted.push_back(keypoints[index[i]]);
+    if (keypoints_sorted.size() == limit) {
+      break;
+    }
   }
 
   return keypoints_sorted;

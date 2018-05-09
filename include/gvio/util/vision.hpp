@@ -102,10 +102,11 @@ cv::Matx33d skew(const cv::Vec3d &v);
  * Sort Keypoints
  *
  * @param keypoints
+ * @param limit
  * @returns Sorted keypoints by response
  */
-std::vector<cv::KeyPoint>
-sort_keypoints(const std::vector<cv::KeyPoint> keypoints);
+std::vector<cv::KeyPoint> sort_keypoints(
+    const std::vector<cv::KeyPoint> keypoints, const size_t limit = 0);
 
 /** @} group vision */
 } // namespace gvio

@@ -1,5 +1,5 @@
 # General Settings
-max_window_size: 30
+max_window_size: 20
 max_nb_tracks: 200
 min_track_length: 15
 enable_ns_trick: true
@@ -14,7 +14,7 @@ imu:
     ba_init_var: [0.01, 0.01, 0.01]
     p_init_var: [0.2, 0.2, 0.2]
   process_noise:
-    w_var: [5e-2, 5e-2, 5e-2]
+    w_var: [5e-3, 5e-3, 5e-3]
     dbg_var: [1e-3, 1e-3, 1e-3]
     a_var: [1e-2, 1e-2, 1e-2]
     dba_var: [1e-2, 1e-2, 1e-2]
@@ -28,4 +28,4 @@ camera:
     q_CI: [0.50243, -0.491157, 0.504585, -0.50172]
 
   measurement_noise:
-    img_var: 1e-1
+    img_var: 1.0e-2

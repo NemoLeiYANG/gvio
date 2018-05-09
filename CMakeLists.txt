@@ -177,7 +177,7 @@ SET(
   # feature2d-gms_matcher_test
   # feature2d-klt_tracker_test
   # feature2d-orb_tracker_test
-  # feature2d-grid_fast_test
+  feature2d-grid_fast_test
   # feature2d-stereo_orb_tracker_test
   # feature2d-stereo_klt_tracker_test
   # gimbal-gmr-gmr_test
@@ -193,9 +193,9 @@ SET(
   # quadrotor-mission_test
   # sim-bezier_test
   # sim-camera_test
-  sim-camera_motion_test
+  # sim-camera_motion_test
   # sim-twowheel_test
-  sim-world_test
+  # sim-world_test
   # util-config_test
   # util-data_test
   # util-file_test
